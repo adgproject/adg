@@ -72,12 +72,8 @@ print 'Tri en cours'
 for diagram in adjmtrx:
     while True:
         sumcol = []
-        for row in range(0,norder):
-            sumcol.append(diagram[:,row].sum())
-        #print 'trace av',diagram.trace()
-        #print adjmtrx[0]
-        #print sumcol
-        #print nbody
+        for col in range(0,norder):
+            sumcol.append(diagram[:,col].sum())
         t1 = all(va == nbody for va in sumcol)
         t2 = (diagram.trace() == 0)
         t3 = (diagram[line].sum() == nbody)
@@ -90,7 +86,34 @@ for diagram in adjmtrx:
         else:
             print "Done !"
             break
-print adjmtrx
+print 'original'
+print adjmtrx[0]
+diaginit = copy.deepcopy(adjmtrx[0])
+###Column permutations
+while True:
+    #diagpermut = copy.deepcopy(adjmtrx[1])
+    diagpermut = copy.deepcopy(adjmtrx[0])
+    print diagpermut
+    sumcol2 =[]
+    t1 = all(va == nbody for va in sumcol2)
+    t2 = (diagpermut.trace() == 0)
+    t3 = (diagpermut[line].sum() == nbody)
+    eq1 = np.array_equal(diagpermut,diaginit)
+    print eq1
+    #if (not t1 or not t2 or not t3 or eq1):
+    if (not eq1):
+        print 'plop'
+        print diagpermut
+        for col in range(0,norder):
+            random.shuffle(diagpermut[:,col])
+        print 'apres'
+        print diagpermut
+        continue
+    else:
+        break
+
+
+### Graph part (computing, writing, drawing)        
 G=[]
 for diagram in adjmtrx:
     G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph()))
