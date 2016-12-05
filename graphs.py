@@ -125,50 +125,48 @@ for diagram in adjmtrx:
             print "Done !"
             print matpermut
             diagrams.append(matpermut)
-print 'original'
-print adjmtrx[0]
-print "Number of diagrams, ",len(diagrams)
-diaginit = copy.deepcopy(adjmtrx[0])
-###Column permutations
-#while True:
-#    #diagpermut = copy.deepcopy(adjmtrx[1])
-#    diagpermut = copy.deepcopy(adjmtrx[0])
-#    print diagpermut
-#    sumcol2 =[]
-#    t1 = all(va == nbody for va in sumcol2)
-#    t2 = (diagpermut.trace() == 0)
-#    t3 = (diagpermut[line].sum() == nbody)
-#    eq1 = np.array_equal(diagpermut,diaginit)
-#    print eq1
-#    #if (not t1 or not t2 or not t3 or eq1):
-#    if (not eq1):
-#        print 'plop'
-#        print diagpermut
-#        for col in range(0,norder):
-#            random.shuffle(diagpermut[:,col])
-#        print 'apres'
-#        print diagpermut
-#        continue
-#    else:
-#        break
-#
+numdiag = len(diagrams)
+print "Number of diagrams, ",numdiag
 
 ### Graph part (computing, writing, drawing)        
 G=[]
+sizegraph = norder*100 
 for diagram in diagrams:
     G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph()))
 
-for i in range(0,numpart):
+
+for i in range(0,numdiag):
+    pos = []
+    for vertex in range(0,norder):
+        if (vertex == 0):
+           pos.append("%i" % vertex +' [pos = "0,0",shape=circle,fixedsize=true,width=1.2] \n ')
+        else:
+           position = sizegraph*(vertex)/(norder-1)
+           pos.append( "%i" % vertex +' [pos = "0,%i"' % position + ',shape=circle,fixedsize=true,width=1]\n ')
+for i in range(0,numdiag):
     write_dot(G[i],'diag_%i.dot' % i)
 
-for i in range(0,numpart):
-    for line in fileinput.FileInput('diag_%i.dot' % i,inplace=1):
-        if "digraph" in line:
-            line=line.replace(line,line+'splines=true \n sep = 1\n overlap = false;ratio="fill";margin=0;\n' + 
-            ' node[label =""]\n 0 [pos = "0,0",shape=circle,fixedsize=true,width=1.2] \n 1 [pos = "0,150",shape=circle,fixedsize=true,width=1]\n 2 [pos = "0,300",shape=circle,fixedsize=true,width=1.2] \n')
-        print line,
+def replace_line(file_name, line_num, text):
+    lines = open(file_name, 'r').readlines()
+    lines[line_num] = text
+    out = open(file_name, 'w')
+    out.writelines(lines)
+    out.close()
 
-for i in range(0,numpart):
+for i in range(0,numdiag):
+    
+    line = "digraph  {\n"+'splines=true \n sep = 1\n overlap = false;ratio="fill";margin=0;\n'+' node[label =""]\n'.join(pos)
+    replace_line('diag_%i.dot' % i,0,line)
+#    for line in fileinput.FileInput('diag_%i.dot' % i,inplace=1):
+#        p += 1
+#        if "digraph" in line:
+#            line=line.replace(line,line+'splines=true \n sep = 1\n overlap = false;ratio="fill";margin=0;\n' + 
+#            ' node[label =""]\n'.join(pos)) 
+#            print line
+
+
+for i in range(0,numdiag):
+    #os.system("neato diag_%i.dot" % i + " -n -Tpng -o diag_%i.png" %i)
     os.system("neato diag_%i.dot" % i + " -n -Tpng -o diag_%i.png" %i)
 
 
