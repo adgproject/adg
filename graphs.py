@@ -9,6 +9,7 @@ from collections import deque
 import matplotlib.pyplot as plt
 import networkx as nx
 import random
+import itertools
 import sys
 from networkx.drawing.nx_agraph import write_dot
 import fileinput
@@ -55,8 +56,16 @@ print 'numpart'
 print numpart
 
 
-for partition in adjcoeff:
-    adjmtrx.append((partition*norder+tuple([0]*(norder**2-len(partition*norder)))))
+print adjcoeff,type(adjcoeff[1])
+
+for item in itertools.combinations_with_replacement(adjcoeff, r=norder):
+    flattupl = sum(item,())
+    adjmtrx.append(flattupl+tuple([0]*(norder**2-len(flattupl))))
+
+print adjmtrx
+
+#for partition in adjcoeff:
+#    adjmtrx.append((partition*norder+tuple([0]*(norder**2-len(partition*norder)))))
 
 
 icount = 0
