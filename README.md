@@ -16,6 +16,6 @@ Pour faire tourner le code il faut une installation de Python > 2.7.1
 ### Utilisation ###
 (A modifier pour gagner en vitesse)
 Pour lancer la génération des diagrames:
-	python grahph.py
+	python adg.py
 
 
