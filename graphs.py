@@ -13,8 +13,23 @@ import itertools
 import sys
 from networkx.drawing.nx_agraph import write_dot
 import fileinput
+from joblib import Parallel, delayed
+import multiprocessing
 
 
+
+print "#####################"
+print "# Automatic Diagram #"
+print "#     Generator     #"
+print "#    RDL,JR,PA,MD   #"
+print "#####################"
+
+print "Parallel Mode"
+num_cores = multiprocessing.cpu_count()
+print "There is %i" % num_cores + "available"
+print "Running"
+
+## Compute all the partitions for a given n
 def partition(n):
     """ A function which computes the numbers of partitions and return them into an list """
     part_of = []
@@ -99,25 +114,11 @@ def perm_unique_helper(listunique,result_list,d):
                 for g in  perm_unique_helper(listunique,result_list,d-1):
                     yield g
                 i.occurrences+=1
-
-
-#poss_lines = [[] for _ in range(norder)]
-#poss_lines.remove(0)
-
-
-
-
-
-    
-#    for line in range(0,norder):
-#            adjmtrx[icount][line] = element 
-#    icount += 1
-
-#print adjmtrx
 print "Size,",len(adjmtrx[0])
 print adjmtrx[0]
 diagrams = []
 print 'Tri en cours'
+adjmtrx = list(set(adjmtrx))
 for diagram in adjmtrx:
     permuts = perm_unique(diagram)
     for permutation in permuts:
@@ -144,6 +145,8 @@ for diagram in diagrams:
     G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph()))
 
 
+
+## Optimizing the position of each vertex for the set of diagrams
 for i in range(0,numdiag):
     pos = []
     for vertex in range(0,norder):
@@ -152,9 +155,12 @@ for i in range(0,numdiag):
         else:
            position = sizegraph*(vertex)/(norder-1)
            pos.append( "%i" % vertex +' [pos = "0,%i"' % position + ',shape=circle,fixedsize=true,width=1]\n ')
+
+## Writing a dot file for each graph
 for i in range(0,numdiag):
     write_dot(G[i],'diag_%i.dot' % i)
 
+## Function to replace a specific line of a textfile
 def replace_line(file_name, line_num, text):
     lines = open(file_name, 'r').readlines()
     lines[line_num] = text
@@ -162,20 +168,13 @@ def replace_line(file_name, line_num, text):
     out.writelines(lines)
     out.close()
 
+## Plotting features
 for i in range(0,numdiag):
-    
     line = "digraph  {\n"+'splines=true \n sep = 1\n overlap = false;ratio="fill";margin=0;\n'+' node[label =""]\n'.join(pos)
     replace_line('diag_%i.dot' % i,0,line)
-#    for line in fileinput.FileInput('diag_%i.dot' % i,inplace=1):
-#        p += 1
-#        if "digraph" in line:
-#            line=line.replace(line,line+'splines=true \n sep = 1\n overlap = false;ratio="fill";margin=0;\n' + 
-#            ' node[label =""]\n'.join(pos)) 
-#            print line
 
-
+## Printing
 for i in range(0,numdiag):
-    #os.system("neato diag_%i.dot" % i + " -n -Tpng -o diag_%i.png" %i)
     os.system("neato diag_%i.dot" % i + " -n -Tpng -o diag_%i.png" %i)
 
 
