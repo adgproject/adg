@@ -88,11 +88,13 @@ G=[]
 sizegraph = norder*100
 for diagram in diagrams:
     G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph()))
+print diagrams[1]
+G1=[]
 for diag in G:
     #if (not nx.is_strongly_connected(diag)):
-    if(nx.number_strongly_connected_components(diag) != 1):
-        G.remove(diag)
-
+    if((nx.number_strongly_connected_components(diag)) == 1):
+        G1.append(diag)
+G=G1
 numdiag = len(G)
 print "Time ellapsed: ",datetime.now() - start_time
 print "Number of connected diagrams, ",numdiag
