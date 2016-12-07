@@ -16,6 +16,7 @@ import itertools
 #from joblib import Parallel, delayed
 import multiprocessing
 from datetime import datetime
+import string
 
 
 print "#####################"
@@ -78,8 +79,8 @@ i = 0
 with open("Diagrams.list", "w") as f:
     for diagram in diagrams:
         f.write("Diagram n: %i" % i)
-        #np.savetxt(f,diagram)
-        diagram.tofile(f,"")
+        np.savetxt(f,diagram)
+        #diagram.tofile(f,"")
         f.write("\n")
         i += 1
 
@@ -87,7 +88,7 @@ with open("Diagrams.list", "w") as f:
 G=[]
 sizegraph = norder*100
 for diagram in diagrams:
-    G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph()))
+    G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph(),parallel_edges=True))
 print diagrams[1]
 G1=[]
 for diag in G:
@@ -98,6 +99,37 @@ G=G1
 numdiag = len(G)
 print "Time ellapsed: ",datetime.now() - start_time
 print "Number of connected diagrams, ",numdiag
+
+
+### Algebraic expressions:
+### CAVEAT !!! This works only for MBPT-Theory
+
+def line_label(n):
+    labels=list(string.ascii_lowercase)
+    return labels[n]
+
+def mat_elements(irow):
+    return 
+###
+
+for diag in G:
+    #Beware of the sign convention !!!
+    mat_els = []
+    incidence = - nx.incidence_matrix(diag,oriented=True).todense()
+    nrow = diag.number_of_nodes()
+    ncol = diag.number_of_edges()
+    for row in range(nrow):
+        ket = ''
+        bra = ''
+        for col in range(ncol):
+            if (incidence[row,col] == 1):
+                bra = bra + line_label(col) 
+            if (incidence[row,col] == -1):
+                ket = ket + line_label(col)
+        mat_els.append('<'+bra+'|H|'+ket+'>')
+
+    print mat_els
+
 
 ## Optimizing the position of each vertex for the set of diagrams
 for i in range(0,numdiag):
