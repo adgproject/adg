@@ -110,8 +110,13 @@ print "Number of connected diagrams, ",numdiag
 ### Algebraic expressions:
 ### CAVEAT !!! This works only for MBPT
 
-def line_label(n):
+def line_label_h(n):
     labels=list(string.ascii_lowercase)
+    labels=labels[0:15]
+    return labels[n]
+def line_label_p(n):
+    labels=list(string.ascii_lowercase)
+    labels=labels[15:-1]
     return labels[n]
 
 def mat_elements(irow):
@@ -125,6 +130,7 @@ denoms = []
 phases = []
 nedges_eq = []
 for diag in G:
+    type_edg =[]
     braket = ''
     #Beware of the sign convention !!!
     incidence = - nx.incidence_matrix(diag,oriented=True).todense()
@@ -136,6 +142,9 @@ for diag in G:
         flat = list(incidence[:,col].A1)
         if(flat.index(1) < flat.index(-1)):
             n_holes += 1
+            type_edg.append('h')
+        else:
+            type_edg.append('p')
         diffcols.add(repr(flat))
 
     for row in range(nrow):
@@ -144,9 +153,15 @@ for diag in G:
         for col in range(ncol):
         ######### Mtrx Elements ###########
             if (incidence[row,col] == 1):
-                bra = bra + line_label(col) 
+                if (type_edg[col] == 'h'):
+                    bra = bra + line_label_h(col) 
+                else:
+                    bra = bra + line_label_p(col) 
             if (incidence[row,col] == -1):
-                ket = ket + line_label(col)
+                if (type_edg[col] == 'h'):
+                    ket = ket + line_label_h(col) 
+                else:
+                    ket = ket + line_label_p(col) 
         ###################################
         braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
     mat_els.append(braket)
@@ -156,9 +171,15 @@ for diag in G:
         for col in range(ncol):
             val_test = incidence[0:row,col].sum()
             if (val_test == 1):
-                denom=denom+' +E_'+line_label(col)
+                if (type_edg[col] == 'h'):
+                    denom=denom+' +E_'+line_label_h(col)
+                else:
+                    denom=denom+' +E_'+line_label_p(col)
             if (val_test == -1):
-                denom=denom+'-E_'+line_label(col)
+                if (type_edg[col] == 'h'):
+                    denom=denom+'-E_'+line_label_h(col)
+                else:
+                    denom=denom+'-E_'+line_label_p(col)
         denom = denom+')'
     if ('( +' in denom):
         denom = denom.replace('( +','(')
@@ -173,7 +194,8 @@ for diag in G:
     #### CAVEAT !!! Valid only for *MBPT*
     nedges_eq.append(2**n_sym)
     #print "After neqlines"
-
+    #### Loops
+    
 
 ## Optimizing the position of each vertex for the set of diagrams
 for i in range(0,numdiag):
