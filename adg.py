@@ -123,6 +123,7 @@ def mat_elements(irow):
 mat_els = []
 denoms = []
 phases = []
+nedges_eq = []
 for diag in G:
     braket = ''
     #Beware of the sign convention !!!
@@ -164,10 +165,15 @@ for diag in G:
     denom = denom.strip(' ')
     denoms.append(denom) 
     phases.append('(-1)^{%i' % n_holes + '+l}')
+    #print incidence
+    eq_lines=np.array(incidence.transpose())
+    #neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines)))).transpose()
+    neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines))))
+    #print neq_lines
+    n_sym = len(eq_lines)-len(neq_lines)
+    nedges_eq.append(n_sym)
+    #print "After neqlines"
 
-   
-
-    
 
 ## Optimizing the position of each vertex for the set of diagrams
 for i in range(0,numdiag):
@@ -235,7 +241,7 @@ if (not pdiag or not pdraw):
     latex_file.write(enddoc)
 else:
     for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{N!}"+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        diag_exp = "\dfrac{1}{%i!}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
