@@ -108,7 +108,7 @@ print "Number of connected diagrams, ",numdiag
 
 
 ### Algebraic expressions:
-### CAVEAT !!! This works only for MBPT-Theory
+### CAVEAT !!! This works only for MBPT
 
 def line_label(n):
     labels=list(string.ascii_lowercase)
@@ -169,9 +169,9 @@ for diag in G:
     eq_lines=np.array(incidence.transpose())
     #neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines)))).transpose()
     neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines))))
-    #print neq_lines
     n_sym = len(eq_lines)-len(neq_lines)
-    nedges_eq.append(n_sym)
+    #### CAVEAT !!! Valid only for *MBPT*
+    nedges_eq.append(2**n_sym)
     #print "After neqlines"
 
 
@@ -208,7 +208,9 @@ if (pdraw):
 
 ## Printing
     for i in range(0,numdiag):
-        os.system("neato " +directory+"/Diagrams/diag_%i.dot" % i + " -n -Tpng -o"+directory+"/Diagrams/diag_%i.png" %i)
+        os.system("dot " +directory+"/Diagrams/diag_%i.dot" % i + " -Tpng -o"+directory+"/Diagrams/diag_%i.png" %i)
+        ## "Pretty but misleading"
+        #os.system("neato " +directory+"/Diagrams/diag_%i.dot" % i + " -n -Tpng -o"+directory+"/Diagrams/diag_%i.png" %i)
 
 
 
@@ -224,6 +226,7 @@ if (norder > 3):
 if (land):
     header = header + "\usepackage[landscape]{geometry}\n"
 
+header = header + "\\title{Diagrams and algebraic expressions at order %i" % norder +" in MBPT}\n"
 latex_file = open(directory + '/result.tex','w')
 latex_file.write(header)
 begdoc ="\\begin{document}\n"
@@ -231,17 +234,18 @@ enddoc ="\\end{document}"
 begeq = "\\begin{equation}\n"
 endeq = "\\end{equation}\n"
 latex_file.write(begdoc)
+latex_file.write("\maketitle\n")
 latex_file.write("\\graphicspath{{Diagrams/}}")
 if (not pdiag or not pdraw):
     for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{N!}"+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
     latex_file.write(enddoc)
 else:
     for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{%i!}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
