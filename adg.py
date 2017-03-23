@@ -10,13 +10,13 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random
 import sys
-from networkx.drawing.nx_agraph import write_dot
 import fileinput
 import itertools
 #from joblib import Parallel, delayed
 import multiprocessing
 from datetime import datetime
 import string
+import shutil
 
 
 print "#####################"
@@ -78,7 +78,7 @@ def diagram_generation(n):
 
 print "Running"
 start_time = datetime.now()
-diagrams = diagram_generation(norder) 
+diagrams = diagram_generation(norder)
 numdiag = len(diagrams)
 print "Number of possible diagrams, ",numdiag
 
@@ -91,7 +91,7 @@ with open(directory+"/Diagrams.list", "w") as f:
         f.write("\n")
         i += 1
 
-### Graph part (computing, writing, drawing)        
+### Graph part (computing, writing, drawing)
 G=[]
 sizegraph = norder*100
 for diagram in diagrams:
@@ -120,9 +120,9 @@ def line_label_p(n):
     return labels[n]
 
 def mat_elements(irow):
-    return 
+    return
 
-    
+
 ###
 
 mat_els = []
@@ -154,14 +154,14 @@ for diag in G:
         ######### Mtrx Elements ###########
             if (incidence[row,col] == 1):
                 if (type_edg[col] == 'h'):
-                    bra = bra + line_label_h(col) 
+                    bra = bra + line_label_h(col)
                 else:
-                    bra = bra + line_label_p(col) 
+                    bra = bra + line_label_p(col)
             if (incidence[row,col] == -1):
                 if (type_edg[col] == 'h'):
-                    ket = ket + line_label_h(col) 
+                    ket = ket + line_label_h(col)
                 else:
-                    ket = ket + line_label_p(col) 
+                    ket = ket + line_label_p(col)
         ###################################
         braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
     mat_els.append(braket)
@@ -184,7 +184,7 @@ for diag in G:
     if ('( +' in denom):
         denom = denom.replace('( +','(')
     denom = denom.strip(' ')
-    denoms.append(denom) 
+    denoms.append(denom)
     phases.append('(-1)^{%i' % n_holes + '+l}')
     #print incidence
     eq_lines=np.array(incidence.transpose())
@@ -195,7 +195,7 @@ for diag in G:
     nedges_eq.append(2**n_sym)
     #print "After neqlines"
     #### Loops
-    
+
 
 ## Optimizing the position of each vertex for the set of diagrams
 for i in range(0,numdiag):
@@ -207,33 +207,85 @@ for i in range(0,numdiag):
            position = sizegraph*(vertex)/(norder-1)
            pos.append( "%i" % vertex +' [pos = "0,%i"' % position + ',shape=circle,fixedsize=true,width=1]\n ')
 
+## Function generating the feynmanmf instructions
+def feynmf_generator(diag,theory,diag_name):
+    p_order = diag.number_of_nodes()
+    diag_size = 20*p_order
+
+    theories = ["MBPT","BMBPT","SCGF"]
+    th_index = theories.index(theory)
+    prop_types = ["half_prop","prop_pm","double_arrow"]
+    prop = prop_types[th_index]
+
+    file_name = diag_name + ".tex"
+
+    feynmf_file = open(file_name,'w')
+
+    begin_file = "\parbox{%i" %diag_size +"pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" %diag_size + ",%i)\n" %diag_size
+    end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
+
+    if p_order >= 2:
+        feynmf_file.write(begin_file)
+        feynmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" %(p_order-1))
+        feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}\n")
+        feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %(p_order-1))
+
+        if p_order > 2:
+            feynmf_file.write("\\fmf{phantom}{v0,v1}\n")
+            for vertex in range(1,p_order-2):
+                feynmf_file.write("\\fmf{phantom}{v%i" %vertex + ",v%i}\n" %(vertex+1))
+                feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %vertex)
+
+            feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %(p_order-2))
+            feynmf_file.write("\\fmf{phantom}{v%i,"%(p_order-2) + "v%i}\n" %(p_order-1))
+            feynmf_file.write("\\fmffreeze\n")
+
+        oriented_adj_mat = []
+        for i in range(0,p_order):
+            oriented_adj_mat.append([])
+            for j in range(0,p_order):
+                oriented_adj_mat[i].append(0)
+
+        for line in nx.generate_edgelist(diag,data=False):
+            i = int(line[0])
+            j = int(line[2])
+            oriented_adj_mat[i][j] =+ 1
+
+        for i in range(0,p_order):
+            for j in range(0,p_order):
+                if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0): ## Vertex consecutifs
+                    if oriented_adj_mat[i][j] == 1:
+                        feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
+                    else:
+                        feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
+                        feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
+
+                        if oriented_adj_mat[i][j] == 3:
+                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
+                        elif oriented_adj_mat[i][j] == 4:
+                            feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
+                            feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
+
+                elif (i != j) and (oriented_adj_mat[i][j] != 0): ## Vertex non consecutifs non diagonaux
+                    feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
+                    if oriented_adj_mat[i][j] == 1:
+                        break
+                    feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
+                    if oriented_adj_mat[i][j] == 2:
+                        break
+                    feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
+        feynmf_file.write(end_file)
+    else:
+        print "Perturbative order too small"
+
 ## Writing a dot file for each graph
-msg = 'Generate and plot diagrams ?'
+msg = 'Generate diagrams feymanmf instructions ?'
 pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if (pdraw):
     for i in range(0,numdiag):
-        write_dot(G[i],directory+'/Diagrams/diag_%i.dot' % i)
-
-## Function to replace a specific line of a textfile
-def replace_line(file_name, line_num, text):
-    lines = open(file_name, 'r').readlines()
-    lines[line_num] = text
-    out = open(file_name, 'w')
-    out.writelines(lines)
-    out.close()
-
-## Plotting features
-if (pdraw):
-    for i in range(0,numdiag):
-        line = "digraph  {\n"+'splines=true \n sep = 1\n overlap = false;ratio="fill";margin=0;\n'+' node[label =""]\n'.join(pos)
-        replace_line(directory+'/Diagrams/diag_%i.dot' % i,0,line)
-
-## Printing
-    for i in range(0,numdiag):
-        os.system("dot " +directory+"/Diagrams/diag_%i.dot" % i + " -Tpng -o"+directory+"/Diagrams/diag_%i.png" %i)
-        ## "Pretty but misleading"
-        #os.system("neato " +directory+"/Diagrams/diag_%i.dot" % i + " -n -Tpng -o"+directory+"/Diagrams/diag_%i.png" %i)
-
+        diag_name = 'diag_%i' %i
+        feynmf_generator(G[i],"MBPT",diag_name)
+        shutil.move(diag_name +'.tex', directory + "/Diagrams/" + diag_name + '.tex')
 
 
 msg = 'Include diagrams in tex ?'
@@ -241,6 +293,8 @@ pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
 ### Latexisation
 header = "\documentclass[10pt,a4paper]{article}\n \usepackage[utf8]{inputenc}\n\usepackage{braket}\n\usepackage{graphicx}\n"
 header = header + "\usepackage[english]{babel}\n\usepackage{amsmath}\n\usepackage{amsfonts}\n\usepackage{amssymb}\n"
+if pdiag:
+    header = header + "\usepackage[force]{feynmp-auto}\n"
 land = False
 if (norder > 3):
     msg = 'Expressions may be long rotate pdf ?'
@@ -271,8 +325,9 @@ else:
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
-        latex_file.write('\\begin{center}\n')
-        latex_file.write("\\includegraphics[scale=0.15]{diag_%i" %i_diag +".png}\n")
+        latex_file.write('\n\\begin{center}\n')
+        diag_file = open(directory+"/Diagrams/diag_%i.tex" %i_diag)
+        latex_file.write(diag_file.read())
         latex_file.write('\\end{center}\n')
     latex_file.write(enddoc)
 latex_file.close()
@@ -280,9 +335,8 @@ latex_file.close()
 msg = 'Compile pdf ?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if (pdfcompile):
-    os.chdir(directory) 
+    os.chdir(directory)
     os.system("pdflatex result.tex")
+    if pdiag:
+        os.system("pdflatex result.tex")
     print "Result saved in "+directory +'/result.pdf'
-    
-
-
