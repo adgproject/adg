@@ -249,7 +249,7 @@ def feynmf_generator(diag,theory,diag_name):
         for line in nx.generate_edgelist(diag,data=False):
             i = int(line[0])
             j = int(line[2])
-            oriented_adj_mat[i][j] =+ 1
+            oriented_adj_mat[i][j] += 1
 
         for i in range(0,p_order):
             for j in range(0,p_order):
