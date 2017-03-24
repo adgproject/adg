@@ -345,4 +345,8 @@ if (pdfcompile):
     os.system("pdflatex result.tex")
     if pdiag:
         os.system("pdflatex result.tex")
+        for i_diag in range(0,numdiag):
+            os.unlink("diag_%i.1" %i_diag)
+            os.unlink("diag_%i.mp" %i_diag)
+            os.unlink("diag_%i.log" %i_diag)
     print "Result saved in "+directory +'/result.pdf'
