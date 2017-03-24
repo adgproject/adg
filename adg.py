@@ -280,6 +280,8 @@ def feynmf_generator(diag,theory,diag_name):
 msg = 'Generate diagrams feymanmf instructions ?'
 pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if (pdraw):
+    shutil.copy('feynmp.mp', directory + '/feynmp.mp')
+    shutil.copy('feynmp.sty', directory + '/feynmp.sty')
     for i in range(0,numdiag):
         diag_name = 'diag_%i' %i
         feynmf_generator(G[i],"MBPT",diag_name)
