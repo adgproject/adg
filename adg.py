@@ -255,7 +255,10 @@ def feynmf_generator(diag,theory,diag_name):
             for j in range(0,p_order):
                 if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0): ## Vertex consecutifs
                     if oriented_adj_mat[i][j] == 1:
-                        feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
+                        if oriented_adj_mat[j][i] !=1:
+                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
+                        else:
+                            feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
                     else:
                         feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
                         feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
