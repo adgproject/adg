@@ -268,12 +268,10 @@ def feynmf_generator(diag,theory,diag_name):
 
                 elif (i != j) and (oriented_adj_mat[i][j] != 0): ## Vertex non consecutifs non diagonaux
                     feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
-                    if oriented_adj_mat[i][j] == 1:
-                        break
-                    feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
-                    if oriented_adj_mat[i][j] == 2:
-                        break
-                    feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
+                    if oriented_adj_mat[i][j] != 1:
+                        feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
+                        if oriented_adj_mat[i][j] != 2:
+                            feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
         feynmf_file.write(end_file)
     else:
         print "Perturbative order too small"
