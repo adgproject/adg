@@ -68,6 +68,21 @@ def v0_specs(matrices):
             v0_specs_ok.append(matrix)
     return v0_specs_ok
 
+#Select out matrices with loops between two vertices
+def no_loop(matrices):
+    no_loop = []
+    for matrix in matrices:
+        test = True
+        line = matrix[0]
+        for i in range(len(matrix[0])):
+            for j in range(i):
+                if (matrix[i][j] != 0) and (matrix[j][i] != 0):
+                    test = False
+                    break
+        if test:
+            no_loop.append(matrix)
+    return no_loop
+
 def diagram_generation(n):
     seeds = seed(n)
     all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
