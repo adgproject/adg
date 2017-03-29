@@ -93,7 +93,6 @@ with open(directory+"/Diagrams.list", "w") as f:
 
 ### Graph part (computing, writing, drawing)
 G=[]
-sizegraph = norder*100
 for diagram in diagrams:
     G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph(),parallel_edges=True))
 G1=[]
@@ -196,16 +195,6 @@ for diag in G:
     #print "After neqlines"
     #### Loops
 
-
-## Optimizing the position of each vertex for the set of diagrams
-for i in range(0,numdiag):
-    pos = []
-    for vertex in range(0,norder):
-        if (vertex == 0):
-           pos.append("%i" % vertex +' [pos = "0,0",shape=circle,fixedsize=true,width=1] \n ')
-        else:
-           position = sizegraph*(vertex)/(norder-1)
-           pos.append( "%i" % vertex +' [pos = "0,%i"' % position + ',shape=circle,fixedsize=true,width=1]\n ')
 
 ## Function generating the feynmanmf instructions
 def feynmf_generator(diag,theory,diag_name):
