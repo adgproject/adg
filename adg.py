@@ -83,6 +83,22 @@ def no_loop(matrices):
             no_loop.append(matrix)
     return no_loop
 
+#Check the degrees of the vertices (i.e. its effective one- or two-body structure)
+def check_degree(matrices):
+    deg_ok = []
+    for matrix in matrices:
+        test = True
+        for i in range(len(matrix[0])):
+            degree = 0
+            for j in range(len(matrix[0])):
+                degree += matrix[i][j] + matrix[j][i]
+            if (degree != 2) and (degree != 4):
+                test = False
+                break
+        if test:
+            deg_ok.append(matrix)
+    return deg_ok
+
 def diagram_generation(n):
     seeds = seed(n)
     all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
@@ -138,7 +154,8 @@ def BMBPT_generation(p_order):
                     matrices.append(mat_4)
                 temp_matrices = copy.deepcopy(matrices)
             print matrices
-    mat_wo_loops = no_loop(matrices)
+    good_degree = check_degree(matrices)
+    mat_wo_loops = no_loop(good_degree)
     matricesUniq = []
     for i in mat_wo_loops:
             if i not in matricesUniq:
