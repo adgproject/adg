@@ -105,9 +105,56 @@ def diagram_generation(n):
         diagrams.append(np.array(el))
     return diagrams
 
+def BMBPT_generation(p_order):
+    empty_mat = []
+    for i in range(0,p_order):
+        empty_mat.append([])
+        for j in range(0,p_order):
+            empty_mat[i].append(0)
+
+    print empty_mat
+    matrices = []
+    temp_matrices = []
+    temp_matrices.append(empty_mat)
+
+    for i in range(1,p_order):
+        for j in range(p_order):
+
+            if i != j:
+                matrices = []
+                for mat in temp_matrices:
+                    matrices.append(mat)
+                    mat_1 = copy.deepcopy(mat)
+                    mat_1[i][j] = 1
+                    matrices.append(mat_1)
+                    mat_2 = copy.deepcopy(mat)
+                    mat_2[i][j] = 2
+                    matrices.append(mat_2)
+                    mat_3 = copy.deepcopy(mat)
+                    mat_3[i][j] = 3
+                    matrices.append(mat_3)
+                    mat_4 = copy.deepcopy(mat)
+                    mat_4[i][j] = 4
+                    matrices.append(mat_4)
+                temp_matrices = copy.deepcopy(matrices)
+            print matrices
+    mat_wo_loops = no_loop(matrices)
+    matricesUniq = []
+    for i in mat_wo_loops:
+            if i not in matricesUniq:
+                    matricesUniq.append(i)
+    matricesUniq.sort(reverse=True)
+    diagrams = []
+    for el in matricesUniq:
+        diagrams.append(np.array(el))
+    print diagrams
+    print
+    return diagrams
+
 print "Running"
 start_time = datetime.now()
-diagrams = diagram_generation(norder)
+#diagrams = diagram_generation(norder)
+diagrams = BMBPT_generation(norder)
 numdiag = len(diagrams)
 print "Number of possible diagrams, ",numdiag
 
@@ -127,7 +174,7 @@ for diagram in diagrams:
 G1=[]
 for diag in G:
     #if (not nx.is_strongly_connected(diag)):
-    if((nx.number_strongly_connected_components(diag)) == 1):
+    if((nx.number_weakly_connected_components(diag)) == 1):
         G1.append(diag)
 G=G1
 numdiag = len(G)
@@ -138,91 +185,91 @@ print "Number of connected diagrams, ",numdiag
 ### Algebraic expressions:
 ### CAVEAT !!! This works only for MBPT
 
-def line_label_h(n):
-    labels=list(string.ascii_lowercase)
-    labels=labels[0:15]
-    return labels[n]
-def line_label_p(n):
-    labels=list(string.ascii_lowercase)
-    labels=labels[15:-1]
-    return labels[n]
-
-def mat_elements(irow):
-    return
+# def line_label_h(n):
+#     labels=list(string.ascii_lowercase)
+#     labels=labels[0:15]
+#     return labels[n]
+# def line_label_p(n):
+#     labels=list(string.ascii_lowercase)
+#     labels=labels[15:-1]
+#     return labels[n]
+#
+# def mat_elements(irow):
+#     return
 
 
 ###
 
-mat_els = []
-denoms = []
-phases = []
-nedges_eq = []
-for diag in G:
-    type_edg =[]
-    braket = ''
-    #Beware of the sign convention !!!
-    incidence = - nx.incidence_matrix(diag,oriented=True).todense()
-    nrow = diag.number_of_nodes()
-    ncol = diag.number_of_edges()
-    n_holes= 0
-    diffcols = set()
-    for col in range(ncol):
-        flat = list(incidence[:,col].A1)
-        if(flat.index(1) < flat.index(-1)):
-            n_holes += 1
-            type_edg.append('h')
-        else:
-            type_edg.append('p')
-        diffcols.add(repr(flat))
-
-    for row in range(nrow):
-        ket = ''
-        bra = ''
-        for col in range(ncol):
-        ######### Mtrx Elements ###########
-            if (incidence[row,col] == 1):
-                if (type_edg[col] == 'h'):
-                    bra = bra + line_label_h(col)
-                else:
-                    bra = bra + line_label_p(col)
-            if (incidence[row,col] == -1):
-                if (type_edg[col] == 'h'):
-                    ket = ket + line_label_h(col)
-                else:
-                    ket = ket + line_label_p(col)
-        ###################################
-        braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
-    mat_els.append(braket)
-    denom = ''
-    for row in range(1,nrow):
-        denom = denom + '('
-        for col in range(ncol):
-            val_test = incidence[0:row,col].sum()
-            if (val_test == 1):
-                if (type_edg[col] == 'h'):
-                    denom=denom+' +E_'+line_label_h(col)
-                else:
-                    denom=denom+' +E_'+line_label_p(col)
-            if (val_test == -1):
-                if (type_edg[col] == 'h'):
-                    denom=denom+'-E_'+line_label_h(col)
-                else:
-                    denom=denom+'-E_'+line_label_p(col)
-        denom = denom+')'
-    if ('( +' in denom):
-        denom = denom.replace('( +','(')
-    denom = denom.strip(' ')
-    denoms.append(denom)
-    phases.append('(-1)^{%i' % n_holes + '+l}')
-    #print incidence
-    eq_lines=np.array(incidence.transpose())
-    #neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines)))).transpose()
-    neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines))))
-    n_sym = len(eq_lines)-len(neq_lines)
-    #### CAVEAT !!! Valid only for *MBPT*
-    nedges_eq.append(2**n_sym)
-    #print "After neqlines"
-    #### Loops
+# mat_els = []
+# denoms = []
+# phases = []
+# nedges_eq = []
+# for diag in G:
+#     type_edg =[]
+#     braket = ''
+#     #Beware of the sign convention !!!
+#     incidence = - nx.incidence_matrix(diag,oriented=True).todense()
+#     nrow = diag.number_of_nodes()
+#     ncol = diag.number_of_edges()
+#     n_holes= 0
+#     diffcols = set()
+#     for col in range(ncol):
+#         flat = list(incidence[:,col].A1)
+#         if(flat.index(1) < flat.index(-1)):
+#             n_holes += 1
+#             type_edg.append('h')
+#         else:
+#             type_edg.append('p')
+#         diffcols.add(repr(flat))
+#
+#     for row in range(nrow):
+#         ket = ''
+#         bra = ''
+#         for col in range(ncol):
+#         ######### Mtrx Elements ###########
+#             if (incidence[row,col] == 1):
+#                 if (type_edg[col] == 'h'):
+#                     bra = bra + line_label_h(col)
+#                 else:
+#                     bra = bra + line_label_p(col)
+#             if (incidence[row,col] == -1):
+#                 if (type_edg[col] == 'h'):
+#                     ket = ket + line_label_h(col)
+#                 else:
+#                     ket = ket + line_label_p(col)
+#         ###################################
+#         braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
+#     mat_els.append(braket)
+#     denom = ''
+#     for row in range(1,nrow):
+#         denom = denom + '('
+#         for col in range(ncol):
+#             val_test = incidence[0:row,col].sum()
+#             if (val_test == 1):
+#                 if (type_edg[col] == 'h'):
+#                     denom=denom+' +E_'+line_label_h(col)
+#                 else:
+#                     denom=denom+' +E_'+line_label_p(col)
+#             if (val_test == -1):
+#                 if (type_edg[col] == 'h'):
+#                     denom=denom+'-E_'+line_label_h(col)
+#                 else:
+#                     denom=denom+'-E_'+line_label_p(col)
+#         denom = denom+')'
+#     if ('( +' in denom):
+#         denom = denom.replace('( +','(')
+#     denom = denom.strip(' ')
+#     denoms.append(denom)
+#     phases.append('(-1)^{%i' % n_holes + '+l}')
+#     #print incidence
+#     eq_lines=np.array(incidence.transpose())
+#     #neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines)))).transpose()
+#     neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines))))
+#     n_sym = len(eq_lines)-len(neq_lines)
+#     #### CAVEAT !!! Valid only for *MBPT*
+#     nedges_eq.append(2**n_sym)
+#     #print "After neqlines"
+#     #### Loops
 
 
 ## Function generating the feynmanmf instructions
@@ -337,18 +384,18 @@ latex_file.write(begdoc)
 latex_file.write("\maketitle\n")
 latex_file.write("\\graphicspath{{Diagrams/}}")
 if (not pdiag or not pdraw):
-    for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
-        latex_file.write(begeq)
-        latex_file.write(diag_exp)
-        latex_file.write(endeq)
+    # for i_diag in range(0,numdiag):
+        # diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        # latex_file.write(begeq)
+        # latex_file.write(diag_exp)
+        # latex_file.write(endeq)
     latex_file.write(enddoc)
 else:
     for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
-        latex_file.write(begeq)
-        latex_file.write(diag_exp)
-        latex_file.write(endeq)
+        # diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        # latex_file.write(begeq)
+        # latex_file.write(diag_exp)
+        # latex_file.write(endeq)
         latex_file.write('\n\\begin{center}\n')
         diag_file = open(directory+"/Diagrams/diag_%i.tex" %i_diag)
         latex_file.write(diag_file.read())
