@@ -185,17 +185,17 @@ print "Number of connected diagrams, ",numdiag
 ### Algebraic expressions:
 ### CAVEAT !!! This works only for MBPT
 
-# def line_label_h(n):
-#     labels=list(string.ascii_lowercase)
-#     labels=labels[0:15]
-#     return labels[n]
-# def line_label_p(n):
-#     labels=list(string.ascii_lowercase)
-#     labels=labels[15:-1]
-#     return labels[n]
-#
-# def mat_elements(irow):
-#     return
+def line_label_h(n):
+    labels=list(string.ascii_lowercase)
+    labels=labels[0:15]
+    return labels[n]
+def line_label_p(n):
+    labels=list(string.ascii_lowercase)
+    labels=labels[15:-1]
+    return labels[n]
+
+def mat_elements(irow):
+    return
 
 
 ###
