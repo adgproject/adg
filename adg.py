@@ -140,18 +140,19 @@ def BMBPT_generation(p_order):
                 matrices = []
                 for mat in temp_matrices:
                     matrices.append(mat)
-                    mat_1 = copy.deepcopy(mat)
-                    mat_1[i][j] = 1
-                    matrices.append(mat_1)
-                    mat_2 = copy.deepcopy(mat)
-                    mat_2[i][j] = 2
-                    matrices.append(mat_2)
-                    mat_3 = copy.deepcopy(mat)
-                    mat_3[i][j] = 3
-                    matrices.append(mat_3)
-                    mat_4 = copy.deepcopy(mat)
-                    mat_4[i][j] = 4
-                    matrices.append(mat_4)
+                    if mat[j][i] == 0:
+                        mat_1 = copy.deepcopy(mat)
+                        mat_1[i][j] = 1
+                        matrices.append(mat_1)
+                        mat_2 = copy.deepcopy(mat)
+                        mat_2[i][j] = 2
+                        matrices.append(mat_2)
+                        mat_3 = copy.deepcopy(mat)
+                        mat_3[i][j] = 3
+                        matrices.append(mat_3)
+                        mat_4 = copy.deepcopy(mat)
+                        mat_4[i][j] = 4
+                        matrices.append(mat_4)
                 temp_matrices = copy.deepcopy(matrices)
     good_degree = check_degree(matrices)
     mat_wo_loops = no_loop(good_degree)
