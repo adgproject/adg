@@ -153,7 +153,6 @@ def BMBPT_generation(p_order):
                     mat_4[i][j] = 4
                     matrices.append(mat_4)
                 temp_matrices = copy.deepcopy(matrices)
-            print matrices
     good_degree = check_degree(matrices)
     mat_wo_loops = no_loop(good_degree)
     matricesUniq = []
@@ -164,8 +163,6 @@ def BMBPT_generation(p_order):
     diagrams = []
     for el in matricesUniq:
         diagrams.append(np.array(el))
-    print diagrams
-    print
     return diagrams
 
 print "Running"
@@ -193,6 +190,19 @@ for diag in G:
     #if (not nx.is_strongly_connected(diag)):
     if((nx.number_weakly_connected_components(diag)) == 1):
         G1.append(diag)
+G=G1
+G1=[]
+for diag in G:
+    test = True
+    if G1 == []:
+        G1.append(diag)
+    else:
+        for good_diag in G1:
+            if nx.is_isomorphic(diag,good_diag):
+                test = False
+                break
+        if test:
+            G1.append(diag)
 G=G1
 numdiag = len(G)
 print "Time ellapsed: ",datetime.now() - start_time
