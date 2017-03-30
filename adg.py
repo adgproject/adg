@@ -31,7 +31,14 @@ print "There is %i" % num_cores + " core(s) available"
 norder = int(raw_input('Order of the diagrams ?\n'))
 theory = raw_input('MBPT or BMBPT ?\n')
 
-directory = theory + '/Order-%i'% norder
+three_N = False
+if theory == "BMBPT":
+    three_N = raw_input("Include three-body forces ? (y/N) ").lower() == 'y'
+
+if three_N:
+    directory = theory + '/Order-%i'% norder + 'with3N'
+else:
+    directory = theory + '/Order-%i'% norder
 if not os.path.exists(directory):
     os.makedirs(directory)
 if not os.path.exists(directory+"/Diagrams"):
@@ -84,8 +91,8 @@ def no_loop(matrices):
             no_loop.append(matrix)
     return no_loop
 
-#Check the degrees of the vertices (i.e. its effective one- or two-body structure)
-def check_degree(matrices):
+#Check the degrees of the vertices (i.e. its effective one-, two- or three-body structure)
+def check_degree(matrices,three_N):
     deg_ok = []
     for matrix in matrices:
         test = True
@@ -94,8 +101,9 @@ def check_degree(matrices):
             for j in range(len(matrix[0])):
                 degree += matrix[i][j] + matrix[j][i]
             if (degree != 2) and (degree != 4):
-                test = False
-                break
+                if (three_N == False) or (degree != 6):
+                    test = False
+                    break
         if test:
             deg_ok.append(matrix)
     return deg_ok
@@ -122,12 +130,16 @@ def diagram_generation(n):
         diagrams.append(np.array(el))
     return diagrams
 
-def BMBPT_generation(p_order):
+def BMBPT_generation(p_order,three_N):
     empty_mat = []
     for i in range(0,p_order):
         empty_mat.append([])
         for j in range(0,p_order):
             empty_mat[i].append(0)
+
+    deg_max = 4
+    if three_N:
+        deg_max = 6
 
     matrices = []
     temp_matrices = []
@@ -147,13 +159,13 @@ def BMBPT_generation(p_order):
                             row_degree += mat[i][k]
                             col_degree += mat[k][j]
                         elem = 1
-                        while ((elem + row_degree) < 5) or ((elem + col_degree) < 5):
+                        while ((elem + row_degree) <= deg_max) or ((elem + col_degree) <= deg_max):
                             temp_mat = copy.deepcopy(mat)
                             temp_mat[i][j] = elem
                             matrices.append(temp_mat)
                             elem += 1
                 temp_matrices = copy.deepcopy(matrices)
-    good_degree = check_degree(matrices)
+    good_degree = check_degree(matrices,three_N)
     mat_wo_loops = no_loop(good_degree)
     matricesUniq = []
     for i in mat_wo_loops:
@@ -170,7 +182,7 @@ start_time = datetime.now()
 if theory == "MBPT":
     diagrams = diagram_generation(norder)
 elif theory == "BMBPT":
-    diagrams = BMBPT_generation(norder)
+    diagrams = BMBPT_generation(norder,three_N)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
@@ -365,9 +377,13 @@ def feynmf_generator(diag,theory,diag_name):
 
                         if oriented_adj_mat[i][j] == 3:
                             feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
-                        elif oriented_adj_mat[i][j] == 4:
+                        elif oriented_adj_mat[i][j] >= 4:
                             feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
                             feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
+                            if oriented_adj_mat[i][j] >= 5:
+                                feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %j + "v%i}\n" %i)
+                                if oriented_adj_mat[i][j] == 6:
+                                    feynmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," %j + "v%i}\n" %i)
 
                 elif (i != j) and (oriented_adj_mat[i][j] != 0): ## Vertex non consecutifs non diagonaux
                     if (oriented_adj_mat[i][j] == 1) and (oriented_adj_mat[j][i] == 2):
@@ -378,6 +394,10 @@ def feynmf_generator(diag,theory,diag_name):
                             feynmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," %j + "v%i}\n" %i)
                             if oriented_adj_mat[i][j] != 2:
                                 feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
+                                if oriented_adj_mat[i][j] != 3:
+                                    feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
+                                    if oriented_adj_mat[i][j] != 4:
+                                        feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %j + "v%i}\n" %i)
         feynmf_file.write(end_file)
     else:
         print "Perturbative order too small"
