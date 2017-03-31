@@ -145,14 +145,28 @@ def BMBPT_generation(p_order,three_N):
     temp_matrices = []
     temp_matrices.append(empty_mat)
 
+    for i0 in range(1,p_order):
+        matrices = []
+        for mat in temp_matrices:
+            matrices.append(mat)
+            j0_degree = 0
+            for k in range(1,p_order):
+                j0_degree += mat[k][0]
+            elem = 1
+            while (elem + j0_degree) <= deg_max:
+                temp_mat = copy.deepcopy(mat)
+                temp_mat[i0][0] = elem
+                matrices.append(temp_mat)
+                elem += 1
+        temp_matrices = copy.deepcopy(matrices)
+
     for i in range(1,p_order):
-        for j in range(p_order):
+        for j in range(1,p_order):
             if i != j:
                 matrices = []
                 for mat in temp_matrices:
                     matrices.append(mat)
                     if mat[j][i] == 0:
-                        test = True
                         out_degree = 0
                         in_degree = 0
                         for k in range(p_order):
