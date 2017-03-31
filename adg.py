@@ -160,6 +160,20 @@ def BMBPT_generation(p_order,three_N):
                 elem += 1
         temp_matrices = copy.deepcopy(matrices)
 
+    deg_j0_ok = []
+    for matrix in temp_matrices:
+        test = True
+        degree = 0
+        for i in range(1,p_order):
+            degree += matrix[i][0]
+        if (degree != 2) and (degree != 4):
+            if (three_N == False) or (degree != 6):
+                test = False
+        if test:
+            deg_j0_ok.append(matrix)
+    matrices = copy.deepcopy(deg_j0_ok)
+    temp_matrices = copy.deepcopy(deg_j0_ok)
+
     for i in range(1,p_order):
         for j in range(1,p_order):
             if i != j:
