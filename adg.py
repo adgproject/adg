@@ -32,13 +32,17 @@ norder = int(raw_input('Order of the diagrams ?\n'))
 theory = raw_input('MBPT or BMBPT ?\n')
 
 three_N = False
+norm = False
 if theory == "BMBPT":
     three_N = raw_input("Include three-body forces ? (y/N) ").lower() == 'y'
+    norm = raw_input("Compute norm kernel instead of operator kernels ? (y/N) ").lower() == 'y'
 
 if three_N:
     directory = theory + '/Order-%i'% norder + 'with3N'
 else:
     directory = theory + '/Order-%i'% norder
+if norm:
+    directory = directory + '_Norm'
 if not os.path.exists(directory):
     os.makedirs(directory)
 if not os.path.exists(directory+"/Diagrams"):
@@ -205,12 +209,61 @@ def BMBPT_generation(p_order,three_N):
         diagrams.append(np.array(el))
     return diagrams
 
+def BMBPT_Norm_generation(p_order,three_N):
+    empty_mat = []
+    for i in range(p_order):
+        empty_mat.append([])
+        for j in range(p_order):
+            empty_mat[i].append(0)
+
+    deg_max = 4
+    if three_N:
+        deg_max = 6
+
+    matrices = []
+    temp_matrices = []
+    temp_matrices.append(empty_mat)
+
+    for i in range(p_order):
+        for j in range(p_order):
+            if i != j:
+                matrices = []
+                for mat in temp_matrices:
+                    matrices.append(mat)
+                    if mat[j][i] == 0:
+                        out_degree = 0
+                        in_degree = 0
+                        for k in range(p_order):
+                            out_degree += mat[i][k] + mat[i][k]
+                            in_degree += mat[k][j] + mat[j][k]
+                        elem = 1
+                        while ((elem + out_degree) <= deg_max) or ((elem + in_degree) <= deg_max):
+                            temp_mat = copy.deepcopy(mat)
+                            temp_mat[i][j] = elem
+                            matrices.append(temp_mat)
+                            elem += 1
+                temp_matrices = copy.deepcopy(matrices)
+    good_degree = check_degree(matrices,three_N)
+    mat_wo_loops = no_loop(good_degree)
+    matricesUniq = []
+    for i in mat_wo_loops:
+            if i not in matricesUniq:
+                    matricesUniq.append(i)
+    matricesUniq.sort(reverse=True)
+    diagrams = []
+    for el in matricesUniq:
+        diagrams.append(np.array(el))
+    return diagrams
+
 print "Running"
 start_time = datetime.now()
 if theory == "MBPT":
     diagrams = diagram_generation(norder)
 elif theory == "BMBPT":
-    diagrams = BMBPT_generation(norder,three_N)
+    if norm:
+        diagrams = BMBPT_Norm_generation(norder,three_N)
+    else:
+        diagrams = BMBPT_generation(norder,three_N)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
@@ -364,7 +417,7 @@ def feynmf_generator(diag,theory,diag_name):
     if p_order >= 2:
         feynmf_file.write(begin_file)
         feynmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" %(p_order-1))
-        if theory == "BMBPT":
+        if (theory == "BMBPT") and (norm == False):
             feynmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v0}\n")
         else:
             feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}\n")
