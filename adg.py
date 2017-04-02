@@ -346,6 +346,14 @@ if theory == "BMBPT":
         else:
             G3_EHF.append(diag)
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
+    nb_2 = len(G2)
+    nb_2_HF = len(G2_HF)
+    nb_2_EHF = len(G2_EHF)
+    nb_2_noHF = len(G2_noHF)
+    nb_3 = len(G3)
+    nb_3_HF = len(G3_HF)
+    nb_3_EHF = len(G3_EHF)
+    nb_3_noHF = len(G3_noHF)
 
 ### Algebraic expressions:
 ### CAVEAT !!! This works only for MBPT
@@ -559,6 +567,21 @@ endeq = "\\end{equation}\n"
 latex_file.write(begdoc)
 latex_file.write("\maketitle\n")
 latex_file.write("\\graphicspath{{Diagrams/}}")
+
+if theory == "BMBPT":
+    latex_file.write("Valid diagrams: %i\n\n" %numdiag)
+    latex_file.write("2N valid diagrams: %i\n\n" %nb_2)
+    latex_file.write("2N canonical diagrams for the energy: %i\n\n" %nb_2_HF)
+    if norm == False:
+        latex_file.write("2N canonical diagrams for a generic operator only: %i\n\n" %nb_2_EHF)
+    latex_file.write("2N non-canonical diagrams: %i\n\n" %nb_2_noHF)
+    if three_N:
+        latex_file.write("3N valid diagrams: %i\n\n" %nb_3)
+        latex_file.write("3N canonical diagrams for the energy: %i\n\n" %nb_3_HF)
+        if norm == False:
+            latex_file.write("3N canonical diagrams for a generic operator only: %i\n\n" %nb_3_EHF)
+        latex_file.write("3N non-canonical diagrams: %i\n\n" %nb_3_noHF)
+
 if (not pdiag or not pdraw) and (theory == "MBPT"):
     for i_diag in range(0,numdiag):
         diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
@@ -567,7 +590,21 @@ if (not pdiag or not pdraw) and (theory == "MBPT"):
         latex_file.write(endeq)
     latex_file.write(enddoc)
 else:
+    if theory == "BMBPT":
+        latex_file.write("\section{Two-body diagrams}\subsection{Three-body energy canonical diagrams}\n")
     for i_diag in range(0,numdiag):
+        if theory == "BMBPT":
+            if i_diag == nb_2_HF:
+                latex_file.write("\subsection{Two-body canonical diagrams for a generic operator only}\n")
+            elif i_diag == nb_2_HF + nb_2_EHF:
+                latex_file.write("\subsection{Two-body non-canonical diagrams}\n")
+            if three_N:
+                if i_diag == nb_2:
+                    latex_file.write("\section{Three-body diagrams}\n\subsection{Three-body energy canonical diagrams}\n")
+                elif i_diag == nb_2 + nb_3_HF:
+                    latex_file.write("\subsection{Three-body canonical diagrams for a generic operator only}\n")
+                elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
+                    latex_file.write("\subsection{Three-body non-canonical diagrams}\n")
         if theory == "MBPT":
             diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
             latex_file.write(begeq)
