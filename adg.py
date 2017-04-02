@@ -330,7 +330,7 @@ if theory == "BMBPT":
                 test_HF = False
         if test_HF:
             G2_HF.append(diag)
-        elif diag.degree(0) == 2:
+        elif (diag.degree(0) == 2) or norm:
             G2_noHF.append(diag)
         else:
             G2_EHF.append(diag)
@@ -341,7 +341,7 @@ if theory == "BMBPT":
                 test_HF = False
         if test_HF:
             G3_HF.append(diag)
-        elif diag.degree(0) == 2:
+        elif (diag.degree(0) == 2) or norm:
             G3_noHF.append(diag)
         else:
             G3_EHF.append(diag)
