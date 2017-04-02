@@ -306,6 +306,18 @@ numdiag = len(G)
 print "Time ellapsed: ",datetime.now() - start_time
 print "Number of connected diagrams, ",numdiag
 
+if theory == "BMBPT":
+    G2=[]
+    G3=[]
+    for diag in G:
+        max_deg = 0
+        for node in diag:
+            max_deg = max(max_deg,diag.degree(node))
+        if max_deg == 6:
+            G3.append(diag)
+        else:
+            G2.append(diag)
+    G = G2 + G3
 
 ### Algebraic expressions:
 ### CAVEAT !!! This works only for MBPT
