@@ -325,23 +325,29 @@ if theory == "BMBPT":
             G2.append(diag)
     for diag in G2:
         test_HF = True
+        test_EHF = True
         for node in diag:
             if diag.degree(node) == 2:
                 test_HF = False
+                if node != 0:
+                    test_EHF = False
         if test_HF:
             G2_HF.append(diag)
-        elif (diag.degree(0) == 2) or norm:
+        elif (test_EHF == False) or norm:
             G2_noHF.append(diag)
         else:
             G2_EHF.append(diag)
     for diag in G3:
         test_HF = True
+        test_EHF = True
         for node in diag:
             if diag.degree(node) == 2:
                 test_HF = False
+                if node != 0:
+                    test_EHF = False
         if test_HF:
             G3_HF.append(diag)
-        elif (diag.degree(0) == 2) or norm:
+        elif (test_EHF == False) or norm:
             G3_noHF.append(diag)
         else:
             G3_EHF.append(diag)
