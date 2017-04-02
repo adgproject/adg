@@ -309,6 +309,12 @@ print "Number of connected diagrams, ",numdiag
 if theory == "BMBPT":
     G2=[]
     G3=[]
+    G2_HF=[]
+    G2_EHF=[]
+    G2_noHF=[]
+    G3_HF=[]
+    G3_EHF=[]
+    G3_noHF=[]
     for diag in G:
         max_deg = 0
         for node in diag:
@@ -317,7 +323,29 @@ if theory == "BMBPT":
             G3.append(diag)
         else:
             G2.append(diag)
-    G = G2 + G3
+    for diag in G2:
+        test_HF = True
+        for node in diag:
+            if diag.degree(node) == 2:
+                test_HF = False
+        if test_HF:
+            G2_HF.append(diag)
+        elif diag.degree(0) == 2:
+            G2_noHF.append(diag)
+        else:
+            G2_EHF.append(diag)
+    for diag in G3:
+        test_HF = True
+        for node in diag:
+            if diag.degree(node) == 2:
+                test_HF = False
+        if test_HF:
+            G3_HF.append(diag)
+        elif diag.degree(0) == 2:
+            G3_noHF.append(diag)
+        else:
+            G3_EHF.append(diag)
+    G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
 
 ### Algebraic expressions:
 ### CAVEAT !!! This works only for MBPT
