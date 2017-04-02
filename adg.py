@@ -597,7 +597,7 @@ if (not pdiag or not pdraw) and (theory == "MBPT"):
     latex_file.write(enddoc)
 else:
     if theory == "BMBPT":
-        latex_file.write("\section{Two-body diagrams}\subsection{Three-body energy canonical diagrams}\n")
+        latex_file.write("\section{Two-body diagrams}\subsection{Two-body energy canonical diagrams}\n")
     for i_diag in range(0,numdiag):
         if theory == "BMBPT":
             if i_diag == nb_2_HF:
