@@ -600,14 +600,14 @@ else:
         latex_file.write("\section{Two-body diagrams}\subsection{Two-body energy canonical diagrams}\n")
     for i_diag in range(0,numdiag):
         if theory == "BMBPT":
-            if i_diag == nb_2_HF:
+            if (i_diag == nb_2_HF) and (norm == False):
                 latex_file.write("\subsection{Two-body canonical diagrams for a generic operator only}\n")
             elif i_diag == nb_2_HF + nb_2_EHF:
                 latex_file.write("\subsection{Two-body non-canonical diagrams}\n")
             if three_N:
                 if i_diag == nb_2:
                     latex_file.write("\section{Three-body diagrams}\n\subsection{Three-body energy canonical diagrams}\n")
-                elif i_diag == nb_2 + nb_3_HF:
+                elif (i_diag == nb_2 + nb_3_HF) and (norm == False):
                     latex_file.write("\subsection{Three-body canonical diagrams for a generic operator only}\n")
                 elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
                     latex_file.write("\subsection{Three-body non-canonical diagrams}\n")
