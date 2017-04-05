@@ -85,9 +85,8 @@ def no_loop(matrices):
     no_loop = []
     for matrix in matrices:
         test = True
-        line = matrix[0]
         for i in range(len(matrix[0])):
-            for j in range(i):
+            for j in range(i+1):
                 if (matrix[i][j] != 0) and (matrix[j][i] != 0):
                     test = False
                     break
@@ -177,26 +176,53 @@ def BMBPT_generation(p_order,three_N):
             deg_j0_ok.append(matrix)
     matrices = copy.deepcopy(deg_j0_ok)
     temp_matrices = copy.deepcopy(deg_j0_ok)
+    deg_j0_ok = []
 
-    for i in range(1,p_order):
-        for j in range(1,p_order):
-            if i != j:
-                matrices = []
-                for mat in temp_matrices:
-                    matrices.append(mat)
-                    if mat[j][i] == 0:
-                        out_degree = 0
-                        in_degree = 0
-                        for k in range(p_order):
-                            out_degree += mat[i][k] + mat[i][k]
-                            in_degree += mat[k][j] + mat[j][k]
-                        elem = 1
-                        while ((elem + out_degree) <= deg_max) or ((elem + in_degree) <= deg_max):
-                            temp_mat = copy.deepcopy(mat)
-                            temp_mat[i][j] = elem
-                            matrices.append(temp_mat)
-                            elem += 1
-                temp_matrices = copy.deepcopy(matrices)
+    for vertex in range(1,p_order):
+        for sum_index in range(vertex+1,p_order):
+            matrices = []
+            for mat in temp_matrices:
+                matrices.append(mat)
+                if mat[vertex][sum_index] == 0:
+                    vert_degree = 0
+                    for k in range(0,p_order):
+                        vert_degree += mat[k][vertex] + mat[vertex][k]
+                    elem = 1
+                    while (elem + vert_degree) <= deg_max:
+                        temp_mat = copy.deepcopy(mat)
+                        temp_mat[sum_index][vertex] = elem
+                        matrices.append(temp_mat)
+                        elem += 1
+            temp_matrices = copy.deepcopy(matrices)
+            matrices = []
+            for mat in temp_matrices:
+                matrices.append(mat)
+                if mat[sum_index][vertex] == 0:
+                    vert_degree = 0
+                    for k in range(0,p_order):
+                        vert_degree += mat[vertex][k] + mat[k][vertex]
+                    elem = 1
+                    while (elem + vert_degree) <= deg_max:
+                        temp_mat = copy.deepcopy(mat)
+                        temp_mat[vertex][sum_index] = elem
+                        matrices.append(temp_mat)
+                        elem += 1
+            temp_matrices = copy.deepcopy(matrices)
+        deg_vertex_ok = []
+        for matrix in temp_matrices:
+            test = True
+            degree = 0
+            for i in range(0,p_order):
+                degree += matrix[i][vertex] + matrix[vertex][i]
+            if (degree != 2) and (degree != 4):
+                if (three_N == False) or (degree != 6):
+                    test = False
+            if test:
+                deg_vertex_ok.append(matrix)
+        matrices = copy.deepcopy(deg_vertex_ok)
+        temp_matrices = copy.deepcopy(deg_vertex_ok)
+        deg_vertex_ok = []
+
     good_degree = check_degree(matrices,three_N)
     mat_wo_loops = no_loop(good_degree)
     matricesUniq = []
