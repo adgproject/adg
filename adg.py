@@ -342,13 +342,23 @@ if theory == "BMBPT":
     G1=[]
     for diag in G:
         test = True
+        if norm == False:
+            for node in diag:
+                diag.node[node]['operator'] = False
+            diag.node[0]['operator'] = True
+            nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
         if G1 == []:
             G1.append(diag)
         else:
             for good_diag in G1:
-                if nx.is_isomorphic(diag,good_diag):
-                    test = False
-                    break
+                if norm:
+                    if nx.is_isomorphic(diag, good_diag):
+                        test = False
+                        break
+                else:
+                    if nx.is_isomorphic(diag, good_diag, node_match = nm):
+                        test = False
+                        break
             if test:
                 G1.append(diag)
     G=G1
