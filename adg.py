@@ -29,7 +29,7 @@ print "Parallel Mode"
 num_cores = multiprocessing.cpu_count()
 print "There is %i" % num_cores + " core(s) available"
 norder = int(raw_input('Order of the diagrams ?\n'))
-theory = raw_input('MBPT or BMBPT ?\n')
+theory = raw_input('MBPT or BMBPT ?\n').upper()
 
 three_N = False
 norm = False
