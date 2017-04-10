@@ -66,20 +66,6 @@ def g(matrices):
             traceless.append(matrix)
     return traceless
 
-#Select matrices with full 0 first line
-def v0_specs(matrices):
-    v0_specs_ok = []
-    for matrix in matrices:
-        test = True
-        line = matrix[0]
-        for i in range(len(line)):
-            if line[i] != 0:
-                test = False
-                break
-        if test:
-            v0_specs_ok.append(matrix)
-    return v0_specs_ok
-
 #Select out matrices with loops between two vertices
 def no_loop(matrices):
     no_loop = []
@@ -324,7 +310,6 @@ with open(directory+"/Diagrams.list", "w") as f:
     for diagram in diagrams:
         f.write("Diagram n: %i" % i)
         np.savetxt(f,diagram)
-        #diagram.tofile(f,"")
         f.write("\n")
         i += 1
 
@@ -334,7 +319,6 @@ for diagram in diagrams:
     G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph(),parallel_edges=True))
 G1=[]
 for diag in G:
-    #if (not nx.is_strongly_connected(diag)):
     if((nx.number_weakly_connected_components(diag)) == 1):
         G1.append(diag)
 G=G1
