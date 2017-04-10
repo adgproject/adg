@@ -97,6 +97,7 @@ def check_degree(matrices,three_N):
             deg_ok.append(matrix)
     return deg_ok
 
+#Generate the diagrams for the MBPT case
 def diagram_generation(n):
     seeds = seed(n)
     all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
@@ -119,7 +120,9 @@ def diagram_generation(n):
         diagrams.append(np.array(el))
     return diagrams
 
+#Generate generic operator diagrams for BMBPT
 def BMBPT_generation(p_order,three_N):
+    #Begin by creating a zero oriented adjacency matric of good dimensions
     empty_mat = []
     for i in range(0,p_order):
         empty_mat.append([])
@@ -134,6 +137,7 @@ def BMBPT_generation(p_order,three_N):
     temp_matrices = []
     temp_matrices.append(empty_mat)
 
+    #Start by the column corresponding to the operator vertex
     for i0 in range(1,p_order):
         matrices = []
         for mat in temp_matrices:
@@ -149,6 +153,7 @@ def BMBPT_generation(p_order,three_N):
                 elem += 1
         temp_matrices = copy.deepcopy(matrices)
 
+    #Get rid of matrices where degree of first vertex is wrong
     deg_j0_ok = []
     for matrix in temp_matrices:
         test = True
@@ -162,8 +167,8 @@ def BMBPT_generation(p_order,three_N):
             deg_j0_ok.append(matrix)
     matrices = copy.deepcopy(deg_j0_ok)
     temp_matrices = copy.deepcopy(deg_j0_ok)
-    deg_j0_ok = []
 
+    #Iterate previous reasoning on all vertices
     for vertex in range(1,p_order):
         for sum_index in range(vertex+1,p_order):
             matrices = []
@@ -209,6 +214,7 @@ def BMBPT_generation(p_order,three_N):
         temp_matrices = copy.deepcopy(deg_vertex_ok)
         deg_vertex_ok = []
 
+    #Checks to exclude non-conform matrices
     good_degree = check_degree(matrices,three_N)
     mat_wo_loops = no_loop(good_degree)
     matricesUniq = []
@@ -221,7 +227,9 @@ def BMBPT_generation(p_order,three_N):
         diagrams.append(np.array(el))
     return diagrams
 
+#Generate norm kernel diagrams for BMBPT
 def BMBPT_Norm_generation(p_order,three_N):
+    #Begin by creating a zero oriented adjacency matric of good dimensions
     empty_mat = []
     for i in range(p_order):
         empty_mat.append([])
@@ -235,6 +243,7 @@ def BMBPT_Norm_generation(p_order,three_N):
     temp_matrices = []
     temp_matrices.append(empty_mat)
 
+    #Generate oriented adjacency matrices going vertex-wise
     for vertex in range(p_order):
         for sum_index in range(vertex+1,p_order):
             matrices = []
@@ -279,6 +288,7 @@ def BMBPT_Norm_generation(p_order,three_N):
         matrices = copy.deepcopy(deg_vertex_ok)
         temp_matrices = copy.deepcopy(deg_vertex_ok)
 
+    #Checks to exclude non-conform matrices
     good_degree = check_degree(matrices,three_N)
     mat_wo_loops = no_loop(good_degree)
     matricesUniq = []
@@ -291,6 +301,7 @@ def BMBPT_Norm_generation(p_order,three_N):
         diagrams.append(np.array(el))
     return diagrams
 
+#Start computing everything
 print "Running"
 start_time = datetime.now()
 if theory == "MBPT":
@@ -322,11 +333,13 @@ for diag in G:
     if((nx.number_weakly_connected_components(diag)) == 1):
         G1.append(diag)
 G=G1
+# Specific checks for topologically identical diagrams in BMBPT
 if theory == "BMBPT":
     G1=[]
     for diag in G:
         test = True
         if norm == False:
+            #Account for different status of vertices in operator diagrams
             for node in diag:
                 diag.node[node]['operator'] = False
             diag.node[0]['operator'] = True
@@ -350,6 +363,7 @@ numdiag = len(G)
 print "Time ellapsed: ",datetime.now() - start_time
 print "Number of connected diagrams, ",numdiag
 
+#Ordering the diagrams in a convenient way
 if theory == "BMBPT":
     G2=[]
     G3=[]
@@ -420,8 +434,8 @@ def line_label_p(n):
 def mat_elements(irow):
     return
 
-
-###
+#Treatment of the algebraic expressions
+### To be extended to BMBPT in the future
 if theory == "MBPT":
     mat_els = []
     denoms = []
@@ -512,39 +526,43 @@ def feynmf_generator(diag,theory,diag_name):
     begin_file = "\parbox{%i" %diag_size +"pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" %diag_size + ",%i)\n" %diag_size
     end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
 
+    #Draw the diagram only if there is one to be drawn...
     if p_order >= 2:
         feynmf_file.write(begin_file)
+
+        #Set the position of the top and bottom vertices
         feynmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" %(p_order-1))
         if (theory == "BMBPT") and (norm == False):
             feynmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v0}\n")
         else:
             feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}\n")
         feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %(p_order-1))
-
+        #Set the position of intermediate vertices if needed
         if p_order > 2:
             feynmf_file.write("\\fmf{phantom}{v0,v1}\n")
             for vertex in range(1,p_order-2):
                 feynmf_file.write("\\fmf{phantom}{v%i" %vertex + ",v%i}\n" %(vertex+1))
                 feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %vertex)
-
             feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %(p_order-2))
             feynmf_file.write("\\fmf{phantom}{v%i,"%(p_order-2) + "v%i}\n" %(p_order-1))
             feynmf_file.write("\\fmffreeze\n")
 
+        # Recover the oriented adjacency matrix of the diagram
         oriented_adj_mat = []
         for i in range(0,p_order):
             oriented_adj_mat.append([])
             for j in range(0,p_order):
                 oriented_adj_mat[i].append(0)
-
         for line in nx.generate_edgelist(diag,data=False):
             i = int(line[0])
             j = int(line[2])
             oriented_adj_mat[i][j] += 1
 
+        #Loop over all elements of the matrix to draw associated propagators
         for i in range(0,p_order):
             for j in range(0,p_order):
-                if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0): ## Vertex consecutifs
+                # For directly consecutive vertices
+                if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0):
                     if oriented_adj_mat[i][j] == 1:
                         if oriented_adj_mat[j][i] !=1:
                             feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
@@ -553,7 +571,6 @@ def feynmf_generator(diag,theory,diag_name):
                     else:
                         feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
                         feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
-
                         if oriented_adj_mat[i][j] == 3:
                             feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
                         elif oriented_adj_mat[i][j] >= 4:
@@ -564,7 +581,8 @@ def feynmf_generator(diag,theory,diag_name):
                                 if oriented_adj_mat[i][j] == 6:
                                     feynmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," %j + "v%i}\n" %i)
 
-                elif (i != j) and (oriented_adj_mat[i][j] != 0): ## Vertex non consecutifs non diagonaux
+                # For more distant vertices
+                elif (i != j) and (oriented_adj_mat[i][j] != 0):
                     if (oriented_adj_mat[i][j] == 1) and (oriented_adj_mat[j][i] == 2):
                         feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
                     else:
@@ -581,7 +599,7 @@ def feynmf_generator(diag,theory,diag_name):
     else:
         print "Perturbative order too small"
 
-## Writing a dot file for each graph
+## Writing a feynmp file for each graph
 msg = 'Generate diagrams feymanmf instructions ?'
 pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if (pdraw):
@@ -595,7 +613,7 @@ if (pdraw):
 
 msg = 'Include diagrams in tex ?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
-### Latexisation
+### Write everything down in a nice LaTeX file
 header = "\documentclass[10pt,a4paper]{article}\n \usepackage[utf8]{inputenc}\n\usepackage{braket}\n\usepackage{graphicx}\n"
 header = header + "\usepackage[english]{babel}\n\usepackage{amsmath}\n\usepackage{amsfonts}\n\usepackage{amssymb}\n"
 if pdiag:
@@ -673,7 +691,9 @@ if (pdfcompile):
     os.chdir(directory)
     os.system("pdflatex result.tex")
     if pdiag:
+        #Second compilation needed
         os.system("pdflatex result.tex")
+        #Get rid of undesired feynmp files to keep a clean directory
         for i_diag in range(0,numdiag):
             os.unlink("diag_%i.1" %i_diag)
             os.unlink("diag_%i.mp" %i_diag)
