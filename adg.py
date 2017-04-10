@@ -54,7 +54,7 @@ def seed(n):
     return [k for k in itertools.permutations(range(n),n)]
 
 #Select matrices with full 0 diagonal
-def g(matrices):
+def no_trace(matrices):
     traceless = []
     for matrix in matrices:
         test = True
@@ -101,7 +101,7 @@ def check_degree(matrices,three_N):
 def diagram_generation(n):
     seeds = seed(n)
     all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
-    traceless = g(all)
+    traceless = no_trace(all)
     coeffs = [i for i in itertools.combinations_with_replacement(range(len(traceless)),2)]
     double = []
     for coef in coeffs:
