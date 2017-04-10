@@ -120,115 +120,8 @@ def diagram_generation(n):
         diagrams.append(np.array(el))
     return diagrams
 
-#Generate generic operator diagrams for BMBPT
-def BMBPT_generation(p_order,three_N):
-    #Begin by creating a zero oriented adjacency matric of good dimensions
-    empty_mat = []
-    for i in range(0,p_order):
-        empty_mat.append([])
-        for j in range(0,p_order):
-            empty_mat[i].append(0)
-
-    deg_max = 4
-    if three_N:
-        deg_max = 6
-
-    matrices = []
-    temp_matrices = []
-    temp_matrices.append(empty_mat)
-
-    #Start by the column corresponding to the operator vertex
-    for i0 in range(1,p_order):
-        matrices = []
-        for mat in temp_matrices:
-            matrices.append(mat)
-            j0_degree = 0
-            for k in range(1,p_order):
-                j0_degree += mat[k][0]
-            elem = 1
-            while (elem + j0_degree) <= deg_max:
-                temp_mat = copy.deepcopy(mat)
-                temp_mat[i0][0] = elem
-                matrices.append(temp_mat)
-                elem += 1
-        temp_matrices = copy.deepcopy(matrices)
-
-    #Get rid of matrices where degree of first vertex is wrong
-    deg_j0_ok = []
-    for matrix in temp_matrices:
-        test = True
-        degree = 0
-        for i in range(1,p_order):
-            degree += matrix[i][0]
-        if (degree != 2) and (degree != 4):
-            if (three_N == False) or (degree != 6):
-                test = False
-        if test:
-            deg_j0_ok.append(matrix)
-    matrices = copy.deepcopy(deg_j0_ok)
-    temp_matrices = copy.deepcopy(deg_j0_ok)
-
-    #Iterate previous reasoning on all vertices
-    for vertex in range(1,p_order):
-        for sum_index in range(vertex+1,p_order):
-            matrices = []
-            for mat in temp_matrices:
-                matrices.append(mat)
-                if mat[vertex][sum_index] == 0:
-                    vert_degree = 0
-                    for k in range(0,p_order):
-                        vert_degree += mat[k][vertex] + mat[vertex][k]
-                    elem = 1
-                    while (elem + vert_degree) <= deg_max:
-                        temp_mat = copy.deepcopy(mat)
-                        temp_mat[sum_index][vertex] = elem
-                        matrices.append(temp_mat)
-                        elem += 1
-            temp_matrices = copy.deepcopy(matrices)
-            matrices = []
-            for mat in temp_matrices:
-                matrices.append(mat)
-                if mat[sum_index][vertex] == 0:
-                    vert_degree = 0
-                    for k in range(0,p_order):
-                        vert_degree += mat[vertex][k] + mat[k][vertex]
-                    elem = 1
-                    while (elem + vert_degree) <= deg_max:
-                        temp_mat = copy.deepcopy(mat)
-                        temp_mat[vertex][sum_index] = elem
-                        matrices.append(temp_mat)
-                        elem += 1
-            temp_matrices = copy.deepcopy(matrices)
-        deg_vertex_ok = []
-        for matrix in temp_matrices:
-            test = True
-            degree = 0
-            for i in range(0,p_order):
-                degree += matrix[i][vertex] + matrix[vertex][i]
-            if (degree != 2) and (degree != 4):
-                if (three_N == False) or (degree != 6):
-                    test = False
-            if test:
-                deg_vertex_ok.append(matrix)
-        matrices = copy.deepcopy(deg_vertex_ok)
-        temp_matrices = copy.deepcopy(deg_vertex_ok)
-        deg_vertex_ok = []
-
-    #Checks to exclude non-conform matrices
-    good_degree = check_degree(matrices,three_N)
-    mat_wo_loops = no_loop(good_degree)
-    matricesUniq = []
-    for i in mat_wo_loops:
-            if i not in matricesUniq:
-                    matricesUniq.append(i)
-    matricesUniq.sort(reverse=True)
-    diagrams = []
-    for el in matricesUniq:
-        diagrams.append(np.array(el))
-    return diagrams
-
-#Generate norm kernel diagrams for BMBPT
-def BMBPT_Norm_generation(p_order,three_N):
+#Generate diagrams for BMBPT
+def BMBPT_generation(p_order,three_N,norm):
     #Begin by creating a zero oriented adjacency matric of good dimensions
     empty_mat = []
     for i in range(p_order):
@@ -260,20 +153,22 @@ def BMBPT_Norm_generation(p_order,three_N):
                         matrices.append(temp_mat)
                         elem += 1
             temp_matrices = copy.deepcopy(matrices)
-            matrices = []
-            for mat in temp_matrices:
-                matrices.append(mat)
-                if mat[sum_index][vertex] == 0:
-                    vert_degree = 0
-                    for k in range(0,p_order):
-                        vert_degree += mat[vertex][k] + mat[k][vertex]
-                    elem = 1
-                    while (elem + vert_degree) <= deg_max:
-                        temp_mat = copy.deepcopy(mat)
-                        temp_mat[vertex][sum_index] = elem
-                        matrices.append(temp_mat)
-                        elem += 1
-            temp_matrices = copy.deepcopy(matrices)
+            #Row is not iterated upon for the first vertex in operator diagrams
+            if norm or (vertex != 0):
+                matrices = []
+                for mat in temp_matrices:
+                    matrices.append(mat)
+                    if mat[sum_index][vertex] == 0:
+                        vert_degree = 0
+                        for k in range(0,p_order):
+                            vert_degree += mat[vertex][k] + mat[k][vertex]
+                        elem = 1
+                        while (elem + vert_degree) <= deg_max:
+                            temp_mat = copy.deepcopy(mat)
+                            temp_mat[vertex][sum_index] = elem
+                            matrices.append(temp_mat)
+                            elem += 1
+                temp_matrices = copy.deepcopy(matrices)
         deg_vertex_ok = []
         for matrix in temp_matrices:
             test = True
@@ -307,10 +202,7 @@ start_time = datetime.now()
 if theory == "MBPT":
     diagrams = diagram_generation(norder)
 elif theory == "BMBPT":
-    if norm:
-        diagrams = BMBPT_Norm_generation(norder,three_N)
-    else:
-        diagrams = BMBPT_generation(norder,three_N)
+    diagrams = BMBPT_generation(norder,three_N,norm)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
