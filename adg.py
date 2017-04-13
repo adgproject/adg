@@ -121,6 +121,7 @@ def diagram_generation(n):
     return diagrams
 
 #Generate diagrams for BMBPT
+#Diagrams are generated from bottom up
 def BMBPT_generation(p_order,three_N,norm):
     #Begin by creating a zero oriented adjacency matric of good dimensions
     empty_mat = []
@@ -142,30 +143,30 @@ def BMBPT_generation(p_order,three_N,norm):
             matrices = []
             for mat in temp_matrices:
                 matrices.append(mat)
-                if mat[vertex][sum_index] == 0:
+                if mat[sum_index][vertex] == 0:
                     vert_degree = 0
                     for k in range(0,p_order):
                         vert_degree += mat[k][vertex] + mat[vertex][k]
                     elem = 1
                     while (elem + vert_degree) <= deg_max:
                         temp_mat = copy.deepcopy(mat)
-                        temp_mat[sum_index][vertex] = elem
+                        temp_mat[vertex][sum_index] = elem
                         matrices.append(temp_mat)
                         elem += 1
             temp_matrices = copy.deepcopy(matrices)
-            #Row is not iterated upon for the first vertex in operator diagrams
+            #Column is not iterated upon for the first vertex in operator diagrams
             if norm or (vertex != 0):
                 matrices = []
                 for mat in temp_matrices:
                     matrices.append(mat)
-                    if mat[sum_index][vertex] == 0:
+                    if mat[vertex][sum_index] == 0:
                         vert_degree = 0
                         for k in range(0,p_order):
                             vert_degree += mat[vertex][k] + mat[k][vertex]
                         elem = 1
                         while (elem + vert_degree) <= deg_max:
                             temp_mat = copy.deepcopy(mat)
-                            temp_mat[vertex][sum_index] = elem
+                            temp_mat[sum_index][vertex] = elem
                             matrices.append(temp_mat)
                             elem += 1
                 temp_matrices = copy.deepcopy(matrices)
@@ -469,36 +470,36 @@ def feynmf_generator(diag,theory,diag_name):
                 if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0):
                     if oriented_adj_mat[i][j] == 1:
                         if oriented_adj_mat[j][i] !=1:
-                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
+                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %i + "v%i}\n" %j)
                         else:
-                            feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
+                            feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %i + "v%i}\n" %j)
                     else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
-                        feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
+                        feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %i + "v%i}\n" %j)
+                        feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %i + "v%i}\n" %j)
                         if oriented_adj_mat[i][j] == 3:
-                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
+                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %i + "v%i}\n" %j)
                         elif oriented_adj_mat[i][j] >= 4:
-                            feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
-                            feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
+                            feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %i + "v%i}\n" %j)
+                            feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %i + "v%i}\n" %j)
                             if oriented_adj_mat[i][j] >= 5:
-                                feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %j + "v%i}\n" %i)
+                                feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %i + "v%i}\n" %j)
                                 if oriented_adj_mat[i][j] == 6:
-                                    feynmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," %j + "v%i}\n" %i)
+                                    feynmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," %i + "v%i}\n" %j)
 
                 # For more distant vertices
                 elif (i != j) and (oriented_adj_mat[i][j] != 0):
                     if (oriented_adj_mat[i][j] == 1) and (oriented_adj_mat[j][i] == 2):
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
+                        feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %i + "v%i}\n" %j)
                     else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," %j + "v%i}\n" %i)
+                        feynmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," %i + "v%i}\n" %j)
                         if oriented_adj_mat[i][j] != 1:
-                            feynmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," %j + "v%i}\n" %i)
+                            feynmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," %i + "v%i}\n" %j)
                             if oriented_adj_mat[i][j] != 2:
-                                feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
+                                feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %i + "v%i}\n" %j)
                                 if oriented_adj_mat[i][j] != 3:
-                                    feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
+                                    feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %i + "v%i}\n" %j)
                                     if oriented_adj_mat[i][j] != 4:
-                                        feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %j + "v%i}\n" %i)
+                                        feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %i + "v%i}\n" %j)
         feynmf_file.write(end_file)
     else:
         print "Perturbative order too small"
