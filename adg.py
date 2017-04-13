@@ -226,8 +226,13 @@ for diag in G:
     if((nx.number_weakly_connected_components(diag)) == 1):
         G1.append(diag)
 G=G1
-# Specific checks for topologically identical diagrams in BMBPT
+# Specific checks for loop diagrams and topologically identical diagrams in BMBPT
 if theory == "BMBPT":
+    G1=[]
+    for diag in G:
+        if nx.is_directed_acyclic_graph(diag):
+            G1.append(diag)
+    G = G1
     G1=[]
     for diag in G:
         test = True
