@@ -423,8 +423,11 @@ if theory == "BMBPT":
     for diag in G:
         # Attribute a qp label to all propagators
         i = 1
+        nb_down_props = 0
         for prop in diag.edges_iter(keys=True):
             diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" %i
+            if prop[0] < prop[1]:
+                nb_down_props += 1
             i += 1
         # Determine the numerator corresponding to the diagram
         numerator = ""
@@ -437,13 +440,26 @@ if theory == "BMBPT":
             # Attribute the good "type number" to each vertex
             numerator = numerator + "^{%i" %diag.out_degree(vertex) + "%i}_{" %diag.in_degree(vertex)
             # First add the qp states corresponding to propagators going out
-            for prop in diag.edges_iter(vertex,keys=True):
+            for prop in diag.out_edges_iter(vertex,keys=True):
                 numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             # Add the qp states corresponding to propagators coming in
-            for prop in diag.edges_iter(keys=True):
-                if prop[1] == vertex:
-                    numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+            for prop in diag.in_edges_iter(vertex,keys=True):
+                numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             numerator = numerator + "} "
+        #Determine the pre-factor
+        prefactor = "(-1)^%i " %(norder -1)
+        if (nb_down_props % 2 != 0):
+            prefactor = "-" + prefactor
+        sym_fact = ""
+        for vertex_i in diag:
+            for vertex_j in diag:
+                if diag.number_of_edges(vertex_i,vertex_j) >= 2:
+                    sym_fact = sym_fact + "(%i!)" %diag.number_of_edges(vertex_i,vertex_j)
+        if sym_fact != "":
+            prefactor = prefactor + "\\frac{1}{" +sym_fact +"}\sum_{k_i}"
+        else:
+            prefactor = prefactor + "\sum_{k_i}"
+        diag_exp = prefactor + numerator
 
 ## Function generating the feynmanmf instructions
 def feynmf_generator(diag,theory,diag_name):
