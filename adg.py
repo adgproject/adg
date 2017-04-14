@@ -418,6 +418,53 @@ if theory == "MBPT":
         #print "After neqlines"
         #### Loops
 
+#Treatment of the algebraic expressions
+if theory == "BMBPT":
+    for diag in G:
+        # Attribute a qp label to all propagators
+        prop_save = (-1,-1)
+        i = 1
+        for vertex in nx.nodes(diag):
+            for prop in nx.edges_iter(diag,vertex):
+                if prop_save != (prop[0],prop[1]):
+                    prop_counter = 0
+                diag.edge[prop[0]][prop[1]][prop_counter]['qp_state'] = "k_{%i}" %i
+                prop_save = (prop[0],prop[1])
+                prop_counter += 1
+                i += 1
+        # Determine the numerator corresponding to the diagram
+        numerator = ""
+        for vertex in nx.nodes(diag):
+            #Attribute the correct operator to each vertex
+            if diag.node[vertex]['operator']:
+                numerator += "O"
+            else:
+                numerator += "\Omega"
+            # Attribute the good "type number" to each vertex
+            in_degree = 0
+            for prop in nx.edges_iter(diag):
+                if prop[1] == vertex:
+                    in_degree += 1
+            out_degree = len(nx.edges(diag,vertex))
+            numerator = numerator + "^{%i" %out_degree + "%i}_{" %in_degree
+            # First add the qp states corresponding to propagators going out
+            prop_counter = 0
+            for prop in nx.edges_iter(diag,vertex):
+                if prop_save != (prop[0],prop[1]):
+                    prop_counter = 0
+                numerator = numerator + diag.edge[prop[0]][prop[1]][prop_counter]['qp_state']
+                prop_save = (prop[0],prop[1])
+                prop_counter += 1
+            # Add the qp states corresponding to propagators coming in
+            prop_counter = 0
+            for prop in nx.edges_iter(diag):
+                if prop_save != (prop[0],prop[1]):
+                    prop_counter = 0
+                if prop[1] == vertex:
+                    numerator = numerator + diag.edge[prop[0]][prop[1]][prop_counter]['qp_state']
+                    prop_save = (prop[0],prop[1])
+                    prop_counter += 1
+            numerator = numerator + "} "
 
 ## Function generating the feynmanmf instructions
 def feynmf_generator(diag,theory,diag_name):
