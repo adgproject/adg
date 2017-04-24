@@ -480,12 +480,20 @@ if theory == "BMBPT":
         if (nb_down_props % 2 != 0):
             prefactor = "-" + prefactor
         sym_fact = ""
+        prop_multiplicity = []
+        for i in range(6):
+            prop_multiplicity.append(0)
         for vertex_i in diag:
             for vertex_j in diag:
                 if diag.number_of_edges(vertex_i,vertex_j) >= 2:
-                    sym_fact = sym_fact + "(%i!)" %diag.number_of_edges(vertex_i,vertex_j)
+                    prop_multiplicity[diag.number_of_edges(vertex_i,vertex_j)-1] += 1
+        for i in range(len(prop_multiplicity)):
+            if prop_multiplicity[i] == 1:
+                sym_fact = sym_fact + "(%i!)" %(i+1)
+            elif prop_multiplicity[i] >= 2:
+                sym_fact = sym_fact + "(%i!)" %(i+1) + "^%i" %prop_multiplicity[i]
         if sym_fact != "":
-            prefactor = prefactor + "\\frac{1}{" +sym_fact +"}\sum_{k_i}"
+            prefactor = "\\frac{" + prefactor + "}{" +sym_fact +"}\sum_{k_i}"
         else:
             prefactor = prefactor + "\sum_{k_i}"
         feynman_exp = prefactor + numerator + "\int_{0}^{\\tau}" + integral + "\n"
