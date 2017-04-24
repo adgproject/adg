@@ -446,6 +446,18 @@ if theory == "BMBPT":
             for prop in diag.in_edges_iter(vertex,keys=True):
                 numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             numerator = numerator + "} "
+        # Determine the denominator corresponding to the diagram
+        # First determine the type of structure we have
+        denominator = ""
+        if nx.dag_longest_path_length(diag) == (norder-1):
+            print nx.dag_longest_path(diag)
+            for vertex in range(1,norder):
+                denominator = denominator + "("
+                for prop in diag.in_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
+                    denominator = denominator + "+ E_" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                for prop in diag.out_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
+                    denominator = denominator + "- E_" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + " "
+                denominator = denominator + ")"
         #Determine the pre-factor
         prefactor = "(-1)^%i " %(norder -1)
         if (nb_down_props % 2 != 0):
@@ -459,7 +471,10 @@ if theory == "BMBPT":
             prefactor = prefactor + "\\frac{1}{" +sym_fact +"}\sum_{k_i}"
         else:
             prefactor = prefactor + "\sum_{k_i}"
-        diag_exp = prefactor + numerator
+        if denominator != "":
+            diag_exp = prefactor + "\\frac{ " + numerator + " }{ " + denominator + " }"
+        else:
+            diag_exp = prefactor + numerator
 
 ## Function generating the feynmanmf instructions
 def feynmf_generator(diag,theory,diag_name):
