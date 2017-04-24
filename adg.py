@@ -621,6 +621,7 @@ if (land):
     header = header + "\usepackage[landscape]{geometry}\n"
 
 header = header + "\\title{Diagrams and algebraic expressions at order %i" % norder +" in " + theory +"}\n"
+header = header + "\\author{RDL, JR, PA, MD, AT}\n"
 latex_file = open(directory + '/result.tex','w')
 latex_file.write(header)
 begdoc ="\\begin{document}\n"
@@ -652,6 +653,7 @@ if (not pdiag or not pdraw):
         elif theory == "BMBPT":
             diag_exp = diag_expressions[i_diag]
             feynman_exp = feynman_expressions[i_diag]
+            latex_file.write("Diagram %i:\n" %(i_diag+1))
             latex_file.write(begeq)
             latex_file.write(feynman_exp)
             latex_file.write(endeq)
@@ -675,6 +677,7 @@ else:
                     latex_file.write("\subsection{Three-body canonical diagrams for a generic operator only}\n")
                 elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
                     latex_file.write("\subsection{Three-body non-canonical diagrams}\n")
+        latex_file.write("Diagram %i:\n" %(i_diag+1))
         if theory == "MBPT":
             diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
         elif theory == "BMBPT":
