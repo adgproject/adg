@@ -697,10 +697,10 @@ msg = 'Compile pdf ?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if (pdfcompile):
     os.chdir(directory)
-    os.system("pdflatex result.tex")
+    os.system("pdflatex -shell-escape result.tex")
     if pdiag:
         #Second compilation needed
-        os.system("pdflatex result.tex")
+        os.system("pdflatex -shell-escape result.tex")
         #Get rid of undesired feynmp files to keep a clean directory
         for i_diag in range(0,numdiag):
             os.unlink("diag_%i.1" %i_diag)
