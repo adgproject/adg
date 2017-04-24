@@ -420,13 +420,14 @@ if theory == "MBPT":
 
 #Treatment of the algebraic expressions
 if theory == "BMBPT":
+    diag_expressions = []
     for diag in G:
         # Attribute a qp label to all propagators
         i = 1
         nb_down_props = 0
         for prop in diag.edges_iter(keys=True):
             diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" %i
-            if prop[0] < prop[1]:
+            if prop[1] < prop[0]:
                 nb_down_props += 1
             i += 1
         # Determine the numerator corresponding to the diagram
@@ -454,10 +455,11 @@ if theory == "BMBPT":
             for vertex in range(1,norder):
                 denominator = denominator + "("
                 for prop in diag.in_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
-                    denominator = denominator + "+ E_" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                    denominator = denominator + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                 for prop in diag.out_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
-                    denominator = denominator + "- E_" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + " "
+                    denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                 denominator = denominator + ")"
+
         #Determine the pre-factor
         prefactor = "(-1)^%i " %(norder -1)
         if (nb_down_props % 2 != 0):
@@ -472,9 +474,10 @@ if theory == "BMBPT":
         else:
             prefactor = prefactor + "\sum_{k_i}"
         if denominator != "":
-            diag_exp = prefactor + "\\frac{ " + numerator + " }{ " + denominator + " }"
+            diag_exp = prefactor + "\\frac{ " + numerator + " }{ " + denominator + " }\n"
         else:
-            diag_exp = prefactor + numerator
+            diag_exp = prefactor + numerator + "\n"
+        diag_expressions.append(diag_exp)
 
 ## Function generating the feynmanmf instructions
 def feynmf_generator(diag,theory,diag_name):
@@ -617,9 +620,12 @@ if theory == "BMBPT":
             latex_file.write("3N canonical diagrams for a generic operator only: %i\n\n" %nb_3_EHF)
         latex_file.write("3N non-canonical diagrams: %i\n\n" %nb_3_noHF)
 
-if (not pdiag or not pdraw) and (theory == "MBPT"):
+if (not pdiag or not pdraw):
     for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        if theory == "MBPT":
+            diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+        elif theory == "BMBPT":
+            diag_exp = diag_expressions[i_diag]
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
@@ -642,9 +648,11 @@ else:
                     latex_file.write("\subsection{Three-body non-canonical diagrams}\n")
         if theory == "MBPT":
             diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
-            latex_file.write(begeq)
-            latex_file.write(diag_exp)
-            latex_file.write(endeq)
+        elif theory == "BMBPT":
+            diag_exp = diag_expressions[i_diag]
+        latex_file.write(begeq)
+        latex_file.write(diag_exp)
+        latex_file.write(endeq)
         latex_file.write('\n\\begin{center}\n')
         diag_file = open(directory+"/Diagrams/diag_%i.tex" %i_diag)
         latex_file.write(diag_file.read())
