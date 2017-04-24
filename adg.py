@@ -420,6 +420,7 @@ if theory == "MBPT":
 
 #Treatment of the algebraic expressions
 if theory == "BMBPT":
+    feynman_expressions = []
     diag_expressions = []
     for diag in G:
         # Attribute a qp label to all propagators
@@ -451,7 +452,6 @@ if theory == "BMBPT":
         # First determine the type of structure we have
         denominator = ""
         if nx.dag_longest_path_length(diag) == (norder-1):
-            print nx.dag_longest_path(diag)
             for vertex in range(1,norder):
                 denominator = denominator + "("
                 for prop in diag.in_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
@@ -459,7 +459,22 @@ if theory == "BMBPT":
                 for prop in diag.out_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
                     denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                 denominator = denominator + ")"
-
+        # Determine the integral component in the Feynman expression
+        integral = ""
+        for vertex in range(1,norder):
+            integral = integral + "\mathrm{d}\\tau_%i" %vertex
+        if norder > 2:
+            for vertex_i in range(1,norder):
+                for vertex_j in range(1,norder):
+                    if diag.has_edge(vertex_i,vertex_j):
+                        integral = integral + "\\theta(\\tau_%i" %vertex_j + "-\\tau_%i) " %vertex_i
+        for vertex in range(1,norder):
+            integral = integral + "e^{-\\tau_%i (" %vertex
+            for prop in diag.in_edges_iter(vertex,keys=True):
+                integral = integral + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+            for prop in diag.out_edges_iter(vertex,keys=True):
+                integral = integral + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+            integral = integral + ")}"
         #Determine the pre-factor
         prefactor = "(-1)^%i " %(norder -1)
         if (nb_down_props % 2 != 0):
@@ -473,10 +488,12 @@ if theory == "BMBPT":
             prefactor = prefactor + "\\frac{1}{" +sym_fact +"}\sum_{k_i}"
         else:
             prefactor = prefactor + "\sum_{k_i}"
+        feynman_exp = prefactor + numerator + "\int_{0}^{\\tau}" + integral + "\n"
         if denominator != "":
             diag_exp = prefactor + "\\frac{ " + numerator + " }{ " + denominator + " }\n"
         else:
             diag_exp = prefactor + numerator + "\n"
+        feynman_expressions.append(feynman_exp)
         diag_expressions.append(diag_exp)
 
 ## Function generating the feynmanmf instructions
@@ -626,6 +643,10 @@ if (not pdiag or not pdraw):
             diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
         elif theory == "BMBPT":
             diag_exp = diag_expressions[i_diag]
+            feynman_exp = feynman_expressions[i_diag]
+            latex_file.write(begeq)
+            latex_file.write(feynman_exp)
+            latex_file.write(endeq)
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
@@ -650,6 +671,10 @@ else:
             diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
         elif theory == "BMBPT":
             diag_exp = diag_expressions[i_diag]
+            feynman_exp = feynman_expressions[i_diag]
+            latex_file.write(begeq)
+            latex_file.write(feynman_exp)
+            latex_file.write(endeq)
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
