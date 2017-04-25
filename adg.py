@@ -451,13 +451,22 @@ if theory == "BMBPT":
         # Determine the denominator corresponding to the diagram
         # First determine the type of structure we have
         denominator = ""
+        # For completely time-ordered diagrams
+        # We can use a Goldstone-MBPT-like rule enforced with subgraphs
         if nx.dag_longest_path_length(diag) == (norder-1):
-            for vertex in range(1,norder):
+            for i in range(1,norder):
+                subgraph_stack = []
+                for j in range(i,norder):
+                    vertex = nx.dag_longest_path(diag)[j]
+                    subgraph_stack.append(vertex)
+                subdiag = diag.subgraph(subgraph_stack)
                 denominator = denominator + "("
-                for prop in diag.in_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
-                    denominator = denominator + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
-                for prop in diag.out_edges_iter(nx.dag_longest_path(diag)[vertex],keys=True):
-                    denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                for prop in diag.in_edges_iter(subdiag,keys=True):
+                    if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
+                        denominator = denominator + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                for prop in diag.out_edges_iter(subdiag,keys=True):
+                    if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
+                        denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                 denominator = denominator + ")"
         # Determine the integral component in the Feynman expression
         integral = ""
