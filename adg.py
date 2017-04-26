@@ -451,23 +451,34 @@ if theory == "BMBPT":
         # Determine the denominator corresponding to the diagram
         # First determine the type of structure we have
         denominator = ""
-        # For completely time-ordered diagrams
-        # We can use a Goldstone-MBPT-like rule enforced with subgraphs
-        if nx.dag_longest_path_length(diag) == (norder-1):
-            for i in range(1,norder):
-                subgraph_stack = []
-                for j in range(i,norder):
-                    vertex = nx.dag_longest_path(diag)[j]
-                    subgraph_stack.append(vertex)
-                subdiag = diag.subgraph(subgraph_stack)
-                denominator = denominator + "("
-                for prop in diag.in_edges_iter(subdiag,keys=True):
-                    if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
-                        denominator = denominator + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
-                for prop in diag.out_edges_iter(subdiag,keys=True):
-                    if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
-                        denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
-                denominator = denominator + ")"
+        testgraph_stack = []
+        for vertex in range(1,norder):
+            testgraph_stack.append(vertex)
+        testdiag = diag.subgraph(testgraph_stack)
+        test_adg_subgraphs = True
+        for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
+            if len(connected_subgraph) > 1:
+                if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
+                    test_adg_subgraphs = False
+        if test_adg_subgraphs:
+            for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
+                for i in range(len(connected_subgraph)):
+                    subgraph_stack = []
+                    if len(connected_subgraph) > 1:
+                        for j in range(i,len(connected_subgraph)):
+                            vertex = nx.dag_longest_path(connected_subgraph)[j]
+                            subgraph_stack.append(vertex)
+                    elif len(connected_subgraph) == 1:
+                        subgraph_stack.append(connected_subgraph.nodes()[0])
+                    subdiag = connected_subgraph.subgraph(subgraph_stack)
+                    denominator = denominator + "("
+                    for prop in diag.in_edges_iter(subdiag,keys=True):
+                        if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
+                            denominator = denominator + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                    for prop in diag.out_edges_iter(subdiag,keys=True):
+                        if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
+                            denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                    denominator = denominator + ")"
         # Determine the integral component in the Feynman expression
         integral = ""
         for vertex in range(1,norder):
