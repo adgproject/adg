@@ -452,14 +452,17 @@ if theory == "BMBPT":
         # First determine the type of structure we have
         denominator = ""
         testgraph_stack = []
+        # Create a subgraph without the operator vertex
         for vertex in range(1,norder):
             testgraph_stack.append(vertex)
         testdiag = diag.subgraph(testgraph_stack)
         test_adg_subgraphs = True
+        # Use the subgraph to determine the structure of the overall graph
         for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
             if len(connected_subgraph) > 1:
                 if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
                     test_adg_subgraphs = False
+        # If the graph has the appropriate structure, determine the denominator
         if test_adg_subgraphs:
             for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
                 for i in range(len(connected_subgraph)):
@@ -479,6 +482,20 @@ if theory == "BMBPT":
                         if subdiag.has_edge(prop[0],prop[1],prop[2]) == False:
                             denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                     denominator = denominator + ")"
+        # Determine the time structure of the graph
+        diag_copy = diag.to_directed()
+        for vertex in range(1,len(diag_copy)):
+            if diag_copy.in_degree(vertex) == 0:
+                diag_copy.add_edge(0,vertex)
+        time_diag = nx.DiGraph()
+        for vertex_i in diag_copy.nodes_iter():
+            for vertex_j in diag_copy.nodes_iter():
+                lgst_path = []
+                for path in nx.all_simple_paths(diag_copy, source= vertex_i, target= vertex_j):
+                    if len(path) > len(lgst_path):
+                        lgst_path = path
+                time_diag.add_path(lgst_path)
+        TimeStructureIsTree = nx.is_arborescence(time_diag)
         # Determine the integral component in the Feynman expression
         integral = ""
         for vertex in range(1,norder):
