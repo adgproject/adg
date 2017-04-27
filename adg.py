@@ -139,13 +139,13 @@ def diagram_generation(n):
                 matrix[i][j] += elem
         double.append(matrix)
     doubleUniq = []
-    for i in double:
-        if i not in doubleUniq:
-            doubleUniq.append(i)
+    for matrix in double:
+        if matrix not in doubleUniq:
+            doubleUniq.append(matrix)
     doubleUniq.sort(reverse=True)
     diagrams = []
-    for el in doubleUniq:
-        diagrams.append(np.array(el))
+    for matrix in doubleUniq:
+        diagrams.append(np.array(matrix))
     return diagrams
 
 
