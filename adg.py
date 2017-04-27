@@ -42,13 +42,13 @@ if not os.path.exists(directory+"/Diagrams"):
     os.makedirs(directory+"/Diagrams")
 
 
-# Generate all 1-magic square of dimension n
 def seed(n):
+    """Generate all 1-magic square of dimension n."""
     return [k for k in itertools.permutations(range(n), n)]
 
 
-# Select matrices with full 0 diagonal
 def no_trace(matrices):
+    """Select matrices with full 0 diagonal."""
     traceless = []
     for matrix in matrices:
         test = True
@@ -61,8 +61,8 @@ def no_trace(matrices):
     return traceless
 
 
-# Select out matrices with loops between two vertices
 def no_loop(matrices):
+    """Select out matrices with loops between two vertices."""
     no_loop = []
     for matrix in matrices:
         test = True
@@ -76,8 +76,10 @@ def no_loop(matrices):
     return no_loop
 
 
-# Check the degrees of the vertices (i.e. its effective one-, two- or three-body structure)
 def check_degree(matrices, three_N):
+    """Check the degrees of the vertices
+    (i.e. its effective one-, two- or three-body structure).
+    """
     deg_ok = []
     for matrix in matrices:
         test = True
@@ -94,8 +96,8 @@ def check_degree(matrices, three_N):
     return deg_ok
 
 
-# Generate the diagrams for the MBPT case
 def diagram_generation(n):
+    """Generate the diagrams for the MBPT case."""
     seeds = seed(n)
     all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
     traceless = no_trace(all)
@@ -118,9 +120,8 @@ def diagram_generation(n):
     return diagrams
 
 
-# Generate diagrams for BMBPT
-# Diagrams are generated from bottom up
 def BMBPT_generation(p_order, three_N, norm):
+    """Generate diagrams for BMBPT from bottom up."""
     # Begin by creating a zero oriented adjacency matric of good dimensions
     empty_mat = []
     for i in range(p_order):
@@ -333,19 +334,17 @@ if theory == "BMBPT":
 
 
 def line_label_h(n):
+    """Select appropriate label for hole line."""
     labels = list(string.ascii_lowercase)
     labels = labels[0:15]
     return labels[n]
 
 
 def line_label_p(n):
+    """Select appropriate label for particle line."""
     labels = list(string.ascii_lowercase)
     labels = labels[15:-1]
     return labels[n]
-
-
-def mat_elements(irow):
-    return
 
 
 # Treatment of the algebraic expressions
@@ -546,8 +545,8 @@ if theory == "BMBPT":
         diag_expressions.append(diag_exp)
 
 
-# Function generating the feynmanmf instructions
 def feynmf_generator(diag, theory, diag_name):
+    """Generate the feynmanmp instructions corresponding to the diagram."""
     p_order = diag.number_of_nodes()
     diag_size = 20*p_order
 
