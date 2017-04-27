@@ -96,6 +96,32 @@ def check_degree(matrices, three_N):
     return deg_ok
 
 
+def check_vertex_degree(matrices, three_N, vertex_id):
+    """Check the degree of a specific vertex in a set of matrices"""
+    good_matrices = []
+    for matrix in matrices:
+        vertex_degree_OK = True
+        vertex_degree = 0
+        for index in range(len(matrix[0])):
+            vertex_degree += matrix[index][vertex_id] + matrix[vertex_id][index]
+        if (vertex_degree != 2) and (vertex_degree != 4):
+            if (not three_N) or (vertex_degree != 6):
+                vertex_degree_OK = False
+        if vertex_degree_OK:
+            good_matrices.append(matrix)
+    return good_matrices
+
+
+def empty_matrix_generation(size):
+    """Generate an empty matrix of size (size,size)"""
+    empty_matrix = []
+    for line in range(size):
+        empty_matrix.append([])
+        for element in range(size):
+            empty_matrix[line].append(0)
+    return empty_matrix
+
+
 def diagram_generation(n):
     """Generate the diagrams for the MBPT case."""
     seeds = seed(n)
@@ -122,19 +148,14 @@ def diagram_generation(n):
 
 def BMBPT_generation(p_order, three_N, norm):
     """Generate diagrams for BMBPT from bottom up."""
-    # Begin by creating a zero oriented adjacency matric of good dimensions
-    empty_mat = []
-    for i in range(p_order):
-        empty_mat.append([])
-        for j in range(p_order):
-            empty_mat[i].append(0)
 
     deg_max = 4
     if three_N:
         deg_max = 6
 
+    # Create a null oriented adjacency matrix of dimension (p_order,p_order)
     temp_matrices = []
-    temp_matrices.append(empty_mat)
+    temp_matrices.append(empty_matrix_generation(p_order))
 
     # Generate oriented adjacency matrices going vertex-wise
     for vertex in range(p_order):
@@ -153,7 +174,7 @@ def BMBPT_generation(p_order, three_N, norm):
                         matrices.append(temp_mat)
                         elem += 1
             temp_matrices = copy.deepcopy(matrices)
-            # Column is not iterated upon for the first vertex in operator diagrams
+            # Column not iterated upon for first vertex in operator diagrams
             if norm or (vertex != 0):
                 matrices = []
                 for mat in temp_matrices:
@@ -169,31 +190,20 @@ def BMBPT_generation(p_order, three_N, norm):
                             matrices.append(temp_mat)
                             elem += 1
                 temp_matrices = copy.deepcopy(matrices)
-        deg_vertex_ok = []
-        for matrix in temp_matrices:
-            test = True
-            degree = 0
-            for i in range(0, p_order):
-                degree += matrix[i][vertex] + matrix[vertex][i]
-            if (degree != 2) and (degree != 4):
-                if (not three_N) or (degree != 6):
-                    test = False
-            if test:
-                deg_vertex_ok.append(matrix)
-        matrices = copy.deepcopy(deg_vertex_ok)
-        temp_matrices = copy.deepcopy(deg_vertex_ok)
+        temp_matrices = check_vertex_degree(matrices, three_N, vertex)
+        matrices = copy.deepcopy(temp_matrices)
 
     # Checks to exclude non-conform matrices
-    good_degree = check_degree(matrices, three_N)
-    mat_wo_loops = no_loop(good_degree)
+    matrices = check_degree(matrices, three_N)
+    matrices = no_loop(matrices)
     matricesUniq = []
-    for i in mat_wo_loops:
-        if i not in matricesUniq:
-            matricesUniq.append(i)
+    for mat in matrices:
+        if mat not in matricesUniq:
+            matricesUniq.append(mat)
     matricesUniq.sort(reverse=True)
     diagrams = []
-    for el in matricesUniq:
-        diagrams.append(np.array(el))
+    for mat in matricesUniq:
+        diagrams.append(np.array(mat))
     return diagrams
 
 
@@ -551,13 +561,10 @@ def feynmf_generator(diag, theory, diag_name):
     diag_size = 20*p_order
 
     theories = ["MBPT", "BMBPT", "SCGF"]
-    th_index = theories.index(theory)
     prop_types = ["half_prop", "prop_pm", "double_arrow"]
-    prop = prop_types[th_index]
+    prop = prop_types[theories.index(theory)]
 
-    file_name = diag_name + ".tex"
-
-    feynmf_file = open(file_name, 'w')
+    feynmf_file = open(diag_name + ".tex", 'w')
 
     begin_file = "\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" % diag_size + ",%i)\n" % diag_size
     end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
@@ -584,15 +591,9 @@ def feynmf_generator(diag, theory, diag_name):
             feynmf_file.write("\\fmffreeze\n")
 
         # Recover the oriented adjacency matrix of the diagram
-        oriented_adj_mat = []
-        for i in range(0, p_order):
-            oriented_adj_mat.append([])
-            for j in range(0, p_order):
-                oriented_adj_mat[i].append(0)
-        for line in nx.generate_edgelist(diag, data=False):
-            i = int(line[0])
-            j = int(line[2])
-            oriented_adj_mat[i][j] += 1
+        oriented_adj_mat = empty_matrix_generation(p_order)
+        for propagator in diag.edges_iter():
+            oriented_adj_mat[propagator[0]][propagator[1]] += 1
 
         # Loop over all elements of the matrix to draw associated propagators
         for i in range(0, p_order):
