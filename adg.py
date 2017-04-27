@@ -236,34 +236,34 @@ for diag in G:
     if (nx.number_weakly_connected_components(diag)) == 1:
         G1.append(diag)
 G = G1
-# Specific checks for loop diagrams and topologically identical diagrams in BMBPT
+# Specific check for loop diagrams in BMBPT
 if theory == "BMBPT":
     G1 = []
     for diag in G:
         if nx.is_directed_acyclic_graph(diag):
             G1.append(diag)
     G = G1
+
+for diag in G:
+    # Account for different status of vertices in operator diagrams
+    for node in diag:
+        diag.node[node]['operator'] = False
+    if (theory == "BMBPT") and not norm:
+        diag.node[0]['operator'] = True
+
+# Specific check for topologically identical diagrams in BMBPT
+if theory == "BMBPT":
     G1 = []
+    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for diag in G:
-        test = True
-        if not norm:
-            # Account for different status of vertices in operator diagrams
-            for node in diag:
-                diag.node[node]['operator'] = False
-            diag.node[0]['operator'] = True
-            nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
         if G1 == []:
             G1.append(diag)
         else:
+            test = True
             for good_diag in G1:
-                if norm:
-                    if nx.is_isomorphic(diag, good_diag):
-                        test = False
-                        break
-                else:
-                    if nx.is_isomorphic(diag, good_diag, node_match=nm):
-                        test = False
-                        break
+                if nx.is_isomorphic(diag, good_diag, node_match=nm):
+                    test = False
+                    break
             if test:
                 G1.append(diag)
     G = G1
