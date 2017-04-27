@@ -117,6 +117,7 @@ def diagram_generation(n):
         diagrams.append(np.array(el))
     return diagrams
 
+
 # Generate diagrams for BMBPT
 # Diagrams are generated from bottom up
 def BMBPT_generation(p_order, three_N, norm):
@@ -443,7 +444,7 @@ if theory == "BMBPT":
             else:
                 numerator += "\Omega"
             # Attribute the good "type number" to each vertex
-            numerator = numerator + "^{%i" % diag.out_degree(vertex) + "%i}_{" %diag.in_degree(vertex)
+            numerator = numerator + "^{%i" % diag.out_degree(vertex) + "%i}_{" % diag.in_degree(vertex)
             # First add the qp states corresponding to propagators going out
             for prop in diag.out_edges_iter(vertex, keys=True):
                 numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
@@ -527,11 +528,11 @@ if theory == "BMBPT":
             for vertex_j in diag:
                 if diag.number_of_edges(vertex_i, vertex_j) >= 2:
                     prop_multiplicity[diag.number_of_edges(vertex_i, vertex_j)-1] += 1
-        for i in range(len(prop_multiplicity)):
-            if prop_multiplicity[i] == 1:
-                sym_fact = sym_fact + "(%i!)" % (i+1)
-            elif prop_multiplicity[i] >= 2:
-                sym_fact = sym_fact + "(%i!)" % (i+1) + "^%i" % prop_multiplicity[i]
+        for prop_id, multiplicity in enumerate(prop_multiplicity):
+            if multiplicity == 1:
+                sym_fact = sym_fact + "(%i!)" % (prop_id+1)
+            elif multiplicity >= 2:
+                sym_fact = sym_fact + "(%i!)" % (prop_id+1) + "^%i" % multiplicity
         if sym_fact != "":
             prefactor = "\\frac{" + prefactor + "}{" + sym_fact + "}\sum_{k_i}"
         else:
@@ -559,7 +560,7 @@ def feynmf_generator(diag, theory, diag_name):
 
     feynmf_file = open(file_name, 'w')
 
-    begin_file = "\parbox{%i" %diag_size +"pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" %diag_size + ",%i)\n" %diag_size
+    begin_file = "\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" % diag_size + ",%i)\n" % diag_size
     end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
 
     # Draw the diagram only if there is one to be drawn...
@@ -622,7 +623,7 @@ def feynmf_generator(diag, theory, diag_name):
                     if (oriented_adj_mat[i][j] == 1) and (oriented_adj_mat[j][i] == 2):
                         feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
                     else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," % i + "v%i}\n" %j)
+                        feynmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," % i + "v%i}\n" % j)
                         if oriented_adj_mat[i][j] != 1:
                             feynmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," % i + "v%i}\n" % j)
                             if oriented_adj_mat[i][j] != 2:
@@ -662,7 +663,7 @@ if norder > 3:
 if land:
     header = header + "\usepackage[landscape]{geometry}\n"
 
-header = header + "\\title{Diagrams and algebraic expressions at order %i" % norder + " in " + theory +"}\n"
+header = header + "\\title{Diagrams and algebraic expressions at order %i" % norder + " in " + theory + "}\n"
 header = header + "\\author{RDL, JR, PA, MD, AT}\n"
 latex_file = open(directory + '/result.tex', 'w')
 latex_file.write(header)
