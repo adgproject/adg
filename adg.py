@@ -564,77 +564,66 @@ def feynmf_generator(diag, theory, diag_name):
     prop_types = ["half_prop", "prop_pm", "double_arrow"]
     prop = prop_types[theories.index(theory)]
 
-    feynmf_file = open(diag_name + ".tex", 'w')
-
+    fmf_file = open(diag_name + ".tex", 'w')
     begin_file = "\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" % diag_size + ",%i)\n" % diag_size
     end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
 
     # Draw the diagram only if there is one to be drawn...
-    if p_order >= 2:
-        feynmf_file.write(begin_file)
+    if p_order < 2:
+        print "Perturbative order too small"
+    else:
+        fmf_file.write(begin_file)
 
-        # Set the position of the top and bottom vertices
-        feynmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
-        if (theory == "BMBPT") and (not norm):
-            feynmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v0}\n")
-        else:
-            feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}\n")
-        feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % (p_order-1))
-        # Set the position of intermediate vertices if needed
-        if p_order > 2:
-            feynmf_file.write("\\fmf{phantom}{v0,v1}\n")
-            for vertex in range(1, p_order-2):
-                feynmf_file.write("\\fmf{phantom}{v%i" % vertex + ",v%i}\n" % (vertex+1))
-                feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % vertex)
-            feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % (p_order-2))
-            feynmf_file.write("\\fmf{phantom}{v%i," % (p_order-2) + "v%i}\n" % (p_order-1))
-            feynmf_file.write("\\fmffreeze\n")
-
-        # Recover the oriented adjacency matrix of the diagram
-        oriented_adj_mat = empty_matrix_generation(p_order)
-        for propagator in diag.edges_iter():
-            oriented_adj_mat[propagator[0]][propagator[1]] += 1
+        # Set the position of the vertices
+        fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
+        for vertex in range(p_order-1):
+            fmf_file.write("\\fmf{phantom}{v%i" % vertex + ",v%i}\n" % (vertex+1))
+            if diag.node[vertex]['operator']:
+                fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v%i}\n" % vertex)
+            else:
+                fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % vertex)
+        fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % (p_order-1))
+        fmf_file.write("\\fmffreeze\n")
 
         # Loop over all elements of the matrix to draw associated propagators
         for i in range(0, p_order):
             for j in range(0, p_order):
                 # For directly consecutive vertices
-                if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0):
-                    if oriented_adj_mat[i][j] == 1:
-                        if oriented_adj_mat[j][i] != 1:
-                            feynmf_file.write("\\fmf{" + prop + "}{v%i," % i + "v%i}\n" % j)
+                if (abs(i-j) == 1) and diag.has_edge(i, j):
+                    if diag.number_of_edges(i, j) == 1:
+                        if diag.number_of_edges(j, i) != 1:
+                            fmf_file.write("\\fmf{" + prop + "}{v%i," % i + "v%i}\n" % j)
                         else:
-                            feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," % i + "v%i}\n" % j)
+                            fmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," % i + "v%i}\n" % j)
                     else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," % i + "v%i}\n" % j)
-                        feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," % i + "v%i}\n" % j)
-                        if oriented_adj_mat[i][j] == 3:
-                            feynmf_file.write("\\fmf{" + prop + "}{v%i," % i + "v%i}\n" % j)
-                        elif oriented_adj_mat[i][j] >= 4:
-                            feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
-                            feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," % i + "v%i}\n" % j)
-                            if oriented_adj_mat[i][j] >= 5:
-                                feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," % i + "v%i}\n" % j)
-                                if oriented_adj_mat[i][j] == 6:
-                                    feynmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," % i + "v%i}\n" % j)
+                        fmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," % i + "v%i}\n" % j)
+                        fmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," % i + "v%i}\n" % j)
+                        if diag.number_of_edges(i, j) == 3:
+                            fmf_file.write("\\fmf{" + prop + "}{v%i," % i + "v%i}\n" % j)
+                        elif diag.number_of_edges(i, j) >= 4:
+                            fmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
+                            fmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," % i + "v%i}\n" % j)
+                            if diag.number_of_edges(i, j) >= 5:
+                                fmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," % i + "v%i}\n" % j)
+                                if diag.number_of_edges(i, j) == 6:
+                                    fmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," % i + "v%i}\n" % j)
 
                 # For more distant vertices
-                elif (i != j) and (oriented_adj_mat[i][j] != 0):
-                    if (oriented_adj_mat[i][j] == 1) and (oriented_adj_mat[j][i] == 2):
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
+                elif (i != j) and diag.has_edge(i, j):
+                    if (diag.number_of_edges(i, j) == 1) and (diag.number_of_edges(j, i) == 2):
+                        fmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
                     else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," % i + "v%i}\n" % j)
-                        if oriented_adj_mat[i][j] != 1:
-                            feynmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," % i + "v%i}\n" % j)
-                            if oriented_adj_mat[i][j] != 2:
-                                feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
-                                if oriented_adj_mat[i][j] != 3:
-                                    feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," % i + "v%i}\n" % j)
-                                    if oriented_adj_mat[i][j] != 4:
-                                        feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," % i + "v%i}\n" % j)
-        feynmf_file.write(end_file)
-    else:
-        print "Perturbative order too small"
+                        fmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," % i + "v%i}\n" % j)
+                        if diag.number_of_edges(i, j) != 1:
+                            fmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," % i + "v%i}\n" % j)
+                            if diag.number_of_edges(i, j) != 2:
+                                fmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
+                                if diag.number_of_edges(i, j) != 3:
+                                    fmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," % i + "v%i}\n" % j)
+                                    if diag.number_of_edges(i, j) != 4:
+                                        fmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," % i + "v%i}\n" % j)
+        fmf_file.write(end_file)
+    fmf_file.close()
 
 
 # Writing a feynmp file for each graph
