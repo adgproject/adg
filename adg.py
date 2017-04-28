@@ -31,7 +31,9 @@ three_N = False
 norm = False
 if theory == "BMBPT":
     three_N = raw_input("Include three-body forces ? (y/N) ").lower() == 'y'
-    norm = raw_input("Compute norm kernel instead of operator kernels ? (y/N) ").lower() == 'y'
+    norm = raw_input(
+        "Compute norm kernel instead of operator kernels ? (y/N) ").lower() == 'y'
+
 
 if three_N:
     directory = theory + '/Order-%i' % norder + 'with3N'
@@ -52,63 +54,64 @@ def seed(n):
 
 def no_trace(matrices):
     """Select matrices with full 0 diagonal."""
-    traceless = []
+    traceless_matrices = []
     for matrix in matrices:
-        test = True
+        test_traceless = True
         for i, n in enumerate(matrix):
             if n[i] == 1:
-                test = False
+                test_traceless = False
                 break
-        if test:
-            traceless.append(matrix)
-    return traceless
+        if test_traceless:
+            traceless_matrices.append(matrix)
+    return traceless_matrices
 
 
 def no_loop(matrices):
     """Select out matrices with loops between two vertices."""
-    no_loop = []
+    no_loop_matrices = []
     for matrix in matrices:
-        test = True
+        test_no_loop = True
         for i in range(len(matrix[0])):
             for j in range(i+1):
                 if (matrix[i][j] != 0) and (matrix[j][i] != 0):
-                    test = False
+                    test_no_loop = False
                     break
-        if test:
-            no_loop.append(matrix)
-    return no_loop
+        if test_no_loop:
+            no_loop_matrices.append(matrix)
+    return no_loop_matrices
 
 
-def check_degree(matrices, three_N):
+def check_degree(matrices, three_N_use):
     """Check the degrees of the vertices
     (i.e. its effective one-, two- or three-body structure).
     """
     deg_ok = []
     for matrix in matrices:
-        test = True
+        test_degree = True
         for i in range(len(matrix[0])):
             degree = 0
             for j in range(len(matrix[0])):
                 degree += matrix[i][j] + matrix[j][i]
             if (degree != 2) and (degree != 4):
-                if (not three_N) or (degree != 6):
-                    test = False
+                if (not three_N_use) or (degree != 6):
+                    test_degree = False
                     break
-        if test:
+        if test_degree:
             deg_ok.append(matrix)
     return deg_ok
 
 
-def check_vertex_degree(matrices, three_N, vertex_id):
+def check_vertex_degree(matrices, three_N_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices"""
     good_matrices = []
     for matrix in matrices:
         vertex_degree_OK = True
         vertex_degree = 0
         for index in range(len(matrix[0])):
-            vertex_degree += matrix[index][vertex_id] + matrix[vertex_id][index]
+            vertex_degree += matrix[index][vertex_id] \
+                + matrix[vertex_id][index]
         if (vertex_degree != 2) and (vertex_degree != 4):
-            if (not three_N) or (vertex_degree != 6):
+            if (not three_N_use) or (vertex_degree != 6):
                 vertex_degree_OK = False
         if vertex_degree_OK:
             good_matrices.append(matrix)
@@ -130,8 +133,10 @@ def diagram_generation(n):
     seeds = seed(n)
     all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
     traceless = no_trace(all)
-    coeffs = [i for i in itertools.combinations_with_replacement(range(len(traceless)), 2)]
+    coeffs = [i for i in itertools.combinations_with_replacement(
+        range(len(traceless)), 2)]
     double = []
+
     for coef in coeffs:
         matrix = copy.deepcopy(traceless[coef[0]])
         for i, line in enumerate(traceless[coef[1]]):
@@ -143,17 +148,17 @@ def diagram_generation(n):
         if matrix not in doubleUniq:
             doubleUniq.append(matrix)
     doubleUniq.sort(reverse=True)
-    diagrams = []
+    mbpt_diagrams = []
     for matrix in doubleUniq:
-        diagrams.append(np.array(matrix))
-    return diagrams
+        mbpt_diagrams.append(np.array(matrix))
+    return mbpt_diagrams
 
 
-def BMBPT_generation(p_order, three_N, norm):
+def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     """Generate diagrams for BMBPT from bottom up."""
 
     deg_max = 4
-    if three_N:
+    if three_N_use:
         deg_max = 6
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
@@ -178,7 +183,7 @@ def BMBPT_generation(p_order, three_N, norm):
                         elem += 1
             temp_matrices = copy.deepcopy(matrices)
             # Column not iterated upon for first vertex in operator diagrams
-            if norm or (vertex != 0):
+            if norm_diagrams or (vertex != 0):
                 matrices = []
                 for mat in temp_matrices:
                     matrices.append(mat)
@@ -193,21 +198,21 @@ def BMBPT_generation(p_order, three_N, norm):
                             matrices.append(temp_mat)
                             elem += 1
                 temp_matrices = copy.deepcopy(matrices)
-        temp_matrices = check_vertex_degree(matrices, three_N, vertex)
+        temp_matrices = check_vertex_degree(matrices, three_N_use, vertex)
         matrices = copy.deepcopy(temp_matrices)
 
     # Checks to exclude non-conform matrices
-    matrices = check_degree(matrices, three_N)
+    matrices = check_degree(matrices, three_N_use)
     matrices = no_loop(matrices)
     matricesUniq = []
     for mat in matrices:
         if mat not in matricesUniq:
             matricesUniq.append(mat)
     matricesUniq.sort(reverse=True)
-    diagrams = []
+    bmbpt_diagrams = []
     for mat in matricesUniq:
-        diagrams.append(np.array(mat))
-    return diagrams
+        bmbpt_diagrams.append(np.array(mat))
+    return bmbpt_diagrams
 
 
 # Start computing everything
@@ -230,10 +235,12 @@ with open(directory+"/Diagrams.list", "w") as f:
         f.write("\n")
         i += 1
 
-### Graph part (computing, writing, drawing)
+# Graph part (computing, writing, drawing)
 G = []
 for diagram in diagrams:
-    G.append(nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(), parallel_edges=True))
+    G.append(nx.from_numpy_matrix(
+        diagram, create_using=nx.MultiDiGraph(), parallel_edges=True))
+
 G1 = []
 for diag in G:
     if (nx.number_weakly_connected_components(diag)) == 1:
@@ -342,8 +349,8 @@ if theory == "BMBPT":
                 print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
             print "3N non-canonical diagrams: %i" % nb_3_noHF
 
-### Algebraic expressions:
-### CAVEAT !!! This works only for MBPT
+# Algebraic expressions:
+# CAVEAT !!! This works only for MBPT
 
 
 def line_label_h(n):
@@ -361,7 +368,7 @@ def line_label_p(n):
 
 
 # Treatment of the algebraic expressions
-### To be extended to BMBPT in the future
+# To be extended to BMBPT in the future
 if theory == "MBPT":
     mat_els = []
     denoms = []
@@ -389,7 +396,7 @@ if theory == "MBPT":
             ket = ''
             bra = ''
             for col in range(ncol):
-            ######### Mtrx Elements ###########
+                ######### Mtrx Elements ###########
                 if (incidence[row, col] == 1):
                     if type_edg[col] == 'h':
                         bra = bra + line_label_h(col)
@@ -400,7 +407,7 @@ if theory == "MBPT":
                         ket = ket + line_label_h(col)
                     else:
                         ket = ket + line_label_p(col)
-            ###################################
+                ###################################
             braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
         mat_els.append(braket)
         denom = ''
@@ -426,13 +433,12 @@ if theory == "MBPT":
         phases.append('(-1)^{%i' % n_holes + '+l}')
         # print incidence
         eq_lines = np.array(incidence.transpose())
-        # neq_lines=np.asarray(list(i for i in set(map(tuple, eq_lines)))).transpose()
         neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         n_sym = len(eq_lines)-len(neq_lines)
-        #### CAVEAT !!! Valid only for *MBPT*
+        # CAVEAT !!! Valid only for *MBPT*
         nedges_eq.append(2**n_sym)
         # print "After neqlines"
-        #### Loops
+        # Loops
 
 # Treatment of the algebraic expressions
 if theory == "BMBPT":
@@ -454,15 +460,18 @@ if theory == "BMBPT":
             if diag.node[vertex]['operator']:
                 numerator += "O"
             else:
-                numerator += "\Omega"
+                numerator += "\\Omega"
             # Attribute the good "type number" to each vertex
-            numerator = numerator + "^{%i" % diag.out_degree(vertex) + "%i}_{" % diag.in_degree(vertex)
+            numerator = numerator + "^{%i" % diag.out_degree(vertex) \
+                + "%i}_{" % diag.in_degree(vertex)
             # First add the qp states corresponding to propagators going out
             for prop in diag.out_edges_iter(vertex, keys=True):
-                numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                numerator = numerator \
+                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             # Add the qp states corresponding to propagators coming in
             for prop in diag.in_edges_iter(vertex, keys=True):
-                numerator = numerator + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                numerator = numerator  \
+                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             numerator = numerator + "} "
         # Determine the denominator corresponding to the diagram
         # First determine the type of structure we have
@@ -493,10 +502,12 @@ if theory == "BMBPT":
                     denominator = denominator + "("
                     for prop in diag.in_edges_iter(subdiag, keys=True):
                         if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
-                            denominator = denominator + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                            denominator = denominator + " + E_{" + \
+                                diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                     for prop in diag.out_edges_iter(subdiag, keys=True):
                         if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
-                            denominator = denominator + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                            denominator = denominator + " - E_{" + \
+                                diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                     denominator = denominator + ")"
         # Determine the time structure of the graph
         diag_copy = diag.to_directed()
@@ -507,7 +518,9 @@ if theory == "BMBPT":
         for vertex_i in diag_copy.nodes_iter():
             for vertex_j in diag_copy.nodes_iter():
                 lgst_path = []
-                for path in nx.all_simple_paths(diag_copy, source=vertex_i, target=vertex_j):
+                for path in nx.all_simple_paths(diag_copy,
+                                                source=vertex_i,
+                                                target=vertex_j):
                     if len(path) > len(lgst_path):
                         lgst_path = path
                 time_diag.add_path(lgst_path)
@@ -515,18 +528,21 @@ if theory == "BMBPT":
         # Determine the integral component in the Feynman expression
         integral = ""
         for vertex in range(1, norder):
-            integral = integral + "\mathrm{d}\\tau_%i" % vertex
+            integral = integral + "\\mathrm{d}\\tau_%i" % vertex
         if norder > 2:
             for vertex_i in range(1, norder):
                 for vertex_j in range(1, norder):
                     if diag.has_edge(vertex_i, vertex_j):
-                        integral = integral + "\\theta(\\tau_%i" % vertex_j + "-\\tau_%i) " % vertex_i
+                        integral = integral + "\\theta(\\tau_%i" % vertex_j \
+                            + "-\\tau_%i) " % vertex_i
         for vertex in range(1, norder):
             integral = integral + "e^{-\\tau_%i (" % vertex
             for prop in diag.in_edges_iter(vertex, keys=True):
-                integral = integral + " + E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                integral = integral + " + E_{" \
+                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
             for prop in diag.out_edges_iter(vertex, keys=True):
-                integral = integral + " - E_{" + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                integral = integral + " - E_{" \
+                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
             integral = integral + ")}"
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
@@ -539,37 +555,45 @@ if theory == "BMBPT":
         for vertex_i in diag:
             for vertex_j in diag:
                 if diag.number_of_edges(vertex_i, vertex_j) >= 2:
-                    prop_multiplicity[diag.number_of_edges(vertex_i, vertex_j)-1] += 1
+                    prop_multiplicity[diag.number_of_edges(
+                        vertex_i, vertex_j) - 1] += 1
+
         for prop_id, multiplicity in enumerate(prop_multiplicity):
             if multiplicity == 1:
                 sym_fact = sym_fact + "(%i!)" % (prop_id+1)
             elif multiplicity >= 2:
-                sym_fact = sym_fact + "(%i!)" % (prop_id+1) + "^%i" % multiplicity
+                sym_fact = sym_fact + "(%i!)" % (prop_id+1) \
+                    + "^%i" % multiplicity
         if sym_fact != "":
-            prefactor = "\\frac{" + prefactor + "}{" + sym_fact + "}\sum_{k_i}"
+            prefactor = "\\frac{" + prefactor + "}{" \
+                + sym_fact + "}\\sum_{k_i}"
         else:
-            prefactor = prefactor + "\sum_{k_i}"
-        feynman_exp = prefactor + numerator + "\int_{0}^{\\tau}" + integral + "\n"
+            prefactor = prefactor + "\\sum_{k_i}"
+        feynman_exp = prefactor + numerator + "\\int_{0}^{\\tau}" \
+            + integral + "\n"
         if denominator != "":
-            diag_exp = prefactor + "\\frac{ " + numerator + " }{ " + denominator + " }\n"
+            diag_exp = prefactor + "\\frac{ " + numerator \
+                + " }{ " + denominator + " }\n"
         else:
             diag_exp = prefactor + numerator + "\n"
         feynman_expressions.append(feynman_exp)
         diag_expressions.append(diag_exp)
 
 
-def feynmf_generator(diag, theory, diag_name):
+def feynmf_generator(diag, theory_type, diagram_name):
     """Generate the feynmanmp instructions corresponding to the diagram."""
     p_order = diag.number_of_nodes()
     diag_size = 20*p_order
 
     theories = ["MBPT", "BMBPT", "SCGF"]
     prop_types = ["half_prop", "prop_pm", "double_arrow"]
-    prop = prop_types[theories.index(theory)]
+    prop = prop_types[theories.index(theory_type)]
 
-    fmf_file = open(diag_name + ".tex", 'w')
-    begin_file = "\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" % diag_size + ",%i)\n" % diag_size
-    end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
+    fmf_file = open(diagram_name + ".tex", 'w')
+    begin_file = "\\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" \
+        + diagram_name + "}\n\\begin{fmfgraph*}(%i" % diag_size \
+        + ",%i)\n" % diag_size
+    end_file = "\\end{fmfgraph*}\n\\end{fmffile}}\n\n"
     fmf_file.write(begin_file)
 
     # Set the position of the vertices
@@ -633,25 +657,32 @@ if pdraw:
     for i in range(0, numdiag):
         diag_name = 'diag_%i' % i
         feynmf_generator(G[i], theory, diag_name)
-        shutil.move(diag_name + '.tex', directory + "/Diagrams/" + diag_name + '.tex')
+        shutil.move(diag_name + '.tex',
+                    directory + "/Diagrams/" + diag_name + '.tex')
 
 
 msg = 'Include diagrams in tex ?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
-### Write everything down in a nice LaTeX file
-header = "\documentclass[10pt,a4paper]{article}\n \usepackage[utf8]{inputenc}\n\usepackage{braket}\n\usepackage{graphicx}\n"
-header = header + "\usepackage[english]{babel}\n\usepackage{amsmath}\n\usepackage{amsfonts}\n\usepackage{amssymb}\n"
+
+# Write everything down in a nice LaTeX file
+header = "\\documentclass[10pt,a4paper]{article}\n" \
+    + "\\usepackage[utf8]{inputenc}\n" \
+    + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
+    + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
+    + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
 if pdiag:
-    header = header + "\usepackage[force]{feynmp-auto}\n"
+    header = header + "\\usepackage[force]{feynmp-auto}\n"
 land = False
 if norder > 3:
     msg = 'Expressions may be long rotate pdf ?'
     land = raw_input("%s (y/N) " % msg).lower() == 'y'
 if land:
-    header = header + "\usepackage[landscape]{geometry}\n"
+    header = header + "\\usepackage[landscape]{geometry}\n"
 
-header = header + "\\title{Diagrams and algebraic expressions at order %i" % norder + " in " + theory + "}\n"
-header = header + "\\author{RDL, JR, PA, MD, AT}\n"
+header = header \
+    + "\\title{Diagrams and algebraic expressions at order %i" % norder \
+    + " in " + theory + "}\n" \
+    + "\\author{RDL, JR, PA, MD, AT}\n"
 latex_file = open(directory + '/result.tex', 'w')
 latex_file.write(header)
 begdoc = "\\begin{document}\n"
@@ -659,7 +690,7 @@ enddoc = "\\end{document}"
 begeq = "\\begin{equation}\n"
 endeq = "\\end{equation}\n"
 latex_file.write(begdoc)
-latex_file.write("\maketitle\n")
+latex_file.write("\\maketitle\n")
 latex_file.write("\\graphicspath{{Diagrams/}}")
 
 if theory == "BMBPT":
@@ -679,7 +710,9 @@ if theory == "BMBPT":
 if not pdiag or not pdraw:
     for i_diag in range(0, numdiag):
         if theory == "MBPT":
-            diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+            diag_exp = "\\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] \
+                + "\\sum{\\dfrac{" + mat_els[i_diag] + "}{" \
+                + denoms[i_diag] + "}}\n"
         elif theory == "BMBPT":
             diag_exp = diag_expressions[i_diag]
             feynman_exp = feynman_expressions[i_diag]
@@ -693,23 +726,27 @@ if not pdiag or not pdraw:
     latex_file.write(enddoc)
 else:
     if theory == "BMBPT":
-        latex_file.write("\section{Two-body diagrams}\subsection{Two-body energy canonical diagrams}\n")
+        latex_file.write("\\section{Two-body diagrams}\n")
+        latex_file.write("\\subsection{Two-body energy canonical diagrams}\n")
     for i_diag in range(0, numdiag):
         if theory == "BMBPT":
             if (i_diag == nb_2_HF) and (not norm):
-                latex_file.write("\subsection{Two-body canonical diagrams for a generic operator only}\n")
+                latex_file.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n")
             elif i_diag == nb_2_HF + nb_2_EHF:
-                latex_file.write("\subsection{Two-body non-canonical diagrams}\n")
+                latex_file.write("\\subsection{Two-body non-canonical diagrams}\n")
             if three_N:
                 if i_diag == nb_2:
-                    latex_file.write("\section{Three-body diagrams}\n\subsection{Three-body energy canonical diagrams}\n")
+                    latex_file.write("\\section{Three-body diagrams}\n")
+                    latex_file.write("\\subsection{Three-body energy canonical diagrams}\n")
                 elif (i_diag == nb_2 + nb_3_HF) and (not norm):
-                    latex_file.write("\subsection{Three-body canonical diagrams for a generic operator only}\n")
+                    latex_file.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n")
                 elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
-                    latex_file.write("\subsection{Three-body non-canonical diagrams}\n")
+                    latex_file.write("\\subsection{Three-body non-canonical diagrams}\n")
         latex_file.write("Diagram %i:\n" % (i_diag+1))
         if theory == "MBPT":
-            diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] + "\sum{\dfrac{" + mat_els[i_diag] + "}{" + denoms[i_diag] + "}}\n"
+            diag_exp = "\\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] \
+                + "\\sum{\\dfrac{" + mat_els[i_diag] + "}{" \
+                + denoms[i_diag] + "}}\n"
         elif theory == "BMBPT":
             diag_exp = diag_expressions[i_diag]
             feynman_exp = feynman_expressions[i_diag]
