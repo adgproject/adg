@@ -215,6 +215,20 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     return bmbpt_diagrams
 
 
+def line_label_h(n):
+    """Select appropriate label for hole line."""
+    labels = list(string.ascii_lowercase)
+    labels = labels[0:15]
+    return labels[n]
+
+
+def line_label_p(n):
+    """Select appropriate label for particle line."""
+    labels = list(string.ascii_lowercase)
+    labels = labels[15:-1]
+    return labels[n]
+
+
 # Start computing everything
 print "Running"
 start_time = datetime.now()
@@ -350,22 +364,6 @@ if theory == "BMBPT":
             print "3N non-canonical diagrams: %i" % nb_3_noHF
 
 # Algebraic expressions:
-# CAVEAT !!! This works only for MBPT
-
-
-def line_label_h(n):
-    """Select appropriate label for hole line."""
-    labels = list(string.ascii_lowercase)
-    labels = labels[0:15]
-    return labels[n]
-
-
-def line_label_p(n):
-    """Select appropriate label for particle line."""
-    labels = list(string.ascii_lowercase)
-    labels = labels[15:-1]
-    return labels[n]
-
 
 # Treatment of the algebraic expressions
 # To be extended to BMBPT in the future
