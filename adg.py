@@ -630,18 +630,24 @@ def feynmf_generator(diag, theory_type, diagram_name):
 
             # For more distant vertices
             elif (i != j) and diag.has_edge(i, j):
-                if (diag.number_of_edges(i, j) == 1) and (diag.number_of_edges(j, i) == 2):
-                    fmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
-                else:
-                    fmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," % i + "v%i}\n" % j)
-                    if diag.number_of_edges(i, j) != 1:
-                        fmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," % i + "v%i}\n" % j)
-                        if diag.number_of_edges(i, j) != 2:
-                            fmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
-                            if diag.number_of_edges(i, j) != 3:
-                                fmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," % i + "v%i}\n" % j)
-                                if diag.number_of_edges(i, j) != 4:
-                                    fmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," % i + "v%i}\n" % j)
+                props_left_to_draw = diag.number_of_edges(i, j)
+                while props_left_to_draw > 0:
+                    fmf_file.write("\\fmf{" + prop + ",")
+                    if props_left_to_draw == 1:
+                        if diag.number_of_edges(j, i) == 2:
+                            fmf_file.write("right=0.75")
+                        else:
+                            fmf_file.write("right=0.6")
+                    elif props_left_to_draw == 2:
+                        fmf_file.write("left=0.6")
+                    elif props_left_to_draw == 3:
+                        fmf_file.write("right=0.75")
+                    elif props_left_to_draw == 4:
+                        fmf_file.write("left=0.75")
+                    elif props_left_to_draw == 5:
+                        fmf_file.write("right=0.9")
+                    fmf_file.write("}{v%i," % i + "v%i}\n" % j)
+                    props_left_to_draw -= 1
     fmf_file.write(end_file)
     fmf_file.close()
 
