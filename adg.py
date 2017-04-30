@@ -21,18 +21,18 @@ print "#####################"
 print "Parallel Mode"
 num_cores = multiprocessing.cpu_count()
 print "There is %i" % num_cores + " core(s) available"
-norder = int(raw_input('Order of the diagrams ?\n'))
+norder = int(raw_input('Order of the diagrams?\n'))
 while norder < 2:
     print "Perturbative order too small!"
-    norder = int(raw_input('Order of the diagrams ?\n'))
-theory = raw_input('MBPT or BMBPT ?\n').upper()
+    norder = int(raw_input('Order of the diagrams?\n'))
+theory = raw_input('MBPT or BMBPT?\n').upper()
 
 three_N = False
 norm = False
 if theory == "BMBPT":
-    three_N = raw_input("Include three-body forces ? (y/N) ").lower() == 'y'
+    three_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
     norm = raw_input(
-        "Compute norm kernel instead of operator kernels ? (y/N) ").lower() == 'y'
+        "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
 
 
 if three_N:
@@ -653,7 +653,7 @@ def feynmf_generator(diag, theory_type, diagram_name):
 
 
 # Writing a feynmp file for each graph
-msg = 'Generate diagrams feymanmf instructions ?'
+msg = 'Generate diagrams feymanmf instructions?'
 pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdraw:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
@@ -665,7 +665,7 @@ if pdraw:
                     directory + "/Diagrams/" + diag_name + '.tex')
 
 
-msg = 'Include diagrams in tex ?'
+msg = 'Include diagrams in tex?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
 
 # Write everything down in a nice LaTeX file
@@ -678,7 +678,7 @@ if pdiag:
     header = header + "\\usepackage[force]{feynmp-auto}\n"
 land = False
 if norder > 3:
-    msg = 'Expressions may be long rotate pdf ?'
+    msg = 'Expressions may be long, rotate pdf?'
     land = raw_input("%s (y/N) " % msg).lower() == 'y'
 if land:
     header = header + "\\usepackage[landscape]{geometry}\n"
@@ -767,7 +767,7 @@ else:
     latex_file.write(enddoc)
 latex_file.close()
 
-msg = 'Compile pdf ?'
+msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdfcompile:
     os.chdir(directory)
