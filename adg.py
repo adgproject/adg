@@ -598,7 +598,7 @@ def feynmf_generator(diag, theory_type, diagram_name):
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in range(p_order-1):
         fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
-        if diag.node[vertex]['operator']:
+        if diag.node[vert]['operator']:
             fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
             fmf_file.write("}{v%i}\n" % vert)
         else:
