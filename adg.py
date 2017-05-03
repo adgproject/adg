@@ -596,45 +596,52 @@ def feynmf_generator(diag, theory_type, diagram_name):
 
     # Set the position of the vertices
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
-    for vertex in range(p_order-1):
-        fmf_file.write("\\fmf{phantom}{v%i" % vertex + ",v%i}\n" % (vertex+1))
+    for vert in range(p_order-1):
+        fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
         if diag.node[vertex]['operator']:
-            fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v%i}\n" % vertex)
+            fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
+            fmf_file.write("}{v%i}\n" % vert)
         else:
-            fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % vertex)
-    fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" % (p_order-1))
+            fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
+            fmf_file.write("}{v%i}\n" % vert)
+    fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}")
+    fmf_file.write("{v%i}\n" % (p_order-1))
     fmf_file.write("\\fmffreeze\n")
 
     # Loop over all elements of the matrix to draw associated propagators
-    for i in range(0, p_order):
-        for j in range(0, p_order):
+    for vert_i in range(0, p_order):
+        for vert_j in range(0, p_order):
             # For directly consecutive vertices
-            if (abs(i-j) == 1) and diag.has_edge(i, j):
-                if diag.number_of_edges(i, j) == 1:
-                    if diag.number_of_edges(j, i) != 1:
-                        fmf_file.write("\\fmf{" + prop + "}{v%i," % i + "v%i}\n" % j)
-                    else:
-                        fmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," % i + "v%i}\n" % j)
-                else:
-                    fmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," % i + "v%i}\n" % j)
-                    fmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," % i + "v%i}\n" % j)
-                    if diag.number_of_edges(i, j) == 3:
-                        fmf_file.write("\\fmf{" + prop + "}{v%i," % i + "v%i}\n" % j)
-                    elif diag.number_of_edges(i, j) >= 4:
-                        fmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," % i + "v%i}\n" % j)
-                        fmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," % i + "v%i}\n" % j)
-                        if diag.number_of_edges(i, j) >= 5:
-                            fmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," % i + "v%i}\n" % j)
-                            if diag.number_of_edges(i, j) == 6:
-                                fmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," % i + "v%i}\n" % j)
-
+            if (abs(vert_i-vert_j) == 1) and diag.has_edge(vert_i, vert_j):
+                if diag.number_of_edges(vert_i, vert_j) % 2 == 1:
+                    fmf_file.write("\\fmf{" + prop)
+                    # Check for specific MBPT configuration
+                    if diag.number_of_edges(vert_j, vert_i) == 1:
+                        fmf_file.write(",right=0.5")
+                    fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
+                pairs_left_to_draw = diag.number_of_edges(vert_i, vert_j) // 2
+                while pairs_left_to_draw > 0:
+                    if pairs_left_to_draw == 3:
+                        fmf_file.write("\\fmf{" + prop + ",right=0.9}")
+                        fmf_file.write("{v%i," % vert_i + "v%i}\n" % vert_j)
+                        fmf_file.write("\\fmf{" + prop + ",left=0.9}")
+                    elif pairs_left_to_draw == 2:
+                        fmf_file.write("\\fmf{" + prop + ",right=0.75}")
+                        fmf_file.write("{v%i," % vert_i + "v%i}\n" % vert_j)
+                        fmf_file.write("\\fmf{" + prop + ",left=0.75}")
+                    elif pairs_left_to_draw == 1:
+                        fmf_file.write("\\fmf{" + prop + ",right=0.5}")
+                        fmf_file.write("{v%i," % vert_i + "v%i}\n" % vert_j)
+                        fmf_file.write("\\fmf{" + prop + ",left=0.5}")
+                    fmf_file.write("{v%i," % vert_i + "v%i}\n" % vert_j)
+                    pairs_left_to_draw -= 1
             # For more distant vertices
-            elif (i != j) and diag.has_edge(i, j):
-                props_left_to_draw = diag.number_of_edges(i, j)
+            elif (vert_i != vert_j) and diag.has_edge(vert_i, vert_j):
+                props_left_to_draw = diag.number_of_edges(vert_i, vert_j)
                 while props_left_to_draw > 0:
                     fmf_file.write("\\fmf{" + prop + ",")
                     if props_left_to_draw == 1:
-                        if diag.number_of_edges(j, i) == 2:
+                        if diag.number_of_edges(vert_j, vert_i) == 2:
                             fmf_file.write("right=0.75")
                         else:
                             fmf_file.write("right=0.6")
@@ -646,7 +653,7 @@ def feynmf_generator(diag, theory_type, diagram_name):
                         fmf_file.write("left=0.75")
                     elif props_left_to_draw == 5:
                         fmf_file.write("right=0.9")
-                    fmf_file.write("}{v%i," % i + "v%i}\n" % j)
+                    fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
                     props_left_to_draw -= 1
     fmf_file.write(end_file)
     fmf_file.close()
