@@ -599,10 +599,9 @@ def feynmf_generator(diag, theory_type, diagram_name):
         fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
         if diag.node[vert]['operator']:
             fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
-            fmf_file.write("}{v%i}\n" % vert)
         else:
             fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
-            fmf_file.write("}{v%i}\n" % vert)
+        fmf_file.write("}{v%i}\n" % vert)
     fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}")
     fmf_file.write("{v%i}\n" % (p_order-1))
     fmf_file.write("\\fmffreeze\n")
@@ -610,52 +609,32 @@ def feynmf_generator(diag, theory_type, diagram_name):
     # Loop over all elements of the matrix to draw associated propagators
     for vert_i in range(0, p_order):
         for vert_j in range(0, p_order):
-            # For directly consecutive vertices
-            if (abs(vert_i-vert_j) == 1) and diag.has_edge(vert_i, vert_j):
-                props_left_to_draw = diag.number_of_edges(vert_i, vert_j)
+            props_left_to_draw = diag.number_of_edges(vert_i, vert_j)
+            # Special config for consecutive vertices
+            if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
+                fmf_file.write("\\fmf{" + prop)
+                # Check for specific MBPT configuration
+                if diag.number_of_edges(vert_j, vert_i) == 1:
+                    fmf_file.write(",right=0.5")
+                fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
+                props_left_to_draw -= 1
+            while props_left_to_draw > 0:
+                fmf_file.write("\\fmf{" + prop + ",")
                 if props_left_to_draw % 2 == 1:
-                    fmf_file.write("\\fmf{" + prop)
-                    # Check for specific MBPT configuration
-                    if diag.number_of_edges(vert_j, vert_i) == 1:
-                        fmf_file.write(",right=0.5")
-                    fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
-                    props_left_to_draw -= 1
-                while props_left_to_draw > 0:
-                    fmf_file.write("\\fmf{" + prop + ",")
-                    if props_left_to_draw == 6:
-                        fmf_file.write("left=0.9")
-                    elif props_left_to_draw == 5:
-                        fmf_file.write("right=0.9")
-                    elif props_left_to_draw == 4:
-                        fmf_file.write("left=0.75")
-                    elif props_left_to_draw == 3:
-                        fmf_file.write("right=0.75")
-                    elif props_left_to_draw == 2:
-                        fmf_file.write("left=0.5")
-                    elif props_left_to_draw == 1:
-                        fmf_file.write("right=0.5")
-                    fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
-                    props_left_to_draw -= 1
-            # For more distant vertices
-            elif (vert_i != vert_j) and diag.has_edge(vert_i, vert_j):
-                props_left_to_draw = diag.number_of_edges(vert_i, vert_j)
-                while props_left_to_draw > 0:
-                    fmf_file.write("\\fmf{" + prop + ",")
-                    if props_left_to_draw == 1:
-                        if diag.number_of_edges(vert_j, vert_i) == 2:
-                            fmf_file.write("right=0.75")
-                        else:
-                            fmf_file.write("right=0.6")
-                    elif props_left_to_draw == 2:
-                        fmf_file.write("left=0.6")
-                    elif props_left_to_draw == 3:
-                        fmf_file.write("right=0.75")
-                    elif props_left_to_draw == 4:
-                        fmf_file.write("left=0.75")
-                    elif props_left_to_draw == 5:
-                        fmf_file.write("right=0.9")
-                    fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
-                    props_left_to_draw -= 1
+                    fmf_file.write("right=")
+                else:
+                    fmf_file.write("left=")
+                if (props_left_to_draw == 6) or (props_left_to_draw == 5):
+                    fmf_file.write("0.9")
+                elif (props_left_to_draw == 4) or (props_left_to_draw == 3):
+                    fmf_file.write("0.75")
+                elif (props_left_to_draw == 2) or (props_left_to_draw == 1):
+                    if abs(vert_i-vert_j) == 1:
+                        fmf_file.write("0.5")
+                    else:
+                        fmf_file.write("0.6")
+                fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
+                props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n\n")
     fmf_file.close()
 
