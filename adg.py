@@ -350,18 +350,17 @@ if theory == "BMBPT":
     nb_3_HF = len(G3_HF)
     nb_3_EHF = len(G3_EHF)
     nb_3_noHF = len(G3_noHF)
-    if theory == "BMBPT":
-        print "\n2N valid diagrams: %i" % nb_2
-        print "2N energy canonical diagrams: %i" % nb_2_HF
+    print "\n2N valid diagrams: %i" % nb_2
+    print "2N energy canonical diagrams: %i" % nb_2_HF
+    if not norm:
+        print "2N canonical diagrams for a generic operator only: %i" % nb_2_EHF
+    print "2N non-canonical diagrams: %i\n" % nb_2_noHF
+    if three_N:
+        print "3N valid diagrams: %i" % nb_3
+        print "3N energy canonical diagrams: %i" % nb_3_HF
         if not norm:
-            print "2N canonical diagrams for a generic operator only: %i" % nb_2_EHF
-        print "2N non-canonical diagrams: %i\n" % nb_2_noHF
-        if three_N:
-            print "3N valid diagrams: %i" % nb_3
-            print "3N energy canonical diagrams: %i" % nb_3_HF
-            if not norm:
-                print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
-            print "3N non-canonical diagrams: %i" % nb_3_noHF
+            print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
+        print "3N non-canonical diagrams: %i" % nb_3_noHF
 
 # Algebraic expressions:
 
