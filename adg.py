@@ -484,6 +484,10 @@ if theory == "BMBPT":
             if len(connected_subgraph) > 1:
                 if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
                     test_adg_subgraphs = False
+        sink_number = 0
+        for vertex in range(1, norder):
+            if diag.out_degree(vertex) == 0:
+                sink_number += 1
         # If the graph has the appropriate structure, determine the denominator
         if test_adg_subgraphs:
             for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
@@ -506,6 +510,31 @@ if theory == "BMBPT":
                             denominator = denominator + " - E_{" + \
                                 diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
                     denominator = denominator + ")"
+        elif (norder == 4) and (sink_number == 1):
+            for i in range(2):
+                subgraph_stack = []
+                subgraph_stack.append(nx.dag_longest_path(testdiag)[1])
+                if i == 0:
+                    subgraph_stack.append(nx.dag_longest_path(testdiag)[0])
+                else:
+                    for vertex_1 in nx.nodes(testdiag):
+                        test_vertex = True
+                        for vertex_2 in nx.dag_longest_path(testdiag):
+                            if vertex_1 == vertex_2:
+                                test_vertex = False
+                        if test_vertex:
+                            subgraph_stack.append(vertex_1)
+                subdiag = testdiag.subgraph(subgraph_stack)
+                denominator = denominator + "("
+                for prop in diag.in_edges_iter(subdiag, keys=True):
+                    if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
+                        denominator = denominator + " + E_{" + \
+                            diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                for prop in diag.out_edges_iter(subdiag, keys=True):
+                    if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
+                        denominator = denominator + " - E_{" + \
+                            diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                denominator = denominator + ")"
         # Determine the time structure of the graph
         diag_copy = diag.to_directed()
         for vertex in range(1, len(diag_copy)):
@@ -573,6 +602,36 @@ if theory == "BMBPT":
                 + " }{ " + denominator + " }\n"
         else:
             diag_exp = prefactor + numerator + "\n"
+        if (norder == 4) and (sink_number == 1) and (not test_adg_subgraphs):
+            subgraph_stack = []
+            for vertex in range(norder):
+                if diag.out_degree(vertex) == 0:
+                    subgraph_stack.append(vertex)
+            subdiag = diag.subgraph(subgraph_stack)
+            denominator_abc = ""
+            for prop in diag.in_edges_iter(subdiag, keys=True):
+                if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
+                    denominator_abc = denominator_abc + " + E_{" + \
+                        diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+            for prop in diag.out_edges_iter(subdiag, keys=True):
+                if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
+                    denominator_abc = denominator_abc + " - E_{" + \
+                        diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+            subgraph_stack = []
+            for vertex in range(1, norder):
+                subgraph_stack.append(vertex)
+            subdiag = diag.subgraph(subgraph_stack)
+            denominator_a = ""
+            for prop in diag.in_edges_iter(subdiag, keys=True):
+                if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
+                    denominator_a = denominator_a + " + E_{" + \
+                        diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+            for prop in diag.out_edges_iter(subdiag, keys=True):
+                if subdiag.has_edge(prop[0], prop[1], prop[2]) is False:
+                    denominator_a = denominator_a + " - E_{" + \
+                        diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+            diag_exp += "\\left[ \\frac{1}{" + denominator_abc \
+                + "} + \\frac{1}{" + denominator_a + "} \\right]"
         feynman_expressions.append(feynman_exp)
         diag_expressions.append(diag_exp)
 
