@@ -516,6 +516,12 @@ if theory == "BMBPT":
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
                 denominator += "(" + extract_denom(diag, subdiag) + ")"
+        elif (norder == 4) and (sink_number == 2):
+            denominator += "(" + extract_denom(diag, testdiag) + ")"
+            for vertex in diag:
+                if diag.out_degree(vertex) == 0:
+                    denominator += "(" \
+                        + extract_denom(diag, diag.subgraph(vertex)) + ")"
         # Determine the time structure of the graph
         diag_copy = diag.to_directed()
         for vertex in range(1, len(diag_copy)):
