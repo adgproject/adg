@@ -182,22 +182,6 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
                         matrices.append(temp_mat)
                         elem += 1
             temp_matrices = copy.deepcopy(matrices)
-            # Column not iterated upon for first vertex in operator diagrams
-            if norm_diagrams or (vertex != 0):
-                matrices = []
-                for mat in temp_matrices:
-                    matrices.append(mat)
-                    if mat[vertex][sum_index] == 0:
-                        vert_degree = 0
-                        for k in range(0, p_order):
-                            vert_degree += mat[vertex][k] + mat[k][vertex]
-                        elem = 1
-                        while (elem + vert_degree) <= deg_max:
-                            temp_mat = copy.deepcopy(mat)
-                            temp_mat[sum_index][vertex] = elem
-                            matrices.append(temp_mat)
-                            elem += 1
-                temp_matrices = copy.deepcopy(matrices)
         temp_matrices = check_vertex_degree(matrices, three_N_use, vertex)
         matrices = copy.deepcopy(temp_matrices)
 
