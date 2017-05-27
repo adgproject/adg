@@ -57,8 +57,8 @@ def no_trace(matrices):
     traceless_matrices = []
     for matrix in matrices:
         test_traceless = True
-        for i, n in enumerate(matrix):
-            if n[i] == 1:
+        for ind_i, n in enumerate(matrix):
+            if n[ind_i] == 1:
                 test_traceless = False
                 break
         if test_traceless:
@@ -71,9 +71,9 @@ def no_loop(matrices):
     no_loop_matrices = []
     for matrix in matrices:
         test_no_loop = True
-        for i in range(len(matrix[0])):
-            for j in range(i+1):
-                if (matrix[i][j] != 0) and (matrix[j][i] != 0):
+        for ind_i in range(len(matrix[0])):
+            for ind_j in range(ind_i+1):
+                if (matrix[ind_i][ind_j] != 0) and (matrix[ind_j][ind_i] != 0):
                     test_no_loop = False
                     break
         if test_no_loop:
@@ -88,10 +88,10 @@ def check_degree(matrices, three_N_use):
     deg_ok = []
     for matrix in matrices:
         test_degree = True
-        for i in range(len(matrix[0])):
+        for ind_i in range(len(matrix[0])):
             degree = 0
-            for j in range(len(matrix[0])):
-                degree += matrix[i][j] + matrix[j][i]
+            for ind_j in range(len(matrix[0])):
+                degree += matrix[ind_i][ind_j] + matrix[ind_j][ind_i]
             if (degree != 2) and (degree != 4):
                 if (not three_N_use) or (degree != 6):
                     test_degree = False
@@ -617,14 +617,14 @@ if theory == "BMBPT":
         diag_expressions.append(diag_exp)
 
 
-def feynmf_generator(diag, theory_type, diagram_name):
+def feynmf_generator(start_diag, theory_type, diagram_name):
     """Generate the feynmanmp instructions corresponding to the diagram."""
-    p_order = diag.number_of_nodes()
+    p_order = start_diag.number_of_nodes()
     diag_size = 20*p_order
 
     theories = ["MBPT", "BMBPT", "SCGF"]
     prop_types = ["half_prop", "prop_pm", "double_arrow"]
-    prop = prop_types[theories.index(theory_type)]
+    propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
     begin_file = "\\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" \
@@ -636,7 +636,7 @@ def feynmf_generator(diag, theory_type, diagram_name):
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in range(p_order-1):
         fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
-        if diag.node[vert]['operator']:
+        if start_diag.node[vert]['operator']:
             fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
         else:
             fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
@@ -648,17 +648,17 @@ def feynmf_generator(diag, theory_type, diagram_name):
     # Loop over all elements of the matrix to draw associated propagators
     for vert_i in range(0, p_order):
         for vert_j in range(0, p_order):
-            props_left_to_draw = diag.number_of_edges(vert_i, vert_j)
+            props_left_to_draw = start_diag.number_of_edges(vert_i, vert_j)
             # Special config for consecutive vertices
             if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
-                fmf_file.write("\\fmf{" + prop)
+                fmf_file.write("\\fmf{" + propa)
                 # Check for specific MBPT configuration
-                if diag.number_of_edges(vert_j, vert_i) == 1:
+                if start_diag.number_of_edges(vert_j, vert_i) == 1:
                     fmf_file.write(",right=0.5")
                 fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
                 props_left_to_draw -= 1
             while props_left_to_draw > 0:
-                fmf_file.write("\\fmf{" + prop + ",")
+                fmf_file.write("\\fmf{" + propa + ",")
                 if props_left_to_draw % 2 == 1:
                     fmf_file.write("right=")
                 else:
