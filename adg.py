@@ -108,42 +108,11 @@ if theory == "BMBPT":
     G3_HF = []
     G3_EHF = []
     G3_noHF = []
-    for diag in G:
-        max_deg = 0
-        for node in diag:
-            max_deg = max(max_deg, diag.degree(node))
-        if max_deg == 6:
-            G3.append(diag)
-        else:
-            G2.append(diag)
-    for diag in G2:
-        test_HF = True
-        test_EHF = True
-        for node in diag:
-            if diag.degree(node) == 2:
-                test_HF = False
-                if node != 0:
-                    test_EHF = False
-        if test_HF:
-            G2_HF.append(diag)
-        elif (not test_EHF) or norm:
-            G2_noHF.append(diag)
-        else:
-            G2_EHF.append(diag)
-    for diag in G3:
-        test_HF = True
-        test_EHF = True
-        for node in diag:
-            if diag.degree(node) == 2:
-                test_HF = False
-                if node != 0:
-                    test_EHF = False
-        if test_HF:
-            G3_HF.append(diag)
-        elif (not test_EHF) or norm:
-            G3_noHF.append(diag)
-        else:
-            G3_EHF.append(diag)
+
+    mth.order_2B_or_3B(G, G2, G3)
+    mth.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
+    mth.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
+
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
     nb_2 = len(G2)
     nb_2_HF = len(G2_HF)

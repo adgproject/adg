@@ -177,6 +177,36 @@ def topologically_distinct_diags(diagrams):
     return distinct_diagrams
 
 
+def order_2B_or_3B(diagrams, TwoB_diags, ThreeB_diags):
+    """Order the diagrams depending on their 2B or 3B effective status."""
+    for diag in diagrams:
+        max_deg = 0
+        for node in diag:
+            max_deg = max(max_deg, diag.degree(node))
+        if max_deg == 6:
+            ThreeB_diags.append(diag)
+        else:
+            TwoB_diags.append(diag)
+
+
+def order_HF_or_not(diagrams, HF_diags, EHF_diags, noHF_diags, norm):
+    """Order the diagrams depending on their HF status."""
+    for diag in diagrams:
+        test_HF = True
+        test_EHF = True
+        for node in diag:
+            if diag.degree(node) == 2:
+                test_HF = False
+                if node != 0:
+                    test_EHF = False
+        if test_HF:
+            HF_diags.append(diag)
+        elif (not test_EHF) or norm:
+            noHF_diags.append(diag)
+        else:
+            EHF_diags.append(diag)
+
+
 def line_label_h(n):
     """Select appropriate label for hole line."""
     labels = list(string.ascii_lowercase)
