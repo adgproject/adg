@@ -4,6 +4,7 @@ import copy
 import itertools
 import string
 import numpy as np
+import networkx as nx
 
 
 def seed(n):
@@ -172,17 +173,43 @@ def line_label_p(n):
     return labels[n]
 
 
+def extract_numerator(diagram):
+    """"Returns the numerator associated to a BMBPT diagram."""
+    numerator = ""
+    for vertex in nx.nodes(diagram):
+        # Attribute the correct operator to each vertex
+        if diagram.node[vertex]['operator']:
+            numerator += "O"
+        else:
+            numerator += "\\Omega"
+        # Attribute the good "type number" to each vertex
+        numerator = numerator + "^{%i" % diagram.out_degree(vertex) \
+            + "%i}_{" % diagram.in_degree(vertex)
+        # First add the qp states corresponding to propagators going out
+        for prop in diagram.out_edges_iter(vertex, keys=True):
+            numerator += diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+        # Add the qp states corresponding to propagators coming in
+        previous_vertex = vertex - 1
+        while previous_vertex >= 0:
+            for prop in diagram.in_edges_iter(vertex, keys=True):
+                if prop[0] == previous_vertex:
+                    numerator += diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+            previous_vertex -= 1
+        numerator += "} "
+    return numerator
+
+
 def extract_denom(start_diag, subdiagram):
     """Extract the appropriate denominator using the subdiagram rule."""
     denomin = ""
     for propa in start_diag.in_edges_iter(subdiagram, keys=True):
         if subdiagram.has_edge(propa[0], propa[1], propa[2]) is False:
-            denomin += " + E_{" + \
-                start_diag.edge[propa[0]][propa[1]][propa[2]]['qp_state'] + "}"
+            denomin += " + E_{%s}" \
+                % start_diag.edge[propa[0]][propa[1]][propa[2]]['qp_state']
     for propa in start_diag.out_edges_iter(subdiagram, keys=True):
         if subdiagram.has_edge(propa[0], propa[1], propa[2]) is False:
-            denomin += " - E_{" + \
-                start_diag.edge[propa[0]][propa[1]][propa[2]]['qp_state'] + "}"
+            denomin += " - E_{%s}" \
+                % start_diag.edge[propa[0]][propa[1]][propa[2]]['qp_state']
     return denomin
 
 
@@ -199,6 +226,26 @@ def extract_BMBPT_crossing_sign(diagram):
                     nb_crossings += diagram.number_of_edges(vertex_ante,
                                                             vertex_post)
     return nb_crossings % 2 == 1
+
+
+def multiplicity_symmetry_factor(diagram):
+    """Returns the symmetry factor associated with propagators multiplicity"""
+    factor = ""
+    prop_multiplicity = []
+    for i in range(6):
+        prop_multiplicity.append(0)
+    for vertex_i in diagram:
+        for vertex_j in diagram:
+            if diagram.number_of_edges(vertex_i, vertex_j) >= 2:
+                prop_multiplicity[diagram.number_of_edges(
+                    vertex_i, vertex_j) - 1] += 1
+
+    for prop_id, multiplicity in enumerate(prop_multiplicity):
+        if multiplicity == 1:
+            factor += "(%i!)" % (prop_id+1)
+        elif multiplicity >= 2:
+            factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
+    return factor
 
 
 def feynmf_generator(start_diag, theory_type, diagram_name):

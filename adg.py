@@ -9,8 +9,8 @@ import shutil
 import numpy as np
 import networkx as nx
 from methods import line_label_h, line_label_p, diagram_generation, \
-    BMBPT_generation, feynmf_generator, extract_denom, \
-    extract_BMBPT_crossing_sign
+    BMBPT_generation, feynmf_generator, extract_numerator, extract_denom, \
+    extract_BMBPT_crossing_sign, multiplicity_symmetry_factor
 
 
 print "#####################"
@@ -269,29 +269,7 @@ if theory == "BMBPT":
                 nb_down_props += 1
             i += 1
         # Determine the numerator corresponding to the diagram
-        numerator = ""
-        for vertex in nx.nodes(diag):
-            # Attribute the correct operator to each vertex
-            if diag.node[vertex]['operator']:
-                numerator += "O"
-            else:
-                numerator += "\\Omega"
-            # Attribute the good "type number" to each vertex
-            numerator = numerator + "^{%i" % diag.out_degree(vertex) \
-                + "%i}_{" % diag.in_degree(vertex)
-            # First add the qp states corresponding to propagators going out
-            for prop in diag.out_edges_iter(vertex, keys=True):
-                numerator = numerator \
-                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-            # Add the qp states corresponding to propagators coming in
-            previous_vertex = vertex - 1
-            while previous_vertex >= 0:
-                for prop in diag.in_edges_iter(vertex, keys=True):
-                    if prop[0] == previous_vertex:
-                        numerator = numerator  \
-                            + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                previous_vertex -= 1
-            numerator = numerator + "} "
+        numerator = extract_numerator(diag)
         # Determine the denominator corresponding to the diagram
         # First determine the type of structure we have
         denominator = ""
@@ -364,42 +342,27 @@ if theory == "BMBPT":
         # Determine the integral component in the Feynman expression
         integral = ""
         for vertex in range(1, norder):
-            integral = integral + "\\mathrm{d}\\tau_%i" % vertex
+            integral += "\\mathrm{d}\\tau_%i" % vertex
         if norder > 2:
             for vertex_i in range(1, norder):
                 for vertex_j in range(1, norder):
                     if diag.has_edge(vertex_i, vertex_j):
-                        integral = integral + "\\theta(\\tau_%i" % vertex_j \
+                        integral += "\\theta(\\tau_%i" % vertex_j \
                             + "-\\tau_%i) " % vertex_i
         for vertex in range(1, norder):
-            integral = integral + "e^{-\\tau_%i (" % vertex
+            integral += "e^{-\\tau_%i (" % vertex
             for prop in diag.in_edges_iter(vertex, keys=True):
-                integral = integral + " + E_{" \
-                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
+                integral += " + E_{%s}" \
+                    % diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             for prop in diag.out_edges_iter(vertex, keys=True):
-                integral = integral + " - E_{" \
-                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] + "}"
-            integral = integral + ")}"
+                integral += " - E_{%s}" \
+                    % diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+            integral += ")}"
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
         if xor((nb_down_props % 2 != 0), extract_BMBPT_crossing_sign(diag)):
             prefactor = "-" + prefactor
-        sym_fact = ""
-        prop_multiplicity = []
-        for i in range(6):
-            prop_multiplicity.append(0)
-        for vertex_i in diag:
-            for vertex_j in diag:
-                if diag.number_of_edges(vertex_i, vertex_j) >= 2:
-                    prop_multiplicity[diag.number_of_edges(
-                        vertex_i, vertex_j) - 1] += 1
-
-        for prop_id, multiplicity in enumerate(prop_multiplicity):
-            if multiplicity == 1:
-                sym_fact = sym_fact + "(%i!)" % (prop_id+1)
-            elif multiplicity >= 2:
-                sym_fact = sym_fact + "(%i!)" % (prop_id+1) \
-                    + "^%i" % multiplicity
+        sym_fact = multiplicity_symmetry_factor(diag)
         if sym_fact != "":
             prefactor = "\\frac{" + prefactor + "}{" \
                 + sym_fact + "}\\sum_{k_i}"
