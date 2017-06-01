@@ -8,10 +8,7 @@ from operator import xor
 import shutil
 import numpy as np
 import networkx as nx
-from methods import line_label_h, line_label_p, diagram_generation, \
-    BMBPT_generation, feynmf_generator, extract_numerator, extract_denom, \
-    extract_BMBPT_crossing_sign, multiplicity_symmetry_factor, \
-    topologically_distinct_diags, extract_integral
+import methods as mth
 
 
 print "#####################"
@@ -51,9 +48,9 @@ if not os.path.exists(directory+"/Diagrams"):
 print "Running"
 start_time = datetime.now()
 if theory == "MBPT":
-    diagrams = diagram_generation(norder)
+    diagrams = mth.diagram_generation(norder)
 elif theory == "BMBPT":
-    diagrams = BMBPT_generation(norder, three_N, norm)
+    diagrams = mth.BMBPT_generation(norder, three_N, norm)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
@@ -95,7 +92,7 @@ for diag in G:
 
 # Specific check for topologically identical diagrams in BMBPT
 if theory == "BMBPT":
-    G = topologically_distinct_diags(G)
+    G = mth.topologically_distinct_diags(G)
 
 numdiag = len(G)
 print "Time ellapsed: ", datetime.now() - start_time
@@ -202,14 +199,14 @@ if theory == "MBPT":
                 ######### Mtrx Elements ###########
                 if (incidence[row, col] == 1):
                     if type_edg[col] == 'h':
-                        bra = bra + line_label_h(col)
+                        bra = bra + mth.line_label_h(col)
                     else:
-                        bra = bra + line_label_p(col)
+                        bra = bra + mth.line_label_p(col)
                 if (incidence[row, col] == -1):
                     if type_edg[col] == 'h':
-                        ket = ket + line_label_h(col)
+                        ket = ket + mth.line_label_h(col)
                     else:
-                        ket = ket + line_label_p(col)
+                        ket = ket + mth.line_label_p(col)
                 ###################################
             braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
         mat_els.append(braket)
@@ -220,14 +217,14 @@ if theory == "MBPT":
                 val_test = incidence[0:row, col].sum()
                 if val_test == 1:
                     if type_edg[col] == 'h':
-                        denom = denom + ' +E_' + line_label_h(col)
+                        denom = denom + ' +E_' + mth.line_label_h(col)
                     else:
-                        denom = denom + ' +E_' + line_label_p(col)
+                        denom = denom + ' +E_' + mth.line_label_p(col)
                 if val_test == -1:
                     if type_edg[col] == 'h':
-                        denom = denom + '-E_' + line_label_h(col)
+                        denom = denom + '-E_' + mth.line_label_h(col)
                     else:
-                        denom = denom + '-E_' + line_label_p(col)
+                        denom = denom + '-E_' + mth.line_label_p(col)
             denom = denom + ')'
         if '( +' in denom:
             denom = denom.replace('( +', '(')
@@ -258,7 +255,7 @@ if theory == "BMBPT":
                 nb_down_props += 1
             i += 1
         # Determine the numerator corresponding to the diagram
-        numerator = extract_numerator(diag)
+        numerator = mth.extract_numerator(diag)
         # Determine the denominator corresponding to the diagram
         # First determine the type of structure we have
         denominator = ""
@@ -289,7 +286,7 @@ if theory == "BMBPT":
                     elif len(connected_subgraph) == 1:
                         subgraph_stack.append(connected_subgraph.nodes()[0])
                     subdiag = connected_subgraph.subgraph(subgraph_stack)
-                    denominator += "(" + extract_denom(diag, subdiag) + ")"
+                    denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
         elif (norder == 4) and (sink_number == 1):
             for i in range(2):
                 subgraph_stack = []
@@ -305,20 +302,20 @@ if theory == "BMBPT":
                         if test_vertex:
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
-                denominator += "(" + extract_denom(diag, subdiag) + ")"
+                denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
         elif (norder == 4) and (sink_number == 2):
-            denominator += "(" + extract_denom(diag, testdiag) + ")"
+            denominator += "(" + mth.extract_denom(diag, testdiag) + ")"
             for vertex in diag:
                 if diag.out_degree(vertex) == 0:
                     denominator += "(" \
-                        + extract_denom(diag, diag.subgraph(vertex)) + ")"
+                        + mth.extract_denom(diag, diag.subgraph(vertex)) + ")"
         # Determine the integral component in the Feynman expression
-        integral = extract_integral(diag)
+        integral = mth.extract_integral(diag)
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
-        if xor((nb_down_props % 2 != 0), extract_BMBPT_crossing_sign(diag)):
+        if xor((nb_down_props % 2 != 0), mth.extract_BMBPT_crossing_sign(diag)):
             prefactor = "-" + prefactor
-        sym_fact = multiplicity_symmetry_factor(diag)
+        sym_fact = mth.multiplicity_symmetry_factor(diag)
         if sym_fact != "":
             prefactor = "\\frac{" + prefactor + "}{" \
                 + sym_fact + "}\\sum_{k_i}"
@@ -337,12 +334,12 @@ if theory == "BMBPT":
                 if diag.out_degree(vertex) == 0:
                     subgraph_stack.append(vertex)
             subdiag = diag.subgraph(subgraph_stack)
-            denominator_abc = extract_denom(diag, subdiag)
+            denominator_abc = mth.extract_denom(diag, subdiag)
             subgraph_stack = []
             for vertex in range(1, norder):
                 subgraph_stack.append(vertex)
             subdiag = diag.subgraph(subgraph_stack)
-            denominator_a = extract_denom(diag, subdiag)
+            denominator_a = mth.extract_denom(diag, subdiag)
             diag_exp += "\\left[ \\frac{1}{" + denominator_abc \
                 + "} + \\frac{1}{" + denominator_a + "} \\right]"
         feynman_expressions.append(feynman_exp)
@@ -357,7 +354,7 @@ if pdraw:
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
     for i in range(0, numdiag):
         diag_name = 'diag_%i' % i
-        feynmf_generator(G[i], theory, diag_name)
+        mth.feynmf_generator(G[i], theory, diag_name)
         shutil.move(diag_name + '.tex',
                     directory + "/Diagrams/" + diag_name + '.tex')
 
