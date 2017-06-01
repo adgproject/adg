@@ -186,6 +186,21 @@ def extract_denom(start_diag, subdiagram):
     return denomin
 
 
+def extract_BMBPT_crossing_sign(diagram):
+    """Returns True if there's a sign factor associated with crossing propagators
+
+    Use the fact that all lines propagate upwards and the
+    canonical representation of the diagrams and vertices."""
+    nb_crossings = 0
+    for vertex in diagram:
+        for propagator in diagram.out_edges_iter(vertex, keys=True):
+            for vertex_ante in range(propagator[0]):
+                for vertex_post in range(propagator[0], propagator[1]):
+                    nb_crossings += diagram.number_of_edges(vertex_ante,
+                                                            vertex_post)
+    return nb_crossings % 2 == 1
+
+
 def feynmf_generator(start_diag, theory_type, diagram_name):
     """Generate the feynmanmp instructions corresponding to the diagram."""
     p_order = start_diag.number_of_nodes()

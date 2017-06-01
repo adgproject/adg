@@ -4,11 +4,13 @@
 import os
 import multiprocessing
 from datetime import datetime
+from operator import xor
 import shutil
 import numpy as np
 import networkx as nx
 from methods import line_label_h, line_label_p, diagram_generation, \
-    BMBPT_generation, feynmf_generator, extract_denom
+    BMBPT_generation, feynmf_generator, extract_denom, \
+    extract_BMBPT_crossing_sign
 
 
 print "#####################"
@@ -282,9 +284,13 @@ if theory == "BMBPT":
                 numerator = numerator \
                     + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             # Add the qp states corresponding to propagators coming in
-            for prop in diag.in_edges_iter(vertex, keys=True):
-                numerator = numerator  \
-                    + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+            previous_vertex = vertex - 1
+            while previous_vertex >= 0:
+                for prop in diag.in_edges_iter(vertex, keys=True):
+                    if prop[0] == previous_vertex:
+                        numerator = numerator  \
+                            + diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                previous_vertex -= 1
             numerator = numerator + "} "
         # Determine the denominator corresponding to the diagram
         # First determine the type of structure we have
@@ -376,7 +382,7 @@ if theory == "BMBPT":
             integral = integral + ")}"
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
-        if nb_down_props % 2 != 0:
+        if xor((nb_down_props % 2 != 0), extract_BMBPT_crossing_sign(diag)):
             prefactor = "-" + prefactor
         sym_fact = ""
         prop_multiplicity = []
