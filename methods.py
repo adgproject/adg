@@ -159,6 +159,24 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     return bmbpt_diagrams
 
 
+def topologically_distinct_diags(diagrams):
+    """Returns a list of diagrams all topologically distinct."""
+    distinct_diagrams = []
+    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    for diag in diagrams:
+        if distinct_diagrams == []:
+            distinct_diagrams.append(diag)
+        else:
+            test = True
+            for good_diag in distinct_diagrams:
+                if nx.is_isomorphic(diag, good_diag, node_match=nm):
+                    test = False
+                    break
+            if test:
+                distinct_diagrams.append(diag)
+    return distinct_diagrams
+
+
 def line_label_h(n):
     """Select appropriate label for hole line."""
     labels = list(string.ascii_lowercase)
@@ -213,6 +231,30 @@ def extract_denom(start_diag, subdiagram):
     return denomin
 
 
+def extract_integral(diagram):
+    """Returns the integral part of the Feynman expression of the diagram."""
+    integral = ""
+    norder = diagram.number_of_nodes()
+    for vertex in range(1, norder):
+        integral += "\\mathrm{d}\\tau_%i" % vertex
+    if norder > 2:
+        for vertex_i in range(1, norder):
+            for vertex_j in range(1, norder):
+                if diagram.has_edge(vertex_i, vertex_j):
+                    integral += "\\theta(\\tau_%i" % vertex_j \
+                        + "-\\tau_%i) " % vertex_i
+    for vertex in range(1, norder):
+        integral += "e^{-\\tau_%i (" % vertex
+        for prop in diagram.in_edges_iter(vertex, keys=True):
+            integral += " + E_{%s}" \
+                % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+        for prop in diagram.out_edges_iter(vertex, keys=True):
+            integral += " - E_{%s}" \
+                % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+        integral += ")}"
+    return integral
+
+
 def extract_BMBPT_crossing_sign(diagram):
     """Returns True if there's a sign factor associated with crossing propagators
 
@@ -246,6 +288,25 @@ def multiplicity_symmetry_factor(diagram):
         elif multiplicity >= 2:
             factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
     return factor
+
+
+def has_tree_time_structure(diagram):
+    """Return True if the time structure of the diagram is a tree."""
+    diag_copy = diagram.to_directed()
+    for vertex in range(1, len(diag_copy)):
+        if diag_copy.in_degree(vertex) == 0:
+            diag_copy.add_edge(0, vertex)
+    time_diag = nx.DiGraph()
+    for vertex_i in diag_copy.nodes_iter():
+        for vertex_j in diag_copy.nodes_iter():
+            lgst_path = []
+            for path in nx.all_simple_paths(diag_copy,
+                                            source=vertex_i,
+                                            target=vertex_j):
+                if len(path) > len(lgst_path):
+                    lgst_path = path
+            time_diag.add_path(lgst_path)
+    return nx.is_arborescence(time_diag)
 
 
 def feynmf_generator(start_diag, theory_type, diagram_name):

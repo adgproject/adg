@@ -10,7 +10,8 @@ import numpy as np
 import networkx as nx
 from methods import line_label_h, line_label_p, diagram_generation, \
     BMBPT_generation, feynmf_generator, extract_numerator, extract_denom, \
-    extract_BMBPT_crossing_sign, multiplicity_symmetry_factor
+    extract_BMBPT_crossing_sign, multiplicity_symmetry_factor, \
+    topologically_distinct_diags, extract_integral
 
 
 print "#####################"
@@ -94,20 +95,8 @@ for diag in G:
 
 # Specific check for topologically identical diagrams in BMBPT
 if theory == "BMBPT":
-    G1 = []
-    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-    for diag in G:
-        if G1 == []:
-            G1.append(diag)
-        else:
-            test = True
-            for good_diag in G1:
-                if nx.is_isomorphic(diag, good_diag, node_match=nm):
-                    test = False
-                    break
-            if test:
-                G1.append(diag)
-    G = G1
+    G = topologically_distinct_diags(G)
+
 numdiag = len(G)
 print "Time ellapsed: ", datetime.now() - start_time
 print "Number of connected diagrams, ", numdiag
@@ -323,41 +312,8 @@ if theory == "BMBPT":
                 if diag.out_degree(vertex) == 0:
                     denominator += "(" \
                         + extract_denom(diag, diag.subgraph(vertex)) + ")"
-        # Determine the time structure of the graph
-        diag_copy = diag.to_directed()
-        for vertex in range(1, len(diag_copy)):
-            if diag_copy.in_degree(vertex) == 0:
-                diag_copy.add_edge(0, vertex)
-        time_diag = nx.DiGraph()
-        for vertex_i in diag_copy.nodes_iter():
-            for vertex_j in diag_copy.nodes_iter():
-                lgst_path = []
-                for path in nx.all_simple_paths(diag_copy,
-                                                source=vertex_i,
-                                                target=vertex_j):
-                    if len(path) > len(lgst_path):
-                        lgst_path = path
-                time_diag.add_path(lgst_path)
-        TimeStructureIsTree = nx.is_arborescence(time_diag)
         # Determine the integral component in the Feynman expression
-        integral = ""
-        for vertex in range(1, norder):
-            integral += "\\mathrm{d}\\tau_%i" % vertex
-        if norder > 2:
-            for vertex_i in range(1, norder):
-                for vertex_j in range(1, norder):
-                    if diag.has_edge(vertex_i, vertex_j):
-                        integral += "\\theta(\\tau_%i" % vertex_j \
-                            + "-\\tau_%i) " % vertex_i
-        for vertex in range(1, norder):
-            integral += "e^{-\\tau_%i (" % vertex
-            for prop in diag.in_edges_iter(vertex, keys=True):
-                integral += " + E_{%s}" \
-                    % diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-            for prop in diag.out_edges_iter(vertex, keys=True):
-                integral += " - E_{%s}" \
-                    % diag.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-            integral += ")}"
+        integral = extract_integral(diag)
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
         if xor((nb_down_props % 2 != 0), extract_BMBPT_crossing_sign(diag)):
