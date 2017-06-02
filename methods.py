@@ -321,7 +321,7 @@ def extract_BMBPT_crossing_sign(diagram):
     for vertex in diagram:
         for propagator in diagram.out_edges_iter(vertex, keys=True):
             for vertex_ante in range(propagator[0]):
-                for vertex_post in range(propagator[0], propagator[1]):
+                for vertex_post in range(propagator[0]+1, propagator[1]):
                     nb_crossings += diagram.number_of_edges(vertex_ante,
                                                             vertex_post)
     return nb_crossings % 2 == 1
