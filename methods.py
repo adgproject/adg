@@ -221,6 +221,33 @@ def line_label_p(n):
     return labels[n]
 
 
+def attribute_qp_labels(diagram):
+    """Attribute the appropriate qp labels to the graph's propagators."""
+    i = 1
+    for prop in diagram.edges_iter(keys=True):
+        diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
+        i += 1
+
+
+def omega_subgraph(diagram):
+    """Returns the graph without any operator vertex."""
+    subgraph_stack = []
+    for vertex in range(len(diagram)):
+        if diagram.node[vertex]['operator'] is False:
+            subgraph_stack.append(vertex)
+    return diagram.subgraph(subgraph_stack)
+
+
+def has_only_adg_operator_subgraphs(diagram):
+    """Returns True if diagram has operator subgraphs that are all adg."""
+    has_adg_subgraphs = True
+    for connected_subgraph in nx.weakly_connected_component_subgraphs(diagram):
+        if len(connected_subgraph) > 1:
+            if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
+                has_adg_subgraphs = False
+    return has_adg_subgraphs
+
+
 def extract_numerator(diagram):
     """"Returns the numerator associated to a BMBPT diagram."""
     numerator = ""

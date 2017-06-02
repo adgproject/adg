@@ -4,7 +4,6 @@
 import os
 import multiprocessing
 from datetime import datetime
-from operator import xor
 import shutil
 import numpy as np
 import networkx as nx
@@ -216,34 +215,20 @@ if theory == "BMBPT":
     diag_expressions = []
     for diag in G:
         # Attribute a qp label to all propagators
-        i = 1
-        nb_down_props = 0
-        for prop in diag.edges_iter(keys=True):
-            diag.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
-            if prop[1] < prop[0]:
-                nb_down_props += 1
-            i += 1
+        mth.attribute_qp_labels(diag)
         # Determine the numerator corresponding to the diagram
         numerator = mth.extract_numerator(diag)
-        # Determine the denominator corresponding to the diagram
-        # First determine the type of structure we have
-        denominator = ""
-        testgraph_stack = []
+        # Determine the type of structure we have
         # Create a subgraph without the operator vertex
-        for vertex in range(1, norder):
-            testgraph_stack.append(vertex)
-        testdiag = diag.subgraph(testgraph_stack)
-        test_adg_subgraphs = True
+        testdiag = mth.omega_subgraph(diag)
         # Use the subgraph to determine the structure of the overall graph
-        for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
-            if len(connected_subgraph) > 1:
-                if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
-                    test_adg_subgraphs = False
+        test_adg_subgraphs = mth.has_only_adg_operator_subgraphs(testdiag)
         sink_number = 0
         for vertex in range(1, norder):
             if diag.out_degree(vertex) == 0:
                 sink_number += 1
-        # If the graph has the appropriate structure, determine the denominator
+        # Determine the denominator depending on the graph structure
+        denominator = ""
         if test_adg_subgraphs:
             for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
                 for i in range(len(connected_subgraph)):
@@ -282,7 +267,7 @@ if theory == "BMBPT":
         integral = mth.extract_integral(diag)
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
-        if xor((nb_down_props % 2 != 0), mth.extract_BMBPT_crossing_sign(diag)):
+        if mth.extract_BMBPT_crossing_sign(diag):
             prefactor = "-" + prefactor
         sym_fact = mth.multiplicity_symmetry_factor(diag)
         if sym_fact != "":
