@@ -248,6 +248,15 @@ def has_only_adg_operator_subgraphs(diagram):
     return has_adg_subgraphs
 
 
+def number_of_sinks(diagram):
+    """Returns the number of vertices in the graph with no edges going out."""
+    nb = 0
+    for vertex in nx.nodes(diagram):
+        if diagram.out_degree(vertex) == 0:
+            nb += 1
+    return nb
+
+
 def extract_numerator(diagram):
     """"Returns the numerator associated to a BMBPT diagram."""
     numerator = ""

@@ -223,10 +223,7 @@ if theory == "BMBPT":
         testdiag = mth.omega_subgraph(diag)
         # Use the subgraph to determine the structure of the overall graph
         test_adg_subgraphs = mth.has_only_adg_operator_subgraphs(testdiag)
-        sink_number = 0
-        for vertex in range(1, norder):
-            if diag.out_degree(vertex) == 0:
-                sink_number += 1
+        sink_number = mth.number_of_sinks(diag)
         # Determine the denominator depending on the graph structure
         denominator = ""
         if test_adg_subgraphs:
@@ -283,16 +280,11 @@ if theory == "BMBPT":
         else:
             diag_exp = prefactor + numerator + "\n"
         if (norder == 4) and (sink_number == 1) and (not test_adg_subgraphs):
-            subgraph_stack = []
             for vertex in range(norder):
                 if diag.out_degree(vertex) == 0:
-                    subgraph_stack.append(vertex)
-            subdiag = diag.subgraph(subgraph_stack)
+                    subdiag = diag.subgraph(vertex)
             denominator_abc = mth.extract_denom(diag, subdiag)
-            subgraph_stack = []
-            for vertex in range(1, norder):
-                subgraph_stack.append(vertex)
-            subdiag = diag.subgraph(subgraph_stack)
+            subdiag = mth.omega_subgraph(diag)
             denominator_a = mth.extract_denom(diag, subdiag)
             diag_exp += "\\left[ \\frac{1}{" + denominator_abc \
                 + "} + \\frac{1}{" + denominator_a + "} \\right]"
