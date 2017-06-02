@@ -266,7 +266,8 @@ if theory == "BMBPT":
         prefactor = "(-1)^%i " % (norder - 1)
         if mth.extract_BMBPT_crossing_sign(diag):
             prefactor = "-" + prefactor
-        sym_fact = mth.multiplicity_symmetry_factor(diag)
+        sym_fact = mth.vertex_exchange_sym_factor(diag) \
+            + mth.multiplicity_symmetry_factor(diag)
         if sym_fact != "":
             prefactor = "\\frac{" + prefactor + "}{" \
                 + sym_fact + "}\\sum_{k_i}"

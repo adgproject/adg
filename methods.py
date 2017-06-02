@@ -356,6 +356,32 @@ def multiplicity_symmetry_factor(diagram):
     return factor
 
 
+def vertex_exchange_sym_factor(diagram):
+    """Returns the symmetry factor associated with vertex exchange."""
+    factor = 0
+    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    for vertex in diagram.nodes_iter():
+        successor_subgraphs = []
+        for successor in diagram.successors_iter(vertex):
+            subgraph_stack = []
+            subgraph_stack.append(vertex)
+            subgraph_stack.append(successor)
+            for downstream_vertex in diagram.nodes_iter():
+                if nx.has_path(diagram, successor, downstream_vertex):
+                    subgraph_stack.append(downstream_vertex)
+            successor_subgraphs.append(diagram.subgraph(subgraph_stack))
+        # Double-counting is compensated by +1 increment instead of +2
+        for graph_1 in successor_subgraphs:
+            for graph_2 in successor_subgraphs:
+                if graph_1 != graph_2:
+                    if nx.is_isomorphic(graph_1, graph_2, node_match=nm):
+                        factor += 1
+    if factor != 0:
+        return "%i" % factor
+    else:
+        return ""
+
+
 def has_tree_time_structure(diagram):
     """Return True if the time structure of the diagram is a tree."""
     diag_copy = diagram.to_directed()
