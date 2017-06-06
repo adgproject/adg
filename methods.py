@@ -358,17 +358,17 @@ def multiplicity_symmetry_factor(diagram):
 
 def vertex_exchange_sym_factor(diagram):
     """Returns the symmetry factor associated with vertex exchange."""
-    factor = 0
-    for vertex_1 in diagram.nodes_iter():
-        for vertex_2 in diagram.nodes_iter():
-            if (vertex_1 != vertex_2) \
-               and (diagram.node[vertex_1]['operator'] is False) \
-               and (diagram.node[vertex_2]['operator'] is False):
-                mapping = {vertex_1: vertex_2, vertex_2: vertex_1}
-                permuted_diag = nx.relabel_nodes(diagram, mapping, copy=True)
-                # Double-counting is compensated by +1 increment instead of +2
-                if nx.is_isomorphic(diagram, nx.intersection(diagram, permuted_diag)):
-                    factor += 1
+    # Starts at -2 as the identity belongs to the set of permutations
+    factor = -2
+    non_op_vertices = []
+    for vertex in diagram.nodes_iter():
+        if diagram.node[vertex]['operator'] is False:
+            non_op_vertices.append(vertex)
+    for permutation in itertools.permutations(non_op_vertices, len(non_op_vertices)):
+        mapping = dict(zip(non_op_vertices, permutation))
+        permuted_diag = nx.relabel_nodes(diagram, mapping, copy=True)
+        if nx.is_isomorphic(diagram, nx.intersection(diagram, permuted_diag)):
+            factor += 2
     if factor != 0:
         return "%i" % factor
     else:
