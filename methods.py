@@ -359,23 +359,16 @@ def multiplicity_symmetry_factor(diagram):
 def vertex_exchange_sym_factor(diagram):
     """Returns the symmetry factor associated with vertex exchange."""
     factor = 0
-    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-    for vertex in diagram.nodes_iter():
-        successor_subgraphs = []
-        for successor in diagram.successors_iter(vertex):
-            subgraph_stack = []
-            subgraph_stack.append(vertex)
-            subgraph_stack.append(successor)
-            for downstream_vertex in diagram.nodes_iter():
-                if nx.has_path(diagram, successor, downstream_vertex):
-                    subgraph_stack.append(downstream_vertex)
-            successor_subgraphs.append(diagram.subgraph(subgraph_stack))
-        # Double-counting is compensated by +1 increment instead of +2
-        for graph_1 in successor_subgraphs:
-            for graph_2 in successor_subgraphs:
-                if graph_1 != graph_2:
-                    if nx.is_isomorphic(graph_1, graph_2, node_match=nm):
-                        factor += 1
+    for vertex_1 in diagram.nodes_iter():
+        for vertex_2 in diagram.nodes_iter():
+            if (vertex_1 != vertex_2) \
+               and (diagram.node[vertex_1]['operator'] is False) \
+               and (diagram.node[vertex_2]['operator'] is False):
+                mapping = {vertex_1: vertex_2, vertex_2: vertex_1}
+                permuted_diag = nx.relabel_nodes(diagram, mapping, copy=True)
+                # Double-counting is compensated by +1 increment instead of +2
+                if nx.is_isomorphic(diagram, nx.intersection(diagram, permuted_diag)):
+                    factor += 1
     if factor != 0:
         return "%i" % factor
     else:
