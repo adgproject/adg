@@ -210,7 +210,7 @@ if theory == "MBPT":
 
 
 # Treatment of the algebraic expressions
-if theory == "BMBPT":
+if theory == "BMBPT" and not norm:
     feynman_expressions = []
     diag_expressions = []
     for diag in G:
@@ -368,19 +368,21 @@ for i_diag in range(0, numdiag):
                 latex_file.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n")
             elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
                 latex_file.write("\\subsection{Three-body non-canonical diagrams}\n")
-        diag_exp = diag_expressions[i_diag]
-        feynman_exp = feynman_expressions[i_diag]
         latex_file.write("Diagram %i:\n" % (i_diag+1))
-        latex_file.write(begeq)
-        latex_file.write(feynman_exp)
-        latex_file.write(endeq)
+        if not norm:
+            diag_exp = diag_expressions[i_diag]
+            feynman_exp = feynman_expressions[i_diag]
+            latex_file.write(begeq)
+            latex_file.write(feynman_exp)
+            latex_file.write(endeq)
     elif theory == "MBPT":
         diag_exp = "\\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] \
             + "\\sum{\\dfrac{" + mat_els[i_diag] + "}{" \
             + denoms[i_diag] + "}}\n"
-    latex_file.write(begeq)
-    latex_file.write(diag_exp)
-    latex_file.write(endeq)
+    if not norm:
+        latex_file.write(begeq)
+        latex_file.write(diag_exp)
+        latex_file.write(endeq)
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
         diag_file = open(directory+"/Diagrams/diag_%i.tex" % i_diag)
