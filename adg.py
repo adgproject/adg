@@ -1,22 +1,13 @@
 #!/bin/bash /usr/bin/python
 # -*- coding: utf-8 -*-
 
-import copy
 import os
-import numpy as np
-import random
-from collections import deque
-import matplotlib.pyplot as plt
-import networkx as nx
-import random
-import sys
-import fileinput
-import itertools
-#from joblib import Parallel, delayed
 import multiprocessing
 from datetime import datetime
-import string
 import shutil
+import numpy as np
+import networkx as nx
+import methods as mth
 
 
 print "#####################"
@@ -28,19 +19,22 @@ print "#####################"
 print "Parallel Mode"
 num_cores = multiprocessing.cpu_count()
 print "There is %i" % num_cores + " core(s) available"
-norder = int(raw_input('Order of the diagrams ?\n'))
-theory = raw_input('MBPT or BMBPT ?\n').upper()
+norder = int(raw_input('Order of the diagrams?\n'))
+while norder < 2:
+    print "Perturbative order too small!"
+    norder = int(raw_input('Order of the diagrams?\n'))
+theory = raw_input('MBPT or BMBPT?\n').upper()
 
 three_N = False
 norm = False
 if theory == "BMBPT":
-    three_N = raw_input("Include three-body forces ? (y/N) ").lower() == 'y'
-    norm = raw_input("Compute norm kernel instead of operator kernels ? (y/N) ").lower() == 'y'
-
+    three_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
+    norm = raw_input(
+        "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
 if three_N:
-    directory = theory + '/Order-%i'% norder + 'with3N'
+    directory = theory + '/Order-%i' % norder + 'with3N'
 else:
-    directory = theory + '/Order-%i'% norder
+    directory = theory + '/Order-%i' % norder
 if norm:
     directory = directory + '_Norm'
 if not os.path.exists(directory):
@@ -49,258 +43,75 @@ if not os.path.exists(directory+"/Diagrams"):
     os.makedirs(directory+"/Diagrams")
 
 
-#Generate all 1-magic square of dimension n
-def seed(n):
-    return [k for k in itertools.permutations(range(n),n)]
-
-#Select matrices with full 0 diagonal
-def no_trace(matrices):
-    traceless = []
-    for matrix in matrices:
-        test = True
-        for i,n in enumerate(matrix):
-            if n[i] == 1:
-                test = False
-                break
-        if test:
-            traceless.append(matrix)
-    return traceless
-
-#Select out matrices with loops between two vertices
-def no_loop(matrices):
-    no_loop = []
-    for matrix in matrices:
-        test = True
-        for i in range(len(matrix[0])):
-            for j in range(i+1):
-                if (matrix[i][j] != 0) and (matrix[j][i] != 0):
-                    test = False
-                    break
-        if test:
-            no_loop.append(matrix)
-    return no_loop
-
-#Check the degrees of the vertices (i.e. its effective one-, two- or three-body structure)
-def check_degree(matrices,three_N):
-    deg_ok = []
-    for matrix in matrices:
-        test = True
-        for i in range(len(matrix[0])):
-            degree = 0
-            for j in range(len(matrix[0])):
-                degree += matrix[i][j] + matrix[j][i]
-            if (degree != 2) and (degree != 4):
-                if (three_N == False) or (degree != 6):
-                    test = False
-                    break
-        if test:
-            deg_ok.append(matrix)
-    return deg_ok
-
-#Generate the diagrams for the MBPT case
-def diagram_generation(n):
-    seeds = seed(n)
-    all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
-    traceless = no_trace(all)
-    coeffs = [i for i in itertools.combinations_with_replacement(range(len(traceless)),2)]
-    double = []
-    for coef in coeffs:
-        matrix = copy.deepcopy(traceless[coef[0]])
-        for i,line in enumerate(traceless[coef[1]]):
-            for j,elem in enumerate(line):
-                matrix[i][j] += elem
-        double.append(matrix)
-    doubleUniq = []
-    for i in double:
-            if i not in doubleUniq:
-                    doubleUniq.append(i)
-    doubleUniq.sort(reverse=True)
-    diagrams = []
-    for el in doubleUniq:
-        diagrams.append(np.array(el))
-    return diagrams
-
-#Generate diagrams for BMBPT
-def BMBPT_generation(p_order,three_N,norm):
-    #Begin by creating a zero oriented adjacency matric of good dimensions
-    empty_mat = []
-    for i in range(p_order):
-        empty_mat.append([])
-        for j in range(p_order):
-            empty_mat[i].append(0)
-
-    deg_max = 4
-    if three_N:
-        deg_max = 6
-
-    temp_matrices = []
-    temp_matrices.append(empty_mat)
-
-    #Generate oriented adjacency matrices going vertex-wise
-    for vertex in range(p_order):
-        for sum_index in range(vertex+1,p_order):
-            matrices = []
-            for mat in temp_matrices:
-                matrices.append(mat)
-                if mat[vertex][sum_index] == 0:
-                    vert_degree = 0
-                    for k in range(0,p_order):
-                        vert_degree += mat[k][vertex] + mat[vertex][k]
-                    elem = 1
-                    while (elem + vert_degree) <= deg_max:
-                        temp_mat = copy.deepcopy(mat)
-                        temp_mat[sum_index][vertex] = elem
-                        matrices.append(temp_mat)
-                        elem += 1
-            temp_matrices = copy.deepcopy(matrices)
-            #Row is not iterated upon for the first vertex in operator diagrams
-            if norm or (vertex != 0):
-                matrices = []
-                for mat in temp_matrices:
-                    matrices.append(mat)
-                    if mat[sum_index][vertex] == 0:
-                        vert_degree = 0
-                        for k in range(0,p_order):
-                            vert_degree += mat[vertex][k] + mat[k][vertex]
-                        elem = 1
-                        while (elem + vert_degree) <= deg_max:
-                            temp_mat = copy.deepcopy(mat)
-                            temp_mat[vertex][sum_index] = elem
-                            matrices.append(temp_mat)
-                            elem += 1
-                temp_matrices = copy.deepcopy(matrices)
-        deg_vertex_ok = []
-        for matrix in temp_matrices:
-            test = True
-            degree = 0
-            for i in range(0,p_order):
-                degree += matrix[i][vertex] + matrix[vertex][i]
-            if (degree != 2) and (degree != 4):
-                if (three_N == False) or (degree != 6):
-                    test = False
-            if test:
-                deg_vertex_ok.append(matrix)
-        matrices = copy.deepcopy(deg_vertex_ok)
-        temp_matrices = copy.deepcopy(deg_vertex_ok)
-
-    #Checks to exclude non-conform matrices
-    good_degree = check_degree(matrices,three_N)
-    mat_wo_loops = no_loop(good_degree)
-    matricesUniq = []
-    for i in mat_wo_loops:
-            if i not in matricesUniq:
-                    matricesUniq.append(i)
-    matricesUniq.sort(reverse=True)
-    diagrams = []
-    for el in matricesUniq:
-        diagrams.append(np.array(el))
-    return diagrams
-
-#Start computing everything
+# Start computing everything
 print "Running"
 start_time = datetime.now()
 if theory == "MBPT":
-    diagrams = diagram_generation(norder)
+    diagrams = mth.diagram_generation(norder)
 elif theory == "BMBPT":
-    diagrams = BMBPT_generation(norder,three_N,norm)
+    diagrams = mth.BMBPT_generation(norder, three_N, norm)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
-print "Number of possible diagrams, ",numdiag
+print "Number of possible diagrams, ", numdiag
 
 i = 0
 with open(directory+"/Diagrams.list", "w") as f:
     for diagram in diagrams:
         f.write("Diagram n: %i" % i)
-        np.savetxt(f,diagram)
+        np.savetxt(f, diagram)
         f.write("\n")
         i += 1
 
-### Graph part (computing, writing, drawing)
-G=[]
+# Graph part (computing, writing, drawing)
+G = []
 for diagram in diagrams:
-    G.append(nx.from_numpy_matrix(diagram,create_using=nx.MultiDiGraph(),parallel_edges=True))
-G1=[]
-for diag in G:
-    if((nx.number_weakly_connected_components(diag)) == 1):
-        G1.append(diag)
-G=G1
-# Specific checks for topologically identical diagrams in BMBPT
-if theory == "BMBPT":
-    G1=[]
-    for diag in G:
-        test = True
-        if norm == False:
-            #Account for different status of vertices in operator diagrams
-            for node in diag:
-                diag.node[node]['operator'] = False
-            diag.node[0]['operator'] = True
-            nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-        if G1 == []:
-            G1.append(diag)
-        else:
-            for good_diag in G1:
-                if norm:
-                    if nx.is_isomorphic(diag, good_diag):
-                        test = False
-                        break
-                else:
-                    if nx.is_isomorphic(diag, good_diag, node_match = nm):
-                        test = False
-                        break
-            if test:
-                G1.append(diag)
-    G=G1
-numdiag = len(G)
-print "Time ellapsed: ",datetime.now() - start_time
-print "Number of connected diagrams, ",numdiag
+    G.append(nx.from_numpy_matrix(
+        diagram, create_using=nx.MultiDiGraph(), parallel_edges=True))
 
-#Ordering the diagrams in a convenient way
+G1 = []
+for diag in G:
+    if (nx.number_weakly_connected_components(diag)) == 1:
+        G1.append(diag)
+G = G1
+# Specific check for loop diagrams in BMBPT
 if theory == "BMBPT":
-    G2=[]
-    G3=[]
-    G2_HF=[]
-    G2_EHF=[]
-    G2_noHF=[]
-    G3_HF=[]
-    G3_EHF=[]
-    G3_noHF=[]
+    G1 = []
     for diag in G:
-        max_deg = 0
-        for node in diag:
-            max_deg = max(max_deg,diag.degree(node))
-        if max_deg == 6:
-            G3.append(diag)
-        else:
-            G2.append(diag)
-    for diag in G2:
-        test_HF = True
-        test_EHF = True
-        for node in diag:
-            if diag.degree(node) == 2:
-                test_HF = False
-                if node != 0:
-                    test_EHF = False
-        if test_HF:
-            G2_HF.append(diag)
-        elif (test_EHF == False) or norm:
-            G2_noHF.append(diag)
-        else:
-            G2_EHF.append(diag)
-    for diag in G3:
-        test_HF = True
-        test_EHF = True
-        for node in diag:
-            if diag.degree(node) == 2:
-                test_HF = False
-                if node != 0:
-                    test_EHF = False
-        if test_HF:
-            G3_HF.append(diag)
-        elif (test_EHF == False) or norm:
-            G3_noHF.append(diag)
-        else:
-            G3_EHF.append(diag)
+        if nx.is_directed_acyclic_graph(diag):
+            G1.append(diag)
+    G = G1
+
+for diag in G:
+    # Account for different status of vertices in operator diagrams
+    for node in diag:
+        diag.node[node]['operator'] = False
+    if (theory == "BMBPT") and not norm:
+        diag.node[0]['operator'] = True
+
+# Specific check for topologically identical diagrams in BMBPT
+if theory == "BMBPT":
+    G = mth.topologically_distinct_diags(G)
+
+numdiag = len(G)
+print "Time ellapsed: ", datetime.now() - start_time
+print "Number of connected diagrams, ", numdiag
+
+# Ordering the diagrams in a convenient way
+if theory == "BMBPT":
+    G2 = []
+    G3 = []
+    G2_HF = []
+    G2_EHF = []
+    G2_noHF = []
+    G3_HF = []
+    G3_EHF = []
+    G3_noHF = []
+
+    mth.order_2B_or_3B(G, G2, G3)
+    mth.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
+    mth.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
+
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
     nb_2 = len(G2)
     nb_2_HF = len(G2_HF)
@@ -310,53 +121,39 @@ if theory == "BMBPT":
     nb_3_HF = len(G3_HF)
     nb_3_EHF = len(G3_EHF)
     nb_3_noHF = len(G3_noHF)
-    if theory == "BMBPT":
-        print "\n2N valid diagrams: %i" %nb_2
-        print "2N energy canonical diagrams: %i" %nb_2_HF
-        if norm == False:
-            print "2N canonical diagrams for a generic operator only: %i" %nb_2_EHF
-        print "2N non-canonical diagrams: %i\n" %nb_2_noHF
-        if three_N:
-            print "3N valid diagrams: %i" %nb_3
-            print "3N energy canonical diagrams: %i" %nb_3_HF
-            if norm == False:
-                print "3N canonical diagrams for a generic operator only: %i" %nb_3_EHF
-            print "3N non-canonical diagrams: %i" %nb_3_noHF
+    print "\n2N valid diagrams: %i" % nb_2
+    print "2N energy canonical diagrams: %i" % nb_2_HF
+    if not norm:
+        print "2N canonical diagrams for a generic operator only: %i" % nb_2_EHF
+    print "2N non-canonical diagrams: %i\n" % nb_2_noHF
+    if three_N:
+        print "3N valid diagrams: %i" % nb_3
+        print "3N energy canonical diagrams: %i" % nb_3_HF
+        if not norm:
+            print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
+        print "3N non-canonical diagrams: %i" % nb_3_noHF
 
-### Algebraic expressions:
-### CAVEAT !!! This works only for MBPT
+# Algebraic expressions:
 
-def line_label_h(n):
-    labels=list(string.ascii_lowercase)
-    labels=labels[0:15]
-    return labels[n]
-def line_label_p(n):
-    labels=list(string.ascii_lowercase)
-    labels=labels[15:-1]
-    return labels[n]
-
-def mat_elements(irow):
-    return
-
-#Treatment of the algebraic expressions
-### To be extended to BMBPT in the future
+# Treatment of the algebraic expressions
+# To be extended to BMBPT in the future
 if theory == "MBPT":
     mat_els = []
     denoms = []
     phases = []
     nedges_eq = []
     for diag in G:
-        type_edg =[]
+        type_edg = []
         braket = ''
-        #Beware of the sign convention !!!
-        incidence = - nx.incidence_matrix(diag,oriented=True).todense()
+        # Beware of the sign convention !!!
+        incidence = - nx.incidence_matrix(diag, oriented=True).todense()
         nrow = diag.number_of_nodes()
         ncol = diag.number_of_edges()
-        n_holes= 0
+        n_holes = 0
         diffcols = set()
         for col in range(ncol):
-            flat = list(incidence[:,col].A1)
-            if(flat.index(1) < flat.index(-1)):
+            flat = list(incidence[:, col].A1)
+            if flat.index(1) < flat.index(-1):
                 n_holes += 1
                 type_edg.append('h')
             else:
@@ -367,239 +164,244 @@ if theory == "MBPT":
             ket = ''
             bra = ''
             for col in range(ncol):
-            ######### Mtrx Elements ###########
-                if (incidence[row,col] == 1):
-                    if (type_edg[col] == 'h'):
-                        bra = bra + line_label_h(col)
+                ######### Mtrx Elements ###########
+                if (incidence[row, col] == 1):
+                    if type_edg[col] == 'h':
+                        bra = bra + mth.line_label_h(col)
                     else:
-                        bra = bra + line_label_p(col)
-                if (incidence[row,col] == -1):
-                    if (type_edg[col] == 'h'):
-                        ket = ket + line_label_h(col)
+                        bra = bra + mth.line_label_p(col)
+                if (incidence[row, col] == -1):
+                    if type_edg[col] == 'h':
+                        ket = ket + mth.line_label_h(col)
                     else:
-                        ket = ket + line_label_p(col)
-            ###################################
+                        ket = ket + mth.line_label_p(col)
+                ###################################
             braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
         mat_els.append(braket)
         denom = ''
-        for row in range(1,nrow):
+        for row in range(1, nrow):
             denom = denom + '('
             for col in range(ncol):
-                val_test = incidence[0:row,col].sum()
-                if (val_test == 1):
-                    if (type_edg[col] == 'h'):
-                        denom=denom+' +E_'+line_label_h(col)
+                val_test = incidence[0:row, col].sum()
+                if val_test == 1:
+                    if type_edg[col] == 'h':
+                        denom = denom + ' +E_' + mth.line_label_h(col)
                     else:
-                        denom=denom+' +E_'+line_label_p(col)
-                if (val_test == -1):
-                    if (type_edg[col] == 'h'):
-                        denom=denom+'-E_'+line_label_h(col)
+                        denom = denom + ' +E_' + mth.line_label_p(col)
+                if val_test == -1:
+                    if type_edg[col] == 'h':
+                        denom = denom + '-E_' + mth.line_label_h(col)
                     else:
-                        denom=denom+'-E_'+line_label_p(col)
-            denom = denom+')'
-        if ('( +' in denom):
-            denom = denom.replace('( +','(')
+                        denom = denom + '-E_' + mth.line_label_p(col)
+            denom = denom + ')'
+        if '( +' in denom:
+            denom = denom.replace('( +', '(')
         denom = denom.strip(' ')
         denoms.append(denom)
         phases.append('(-1)^{%i' % n_holes + '+l}')
-        #print incidence
-        eq_lines=np.array(incidence.transpose())
-        #neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines)))).transpose()
-        neq_lines=np.asarray(list(i for i in set(map(tuple,eq_lines))))
+        # print incidence
+        eq_lines = np.array(incidence.transpose())
+        neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         n_sym = len(eq_lines)-len(neq_lines)
-        #### CAVEAT !!! Valid only for *MBPT*
+        # CAVEAT !!! Valid only for *MBPT*
         nedges_eq.append(2**n_sym)
-        #print "After neqlines"
-        #### Loops
+        # print "After neqlines"
+        # Loops
 
 
-## Function generating the feynmanmf instructions
-def feynmf_generator(diag,theory,diag_name):
-    p_order = diag.number_of_nodes()
-    diag_size = 20*p_order
-
-    theories = ["MBPT","BMBPT","SCGF"]
-    th_index = theories.index(theory)
-    prop_types = ["half_prop","prop_pm","double_arrow"]
-    prop = prop_types[th_index]
-
-    file_name = diag_name + ".tex"
-
-    feynmf_file = open(file_name,'w')
-
-    begin_file = "\parbox{%i" %diag_size +"pt}{\\begin{fmffile}{" + diag_name + "}\n\\begin{fmfgraph*}(%i" %diag_size + ",%i)\n" %diag_size
-    end_file = "\end{fmfgraph*}\n\end{fmffile}}\n\n"
-
-    #Draw the diagram only if there is one to be drawn...
-    if p_order >= 2:
-        feynmf_file.write(begin_file)
-
-        #Set the position of the top and bottom vertices
-        feynmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" %(p_order-1))
-        if (theory == "BMBPT") and (norm == False):
-            feynmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v0}\n")
+# Treatment of the algebraic expressions
+if theory == "BMBPT" and not norm:
+    feynman_expressions = []
+    diag_expressions = []
+    for diag in G:
+        # Attribute a qp label to all propagators
+        mth.attribute_qp_labels(diag)
+        # Determine the numerator corresponding to the diagram
+        numerator = mth.extract_numerator(diag)
+        # Determine the type of structure we have
+        # Create a subgraph without the operator vertex
+        testdiag = mth.omega_subgraph(diag)
+        # Use the subgraph to determine the structure of the overall graph
+        test_adg_subgraphs = mth.has_only_adg_operator_subgraphs(testdiag)
+        sink_number = mth.number_of_sinks(diag)
+        # Determine the denominator depending on the graph structure
+        denominator = ""
+        if test_adg_subgraphs:
+            for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
+                for i in range(len(connected_subgraph)):
+                    subgraph_stack = []
+                    if len(connected_subgraph) > 1:
+                        for j in range(i, len(connected_subgraph)):
+                            vertex = nx.dag_longest_path(connected_subgraph)[j]
+                            subgraph_stack.append(vertex)
+                    elif len(connected_subgraph) == 1:
+                        subgraph_stack.append(connected_subgraph.nodes()[0])
+                    subdiag = connected_subgraph.subgraph(subgraph_stack)
+                    denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
+        elif (norder == 4) and (sink_number == 1):
+            for i in range(2):
+                subgraph_stack = []
+                subgraph_stack.append(nx.dag_longest_path(testdiag)[1])
+                if i == 0:
+                    subgraph_stack.append(nx.dag_longest_path(testdiag)[0])
+                else:
+                    for vertex_1 in nx.nodes(testdiag):
+                        test_vertex = True
+                        for vertex_2 in nx.dag_longest_path(testdiag):
+                            if vertex_1 == vertex_2:
+                                test_vertex = False
+                        if test_vertex:
+                            subgraph_stack.append(vertex_1)
+                subdiag = testdiag.subgraph(subgraph_stack)
+                denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
+        elif (norder == 4) and (sink_number == 2):
+            denominator += "(" + mth.extract_denom(diag, testdiag) + ")"
+            for vertex in diag:
+                if diag.out_degree(vertex) == 0:
+                    denominator += "(" \
+                        + mth.extract_denom(diag, diag.subgraph(vertex)) + ")"
+        # Determine the integral component in the Feynman expression
+        integral = mth.extract_integral(diag)
+        # Determine the pre-factor
+        prefactor = "(-1)^%i " % (norder - 1)
+        if mth.extract_BMBPT_crossing_sign(diag):
+            prefactor = "-" + prefactor
+        sym_fact = mth.vertex_exchange_sym_factor(diag) \
+            + mth.multiplicity_symmetry_factor(diag)
+        if sym_fact != "":
+            prefactor = "\\frac{" + prefactor + "}{" \
+                + sym_fact + "}\\sum_{k_i}"
         else:
-            feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}\n")
-        feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %(p_order-1))
-        #Set the position of intermediate vertices if needed
-        if p_order > 2:
-            feynmf_file.write("\\fmf{phantom}{v0,v1}\n")
-            for vertex in range(1,p_order-2):
-                feynmf_file.write("\\fmf{phantom}{v%i" %vertex + ",v%i}\n" %(vertex+1))
-                feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %vertex)
-            feynmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" %(p_order-2))
-            feynmf_file.write("\\fmf{phantom}{v%i,"%(p_order-2) + "v%i}\n" %(p_order-1))
-            feynmf_file.write("\\fmffreeze\n")
+            prefactor = prefactor + "\\sum_{k_i}"
+        feynman_exp = prefactor + numerator + "\\int_{0}^{\\tau}" \
+            + integral + "\n"
+        if denominator != "":
+            diag_exp = prefactor + "\\frac{ " + numerator \
+                + " }{ " + denominator + " }\n"
+        else:
+            diag_exp = prefactor + numerator + "\n"
+        if (norder == 4) and (sink_number == 1) and (not test_adg_subgraphs):
+            for vertex in range(norder):
+                if diag.out_degree(vertex) == 0:
+                    subdiag = diag.subgraph(vertex)
+            denominator_abc = mth.extract_denom(diag, subdiag)
+            subdiag = mth.omega_subgraph(diag)
+            denominator_a = mth.extract_denom(diag, subdiag)
+            diag_exp += "\\left[ \\frac{1}{" + denominator_abc \
+                + "} + \\frac{1}{" + denominator_a + "} \\right]"
+        feynman_expressions.append(feynman_exp)
+        diag_expressions.append(diag_exp)
 
-        # Recover the oriented adjacency matrix of the diagram
-        oriented_adj_mat = []
-        for i in range(0,p_order):
-            oriented_adj_mat.append([])
-            for j in range(0,p_order):
-                oriented_adj_mat[i].append(0)
-        for line in nx.generate_edgelist(diag,data=False):
-            i = int(line[0])
-            j = int(line[2])
-            oriented_adj_mat[i][j] += 1
 
-        #Loop over all elements of the matrix to draw associated propagators
-        for i in range(0,p_order):
-            for j in range(0,p_order):
-                # For directly consecutive vertices
-                if (abs(i-j) == 1) and (oriented_adj_mat[i][j] != 0):
-                    if oriented_adj_mat[i][j] == 1:
-                        if oriented_adj_mat[j][i] !=1:
-                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
-                        else:
-                            feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
-                    else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.5}{v%i," %j + "v%i}\n" %i)
-                        feynmf_file.write("\\fmf{" + prop + ",left=0.5}{v%i," %j + "v%i}\n" %i)
-                        if oriented_adj_mat[i][j] == 3:
-                            feynmf_file.write("\\fmf{" + prop + "}{v%i," %j + "v%i}\n" %i)
-                        elif oriented_adj_mat[i][j] >= 4:
-                            feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
-                            feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
-                            if oriented_adj_mat[i][j] >= 5:
-                                feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %j + "v%i}\n" %i)
-                                if oriented_adj_mat[i][j] == 6:
-                                    feynmf_file.write("\\fmf{" + prop + ",left=0.9}{v%i," %j + "v%i}\n" %i)
-
-                # For more distant vertices
-                elif (i != j) and (oriented_adj_mat[i][j] != 0):
-                    if (oriented_adj_mat[i][j] == 1) and (oriented_adj_mat[j][i] == 2):
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
-                    else:
-                        feynmf_file.write("\\fmf{" + prop + ",right=0.6}{v%i," %j + "v%i}\n" %i)
-                        if oriented_adj_mat[i][j] != 1:
-                            feynmf_file.write("\\fmf{" + prop + ",left=0.6}{v%i," %j + "v%i}\n" %i)
-                            if oriented_adj_mat[i][j] != 2:
-                                feynmf_file.write("\\fmf{" + prop + ",right=0.75}{v%i," %j + "v%i}\n" %i)
-                                if oriented_adj_mat[i][j] != 3:
-                                    feynmf_file.write("\\fmf{" + prop + ",left=0.75}{v%i," %j + "v%i}\n" %i)
-                                    if oriented_adj_mat[i][j] != 4:
-                                        feynmf_file.write("\\fmf{" + prop + ",right=0.9}{v%i," %j + "v%i}\n" %i)
-        feynmf_file.write(end_file)
-    else:
-        print "Perturbative order too small"
-
-## Writing a feynmp file for each graph
-msg = 'Generate diagrams feymanmf instructions ?'
+# Writing a feynmp file for each graph
+msg = 'Generate diagrams feymanmf instructions?'
 pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
-if (pdraw):
+if pdraw:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    for i in range(0,numdiag):
-        diag_name = 'diag_%i' %i
-        feynmf_generator(G[i],theory,diag_name)
-        shutil.move(diag_name +'.tex', directory + "/Diagrams/" + diag_name + '.tex')
+    for i in range(0, numdiag):
+        diag_name = 'diag_%i' % i
+        mth.feynmf_generator(G[i], theory, diag_name)
+        shutil.move(diag_name + '.tex',
+                    directory + "/Diagrams/" + diag_name + '.tex')
 
 
-msg = 'Include diagrams in tex ?'
+msg = 'Include diagrams in tex?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
-### Write everything down in a nice LaTeX file
-header = "\documentclass[10pt,a4paper]{article}\n \usepackage[utf8]{inputenc}\n\usepackage{braket}\n\usepackage{graphicx}\n"
-header = header + "\usepackage[english]{babel}\n\usepackage{amsmath}\n\usepackage{amsfonts}\n\usepackage{amssymb}\n"
-if pdiag:
-    header = header + "\usepackage[force]{feynmp-auto}\n"
-land = False
-if (norder > 3):
-    msg = 'Expressions may be long rotate pdf ?'
-    land = raw_input("%s (y/N) " % msg).lower() == 'y'
-if (land):
-    header = header + "\usepackage[landscape]{geometry}\n"
 
-header = header + "\\title{Diagrams and algebraic expressions at order %i" % norder +" in " + theory +"}\n"
-latex_file = open(directory + '/result.tex','w')
+# Write everything down in a nice LaTeX file
+header = "\\documentclass[10pt,a4paper]{article}\n" \
+    + "\\usepackage[utf8]{inputenc}\n" \
+    + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
+    + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
+    + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
+if pdiag:
+    header = header + "\\usepackage[force]{feynmp-auto}\n"
+land = False
+if norder > 3:
+    msg = 'Expressions may be long, rotate pdf?'
+    land = raw_input("%s (y/N) " % msg).lower() == 'y'
+if land:
+    header = header + "\\usepackage[landscape]{geometry}\n"
+
+header = header \
+    + "\\title{Diagrams and algebraic expressions at order %i" % norder \
+    + " in " + theory + "}\n" \
+    + "\\author{RDL, JR, PA, MD, AT}\n"
+latex_file = open(directory + '/result.tex', 'w')
 latex_file.write(header)
-begdoc ="\\begin{document}\n"
-enddoc ="\\end{document}"
+begdoc = "\\begin{document}\n"
+enddoc = "\\end{document}"
 begeq = "\\begin{equation}\n"
 endeq = "\\end{equation}\n"
 latex_file.write(begdoc)
-latex_file.write("\maketitle\n")
+latex_file.write("\\maketitle\n")
 latex_file.write("\\graphicspath{{Diagrams/}}")
 
 if theory == "BMBPT":
-    latex_file.write("Valid diagrams: %i\n\n" %numdiag)
-    latex_file.write("2N valid diagrams: %i\n\n" %nb_2)
-    latex_file.write("2N canonical diagrams for the energy: %i\n\n" %nb_2_HF)
-    if norm == False:
-        latex_file.write("2N canonical diagrams for a generic operator only: %i\n\n" %nb_2_EHF)
-    latex_file.write("2N non-canonical diagrams: %i\n\n" %nb_2_noHF)
+    latex_file.write("Valid diagrams: %i\n\n" % numdiag)
+    latex_file.write("2N valid diagrams: %i\n\n" % nb_2)
+    latex_file.write("2N canonical diagrams for the energy: %i\n\n" % nb_2_HF)
+    if not norm:
+        latex_file.write("2N canonical diagrams for a generic operator only: %i\n\n" % nb_2_EHF)
+    latex_file.write("2N non-canonical diagrams: %i\n\n" % nb_2_noHF)
     if three_N:
-        latex_file.write("3N valid diagrams: %i\n\n" %nb_3)
-        latex_file.write("3N canonical diagrams for the energy: %i\n\n" %nb_3_HF)
-        if norm == False:
-            latex_file.write("3N canonical diagrams for a generic operator only: %i\n\n" %nb_3_EHF)
-        latex_file.write("3N non-canonical diagrams: %i\n\n" %nb_3_noHF)
+        latex_file.write("3N valid diagrams: %i\n\n" % nb_3)
+        latex_file.write("3N canonical diagrams for the energy: %i\n\n" % nb_3_HF)
+        if not norm:
+            latex_file.write("3N canonical diagrams for a generic operator only: %i\n\n" % nb_3_EHF)
+        latex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_noHF)
+    latex_file.write("\\section{Two-body diagrams}\n")
+    latex_file.write("\\subsection{Two-body energy canonical diagrams}\n")
 
-if (not pdiag or not pdraw) and (theory == "MBPT"):
-    for i_diag in range(0,numdiag):
-        diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
+for i_diag in range(0, numdiag):
+    if theory == "BMBPT":
+        if (i_diag == nb_2_HF) and (not norm):
+            latex_file.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n")
+        elif i_diag == nb_2_HF + nb_2_EHF:
+            latex_file.write("\\subsection{Two-body non-canonical diagrams}\n")
+        if three_N:
+            if i_diag == nb_2:
+                latex_file.write("\\section{Three-body diagrams}\n")
+                latex_file.write("\\subsection{Three-body energy canonical diagrams}\n")
+            elif (i_diag == nb_2 + nb_3_HF) and (not norm):
+                latex_file.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n")
+            elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
+                latex_file.write("\\subsection{Three-body non-canonical diagrams}\n")
+        latex_file.write("Diagram %i:\n" % (i_diag+1))
+        if not norm:
+            diag_exp = diag_expressions[i_diag]
+            feynman_exp = feynman_expressions[i_diag]
+            latex_file.write(begeq)
+            latex_file.write(feynman_exp)
+            latex_file.write(endeq)
+    elif theory == "MBPT":
+        diag_exp = "\\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] \
+            + "\\sum{\\dfrac{" + mat_els[i_diag] + "}{" \
+            + denoms[i_diag] + "}}\n"
+    if not norm:
         latex_file.write(begeq)
         latex_file.write(diag_exp)
         latex_file.write(endeq)
-    latex_file.write(enddoc)
-else:
-    if theory == "BMBPT":
-        latex_file.write("\section{Two-body diagrams}\subsection{Two-body energy canonical diagrams}\n")
-    for i_diag in range(0,numdiag):
-        if theory == "BMBPT":
-            if (i_diag == nb_2_HF) and (norm == False):
-                latex_file.write("\subsection{Two-body canonical diagrams for a generic operator only}\n")
-            elif i_diag == nb_2_HF + nb_2_EHF:
-                latex_file.write("\subsection{Two-body non-canonical diagrams}\n")
-            if three_N:
-                if i_diag == nb_2:
-                    latex_file.write("\section{Three-body diagrams}\n\subsection{Three-body energy canonical diagrams}\n")
-                elif (i_diag == nb_2 + nb_3_HF) and (norm == False):
-                    latex_file.write("\subsection{Three-body canonical diagrams for a generic operator only}\n")
-                elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
-                    latex_file.write("\subsection{Three-body non-canonical diagrams}\n")
-        if theory == "MBPT":
-            diag_exp = "\dfrac{1}{%i}" % nedges_eq[i_diag]+phases[i_diag]+"\sum{\dfrac{"+mat_els[i_diag]+"}{"+denoms[i_diag]+"}}\n"
-            latex_file.write(begeq)
-            latex_file.write(diag_exp)
-            latex_file.write(endeq)
+    if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
-        diag_file = open(directory+"/Diagrams/diag_%i.tex" %i_diag)
+        diag_file = open(directory+"/Diagrams/diag_%i.tex" % i_diag)
         latex_file.write(diag_file.read())
         latex_file.write('\\end{center}\n\n')
-    latex_file.write(enddoc)
+latex_file.write(enddoc)
 latex_file.close()
 
-msg = 'Compile pdf ?'
+msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
-if (pdfcompile):
+if pdfcompile:
     os.chdir(directory)
-    os.system("pdflatex result.tex")
+    os.system("pdflatex -shell-escape result.tex")
     if pdiag:
-        #Second compilation needed
-        os.system("pdflatex result.tex")
-        #Get rid of undesired feynmp files to keep a clean directory
-        for i_diag in range(0,numdiag):
-            os.unlink("diag_%i.1" %i_diag)
-            os.unlink("diag_%i.mp" %i_diag)
-            os.unlink("diag_%i.log" %i_diag)
-    print "Result saved in "+directory +'/result.pdf'
+        # Second compilation needed
+        os.system("pdflatex -shell-escape result.tex")
+        # Get rid of undesired feynmp files to keep a clean directory
+        for i_diag in range(0, numdiag):
+            os.unlink("diag_%i.1" % i_diag)
+            os.unlink("diag_%i.mp" % i_diag)
+            os.unlink("diag_%i.log" % i_diag)
+    print "Result saved in "+directory + '/result.pdf'
