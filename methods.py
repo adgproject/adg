@@ -229,6 +229,24 @@ def attribute_qp_labels(diagram):
         i += 1
 
 
+def time_structure_graph(diagram):
+    """Returns the time-structure graph associated to the diagram."""
+    time_diag = diagram.to_directed()
+    if time_diag.node[0]['operator']:
+        for vertex in range(1, len(time_diag)):
+            time_diag.add_edge(0, vertex)
+    for vertex_a in range(len(time_diag)):
+        for vertex_b in range(len(time_diag)):
+            while time_diag.number_of_edges(vertex_a, vertex_b) > 1:
+                time_diag.remove_edge(vertex_a, vertex_b)
+    for vertex_a in range(len(time_diag)):
+        for vertex_b in range(len(time_diag)):
+            if len(list(nx.all_simple_paths(time_diag, vertex_a, vertex_b))) > 1:
+                while len(nx.shortest_path(time_diag, vertex_a, vertex_b)) == 2:
+                    time_diag.remove_edge(vertex_a, vertex_b)
+    return time_diag
+
+
 def omega_subgraph(diagram):
     """Returns the graph without any operator vertex."""
     subgraph_stack = []

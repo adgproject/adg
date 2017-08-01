@@ -219,6 +219,8 @@ if theory == "BMBPT" and not norm:
         # Determine the numerator corresponding to the diagram
         numerator = mth.extract_numerator(diag)
         # Determine the type of structure we have
+        # Check for the time-structure diagram
+        time_diag = mth.time_structure_graph(diag)
         # Create a subgraph without the operator vertex
         testdiag = mth.omega_subgraph(diag)
         # Use the subgraph to determine the structure of the overall graph
