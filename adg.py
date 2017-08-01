@@ -228,18 +228,14 @@ if theory == "BMBPT" and not norm:
         sink_number = mth.number_of_sinks(diag)
         # Determine the denominator depending on the graph structure
         denominator = ""
-        if test_adg_subgraphs:
-            for connected_subgraph in nx.weakly_connected_component_subgraphs(testdiag):
-                for i in range(len(connected_subgraph)):
-                    subgraph_stack = []
-                    if len(connected_subgraph) > 1:
-                        for j in range(i, len(connected_subgraph)):
-                            vertex = nx.dag_longest_path(connected_subgraph)[j]
-                            subgraph_stack.append(vertex)
-                    elif len(connected_subgraph) == 1:
-                        subgraph_stack.append(connected_subgraph.nodes()[0])
-                    subdiag = connected_subgraph.subgraph(subgraph_stack)
-                    denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
+        if nx.is_arborescence(time_diag):
+            for vertex_i in range(1, len(time_diag)):
+                subgraph_stack = []
+                subgraph_stack.append(diag.nodes()[vertex_i])
+                for vertex_j in nx.descendants(time_diag, vertex_i):
+                    subgraph_stack.append(diag.nodes()[vertex_j])
+                subdiag = diag.subgraph(subgraph_stack)
+                denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
         elif (norder == 4) and (sink_number == 1):
             for i in range(2):
                 subgraph_stack = []
@@ -256,12 +252,6 @@ if theory == "BMBPT" and not norm:
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
                 denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
-        elif (norder == 4) and (sink_number == 2):
-            denominator += "(" + mth.extract_denom(diag, testdiag) + ")"
-            for vertex in diag:
-                if diag.out_degree(vertex) == 0:
-                    denominator += "(" \
-                        + mth.extract_denom(diag, diag.subgraph(vertex)) + ")"
         # Determine the integral component in the Feynman expression
         integral = mth.extract_integral(diag)
         # Determine the pre-factor
