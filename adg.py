@@ -224,7 +224,7 @@ if theory == "BMBPT" and not norm:
         # Create a subgraph without the operator vertex
         testdiag = mth.omega_subgraph(diag)
         # Use the subgraph to determine the structure of the overall graph
-        test_adg_subgraphs = mth.has_only_adg_operator_subgraphs(testdiag)
+        has_branch_subgraphs = mth.has_only_branch_operator_subgraphs(testdiag)
         sink_number = mth.number_of_sinks(diag)
         # Determine the denominator depending on the graph structure
         denominator = ""
@@ -266,7 +266,7 @@ if theory == "BMBPT" and not norm:
                 + " }{ " + denominator + " }\n"
         else:
             diag_exp = prefactor + numerator + "\n"
-        if (norder == 4) and (sink_number == 1) and (not test_adg_subgraphs):
+        if (norder == 4) and (sink_number == 1) and (not has_branch_subgraphs):
             for vertex in range(norder):
                 if diag.out_degree(vertex) == 0:
                     subdiag = diag.subgraph(vertex)

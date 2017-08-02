@@ -256,14 +256,14 @@ def omega_subgraph(diagram):
     return diagram.subgraph(subgraph_stack)
 
 
-def has_only_adg_operator_subgraphs(diagram):
-    """Returns True if diagram has operator subgraphs that are all adg."""
-    has_adg_subgraphs = True
+def has_only_branch_operator_subgraphs(diagram):
+    """Returns True if diagram has operator subgraphs that are all branches."""
+    has_branch_subgraphs = True
     for connected_subgraph in nx.weakly_connected_component_subgraphs(diagram):
         if len(connected_subgraph) > 1:
             if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
-                has_adg_subgraphs = False
-    return has_adg_subgraphs
+                has_branch_subgraphs = False
+    return has_branch_subgraphs
 
 
 def number_of_sinks(diagram):
