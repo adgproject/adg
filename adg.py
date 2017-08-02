@@ -229,13 +229,7 @@ if theory == "BMBPT" and not norm:
         # Determine the denominator depending on the graph structure
         denominator = ""
         if nx.is_arborescence(time_diag):
-            for vertex_i in range(1, len(time_diag)):
-                subgraph_stack = []
-                subgraph_stack.append(diag.nodes()[vertex_i])
-                for vertex_j in nx.descendants(time_diag, vertex_i):
-                    subgraph_stack.append(diag.nodes()[vertex_j])
-                subdiag = diag.subgraph(subgraph_stack)
-                denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
+            denominator = mth.time_tree_denominator(diag, time_diag, denominator)
         elif (norder == 4) and (sink_number == 1):
             for i in range(2):
                 subgraph_stack = []

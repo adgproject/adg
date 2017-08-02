@@ -315,6 +315,18 @@ def extract_denom(start_diag, subdiagram):
     return denomin
 
 
+def time_tree_denominator(diagram, time_diagram, denominator):
+    """Add the denominator for a time-tree diagram."""
+    for vertex_i in range(1, len(time_diagram)):
+        subgraph_stack = []
+        subgraph_stack.append(diagram.nodes()[vertex_i])
+        for vertex_j in nx.descendants(time_diagram, vertex_i):
+            subgraph_stack.append(diagram.nodes()[vertex_j])
+        subdiag = diagram.subgraph(subgraph_stack)
+        denominator += "(" + extract_denom(diagram, subdiag) + ")"
+    return denominator
+
+
 def extract_integral(diagram):
     """Returns the integral part of the Feynman expression of the diagram."""
     integral = ""
