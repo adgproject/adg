@@ -216,28 +216,23 @@ if theory == "BMBPT" and not norm:
     for diag in G:
         # Attribute a qp label to all propagators
         mth.attribute_qp_labels(diag)
-        # Determine the numerator corresponding to the diagram
-        numerator = mth.extract_numerator(diag)
-        # Determine the type of structure we have
         # Check for the time-structure diagram
         time_diag = mth.time_structure_graph(diag)
-        # Create a subgraph without the operator vertex
-        testdiag = mth.omega_subgraph(diag)
-        # Use the subgraph to determine the structure of the overall graph
-        has_branch_subgraphs = mth.has_only_branch_operator_subgraphs(testdiag)
-        sink_number = mth.number_of_sinks(diag)
-        # Determine the denominator depending on the graph structure
+        # Determine the expression depending on the graph structure
+        numerator = mth.extract_numerator(diag)
         denominator = ""
+        extra_factor = ""
         if nx.is_arborescence(time_diag):
             denominator = mth.time_tree_denominator(diag, time_diag, denominator)
-        elif (norder == 4) and (sink_number == 1):
+        elif (norder == 4) and (mth.number_of_sinks(diag) == 1):
+            testdiag = mth.omega_subgraph(diag)
             for i in range(2):
                 subgraph_stack = []
                 subgraph_stack.append(nx.dag_longest_path(testdiag)[1])
                 if i == 0:
                     subgraph_stack.append(nx.dag_longest_path(testdiag)[0])
                 else:
-                    for vertex_1 in nx.nodes(testdiag):
+                    for vertex_1 in testdiag:
                         test_vertex = True
                         for vertex_2 in nx.dag_longest_path(testdiag):
                             if vertex_1 == vertex_2:
@@ -246,6 +241,13 @@ if theory == "BMBPT" and not norm:
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
                 denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
+            for vertex in diag:
+                if diag.out_degree(vertex) == 0:
+                    subdiag = diag.subgraph(vertex)
+            denominator_a = mth.extract_denom(diag, subdiag)
+            denominator_abc = mth.extract_denom(diag, testdiag)
+            extra_factor += "\\left[ \\frac{1}{" + denominator_a \
+                + "} + \\frac{1}{" + denominator_abc + "} \\right]"
         # Determine the integral component in the Feynman expression
         integral = mth.extract_integral(diag)
         # Determine the pre-factor
@@ -263,18 +265,9 @@ if theory == "BMBPT" and not norm:
             + integral + "\n"
         if denominator != "":
             diag_exp = prefactor + "\\frac{ " + numerator \
-                + " }{ " + denominator + " }\n"
+                + " }{ " + denominator + " }" + extra_factor + "\n"
         else:
-            diag_exp = prefactor + numerator + "\n"
-        if (norder == 4) and (sink_number == 1) and (not has_branch_subgraphs):
-            for vertex in range(norder):
-                if diag.out_degree(vertex) == 0:
-                    subdiag = diag.subgraph(vertex)
-            denominator_abc = mth.extract_denom(diag, subdiag)
-            subdiag = mth.omega_subgraph(diag)
-            denominator_a = mth.extract_denom(diag, subdiag)
-            diag_exp += "\\left[ \\frac{1}{" + denominator_abc \
-                + "} + \\frac{1}{" + denominator_a + "} \\right]"
+            diag_exp = prefactor + numerator + extra_factor + "\n"
         feynman_expressions.append(feynman_exp)
         diag_expressions.append(diag_exp)
 

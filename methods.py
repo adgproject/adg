@@ -235,12 +235,10 @@ def time_structure_graph(diagram):
     if time_diag.node[0]['operator']:
         for vertex in range(1, len(time_diag)):
             time_diag.add_edge(0, vertex)
-    for vertex_a in range(len(time_diag)):
-        for vertex_b in range(len(time_diag)):
+    for vertex_a in time_diag:
+        for vertex_b in time_diag:
             while time_diag.number_of_edges(vertex_a, vertex_b) > 1:
                 time_diag.remove_edge(vertex_a, vertex_b)
-    for vertex_a in range(len(time_diag)):
-        for vertex_b in range(len(time_diag)):
             if len(list(nx.all_simple_paths(time_diag, vertex_a, vertex_b))) > 1:
                 while len(nx.shortest_path(time_diag, vertex_a, vertex_b)) == 2:
                     time_diag.remove_edge(vertex_a, vertex_b)
@@ -250,7 +248,7 @@ def time_structure_graph(diagram):
 def omega_subgraph(diagram):
     """Returns the graph without any operator vertex."""
     subgraph_stack = []
-    for vertex in range(len(diagram)):
+    for vertex in diagram:
         if diagram.node[vertex]['operator'] is False:
             subgraph_stack.append(vertex)
     return diagram.subgraph(subgraph_stack)
@@ -269,7 +267,7 @@ def has_only_branch_operator_subgraphs(diagram):
 def number_of_sinks(diagram):
     """Returns the number of vertices in the graph with no edges going out."""
     nb = 0
-    for vertex in nx.nodes(diagram):
+    for vertex in diagram:
         if diagram.out_degree(vertex) == 0:
             nb += 1
     return nb
@@ -278,7 +276,7 @@ def number_of_sinks(diagram):
 def extract_numerator(diagram):
     """"Returns the numerator associated to a BMBPT diagram."""
     numerator = ""
-    for vertex in nx.nodes(diagram):
+    for vertex in diagram:
         # Attribute the correct operator to each vertex
         if diagram.node[vertex]['operator']:
             numerator += "O"
@@ -391,7 +389,7 @@ def vertex_exchange_sym_factor(diagram):
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
     non_op_vertices = []
-    for vertex in diagram.nodes_iter():
+    for vertex in diagram:
         if diagram.node[vertex]['operator'] is False:
             non_op_vertices.append(vertex)
     for permutation in itertools.permutations(non_op_vertices, len(non_op_vertices)):
@@ -412,8 +410,8 @@ def has_tree_time_structure(diagram):
         if diag_copy.in_degree(vertex) == 0:
             diag_copy.add_edge(0, vertex)
     time_diag = nx.DiGraph()
-    for vertex_i in diag_copy.nodes_iter():
-        for vertex_j in diag_copy.nodes_iter():
+    for vertex_i in diag_copy:
+        for vertex_j in diag_copy:
             lgst_path = []
             for path in nx.all_simple_paths(diag_copy,
                                             source=vertex_i,
@@ -452,9 +450,9 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
     fmf_file.write("{v%i}\n" % (p_order-1))
     fmf_file.write("\\fmffreeze\n")
 
-    # Loop over all elements of the matrix to draw associated propagators
-    for vert_i in range(0, p_order):
-        for vert_j in range(0, p_order):
+    # Loop over all elements of the graph to draw associated propagators
+    for vert_i in start_diag:
+        for vert_j in start_diag:
             props_left_to_draw = start_diag.number_of_edges(vert_i, vert_j)
             # Special config for consecutive vertices
             if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
