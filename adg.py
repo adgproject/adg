@@ -89,15 +89,8 @@ for diag in G:
     if (theory == "BMBPT") and not norm:
         diag.node[0]['operator'] = True
 
-# Specific check for topologically identical diagrams in BMBPT
-if theory == "BMBPT":
-    G = mth.topologically_distinct_diags(G)
 
-numdiag = len(G)
-print "Time ellapsed: ", datetime.now() - start_time
-print "Number of connected diagrams, ", numdiag
-
-# Ordering the diagrams in a convenient way
+# Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
     G2 = []
     G3 = []
@@ -112,7 +105,16 @@ if theory == "BMBPT":
     mth.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
     mth.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
 
+    G2_HF = mth.topologically_distinct_diags(G2_HF)
+    G2_EHF = mth.topologically_distinct_diags(G2_EHF)
+    G2_noHF = mth.topologically_distinct_diags(G2_noHF)
+    G3_HF = mth.topologically_distinct_diags(G3_HF)
+    G3_EHF = mth.topologically_distinct_diags(G3_EHF)
+    G3_noHF = mth.topologically_distinct_diags(G3_noHF)
+
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
+    G2 = G2_HF + G2_EHF + G2_noHF
+    G3 = G3_HF + G3_EHF + G3_noHF
     nb_2 = len(G2)
     nb_2_HF = len(G2_HF)
     nb_2_EHF = len(G2_EHF)
@@ -121,6 +123,10 @@ if theory == "BMBPT":
     nb_3_HF = len(G3_HF)
     nb_3_EHF = len(G3_EHF)
     nb_3_noHF = len(G3_noHF)
+
+    numdiag = len(G)
+    print "Time ellapsed: ", datetime.now() - start_time
+    print "Number of connected diagrams, ", numdiag
     print "\n2N valid diagrams: %i" % nb_2
     print "2N energy canonical diagrams: %i" % nb_2_HF
     if not norm:
@@ -223,7 +229,9 @@ if theory == "BMBPT" and not norm:
         denominator = ""
         extra_factor = ""
         if nx.is_arborescence(time_diag):
-            denominator = mth.time_tree_denominator(diag, time_diag, denominator)
+            denominator = mth.time_tree_denominator(
+                diag, time_diag, denominator)
+
         elif (norder == 4) and (mth.number_of_sinks(diag) == 1):
             testdiag = mth.omega_subgraph(diag)
             for i in range(2):
