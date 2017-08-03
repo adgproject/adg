@@ -19,6 +19,7 @@ print "#####################"
 print "Parallel Mode"
 num_cores = multiprocessing.cpu_count()
 print "There is %i" % num_cores + " core(s) available"
+use_parallel = raw_input("Use parallel processing? (y/N)").lower() == 'y'
 norder = int(raw_input('Order of the diagrams?\n'))
 while norder < 2:
     print "Perturbative order too small!"
@@ -105,12 +106,37 @@ if theory == "BMBPT":
     mth.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
     mth.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
 
-    G2_HF = mth.topologically_distinct_diags(G2_HF)
-    G2_EHF = mth.topologically_distinct_diags(G2_EHF)
-    G2_noHF = mth.topologically_distinct_diags(G2_noHF)
-    G3_HF = mth.topologically_distinct_diags(G3_HF)
-    G3_EHF = mth.topologically_distinct_diags(G3_EHF)
-    G3_noHF = mth.topologically_distinct_diags(G3_noHF)
+    if use_parallel:
+        if three_N:
+            nb_procs_max = 6
+        else:
+            nb_procs_max = 3
+        nb_processes = min(num_cores, nb_procs_max)
+        pool = multiprocessing.Pool(nb_processes)
+        r1 = pool.apply_async(mth.topologically_distinct_diags, (G2_HF, ))
+        r2 = pool.apply_async(mth.topologically_distinct_diags, (G2_EHF, ))
+        r3 = pool.apply_async(mth.topologically_distinct_diags, (G2_noHF, ))
+        if three_N:
+            r4 = pool.apply_async(mth.topologically_distinct_diags, (G3_HF, ))
+            r5 = pool.apply_async(mth.topologically_distinct_diags, (G3_EHF, ))
+            r6 = pool.apply_async(mth.topologically_distinct_diags, (G3_noHF, ))
+        G2_HF = r1.get()
+        G2_EHF = r2.get()
+        G2_noHF = r3.get()
+        if three_N:
+            G3_HF = r4.get()
+            G3_EHF = r5.get()
+            G3_noHF = r6.get()
+        pool.close()
+        pool.join()
+
+    else:
+        G2_HF = mth.topologically_distinct_diags(G2_HF)
+        G2_EHF = mth.topologically_distinct_diags(G2_EHF)
+        G2_noHF = mth.topologically_distinct_diags(G2_noHF)
+        G3_HF = mth.topologically_distinct_diags(G3_HF)
+        G3_EHF = mth.topologically_distinct_diags(G3_EHF)
+        G3_noHF = mth.topologically_distinct_diags(G3_noHF)
 
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
     G2 = G2_HF + G2_EHF + G2_noHF
