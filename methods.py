@@ -1,4 +1,4 @@
-"""Module containg methods to be called by ADG"""
+"""Module containg methods to be called by ADG."""
 
 import copy
 import itertools
@@ -62,7 +62,7 @@ def check_degree(matrices, three_N_use):
 
 
 def check_vertex_degree(matrices, three_N_use, vertex_id):
-    """Check the degree of a specific vertex in a set of matrices"""
+    """Check the degree of a specific vertex in a set of matrices."""
     good_matrices = []
     for matrix in matrices:
         vertex_degree_OK = True
@@ -79,7 +79,7 @@ def check_vertex_degree(matrices, three_N_use, vertex_id):
 
 
 def empty_matrix_generation(size):
-    """Generate an empty matrix of size (size,size)"""
+    """Generate an empty matrix of size (size,size)."""
     empty_matrix = []
     for line in range(size):
         empty_matrix.append([])
@@ -116,7 +116,6 @@ def diagram_generation(n):
 
 def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     """Generate diagrams for BMBPT from bottom up."""
-
     deg_max = 4
     if three_N_use:
         deg_max = 6
@@ -160,7 +159,7 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
 
 
 def topologically_distinct_diags(diagrams):
-    """Returns a list of diagrams all topologically distinct."""
+    """Return a list of diagrams all topologically distinct."""
     distinct_diagrams = []
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for diag in diagrams:
@@ -230,7 +229,7 @@ def attribute_qp_labels(diagram):
 
 
 def time_structure_graph(diagram):
-    """Returns the time-structure graph associated to the diagram."""
+    """Return the time-structure graph associated to the diagram."""
     time_diag = diagram.to_directed()
     if time_diag.node[0]['operator']:
         for vertex in range(1, len(time_diag)):
@@ -246,7 +245,7 @@ def time_structure_graph(diagram):
 
 
 def omega_subgraph(diagram):
-    """Returns the graph without any operator vertex."""
+    """Return the graph without any operator vertex."""
     subgraph_stack = []
     for vertex in diagram:
         if diagram.node[vertex]['operator'] is False:
@@ -255,7 +254,7 @@ def omega_subgraph(diagram):
 
 
 def has_only_branch_operator_subgraphs(diagram):
-    """Returns True if diagram has operator subgraphs that are all branches."""
+    """Return True if diagram has operator subgraphs that are all branches."""
     has_branch_subgraphs = True
     for connected_subgraph in nx.weakly_connected_component_subgraphs(diagram):
         if len(connected_subgraph) > 1:
@@ -265,7 +264,7 @@ def has_only_branch_operator_subgraphs(diagram):
 
 
 def number_of_sinks(diagram):
-    """Returns the number of vertices in the graph with no edges going out."""
+    """Return the number of vertices in the graph with no edges going out."""
     nb = 0
     for vertex in diagram:
         if diagram.out_degree(vertex) == 0:
@@ -274,7 +273,7 @@ def number_of_sinks(diagram):
 
 
 def extract_numerator(diagram):
-    """"Returns the numerator associated to a BMBPT diagram."""
+    """"Return the numerator associated to a BMBPT diagram."""
     numerator = ""
     for vertex in diagram:
         # Attribute the correct operator to each vertex
@@ -326,7 +325,7 @@ def time_tree_denominator(diagram, time_diagram, denominator):
 
 
 def extract_integral(diagram):
-    """Returns the integral part of the Feynman expression of the diagram."""
+    """Return the integral part of the Feynman expression of the diagram."""
     integral = ""
     norder = diagram.number_of_nodes()
     for vertex in range(1, norder):
@@ -350,10 +349,11 @@ def extract_integral(diagram):
 
 
 def extract_BMBPT_crossing_sign(diagram):
-    """Returns True if there's a sign factor associated with crossing propagators
+    """Return True if there's a sign factor associated with crossing propagators.
 
     Use the fact that all lines propagate upwards and the
-    canonical representation of the diagrams and vertices."""
+    canonical representation of the diagrams and vertices.
+    """
     nb_crossings = 0
     for vertex in diagram:
         for propagator in diagram.out_edges_iter(vertex, keys=True):
@@ -365,7 +365,7 @@ def extract_BMBPT_crossing_sign(diagram):
 
 
 def multiplicity_symmetry_factor(diagram):
-    """Returns the symmetry factor associated with propagators multiplicity"""
+    """Return the symmetry factor associated with propagators multiplicity."""
     factor = ""
     prop_multiplicity = []
     for i in range(6):
@@ -385,7 +385,7 @@ def multiplicity_symmetry_factor(diagram):
 
 
 def vertex_exchange_sym_factor(diagram):
-    """Returns the symmetry factor associated with vertex exchange."""
+    """Return the symmetry factor associated with vertex exchange."""
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
     non_op_vertices = []
