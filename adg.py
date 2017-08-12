@@ -150,9 +150,11 @@ if theory == "BMBPT":
     nb_3_EHF = len(G3_EHF)
     nb_3_noHF = len(G3_noHF)
 
-    numdiag = len(G)
-    print "Time ellapsed: ", datetime.now() - start_time
-    print "Number of connected diagrams, ", numdiag
+numdiag = len(G)
+print "Time ellapsed: ", datetime.now() - start_time
+print "Number of connected diagrams, ", numdiag
+
+if theory == "BMBPT":
     print "\n2N valid diagrams: %i" % nb_2
     print "2N energy canonical diagrams: %i" % nb_2_HF
     if not norm:
