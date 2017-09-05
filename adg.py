@@ -250,13 +250,28 @@ if theory == "BMBPT" and not norm:
     diag_expressions = []
     if write_time:
         G_time = []
+        time_indexes = []
     for diag in G:
         # Attribute a qp label to all propagators
         mth.attribute_qp_labels(diag)
         # Check for the time-structure diagram
         time_diag = mth.time_structure_graph(diag)
         if write_time:
-            G_time.append(time_diag)
+            if G_time == []:
+                G_time.append(time_diag)
+                time_diag_num = G_time.index(time_diag)
+            else:
+                test = True
+                nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+                for good_tdiag in G_time:
+                    if nx.is_isomorphic(time_diag, good_tdiag, node_match=nm):
+                        test = False
+                        time_diag_num = G_time.index(good_tdiag)
+                        break
+                if test:
+                    G_time.append(time_diag)
+                    time_diag_num = G_time.index(time_diag)
+            time_indexes.append(time_diag_num)
         # Determine the expression depending on the graph structure
         numerator = mth.extract_numerator(diag)
         denominator = ""
@@ -324,9 +339,10 @@ if pdraw:
         mth.feynmf_generator(G[i], theory, diag_name)
         shutil.move(diag_name + '.tex',
                     directory + "/Diagrams/" + diag_name + '.tex')
-        if write_time:
+    if write_time:
+        for i, time_diag in enumerate(G_time):
             time_name = 'time_%i' % i
-            mth.feynmf_generator(G_time[i], 'MBPT', time_name)
+            mth.feynmf_generator(time_diag, 'MBPT', time_name)
             shutil.move(time_name + '.tex',
                         directory + "/Diagrams/" + time_name + '.tex')
 
@@ -376,23 +392,31 @@ if theory == "BMBPT":
         if not norm:
             latex_file.write("3N canonical diagrams for a generic operator only: %i\n\n" % nb_3_EHF)
         latex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_noHF)
-    latex_file.write("\\section{Two-body diagrams}\n")
-    latex_file.write("\\subsection{Two-body energy canonical diagrams}\n")
+    if write_time and pdiag and pdraw:
+        latex_file.write("\\section{Associated time-structure diagrams}\n\n")
+        for i, time_diag in enumerate(G_time):
+            latex_file.write("Time-structure diagram %i:\n" % (i+1))
+            latex_file.write('\n\\begin{center}\n')
+            time_file = open(directory+"/Diagrams/time_%i.tex" % i)
+            latex_file.write(time_file.read())
+            latex_file.write('\n\\end{center}\n\n')
+    latex_file.write("\\section{Two-body diagrams}\n\n")
+    latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
 
 for i_diag in range(0, numdiag):
     if theory == "BMBPT":
         if (i_diag == nb_2_HF) and (not norm):
-            latex_file.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n")
+            latex_file.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n\n")
         elif i_diag == nb_2_HF + nb_2_EHF:
-            latex_file.write("\\subsection{Two-body non-canonical diagrams}\n")
+            latex_file.write("\\subsection{Two-body non-canonical diagrams}\n\n")
         if three_N:
             if i_diag == nb_2:
-                latex_file.write("\\section{Three-body diagrams}\n")
-                latex_file.write("\\subsection{Three-body energy canonical diagrams}\n")
+                latex_file.write("\\section{Three-body diagrams}\n\n")
+                latex_file.write("\\subsection{Three-body energy canonical diagrams}\n\n")
             elif (i_diag == nb_2 + nb_3_HF) and (not norm):
-                latex_file.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n")
+                latex_file.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
             elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
-                latex_file.write("\\subsection{Three-body non-canonical diagrams}\n")
+                latex_file.write("\\subsection{Three-body non-canonical diagrams}\n\n")
         latex_file.write("Diagram %i:\n" % (i_diag+1))
         if not norm:
             diag_exp = diag_expressions[i_diag]
@@ -413,10 +437,12 @@ for i_diag in range(0, numdiag):
         diag_file = open(directory+"/Diagrams/diag_%i.tex" % i_diag)
         latex_file.write(diag_file.read())
         if write_time:
+            i_tdiag = time_indexes[i_diag]
             latex_file.write('\\hspace{10pt} $\\rightarrow$')
-            time_file = open(directory+"/Diagrams/time_%i.tex" % i_diag)
+            time_file = open(directory+"/Diagrams/time_%i.tex" % i_tdiag)
             latex_file.write(time_file.read())
         latex_file.write('\n\\end{center}\n\n')
+
 latex_file.write(enddoc)
 latex_file.close()
 
@@ -433,8 +459,9 @@ if pdfcompile:
             os.unlink("diag_%i.1" % i_diag)
             os.unlink("diag_%i.mp" % i_diag)
             os.unlink("diag_%i.log" % i_diag)
-            if write_time:
-                os.unlink("time_%i.1" % i_diag)
-                os.unlink("time_%i.mp" % i_diag)
-                os.unlink("time_%i.log" % i_diag)
+        if write_time:
+            for i_tdiag in range(len(G_time)):
+                os.unlink("time_%i.1" % i_tdiag)
+                os.unlink("time_%i.mp" % i_tdiag)
+                os.unlink("time_%i.log" % i_tdiag)
     print "Result saved in "+directory + '/result.pdf'
