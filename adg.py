@@ -351,47 +351,12 @@ msg = 'Include diagrams in tex?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
 
 # Write everything down in a nice LaTeX file
-header = "\\documentclass[10pt,a4paper]{article}\n" \
-    + "\\usepackage[utf8]{inputenc}\n" \
-    + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
-    + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
-    + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
-if pdiag:
-    header = header + "\\usepackage[force]{feynmp-auto}\n"
-land = False
-if norder > 3:
-    msg = 'Expressions may be long, rotate pdf?'
-    land = raw_input("%s (y/N) " % msg).lower() == 'y'
-if land:
-    header = header + "\\usepackage[landscape]{geometry}\n"
-
-header = header \
-    + "\\title{Diagrams and algebraic expressions at order %i" % norder \
-    + " in " + theory + "}\n" \
-    + "\\author{RDL, JR, PA, MD, AT}\n"
 latex_file = open(directory + '/result.tex', 'w')
-latex_file.write(header)
-begdoc = "\\begin{document}\n"
-enddoc = "\\end{document}"
-begeq = "\\begin{equation}\n"
-endeq = "\\end{equation}\n"
-latex_file.write(begdoc)
-latex_file.write("\\maketitle\n")
-latex_file.write("\\graphicspath{{Diagrams/}}")
+mth.write_file_header(directory, latex_file, pdiag, norder, theory)
 
 if theory == "BMBPT":
-    latex_file.write("Valid diagrams: %i\n\n" % numdiag)
-    latex_file.write("2N valid diagrams: %i\n\n" % nb_2)
-    latex_file.write("2N canonical diagrams for the energy: %i\n\n" % nb_2_HF)
-    if not norm:
-        latex_file.write("2N canonical diagrams for a generic operator only: %i\n\n" % nb_2_EHF)
-    latex_file.write("2N non-canonical diagrams: %i\n\n" % nb_2_noHF)
-    if three_N:
-        latex_file.write("3N valid diagrams: %i\n\n" % nb_3)
-        latex_file.write("3N canonical diagrams for the energy: %i\n\n" % nb_3_HF)
-        if not norm:
-            latex_file.write("3N canonical diagrams for a generic operator only: %i\n\n" % nb_3_EHF)
-        latex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_noHF)
+    mth.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
+                           nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
     if write_time and pdiag and pdraw:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
         for i, time_diag in enumerate(G_time):
@@ -408,21 +373,13 @@ if theory == "BMBPT":
     latex_file.write("\\section{Two-body diagrams}\n\n")
     latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
 
+begeq = "\\begin{equation}\n"
+endeq = "\\end{equation}\n"
 for i_diag in range(0, numdiag):
     if theory == "BMBPT":
-        if (i_diag == nb_2_HF) and (not norm):
-            latex_file.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n\n")
-        elif i_diag == nb_2_HF + nb_2_EHF:
-            latex_file.write("\\subsection{Two-body non-canonical diagrams}\n\n")
-        if three_N:
-            if i_diag == nb_2:
-                latex_file.write("\\section{Three-body diagrams}\n\n")
-                latex_file.write("\\subsection{Three-body energy canonical diagrams}\n\n")
-            elif (i_diag == nb_2 + nb_3_HF) and (not norm):
-                latex_file.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
-            elif i_diag == nb_2 + nb_3_HF + nb_3_EHF:
-                latex_file.write("\\subsection{Three-body non-canonical diagrams}\n\n")
-        latex_file.write("Diagram %i:\n" % (i_diag+1))
+        mth.write_BMBPT_section(latex_file, i_diag, three_N, norm,
+                                nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
+        latex_file.write("Diagram %i:\n" % (i_diag + 1))
         if not norm:
             diag_exp = diag_expressions[i_diag]
             feynman_exp = feynman_expressions[i_diag]
@@ -439,34 +396,20 @@ for i_diag in range(0, numdiag):
         latex_file.write(endeq)
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
-        diag_file = open(directory+"/Diagrams/diag_%i.tex" % i_diag)
-        latex_file.write(diag_file.read())
+        mth.draw_diagram(directory, latex_file, i_diag, 'diag')
         if write_time:
             i_tdiag = time_indexes[i_diag]
             latex_file.write('\\hspace{10pt} $\\rightarrow$')
-            time_file = open(directory+"/Diagrams/time_%i.tex" % i_tdiag)
-            latex_file.write(time_file.read())
+            mth.draw_diagram(directory, latex_file, i_tdiag, 'time')
         latex_file.write('\n\\end{center}\n\n')
-
+enddoc = "\\end{document}"
 latex_file.write(enddoc)
 latex_file.close()
 
 msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdfcompile:
-    os.chdir(directory)
-    os.system("pdflatex -shell-escape result.tex")
-    if pdiag:
-        # Second compilation needed
-        os.system("pdflatex -shell-escape result.tex")
-        # Get rid of undesired feynmp files to keep a clean directory
-        for i_diag in range(0, numdiag):
-            os.unlink("diag_%i.1" % i_diag)
-            os.unlink("diag_%i.mp" % i_diag)
-            os.unlink("diag_%i.log" % i_diag)
-        if write_time:
-            for i_tdiag in range(len(G_time)):
-                os.unlink("time_%i.1" % i_tdiag)
-                os.unlink("time_%i.mp" % i_tdiag)
-                os.unlink("time_%i.log" % i_tdiag)
-    print "Result saved in "+directory + '/result.pdf'
+    nb_times_diags = 0
+    if write_time:
+        nb_time_diags = len(G_time)
+    mth.compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags)

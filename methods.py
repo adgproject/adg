@@ -1,5 +1,6 @@
 """Module containg methods to be called by ADG."""
 
+import os
 import copy
 import itertools
 import string
@@ -481,3 +482,98 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
                 props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
+
+
+def write_file_header(directory, latex_file, pdiag, norder, theory):
+    """Write the header of the result tex file."""
+    header = "\\documentclass[10pt,a4paper]{article}\n" \
+        + "\\usepackage[utf8]{inputenc}\n" \
+        + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
+        + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
+        + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
+    if pdiag:
+        header = header + "\\usepackage[force]{feynmp-auto}\n"
+    land = False
+    if norder > 3:
+        msg = 'Expressions may be long, rotate pdf?'
+        land = raw_input("%s (y/N) " % msg).lower() == 'y'
+    if land:
+        header = header + "\\usepackage[landscape]{geometry}\n"
+
+    header = header \
+        + "\\title{Diagrams and algebraic expressions at order %i" % norder \
+        + " in " + theory + "}\n" \
+        + "\\author{RDL, JR, PA, MD, AT}\n"
+    latex_file.write(header)
+    begdoc = "\\begin{document}\n"
+    latex_file.write(begdoc)
+    latex_file.write("\\maketitle\n")
+    latex_file.write("\\graphicspath{{Diagrams/}}")
+
+
+def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
+                       nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF):
+    """Write overall header for BMBPT result file."""
+    tex_file.write("Valid diagrams: %i\n\n" % numdiag)
+    tex_file.write("2N valid diagrams: %i\n\n" %
+                   (nb_2_HF + nb_2_EHF + nb_2_noHF))
+    tex_file.write("2N canonical diagrams for the energy: %i\n\n" % nb_2_HF)
+    if not norm:
+        tex_file.write(
+            "2N canonical diagrams for a generic operator only: %i\n\n" % nb_2_EHF)
+    tex_file.write("2N non-canonical diagrams: %i\n\n" % nb_2_noHF)
+    if three_N:
+        tex_file.write("3N valid diagrams: %i\n\n" %
+                       (nb_3_HF + nb_3_EHF + nb_3_noHF))
+        tex_file.write(
+            "3N canonical diagrams for the energy: %i\n\n" % nb_3_HF)
+        if not norm:
+            tex_file.write(
+                "3N canonical diagrams for a generic operator only: %i\n\n" % nb_3_EHF)
+        tex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_noHF)
+
+
+def write_BMBPT_section(result, diag_index, three_N, norm,
+                        nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF):
+    """Write section and subsections for BMBPT result file."""
+    if (diag_index == nb_2_HF) and (not norm):
+        result.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n\n")
+    elif diag_index == nb_2_HF + nb_2_EHF:
+        result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
+    if three_N:
+        if diag_index == nb_2:
+            result.write("\\section{Three-body diagrams}\n\n")
+            result.write("\\subsection{Three-body energy canonical diagrams}\n\n")
+        elif (diag_index == nb_2 + nb_3_HF) and (not norm):
+            result.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
+        elif diag_index == nb_2 + nb_3_HF + nb_3_EHF:
+            result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
+
+
+def draw_diagram(directory, result_file, diagram_index, type):
+    """Copy the diagram feynmanmp instructions in the result file."""
+    if type == 'diag':
+        diag_file = open(directory+"/Diagrams/diag_%i.tex" % diagram_index)
+    elif type == 'time':
+        diag_file = open(directory+"/Diagrams/time_%i.tex" % diagram_index)
+    result_file.write(diag_file.read())
+
+
+def compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags):
+    """Compile result.pdf and delete useless files."""
+    os.chdir(directory)
+    os.system("pdflatex -shell-escape result.tex")
+    if pdiag:
+        # Second compilation needed
+        os.system("pdflatex -shell-escape result.tex")
+        # Get rid of undesired feynmp files to keep a clean directory
+        for diagram in range(0, numdiag):
+            os.unlink("diag_%i.1" % diagram)
+            os.unlink("diag_%i.mp" % diagram)
+            os.unlink("diag_%i.log" % diagram)
+        if write_time:
+            for i_tdiag in range(nb_time_diags):
+                os.unlink("time_%i.1" % i_tdiag)
+                os.unlink("time_%i.mp" % i_tdiag)
+                os.unlink("time_%i.log" % i_tdiag)
+    print "Result saved in "+directory + '/result.pdf'
