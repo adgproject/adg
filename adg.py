@@ -400,6 +400,11 @@ if theory == "BMBPT":
             time_file = open(directory+"/Diagrams/time_%i.tex" % i)
             latex_file.write(time_file.read())
             latex_file.write('\n\\end{center}\n\n')
+            latex_file.write("Related diagrams:")
+            for i_diag in range(0, numdiag):
+                if time_indexes[i_diag] == i:
+                    latex_file.write(" %i," % (i_diag+1))
+            latex_file.write("\n\n")
     latex_file.write("\\section{Two-body diagrams}\n\n")
     latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
 
