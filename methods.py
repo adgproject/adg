@@ -479,5 +479,5 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
                         fmf_file.write("0.6")
                 fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
                 props_left_to_draw -= 1
-    fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n\n")
+    fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()

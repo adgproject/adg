@@ -32,6 +32,7 @@ if theory == "BMBPT":
     three_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
     norm = raw_input(
         "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
+    write_time = raw_input("Draw time-structure diagrams? (y/N)").lower() == 'y'
 if three_N:
     directory = theory + '/Order-%i' % norder + 'with3N'
 else:
@@ -111,7 +112,7 @@ if theory == "BMBPT":
             nb_procs_max = 6
         else:
             nb_procs_max = 3
-        nb_processes = min(num_cores, nb_procs_max)
+        nb_processes = min(num_cores-1, nb_procs_max)
         pool = multiprocessing.Pool(nb_processes)
         r1 = pool.apply_async(mth.topologically_distinct_diags, (G2_HF, ))
         r2 = pool.apply_async(mth.topologically_distinct_diags, (G2_EHF, ))
@@ -247,11 +248,15 @@ if theory == "MBPT":
 if theory == "BMBPT" and not norm:
     feynman_expressions = []
     diag_expressions = []
+    if write_time:
+        G_time = []
     for diag in G:
         # Attribute a qp label to all propagators
         mth.attribute_qp_labels(diag)
         # Check for the time-structure diagram
         time_diag = mth.time_structure_graph(diag)
+        if write_time:
+            G_time.append(time_diag)
         # Determine the expression depending on the graph structure
         numerator = mth.extract_numerator(diag)
         denominator = ""
@@ -319,6 +324,11 @@ if pdraw:
         mth.feynmf_generator(G[i], theory, diag_name)
         shutil.move(diag_name + '.tex',
                     directory + "/Diagrams/" + diag_name + '.tex')
+        if write_time:
+            time_name = 'time_%i' % i
+            mth.feynmf_generator(G_time[i], 'MBPT', time_name)
+            shutil.move(time_name + '.tex',
+                        directory + "/Diagrams/" + time_name + '.tex')
 
 
 msg = 'Include diagrams in tex?'
@@ -402,7 +412,11 @@ for i_diag in range(0, numdiag):
         latex_file.write('\n\\begin{center}\n')
         diag_file = open(directory+"/Diagrams/diag_%i.tex" % i_diag)
         latex_file.write(diag_file.read())
-        latex_file.write('\\end{center}\n\n')
+        if write_time:
+            latex_file.write('\\hspace{10pt} $\\rightarrow$')
+            time_file = open(directory+"/Diagrams/time_%i.tex" % i_diag)
+            latex_file.write(time_file.read())
+        latex_file.write('\n\\end{center}\n\n')
 latex_file.write(enddoc)
 latex_file.close()
 
@@ -419,4 +433,8 @@ if pdfcompile:
             os.unlink("diag_%i.1" % i_diag)
             os.unlink("diag_%i.mp" % i_diag)
             os.unlink("diag_%i.log" % i_diag)
+            if write_time:
+                os.unlink("time_%i.1" % i_diag)
+                os.unlink("time_%i.mp" % i_diag)
+                os.unlink("time_%i.log" % i_diag)
     print "Result saved in "+directory + '/result.pdf'
