@@ -16,10 +16,7 @@ print "#     Generator     #"
 print "#    RDL,JR,PA,MD   #"
 print "#####################"
 
-print "Parallel Mode"
-num_cores = multiprocessing.cpu_count()
-print "There is %i" % num_cores + " core(s) available"
-use_parallel = raw_input("Use parallel processing? (y/N)").lower() == 'y'
+
 norder = int(raw_input('Order of the diagrams?\n'))
 while norder < 2:
     print "Perturbative order too small!"
@@ -32,7 +29,12 @@ if theory == "BMBPT":
     three_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
     norm = raw_input(
         "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
-    write_time = raw_input("Draw time-structure diagrams? (y/N)").lower() == 'y'
+    write_time = raw_input(
+        "Draw time-structure diagrams? (y/N)").lower() == 'y'
+    print "Parallel Mode available"
+    num_cores = multiprocessing.cpu_count()
+    print "There is %i" % num_cores + " core(s) available"
+    use_parallel = raw_input("Use parallel processing? (y/N)").lower() == 'y'
 if three_N:
     directory = theory + '/Order-%i' % norder + 'with3N'
 else:
