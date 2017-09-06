@@ -488,6 +488,7 @@ def write_file_header(directory, latex_file, pdiag, norder, theory):
     """Write the header of the result tex file."""
     header = "\\documentclass[10pt,a4paper]{article}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
+        + "\\usepackage[hyperindex=true]{hyperref}" \
         + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
         + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
@@ -503,7 +504,7 @@ def write_file_header(directory, latex_file, pdiag, norder, theory):
     header = header \
         + "\\title{Diagrams and algebraic expressions at order %i" % norder \
         + " in " + theory + "}\n" \
-        + "\\author{RDL, JR, PA, MD, AT}\n"
+        + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
     latex_file.write(header)
     begdoc = "\\begin{document}\n"
     latex_file.write(begdoc)

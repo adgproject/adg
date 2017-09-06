@@ -362,12 +362,13 @@ if theory == "BMBPT":
     if write_time and pdiag and pdraw:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
         for i in range(nb_time_diags):
-            latex_file.write("Time-structure diagram %i:\n" % (i+1))
+            latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
+                             % (i+1))
             latex_file.write('\n\\begin{center}\n')
             time_file = open(directory+"/Diagrams/time_%i.tex" % i)
             latex_file.write(time_file.read())
             latex_file.write('\n\\end{center}\n\n')
-            latex_file.write("Related diagrams:")
+            latex_file.write("Related Feynman diagrams:")
             for i_diag in range(0, numdiag):
                 if time_indexes[i_diag] == i:
                     latex_file.write(" %i," % (i_diag+1))
@@ -375,33 +376,34 @@ if theory == "BMBPT":
     latex_file.write("\\section{Two-body diagrams}\n\n")
     latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
 
-begeq = "\\begin{equation}\n"
-endeq = "\\end{equation}\n"
 for i_diag in range(0, numdiag):
     if theory == "BMBPT":
         mth.write_BMBPT_section(latex_file, i_diag, three_N, norm,
                                 nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
-        latex_file.write("Diagram %i:\n" % (i_diag + 1))
+        latex_file.write("\\paragraph{Diagram %i:}\n" % (i_diag + 1))
         if not norm:
             diag_exp = diag_expressions[i_diag]
             feynman_exp = feynman_expressions[i_diag]
-            latex_file.write(begeq)
-            latex_file.write(feynman_exp)
-            latex_file.write(endeq)
+            latex_file.write("\\begin{align}\n\\text{PO}%i" % norder
+                             + ".%i\n" % (i_diag+1))
+            latex_file.write("&= " + feynman_exp + r" \nonumber \\" + "\n")
+            latex_file.write("&= " + diag_exp)
+            latex_file.write("\\end{align}\n")
     elif theory == "MBPT":
         diag_exp = "\\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] \
             + "\\sum{\\dfrac{" + mat_els[i_diag] + "}{" \
             + denoms[i_diag] + "}}\n"
-    if not norm:
-        latex_file.write(begeq)
+        latex_file.write("\\begin{equation}\n")
         latex_file.write(diag_exp)
-        latex_file.write(endeq)
+        latex_file.write("\\end{equation}\n")
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
         mth.draw_diagram(directory, latex_file, i_diag, 'diag')
         if write_time:
             i_tdiag = time_indexes[i_diag]
-            latex_file.write('\\hspace{10pt} $\\rightarrow$')
+            latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
+                             % (i_tdiag + 1))
+
             mth.draw_diagram(directory, latex_file, i_tdiag, 'time')
         latex_file.write('\n\\end{center}\n\n')
 enddoc = "\\end{document}"
