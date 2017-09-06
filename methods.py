@@ -578,3 +578,24 @@ def compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags):
                 os.unlink("time_%i.mp" % i_tdiag)
                 os.unlink("time_%i.log" % i_tdiag)
     print "Result saved in "+directory + '/result.pdf'
+
+
+def tree_time_structure_den(time_diagram):
+    """Return the denominator associated to a tree time-structure diagram."""
+    denominator = ""
+    labels = list(string.ascii_lowercase)
+    i = 0
+    for vertex in time_diagram:
+        if not time_diagram.node[vertex]['operator']:
+            time_diagram.node[vertex]['label'] = labels[i]
+            i += 1
+    for vertex in time_diagram:
+        if not time_diagram.node[vertex]['operator']:
+            if time_diagram.out_degree(vertex) == 0:
+                denominator += time_diagram.node[vertex]['label']
+            else:
+                denominator += "(" + time_diagram.node[vertex]['label']
+                for descendant in nx.descendants(time_diagram, vertex):
+                    denominator += "+" + time_diagram.node[descendant]['label']
+                denominator += ")"
+    return denominator

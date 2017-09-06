@@ -370,6 +370,15 @@ if theory == "BMBPT":
             time_file = open(directory+"/Diagrams/time_%i.tex" % i)
             latex_file.write(time_file.read())
             latex_file.write('\n\\end{center}\n\n')
+            if nx.is_arborescence(G_time[i]):
+                latex_file.write("Tree: Yes\n\n")
+                latex_file.write("\\begin{equation}\n")
+                latex_file.write("\\frac{1}{"
+                                 + mth.tree_time_structure_den(G_time[i])
+                                 + "}\n")
+                latex_file.write("\\end{equation}\n")
+            else:
+                latex_file.write("Tree: No\n\n")
             latex_file.write("Related Feynman diagrams:")
             for i_diag in range(0, numdiag):
                 if time_indexes[i_diag] == i:
