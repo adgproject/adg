@@ -245,6 +245,7 @@ if theory == "MBPT":
 
 
 # Treatment of the algebraic expressions
+nb_time_diags = 0
 if theory == "BMBPT" and not norm:
     feynman_expressions = []
     diag_expressions = []
@@ -326,6 +327,7 @@ if theory == "BMBPT" and not norm:
             diag_exp = prefactor + numerator + extra_factor + "\n"
         feynman_expressions.append(feynman_exp)
         diag_expressions.append(diag_exp)
+    nb_time_diags = len(G_time)
 
 
 # Writing a feynmp file for each graph
@@ -359,7 +361,7 @@ if theory == "BMBPT":
                            nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
     if write_time and pdiag and pdraw:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
-        for i, time_diag in enumerate(G_time):
+        for i in range(nb_time_diags):
             latex_file.write("Time-structure diagram %i:\n" % (i+1))
             latex_file.write('\n\\begin{center}\n')
             time_file = open(directory+"/Diagrams/time_%i.tex" % i)
@@ -409,7 +411,4 @@ latex_file.close()
 msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdfcompile:
-    nb_times_diags = 0
-    if write_time:
-        nb_time_diags = len(G_time)
     mth.compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags)
