@@ -239,8 +239,10 @@ def time_structure_graph(diagram):
         for vertex_b in time_diag:
             while time_diag.number_of_edges(vertex_a, vertex_b) > 1:
                 time_diag.remove_edge(vertex_a, vertex_b)
-            if len(list(nx.all_simple_paths(time_diag, vertex_a, vertex_b))) > 1:
-                while len(nx.shortest_path(time_diag, vertex_a, vertex_b)) == 2:
+            if len(list(nx.all_simple_paths(time_diag,
+                                            vertex_a, vertex_b))) > 1:
+                while len(nx.shortest_path(time_diag,
+                                           vertex_a, vertex_b)) == 2:
                     time_diag.remove_edge(vertex_a, vertex_b)
     return time_diag
 
@@ -293,7 +295,8 @@ def extract_numerator(diagram):
         while previous_vertex >= 0:
             for prop in diagram.in_edges_iter(vertex, keys=True):
                 if prop[0] == previous_vertex:
-                    numerator += diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                    numerator += \
+                        diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             previous_vertex -= 1
         numerator += "} "
     return numerator
@@ -393,7 +396,8 @@ def vertex_exchange_sym_factor(diagram):
     for vertex in diagram:
         if diagram.node[vertex]['operator'] is False:
             non_op_vertices.append(vertex)
-    for permutation in itertools.permutations(non_op_vertices, len(non_op_vertices)):
+    for permutation in itertools.permutations(non_op_vertices,
+                                              len(non_op_vertices)):
         mapping = dict(zip(non_op_vertices, permutation))
         permuted_diag = nx.relabel_nodes(diagram, mapping, copy=True)
         if nx.is_isomorphic(diagram, nx.intersection(diagram, permuted_diag)):
@@ -521,7 +525,8 @@ def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
     tex_file.write("2N canonical diagrams for the energy: %i\n\n" % nb_2_HF)
     if not norm:
         tex_file.write(
-            "2N canonical diagrams for a generic operator only: %i\n\n" % nb_2_EHF)
+            "2N canonical diagrams for a generic operator only: %i\n\n"
+            % nb_2_EHF)
     tex_file.write("2N non-canonical diagrams: %i\n\n" % nb_2_noHF)
     if three_N:
         tex_file.write("3N valid diagrams: %i\n\n" %
@@ -530,7 +535,8 @@ def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
             "3N canonical diagrams for the energy: %i\n\n" % nb_3_HF)
         if not norm:
             tex_file.write(
-                "3N canonical diagrams for a generic operator only: %i\n\n" % nb_3_EHF)
+                "3N canonical diagrams for a generic operator only: %i\n\n"
+                % nb_3_EHF)
         tex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_noHF)
 
 
@@ -544,18 +550,19 @@ def write_BMBPT_section(result, diag_index, three_N, norm,
     if three_N:
         if diag_index == nb_2:
             result.write("\\section{Three-body diagrams}\n\n")
-            result.write("\\subsection{Three-body energy canonical diagrams}\n\n")
+            result.write(
+                "\\subsection{Three-body energy canonical diagrams}\n\n")
         elif (diag_index == nb_2 + nb_3_HF) and (not norm):
             result.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
         elif diag_index == nb_2 + nb_3_HF + nb_3_EHF:
             result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
 
 
-def draw_diagram(directory, result_file, diagram_index, type):
+def draw_diagram(directory, result_file, diagram_index, diag_type):
     """Copy the diagram feynmanmp instructions in the result file."""
-    if type == 'diag':
+    if diag_type == 'diag':
         diag_file = open(directory+"/Diagrams/diag_%i.tex" % diagram_index)
-    elif type == 'time':
+    elif diag_type == 'time':
         diag_file = open(directory+"/Diagrams/time_%i.tex" % diagram_index)
     result_file.write(diag_file.read())
 

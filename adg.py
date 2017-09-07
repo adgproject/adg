@@ -266,7 +266,8 @@ if theory == "BMBPT" and not norm:
                 time_diag_num = G_time.index(time_diag)
             else:
                 test = True
-                nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+                nm = nx.algorithms.isomorphism.categorical_node_match(
+                    'operator', False)
                 for good_tdiag in G_time:
                     if nx.is_isomorphic(time_diag, good_tdiag, node_match=nm):
                         test = False
@@ -370,7 +371,7 @@ if theory == "BMBPT":
                              % (i+1))
             if pdiag and pdraw:
                 latex_file.write('\n\\begin{center}\n')
-                time_file = open(directory+"/Diagrams/time_%i.tex" % i)
+                time_file = open(directory + "/Diagrams/time_%i.tex" % i)
                 latex_file.write(time_file.read())
                 latex_file.write('\n\\end{center}\n\n')
             if nx.is_arborescence(G_time[i]):
@@ -400,7 +401,7 @@ for i_diag in range(0, numdiag):
             diag_exp = diag_expressions[i_diag]
             feynman_exp = feynman_expressions[i_diag]
             latex_file.write("\\begin{align}\n\\text{PO}%i" % norder
-                             + ".%i\n" % (i_diag+1))
+                             + ".%i\n" % (i_diag + 1))
             latex_file.write("&= " + feynman_exp + r" \nonumber \\" + "\n")
             latex_file.write("&= " + diag_exp)
             latex_file.write("\\end{align}\n")
@@ -418,7 +419,6 @@ for i_diag in range(0, numdiag):
             i_tdiag = time_indexes[i_diag]
             latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
                              % (i_tdiag + 1))
-
             mth.draw_diagram(directory, latex_file, i_tdiag, 'time')
         latex_file.write('\n\\end{center}\n\n')
     if theory == 'BMBPT' and write_time:
