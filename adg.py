@@ -5,7 +5,6 @@ import os
 import multiprocessing
 from datetime import datetime
 import shutil
-import string
 import numpy as np
 import networkx as nx
 import methods as mth
@@ -78,18 +77,15 @@ for diagram in diagrams:
     G.append(nx.from_numpy_matrix(
         diagram, create_using=nx.MultiDiGraph(), parallel_edges=True))
 
-G1 = []
-for diag in G:
-    if (nx.number_weakly_connected_components(diag)) == 1:
-        G1.append(diag)
-G = G1
+for i_diag in range(len(G)-1, -1, -1):
+    if (nx.number_weakly_connected_components(G[i_diag])) != 1:
+        del G[i_diag]
+
 # Specific check for loop diagrams in BMBPT
 if theory == "BMBPT":
-    G1 = []
-    for diag in G:
-        if nx.is_directed_acyclic_graph(diag):
-            G1.append(diag)
-    G = G1
+    for i_diag in range(len(G)-1, -1, -1):
+        if not nx.is_directed_acyclic_graph(G[i_diag]):
+            del G[i_diag]
 
 G = mth.label_vertices(G, theory, norm)
 
@@ -403,6 +399,7 @@ for i_diag in range(0, numdiag):
             mth.draw_diagram(directory, latex_file, i_tdiag, 'time')
         latex_file.write('\n\\end{center}\n\n')
     if theory == 'BMBPT' and write_time:
+        i_tdiag = time_indexes[i_diag]
         latex_file.write("\\begin{equation}\n\\text{T}%i = " % (i_tdiag + 1)
                          + time_diag_exps.get(i_tdiag, '')
                          + "\\end{equation}\n")

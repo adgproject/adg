@@ -21,54 +21,53 @@ def no_trace(matrices):
 
 def no_loop(matrices):
     """Select out matrices with loops between two vertices."""
-    no_loop_matrices = []
-    for matrix in matrices:
+    for i_mat in range(len(matrices)-1, -1, -1):
         test_no_loop = True
-        for ind_i in range(len(matrix[0])):
+        for ind_i in range(len(matrices[i_mat][0])):
             for ind_j in range(ind_i+1):
-                if (matrix[ind_i][ind_j] != 0) and (matrix[ind_j][ind_i] != 0):
+                if (matrices[i_mat][ind_i][ind_j] != 0) \
+                  and (matrices[i_mat][ind_j][ind_i] != 0):
                     test_no_loop = False
                     break
-        if test_no_loop:
-            no_loop_matrices.append(matrix)
-    return no_loop_matrices
+        if not test_no_loop:
+            del matrices[i_mat]
+    return matrices
 
 
 def check_degree(matrices, three_N_use):
     """Check the degrees of the vertices
     (i.e. its effective one-, two- or three-body structure).
     """
-    deg_ok = []
-    for matrix in matrices:
+    for i_mat in range(len(matrices)-1, -1, -1):
         test_degree = True
-        for ind_i in range(len(matrix[0])):
+        for ind_i in range(len(matrices[i_mat][0])):
             degree = 0
-            for ind_j in range(len(matrix[0])):
-                degree += matrix[ind_i][ind_j] + matrix[ind_j][ind_i]
+            for ind_j in range(len(matrices[i_mat][0])):
+                degree += matrices[i_mat][ind_i][ind_j] \
+                    + matrices[i_mat][ind_j][ind_i]
             if (degree != 2) and (degree != 4):
                 if (not three_N_use) or (degree != 6):
                     test_degree = False
                     break
-        if test_degree:
-            deg_ok.append(matrix)
-    return deg_ok
+        if not test_degree:
+            del matrices[i_mat]
+    return matrices
 
 
 def check_vertex_degree(matrices, three_N_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices."""
-    good_matrices = []
-    for matrix in matrices:
+    for i_mat in range(len(matrices)-1, -1, -1):
         vertex_degree_OK = True
         vertex_degree = 0
-        for index in range(len(matrix[0])):
-            vertex_degree += matrix[index][vertex_id] \
-                + matrix[vertex_id][index]
+        for index in range(len(matrices[i_mat][0])):
+            vertex_degree += matrices[i_mat][index][vertex_id] \
+                + matrices[i_mat][vertex_id][index]
         if (vertex_degree != 2) and (vertex_degree != 4):
             if (not three_N_use) or (vertex_degree != 6):
                 vertex_degree_OK = False
-        if vertex_degree_OK:
-            good_matrices.append(matrix)
-    return good_matrices
+        if not vertex_degree_OK:
+            del matrices[i_mat]
+    return matrices
 
 
 def empty_matrix_generation(size):
