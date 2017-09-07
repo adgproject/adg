@@ -9,6 +9,9 @@ import string
 import numpy as np
 import networkx as nx
 import methods as mth
+import bmbpt
+import mbpt
+import time_structure as tst
 
 
 print "#####################"
@@ -52,9 +55,9 @@ if not os.path.exists(directory+"/Diagrams"):
 print "Running"
 start_time = datetime.now()
 if theory == "MBPT":
-    diagrams = mth.diagram_generation(norder)
+    diagrams = mbpt.diagram_generation(norder)
 elif theory == "BMBPT":
-    diagrams = mth.BMBPT_generation(norder, three_N, norm)
+    diagrams = bmbpt.BMBPT_generation(norder, three_N, norm)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
@@ -106,9 +109,9 @@ if theory == "BMBPT":
     G3_EHF = []
     G3_noHF = []
 
-    mth.order_2B_or_3B(G, G2, G3)
-    mth.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
-    mth.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
+    bmbpt.order_2B_or_3B(G, G2, G3)
+    bmbpt.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
+    bmbpt.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
 
     if use_parallel:
         if three_N:
@@ -205,14 +208,14 @@ if theory == "MBPT":
                 ######### Mtrx Elements ###########
                 if (incidence[row, col] == 1):
                     if type_edg[col] == 'h':
-                        bra = bra + mth.line_label_h(col)
+                        bra = bra + mbpt.line_label_h(col)
                     else:
-                        bra = bra + mth.line_label_p(col)
+                        bra = bra + mbpt.line_label_p(col)
                 if (incidence[row, col] == -1):
                     if type_edg[col] == 'h':
-                        ket = ket + mth.line_label_h(col)
+                        ket = ket + mbpt.line_label_h(col)
                     else:
-                        ket = ket + mth.line_label_p(col)
+                        ket = ket + mbpt.line_label_p(col)
                 ###################################
             braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
         mat_els.append(braket)
@@ -223,14 +226,14 @@ if theory == "MBPT":
                 val_test = incidence[0:row, col].sum()
                 if val_test == 1:
                     if type_edg[col] == 'h':
-                        denom = denom + ' +E_' + mth.line_label_h(col)
+                        denom = denom + ' +E_' + mbpt.line_label_h(col)
                     else:
-                        denom = denom + ' +E_' + mth.line_label_p(col)
+                        denom = denom + ' +E_' + mbpt.line_label_p(col)
                 if val_test == -1:
                     if type_edg[col] == 'h':
-                        denom = denom + '-E_' + mth.line_label_h(col)
+                        denom = denom + '-E_' + mbpt.line_label_h(col)
                     else:
-                        denom = denom + '-E_' + mth.line_label_p(col)
+                        denom = denom + '-E_' + mbpt.line_label_p(col)
             denom = denom + ')'
         if '( +' in denom:
             denom = denom.replace('( +', '(')
@@ -257,9 +260,9 @@ if theory == "BMBPT" and not norm:
         time_indexes = []
     for diag in G:
         # Attribute a qp label to all propagators
-        mth.attribute_qp_labels(diag)
+        bmbpt.attribute_qp_labels(diag)
         # Check for the time-structure diagram
-        time_diag = mth.time_structure_graph(diag)
+        time_diag = tst.time_structure_graph(diag)
         if write_time:
             if G_time == []:
                 G_time.append(time_diag)
@@ -278,15 +281,15 @@ if theory == "BMBPT" and not norm:
                     time_diag_num = G_time.index(time_diag)
             time_indexes.append(time_diag_num)
         # Determine the expression depending on the graph structure
-        numerator = mth.extract_numerator(diag)
+        numerator = bmbpt.extract_numerator(diag)
         denominator = ""
         extra_factor = ""
         if nx.is_arborescence(time_diag):
-            denominator = mth.time_tree_denominator(
+            denominator = bmbpt.time_tree_denominator(
                 diag, time_diag, denominator)
 
         elif (norder == 4) and (mth.number_of_sinks(diag) == 1):
-            testdiag = mth.omega_subgraph(diag)
+            testdiag = bmbpt.omega_subgraph(diag)
             for i in range(2):
                 subgraph_stack = []
                 subgraph_stack.append(nx.dag_longest_path(testdiag)[1])
@@ -301,22 +304,22 @@ if theory == "BMBPT" and not norm:
                         if test_vertex:
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
-                denominator += "(" + mth.extract_denom(diag, subdiag) + ")"
+                denominator += "(" + bmbpt.extract_denom(diag, subdiag) + ")"
             for vertex in diag:
                 if diag.out_degree(vertex) == 0:
                     subdiag = diag.subgraph(vertex)
-            denominator_a = mth.extract_denom(diag, subdiag)
-            denominator_abc = mth.extract_denom(diag, testdiag)
+            denominator_a = bmbpt.extract_denom(diag, subdiag)
+            denominator_abc = bmbpt.extract_denom(diag, testdiag)
             extra_factor += "\\left[ \\frac{1}{" + denominator_a \
                 + "} + \\frac{1}{" + denominator_abc + "} \\right]"
         # Determine the integral component in the Feynman expression
-        integral = mth.extract_integral(diag)
+        integral = bmbpt.extract_integral(diag)
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
-        if mth.extract_BMBPT_crossing_sign(diag):
+        if bmbpt.extract_BMBPT_crossing_sign(diag):
             prefactor = "-" + prefactor
-        sym_fact = mth.vertex_exchange_sym_factor(diag) \
-            + mth.multiplicity_symmetry_factor(diag)
+        sym_fact = bmbpt.vertex_exchange_sym_factor(diag) \
+            + bmbpt.multiplicity_symmetry_factor(diag)
         if sym_fact != "":
             prefactor = "\\frac{" + prefactor + "}{" \
                 + sym_fact + "}\\sum_{k_i}"
@@ -361,8 +364,8 @@ latex_file = open(directory + '/result.tex', 'w')
 mth.write_file_header(directory, latex_file, pdiag, norder, theory)
 
 if theory == "BMBPT":
-    mth.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
-                           nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
+    bmbpt.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
+                             nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
     if write_time:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
         time_diag_exps = {}
@@ -378,7 +381,7 @@ if theory == "BMBPT":
                 latex_file.write("Tree: Yes\n\n")
                 latex_file.write("\\begin{equation}\n")
                 time_diag_exps.setdefault(i, "\\frac{1}{"
-                                          + mth.tree_time_structure_den(G_time[i])
+                                          + tst.tree_time_structure_den(G_time[i])
                                           + "}\n")
                 latex_file.write(time_diag_exps[i])
                 latex_file.write("\\end{equation}\n")
@@ -394,8 +397,8 @@ if theory == "BMBPT":
 
 for i_diag in range(0, numdiag):
     if theory == "BMBPT":
-        mth.write_BMBPT_section(latex_file, i_diag, three_N, norm,
-                                nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
+        bmbpt.write_BMBPT_section(latex_file, i_diag, three_N, norm,
+                                  nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (i_diag + 1))
         if not norm:
             diag_exp = diag_expressions[i_diag]
