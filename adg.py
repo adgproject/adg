@@ -29,6 +29,7 @@ theory = raw_input('MBPT or BMBPT?\n').upper()
 
 three_N = False
 norm = False
+write_time = False
 if theory == "BMBPT":
     three_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
     norm = raw_input(
@@ -90,13 +91,7 @@ if theory == "BMBPT":
             G1.append(diag)
     G = G1
 
-for diag in G:
-    # Account for different status of vertices in operator diagrams
-    for node in diag:
-        diag.node[node]['operator'] = False
-    if (theory == "BMBPT") and not norm:
-        diag.node[0]['operator'] = True
-
+G = mth.label_vertices(G, theory, norm)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
@@ -343,18 +338,9 @@ pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdraw:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    for i in range(0, numdiag):
-        diag_name = 'diag_%i' % i
-        mth.feynmf_generator(G[i], theory, diag_name)
-        shutil.move(diag_name + '.tex',
-                    directory + "/Diagrams/" + diag_name + '.tex')
+    mth.create_feynmanmp_files(G, theory, directory, 'diag')
     if write_time:
-        for i, time_diag in enumerate(G_time):
-            time_name = 'time_%i' % i
-            mth.feynmf_generator(time_diag, 'MBPT', time_name)
-            shutil.move(time_name + '.tex',
-                        directory + "/Diagrams/" + time_name + '.tex')
-
+        mth.create_feynmanmp_files(G_time, theory, directory, 'time')
 
 msg = 'Include diagrams in tex?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
@@ -401,20 +387,12 @@ for i_diag in range(0, numdiag):
                                   nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (i_diag + 1))
         if not norm:
-            diag_exp = diag_expressions[i_diag]
-            feynman_exp = feynman_expressions[i_diag]
-            latex_file.write("\\begin{align}\n\\text{PO}%i" % norder
-                             + ".%i\n" % (i_diag + 1))
-            latex_file.write("&= " + feynman_exp + r" \nonumber \\" + "\n")
-            latex_file.write("&= " + diag_exp)
-            latex_file.write("\\end{align}\n")
+            bmbpt.write_diag_exps(latex_file, i_diag, norder,
+                                  feynman_expressions[i_diag],
+                                  diag_expressions[i_diag])
     elif theory == "MBPT":
-        diag_exp = "\\dfrac{1}{%i}" % nedges_eq[i_diag] + phases[i_diag] \
-            + "\\sum{\\dfrac{" + mat_els[i_diag] + "}{" \
-            + denoms[i_diag] + "}}\n"
-        latex_file.write("\\begin{equation}\n")
-        latex_file.write(diag_exp)
-        latex_file.write("\\end{equation}\n")
+        mbpt.write_diag_exp(latex_file, nedges_eq[i_diag], phases[i_diag],
+                            mat_els[i_diag], denoms[i_diag])
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
         mth.draw_diagram(directory, latex_file, i_diag, 'diag')
@@ -428,20 +406,7 @@ for i_diag in range(0, numdiag):
         latex_file.write("\\begin{equation}\n\\text{T}%i = " % (i_tdiag + 1)
                          + time_diag_exps.get(i_tdiag, '')
                          + "\\end{equation}\n")
-        latex_file.write("\\begin{align*}\n")
-        labels = list(string.ascii_lowercase)
-        for vertex in range(1, norder):
-            latex_file.write(labels[vertex-1] + " &= ")
-            for prop in G[i_diag].in_edges_iter(vertex, keys=True):
-                latex_file.write(" + E_{%s}"
-                                 % G[i_diag].edge[prop[0]][prop[1]][prop[2]]['qp_state'])
-            for prop in G[i_diag].out_edges_iter(vertex, keys=True):
-                latex_file.write(" - E_{%s}"
-                                 % G[i_diag].edge[prop[0]][prop[1]][prop[2]]['qp_state'])
-            if vertex != norder-1:
-                latex_file.write(r"\\")
-            latex_file.write('\n')
-        latex_file.write("\\end{align*}\n")
+        bmbpt.write_vertices_values(latex_file, G[i_diag])
 enddoc = "\\end{document}"
 latex_file.write(enddoc)
 latex_file.close()

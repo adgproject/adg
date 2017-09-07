@@ -50,3 +50,14 @@ def line_label_p(n):
     labels = list(string.ascii_lowercase)
     labels = labels[15:-1]
     return labels[n]
+
+
+def write_diag_exp(latex_file, nedges_eq, phases, matrix_elements,
+                   denominators):
+    """Write the expression associated to a diagram in the LaTeX file."""
+    diag_exp = "\\dfrac{1}{%i}" % nedges_eq + phases \
+        + "\\sum{\\dfrac{" + matrix_elements + "}{" \
+        + denominators + "}}\n"
+    latex_file.write("\\begin{equation}\n")
+    latex_file.write(diag_exp)
+    latex_file.write("\\end{equation}\n")

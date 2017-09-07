@@ -1,6 +1,7 @@
 """Module containg methods to be called by ADG."""
 
 import os
+import shutil
 import networkx as nx
 
 
@@ -98,6 +99,16 @@ def topologically_distinct_diags(diagrams):
     return distinct_diagrams
 
 
+def label_vertices(diagrams_list, theory_type, study_norm):
+    """Account for different status of vertices in operator diagrams."""
+    for diagram in diagrams_list:
+        for node in diagram:
+            diagram.node[node]['operator'] = False
+        if (theory_type == "BMBPT") and not study_norm:
+            diagram.node[0]['operator'] = True
+    return diagrams_list
+
+
 def has_only_branch_operator_subgraphs(diagram):
     """Return True if diagram has operator subgraphs that are all branches."""
     has_branch_subgraphs = True
@@ -176,6 +187,19 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
                 props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
+
+
+def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
+    """Create and move the appropriate feynmanmp files to the right place."""
+    for i, diagram in enumerate(diagrams_list):
+        if diag_type == 'diag':
+            diag_name = 'diag_%i' % i
+            feynmf_generator(diagram, theory_type, diag_name)
+        elif diag_type == 'time':
+            diag_name = 'time_%i' % i
+            feynmf_generator(diagram, 'MBPT', diag_name)
+        shutil.move(diag_name + '.tex',
+                    directory + "/Diagrams/" + diag_name + '.tex')
 
 
 def write_file_header(directory, latex_file, pdiag, norder, theory):

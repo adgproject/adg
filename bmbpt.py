@@ -2,6 +2,7 @@
 
 import copy
 import itertools
+import string
 import numpy as np
 import methods as mth
 import networkx as nx
@@ -271,3 +272,31 @@ def write_BMBPT_section(result, diag_index, three_N, norm,
             result.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
         elif diag_index == nb_2 + nb_3_HF + nb_3_EHF:
             result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
+
+
+def write_diag_exps(latex_file, i_diag, norder, feynman_expression,
+                    diag_expression):
+    """Write the expressions associated to a diagram in the LaTeX file."""
+    latex_file.write("\\begin{align}\n\\text{PO}%i" % norder
+                     + ".%i\n" % (i_diag + 1))
+    latex_file.write("&= " + feynman_expression + r" \nonumber \\" + "\n")
+    latex_file.write("&= " + diag_expression)
+    latex_file.write("\\end{align}\n")
+
+
+def write_vertices_values(latex_file, diagram):
+    """Write the qp energies associated to each vertex of the diagram."""
+    latex_file.write("\\begin{align*}\n")
+    labels = list(string.ascii_lowercase)
+    for vertex in range(1, len(diagram)):
+        latex_file.write(labels[vertex-1] + " &= ")
+        for prop in diagram.in_edges_iter(vertex, keys=True):
+            latex_file.write(" + E_{%s}"
+                             % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
+        for prop in diagram.out_edges_iter(vertex, keys=True):
+            latex_file.write(" - E_{%s}"
+                             % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
+        if vertex != len(diagram)-1:
+            latex_file.write(r"\\")
+        latex_file.write('\n')
+    latex_file.write("\\end{align*}\n")
