@@ -5,6 +5,7 @@ import os
 import multiprocessing
 from datetime import datetime
 import shutil
+import string
 import numpy as np
 import networkx as nx
 import methods as mth
@@ -361,21 +362,24 @@ mth.write_file_header(directory, latex_file, pdiag, norder, theory)
 if theory == "BMBPT":
     mth.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
                            nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
-    if write_time and pdiag and pdraw:
+    if write_time:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
+        time_diag_exps = {}
         for i in range(nb_time_diags):
             latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                              % (i+1))
-            latex_file.write('\n\\begin{center}\n')
-            time_file = open(directory+"/Diagrams/time_%i.tex" % i)
-            latex_file.write(time_file.read())
-            latex_file.write('\n\\end{center}\n\n')
+            if pdiag and pdraw:
+                latex_file.write('\n\\begin{center}\n')
+                time_file = open(directory+"/Diagrams/time_%i.tex" % i)
+                latex_file.write(time_file.read())
+                latex_file.write('\n\\end{center}\n\n')
             if nx.is_arborescence(G_time[i]):
                 latex_file.write("Tree: Yes\n\n")
                 latex_file.write("\\begin{equation}\n")
-                latex_file.write("\\frac{1}{"
-                                 + mth.tree_time_structure_den(G_time[i])
-                                 + "}\n")
+                time_diag_exps.setdefault(i, "\\frac{1}{"
+                                          + mth.tree_time_structure_den(G_time[i])
+                                          + "}\n")
+                latex_file.write(time_diag_exps[i])
                 latex_file.write("\\end{equation}\n")
             else:
                 latex_file.write("Tree: No\n\n")
@@ -417,6 +421,24 @@ for i_diag in range(0, numdiag):
 
             mth.draw_diagram(directory, latex_file, i_tdiag, 'time')
         latex_file.write('\n\\end{center}\n\n')
+    if theory == 'BMBPT' and write_time:
+        latex_file.write("\\begin{equation}\n\\text{T}%i = " % (i_tdiag + 1)
+                         + time_diag_exps.get(i_tdiag, '')
+                         + "\\end{equation}\n")
+        latex_file.write("\\begin{align*}\n")
+        labels = list(string.ascii_lowercase)
+        for vertex in range(1, norder):
+            latex_file.write(labels[vertex-1] + " &= ")
+            for prop in G[i_diag].in_edges_iter(vertex, keys=True):
+                latex_file.write(" + E_{%s}"
+                                 % G[i_diag].edge[prop[0]][prop[1]][prop[2]]['qp_state'])
+            for prop in G[i_diag].out_edges_iter(vertex, keys=True):
+                latex_file.write(" - E_{%s}"
+                                 % G[i_diag].edge[prop[0]][prop[1]][prop[2]]['qp_state'])
+            if vertex != norder-1:
+                latex_file.write(r"\\")
+            latex_file.write('\n')
+        latex_file.write("\\end{align*}\n")
 enddoc = "\\end{document}"
 latex_file.write(enddoc)
 latex_file.close()
