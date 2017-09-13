@@ -5,6 +5,9 @@ import os
 import multiprocessing
 from datetime import datetime
 import shutil
+import cProfile
+import pstats
+import StringIO
 import numpy as np
 import networkx as nx
 import methods as mth
@@ -50,6 +53,8 @@ if not os.path.exists(directory):
 if not os.path.exists(directory+"/Diagrams"):
     os.makedirs(directory+"/Diagrams")
 
+pr = cProfile.Profile()
+pr.enable()
 
 # Start computing everything
 print "Running"
@@ -77,13 +82,13 @@ for diagram in diagrams:
     G.append(nx.from_numpy_matrix(
         diagram, create_using=nx.MultiDiGraph(), parallel_edges=True))
 
-for i_diag in range(len(G)-1, -1, -1):
+for i_diag in xrange(len(G)-1, -1, -1):
     if (nx.number_weakly_connected_components(G[i_diag])) != 1:
         del G[i_diag]
 
 # Specific check for loop diagrams in BMBPT
 if theory == "BMBPT":
-    for i_diag in range(len(G)-1, -1, -1):
+    for i_diag in xrange(len(G)-1, -1, -1):
         if not nx.is_directed_acyclic_graph(G[i_diag]):
             del G[i_diag]
 
@@ -91,8 +96,6 @@ G = mth.label_vertices(G, theory, norm)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
-    G2 = []
-    G3 = []
     G2_HF = []
     G2_EHF = []
     G2_noHF = []
@@ -100,7 +103,9 @@ if theory == "BMBPT":
     G3_EHF = []
     G3_noHF = []
 
-    bmbpt.order_2B_or_3B(G, G2, G3)
+    # bmbpt.order_2B_or_3B(G, G2, G3)
+    G2 = [diag for diag in G if sorted(diag.degree().values())[-1] < 5]
+    G3 = [diag for diag in G if sorted(diag.degree().values())[-1] == 6]
     bmbpt.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
     bmbpt.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
 
@@ -109,6 +114,7 @@ if theory == "BMBPT":
             nb_procs_max = 6
         else:
             nb_procs_max = 3
+        nb_procs_max = 6 if three_N else 3
         nb_processes = min(num_cores-1, nb_procs_max)
         pool = multiprocessing.Pool(nb_processes)
         r1 = pool.apply_async(mth.topologically_distinct_diags, (G2_HF, ))
@@ -137,16 +143,14 @@ if theory == "BMBPT":
         G3_noHF = mth.topologically_distinct_diags(G3_noHF)
 
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
-    G2 = G2_HF + G2_EHF + G2_noHF
-    G3 = G3_HF + G3_EHF + G3_noHF
-    nb_2 = len(G2)
     nb_2_HF = len(G2_HF)
     nb_2_EHF = len(G2_EHF)
     nb_2_noHF = len(G2_noHF)
-    nb_3 = len(G3)
+    nb_2 = nb_2_HF + nb_2_EHF + nb_2_noHF
     nb_3_HF = len(G3_HF)
     nb_3_EHF = len(G3_EHF)
     nb_3_noHF = len(G3_noHF)
+    nb_3 = nb_3_HF + nb_3_EHF + nb_3_noHF
 
 numdiag = len(G)
 print "Time ellapsed: ", datetime.now() - start_time
@@ -327,6 +331,12 @@ if theory == "BMBPT" and not norm:
         diag_expressions.append(diag_exp)
     nb_time_diags = len(G_time)
 
+pr.disable()
+s = StringIO.StringIO()
+sortby = 'cumulative'
+ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+ps.print_stats()
+ps.dump_stats("stats.dat")
 
 # Writing a feynmp file for each graph
 msg = 'Generate diagrams feymanmf instructions?'
@@ -351,7 +361,7 @@ if theory == "BMBPT":
     if write_time:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
         time_diag_exps = {}
-        for i in range(nb_time_diags):
+        for i in xrange(nb_time_diags):
             latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                              % (i+1))
             if pdiag and pdraw:

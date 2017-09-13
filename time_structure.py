@@ -9,7 +9,7 @@ def time_structure_graph(diagram):
     """Return the time-structure graph associated to the diagram."""
     time_diag = diagram.to_directed()
     if time_diag.node[0]['operator']:
-        for vertex in range(1, len(time_diag)):
+        for vertex in xrange(1, len(time_diag)):
             time_diag.add_edge(0, vertex)
     for vertex_a in time_diag:
         for vertex_b in time_diag:
@@ -26,7 +26,7 @@ def time_structure_graph(diagram):
 def has_tree_time_structure(diagram):
     """Return True if the time structure of the diagram is a tree."""
     diag_copy = diagram.to_directed()
-    for vertex in range(1, len(diag_copy)):
+    for vertex in xrange(1, len(diag_copy)):
         if diag_copy.in_degree(vertex) == 0:
             diag_copy.add_edge(0, vertex)
     time_diag = nx.DiGraph()

@@ -19,14 +19,14 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     temp_matrices.append(mth.empty_matrix_generation(p_order))
 
     # Generate oriented adjacency matrices going vertex-wise
-    for vertex in range(p_order):
-        for sum_index in range(vertex+1, p_order):
+    for vertex in xrange(p_order):
+        for sum_index in xrange(vertex+1, p_order):
             matrices = []
             for mat in temp_matrices:
                 matrices.append(mat)
                 if mat[sum_index][vertex] == 0:
                     vert_degree = 0
-                    for k in range(0, p_order):
+                    for k in xrange(0, p_order):
                         vert_degree += mat[k][vertex] + mat[vertex][k]
                     elem = 1
                     while (elem + vert_degree) <= deg_max:
@@ -156,15 +156,16 @@ def extract_integral(diagram):
     """Return the integral part of the Feynman expression of the diagram."""
     integral = ""
     norder = diagram.number_of_nodes()
-    for vertex in range(1, norder):
+    pert_vertex_indices = range(1, norder)
+    for vertex in pert_vertex_indices:
         integral += "\\mathrm{d}\\tau_%i" % vertex
     if norder > 2:
-        for vertex_i in range(1, norder):
-            for vertex_j in range(1, norder):
+        for vertex_i in pert_vertex_indices:
+            for vertex_j in pert_vertex_indices:
                 if diagram.has_edge(vertex_i, vertex_j):
                     integral += "\\theta(\\tau_%i" % vertex_j \
                         + "-\\tau_%i) " % vertex_i
-    for vertex in range(1, norder):
+    for vertex in pert_vertex_indices:
         integral += "e^{-\\tau_%i (" % vertex
         for prop in diagram.in_edges_iter(vertex, keys=True):
             integral += " + E_{%s}" \
@@ -185,8 +186,8 @@ def extract_BMBPT_crossing_sign(diagram):
     nb_crossings = 0
     for vertex in diagram:
         for propagator in diagram.out_edges_iter(vertex, keys=True):
-            for vertex_ante in range(propagator[0]):
-                for vertex_post in range(propagator[0]+1, propagator[1]):
+            for vertex_ante in xrange(propagator[0]):
+                for vertex_post in xrange(propagator[0]+1, propagator[1]):
                     nb_crossings += diagram.number_of_edges(vertex_ante,
                                                             vertex_post)
     return nb_crossings % 2 == 1
@@ -196,7 +197,7 @@ def multiplicity_symmetry_factor(diagram):
     """Return the symmetry factor associated with propagators multiplicity."""
     factor = ""
     prop_multiplicity = []
-    for i in range(6):
+    for i in xrange(6):
         prop_multiplicity.append(0)
     for vertex_i in diagram:
         for vertex_j in diagram:
@@ -288,7 +289,7 @@ def write_vertices_values(latex_file, diagram):
     """Write the qp energies associated to each vertex of the diagram."""
     latex_file.write("\\begin{align*}\n")
     labels = list(string.ascii_lowercase)
-    for vertex in range(1, len(diagram)):
+    for vertex in xrange(1, len(diagram)):
         latex_file.write(labels[vertex-1] + " &= ")
         for prop in diagram.in_edges_iter(vertex, keys=True):
             latex_file.write(" + E_{%s}"

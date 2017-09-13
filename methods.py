@@ -21,12 +21,13 @@ def no_trace(matrices):
 
 def no_loop(matrices):
     """Select out matrices with loops between two vertices."""
-    for i_mat in range(len(matrices)-1, -1, -1):
+    for i_mat in xrange(len(matrices)-1, -1, -1):
         test_no_loop = True
-        for ind_i in range(len(matrices[i_mat][0])):
-            for ind_j in range(ind_i+1):
-                if (matrices[i_mat][ind_i][ind_j] != 0) \
-                  and (matrices[i_mat][ind_j][ind_i] != 0):
+        matrix = matrices[i_mat]
+        for ind_i in xrange(len(matrix[0])):
+            for ind_j in xrange(ind_i+1):
+                if (matrix[ind_i][ind_j] != 0) \
+                  and (matrix[ind_j][ind_i] != 0):
                     test_no_loop = False
                     break
         if not test_no_loop:
@@ -38,13 +39,14 @@ def check_degree(matrices, three_N_use):
     """Check the degrees of the vertices
     (i.e. its effective one-, two- or three-body structure).
     """
-    for i_mat in range(len(matrices)-1, -1, -1):
+    for i_mat in xrange(len(matrices)-1, -1, -1):
         test_degree = True
-        for ind_i in range(len(matrices[i_mat][0])):
+        matrix = matrices[i_mat]
+        for ind_i in xrange(len(matrix[0])):
             degree = 0
-            for ind_j in range(len(matrices[i_mat][0])):
-                degree += matrices[i_mat][ind_i][ind_j] \
-                    + matrices[i_mat][ind_j][ind_i]
+            for ind_j in xrange(len(matrix[0])):
+                degree += matrix[ind_i][ind_j] \
+                    + matrix[ind_j][ind_i]
             if (degree != 2) and (degree != 4):
                 if (not three_N_use) or (degree != 6):
                     test_degree = False
@@ -56,12 +58,13 @@ def check_degree(matrices, three_N_use):
 
 def check_vertex_degree(matrices, three_N_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices."""
-    for i_mat in range(len(matrices)-1, -1, -1):
+    for i_mat in xrange(len(matrices)-1, -1, -1):
         vertex_degree_OK = True
         vertex_degree = 0
-        for index in range(len(matrices[i_mat][0])):
-            vertex_degree += matrices[i_mat][index][vertex_id] \
-                + matrices[i_mat][vertex_id][index]
+        matrix = matrices[i_mat]
+        for index in xrange(len(matrices[i_mat][0])):
+            vertex_degree += matrix[index][vertex_id] \
+                + matrix[vertex_id][index]
         if (vertex_degree != 2) and (vertex_degree != 4):
             if (not three_N_use) or (vertex_degree != 6):
                 vertex_degree_OK = False
@@ -82,20 +85,14 @@ def empty_matrix_generation(size):
 
 def topologically_distinct_diags(diagrams):
     """Return a list of diagrams all topologically distinct."""
-    distinct_diagrams = []
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-    for diag in diagrams:
-        if distinct_diagrams == []:
-            distinct_diagrams.append(diag)
-        else:
-            test = True
-            for good_diag in distinct_diagrams:
-                if nx.is_isomorphic(diag, good_diag, node_match=nm):
-                    test = False
-                    break
-            if test:
-                distinct_diagrams.append(diag)
-    return distinct_diagrams
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        diag = diagrams[i_diag]
+        for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
+            if nx.is_isomorphic(diag, diagrams[i_comp_diag], node_match=nm):
+                del diagrams[i_comp_diag]
+                break
+    return diagrams
 
 
 def label_vertices(diagrams_list, theory_type, study_norm):
@@ -144,7 +141,7 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
 
     # Set the position of the vertices
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
-    for vert in range(p_order-1):
+    for vert in xrange(p_order-1):
         fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
         if start_diag.node[vert]['operator']:
             fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
@@ -246,12 +243,12 @@ def compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags):
         # Second compilation needed
         os.system("pdflatex -shell-escape result.tex")
         # Get rid of undesired feynmp files to keep a clean directory
-        for diagram in range(0, numdiag):
+        for diagram in xrange(0, numdiag):
             os.unlink("diag_%i.1" % diagram)
             os.unlink("diag_%i.mp" % diagram)
             os.unlink("diag_%i.log" % diagram)
         if write_time:
-            for i_tdiag in range(nb_time_diags):
+            for i_tdiag in xrange(nb_time_diags):
                 os.unlink("time_%i.1" % i_tdiag)
                 os.unlink("time_%i.mp" % i_tdiag)
                 os.unlink("time_%i.log" % i_tdiag)
