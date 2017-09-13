@@ -10,24 +10,20 @@ import networkx as nx
 
 def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     """Generate diagrams for BMBPT from bottom up."""
-    deg_max = 4
-    if three_N_use:
-        deg_max = 6
+    deg_max = 6 if three_N_use else 4
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    temp_matrices = []
-    temp_matrices.append(mth.empty_matrix_generation(p_order))
+    temp_matrices = [mth.empty_matrix_generation(p_order)]
 
     # Generate oriented adjacency matrices going vertex-wise
-    for vertex in xrange(p_order):
+    vertices = range(p_order)
+    for vertex in vertices:
         for sum_index in xrange(vertex+1, p_order):
             matrices = []
             for mat in temp_matrices:
                 matrices.append(mat)
                 if mat[sum_index][vertex] == 0:
-                    vert_degree = 0
-                    for k in xrange(0, p_order):
-                        vert_degree += mat[k][vertex] + mat[vertex][k]
+                    vert_degree = sum(mat[k][vertex] + mat[vertex][k] for k in vertices)
                     elem = 1
                     while (elem + vert_degree) <= deg_max:
                         temp_mat = copy.deepcopy(mat)
@@ -46,10 +42,7 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
         if mat not in matricesUniq:
             matricesUniq.append(mat)
     matricesUniq.sort(reverse=True)
-    bmbpt_diagrams = []
-    for mat in matricesUniq:
-        bmbpt_diagrams.append(np.array(mat))
-    return bmbpt_diagrams
+    return [np.array(mat) for mat in matricesUniq]
 
 
 def order_2B_or_3B(diagrams, TwoB_diags, ThreeB_diags):
@@ -92,10 +85,7 @@ def attribute_qp_labels(diagram):
 
 def omega_subgraph(diagram):
     """Return the graph without any operator vertex."""
-    subgraph_stack = []
-    for vertex in diagram:
-        if diagram.node[vertex]['operator'] is False:
-            subgraph_stack.append(vertex)
+    subgraph_stack = [vertex for vertex in diagram if diagram.node[vertex]['operator'] is False]
     return diagram.subgraph(subgraph_stack)
 
 
@@ -143,8 +133,7 @@ def extract_denom(start_diag, subdiagram):
 def time_tree_denominator(diagram, time_diagram, denominator):
     """Add the denominator for a time-tree diagram."""
     for vertex_i in range(1, len(time_diagram)):
-        subgraph_stack = []
-        subgraph_stack.append(diagram.nodes()[vertex_i])
+        subgraph_stack = [diagram.nodes()[vertex_i]]
         for vertex_j in nx.descendants(time_diagram, vertex_i):
             subgraph_stack.append(diagram.nodes()[vertex_j])
         subdiag = diagram.subgraph(subgraph_stack)
@@ -196,9 +185,7 @@ def extract_BMBPT_crossing_sign(diagram):
 def multiplicity_symmetry_factor(diagram):
     """Return the symmetry factor associated with propagators multiplicity."""
     factor = ""
-    prop_multiplicity = []
-    for i in xrange(6):
-        prop_multiplicity.append(0)
+    prop_multiplicity = [0 for i in xrange(6)]
     for vertex_i in diagram:
         for vertex_j in diagram:
             if diagram.number_of_edges(vertex_i, vertex_j) >= 2:
@@ -217,10 +204,7 @@ def vertex_exchange_sym_factor(diagram):
     """Return the symmetry factor associated with vertex exchange."""
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
-    non_op_vertices = []
-    for vertex in diagram:
-        if diagram.node[vertex]['operator'] is False:
-            non_op_vertices.append(vertex)
+    non_op_vertices = [vertex for vertex in diagram if diagram.node[vertex]['operator'] is False]
     for permutation in itertools.permutations(non_op_vertices,
                                               len(non_op_vertices)):
         mapping = dict(zip(non_op_vertices, permutation))

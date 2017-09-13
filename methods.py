@@ -88,10 +88,12 @@ def topologically_distinct_diags(diagrams):
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
         diag = diagrams[i_diag]
+        vert_degrees = sorted(diag.degree().values())
         for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
-            if nx.is_isomorphic(diag, diagrams[i_comp_diag], node_match=nm):
-                del diagrams[i_comp_diag]
-                break
+            if vert_degrees == sorted(diagrams[i_comp_diag].degree().values()):
+                if nx.is_isomorphic(diag, diagrams[i_comp_diag], node_match=nm):
+                    del diagrams[i_comp_diag]
+                    break
     return diagrams
 
 
@@ -117,11 +119,7 @@ def has_only_branch_operator_subgraphs(diagram):
 
 def number_of_sinks(diagram):
     """Return the number of vertices in the graph with no edges going out."""
-    nb = 0
-    for vertex in diagram:
-        if diagram.out_degree(vertex) == 0:
-            nb += 1
-    return nb
+    return sum(1 for vertex in diagram if diagram.out_degree(vertex) == 0)
 
 
 def feynmf_generator(start_diag, theory_type, diagram_name):

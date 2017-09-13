@@ -286,8 +286,7 @@ if theory == "BMBPT" and not norm:
         elif (norder == 4) and (mth.number_of_sinks(diag) == 1):
             testdiag = bmbpt.omega_subgraph(diag)
             for i in range(2):
-                subgraph_stack = []
-                subgraph_stack.append(nx.dag_longest_path(testdiag)[1])
+                subgraph_stack = [nx.dag_longest_path(testdiag)[1]]
                 if i == 0:
                     subgraph_stack.append(nx.dag_longest_path(testdiag)[0])
                 else:
