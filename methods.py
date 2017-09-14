@@ -32,7 +32,6 @@ def no_loop(matrices):
                     break
         if not test_no_loop:
             del matrices[i_mat]
-    return matrices
 
 
 def check_degree(matrices, three_N_use):
@@ -40,37 +39,27 @@ def check_degree(matrices, three_N_use):
     (i.e. its effective one-, two- or three-body structure).
     """
     for i_mat in xrange(len(matrices)-1, -1, -1):
-        test_degree = True
         matrix = matrices[i_mat]
         for ind_i in xrange(len(matrix[0])):
-            degree = 0
-            for ind_j in xrange(len(matrix[0])):
-                degree += matrix[ind_i][ind_j] \
-                    + matrix[ind_j][ind_i]
+            degree = sum(matrix[ind_i][ind_j]
+                         + matrix[ind_j][ind_i]
+                         for ind_j in xrange(len(matrix[0])))
             if (degree != 2) and (degree != 4):
                 if (not three_N_use) or (degree != 6):
-                    test_degree = False
+                    del matrices[i_mat]
                     break
-        if not test_degree:
-            del matrices[i_mat]
-    return matrices
 
 
 def check_vertex_degree(matrices, three_N_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices."""
     for i_mat in xrange(len(matrices)-1, -1, -1):
-        vertex_degree_OK = True
-        vertex_degree = 0
         matrix = matrices[i_mat]
-        for index in xrange(len(matrices[i_mat][0])):
-            vertex_degree += matrix[index][vertex_id] \
-                + matrix[vertex_id][index]
+        vertex_degree = sum(matrix[index][vertex_id]
+                            + matrix[vertex_id][index]
+                            for index in xrange(len(matrices[i_mat][0])))
         if (vertex_degree != 2) and (vertex_degree != 4):
             if (not three_N_use) or (vertex_degree != 6):
-                vertex_degree_OK = False
-        if not vertex_degree_OK:
-            del matrices[i_mat]
-    return matrices
+                del matrices[i_mat]
 
 
 def empty_matrix_generation(size):
@@ -88,10 +77,13 @@ def topologically_distinct_diags(diagrams):
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
         diag = diagrams[i_diag]
-        vert_degrees = sorted(diag.degree().values())
+        vert_degrees = sorted([degree for node, degree in diag.degree_iter()])
         for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
-            if vert_degrees == sorted(diagrams[i_comp_diag].degree().values()):
-                if nx.is_isomorphic(diag, diagrams[i_comp_diag], node_match=nm):
+            if vert_degrees == sorted([
+                    degree for node, degree
+                    in diagrams[i_comp_diag].degree_iter()]):
+                if nx.is_isomorphic(diag, diagrams[i_comp_diag],
+                                    node_match=nm):
                     del diagrams[i_comp_diag]
                     break
     return diagrams
@@ -104,7 +96,6 @@ def label_vertices(diagrams_list, theory_type, study_norm):
             diagram.node[node]['operator'] = False
         if (theory_type == "BMBPT") and not study_norm:
             diagram.node[0]['operator'] = True
-    return diagrams_list
 
 
 def has_only_branch_operator_subgraphs(diagram):

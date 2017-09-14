@@ -13,30 +13,28 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     deg_max = 6 if three_N_use else 4
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    temp_matrices = [mth.empty_matrix_generation(p_order)]
+    matrices = [mth.empty_matrix_generation(p_order)]
 
     # Generate oriented adjacency matrices going vertex-wise
     vertices = range(p_order)
     for vertex in vertices:
         for sum_index in xrange(vertex+1, p_order):
-            matrices = []
-            for mat in temp_matrices:
-                matrices.append(mat)
+            for mat_indx in xrange(len(matrices)-1, -1, -1):
+                mat = matrices[mat_indx]
                 if mat[sum_index][vertex] == 0:
-                    vert_degree = sum(mat[k][vertex] + mat[vertex][k] for k in vertices)
+                    vert_degree = sum(mat[k][vertex]
+                                      + mat[vertex][k] for k in vertices)
                     elem = 1
                     while (elem + vert_degree) <= deg_max:
                         temp_mat = copy.deepcopy(mat)
                         temp_mat[vertex][sum_index] = elem
                         matrices.append(temp_mat)
                         elem += 1
-            temp_matrices = copy.deepcopy(matrices)
-        temp_matrices = mth.check_vertex_degree(matrices, three_N_use, vertex)
-        matrices = copy.deepcopy(temp_matrices)
+        mth.check_vertex_degree(matrices, three_N_use, vertex)
 
     # Checks to exclude non-conform matrices
-    matrices = mth.check_degree(matrices, three_N_use)
-    matrices = mth.no_loop(matrices)
+    mth.check_degree(matrices, three_N_use)
+    mth.no_loop(matrices)
     matricesUniq = []
     for mat in matrices:
         if mat not in matricesUniq:
@@ -85,7 +83,8 @@ def attribute_qp_labels(diagram):
 
 def omega_subgraph(diagram):
     """Return the graph without any operator vertex."""
-    subgraph_stack = [vertex for vertex in diagram if diagram.node[vertex]['operator'] is False]
+    subgraph_stack = [vertex for vertex in diagram
+                      if diagram.node[vertex]['operator'] is False]
     return diagram.subgraph(subgraph_stack)
 
 
@@ -204,7 +203,8 @@ def vertex_exchange_sym_factor(diagram):
     """Return the symmetry factor associated with vertex exchange."""
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
-    non_op_vertices = [vertex for vertex in diagram if diagram.node[vertex]['operator'] is False]
+    non_op_vertices = [vertex for vertex in diagram
+                       if diagram.node[vertex]['operator'] is False]
     for permutation in itertools.permutations(non_op_vertices,
                                               len(non_op_vertices)):
         mapping = dict(zip(non_op_vertices, permutation))

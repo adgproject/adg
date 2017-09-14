@@ -92,7 +92,7 @@ if theory == "BMBPT":
         if not nx.is_directed_acyclic_graph(G[i_diag]):
             del G[i_diag]
 
-G = mth.label_vertices(G, theory, norm)
+mth.label_vertices(G, theory, norm)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
@@ -110,10 +110,6 @@ if theory == "BMBPT":
     bmbpt.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
 
     if use_parallel:
-        if three_N:
-            nb_procs_max = 6
-        else:
-            nb_procs_max = 3
         nb_procs_max = 6 if three_N else 3
         nb_processes = min(num_cores-1, nb_procs_max)
         pool = multiprocessing.Pool(nb_processes)
@@ -253,6 +249,7 @@ if theory == "BMBPT" and not norm:
     if write_time:
         G_time = []
         time_indexes = []
+        nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for diag in G:
         # Attribute a qp label to all propagators
         bmbpt.attribute_qp_labels(diag)
@@ -264,8 +261,6 @@ if theory == "BMBPT" and not norm:
                 time_diag_num = G_time.index(time_diag)
             else:
                 test = True
-                nm = nx.algorithms.isomorphism.categorical_node_match(
-                    'operator', False)
                 for good_tdiag in G_time:
                     if nx.is_isomorphic(time_diag, good_tdiag, node_match=nm):
                         test = False
