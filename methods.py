@@ -242,3 +242,13 @@ def compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags):
                 os.unlink("time_%i.mp" % i_tdiag)
                 os.unlink("time_%i.log" % i_tdiag)
     print "Result saved in "+directory + '/result.pdf'
+
+
+class Diagram(object):
+    """Describes a diagram with its related properties."""
+
+    def __init__(self, nx_graph):
+        self.graph = nx_graph
+        self.degrees = sorted([degree for node, degree
+                               in nx_graph.degree_iter()])
+        self.max_degree = self.degrees[-1]
