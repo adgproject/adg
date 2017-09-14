@@ -10,6 +10,7 @@ import pstats
 import StringIO
 import numpy as np
 import networkx as nx
+from meliae import scanner
 import methods as mth
 import bmbpt
 import mbpt
@@ -94,6 +95,9 @@ if theory == "BMBPT":
 
 mth.label_vertices(G, theory, norm)
 
+diagrams = [bmbpt.BmbptFeynmanDiagram(diag, norm) for diag in G]
+print len(diagrams)
+
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
     G2_HF = []
@@ -108,6 +112,17 @@ if theory == "BMBPT":
     G3 = [diag for diag in G if sorted(diag.degree().values())[-1] == 6]
     bmbpt.order_HF_or_not(G2, G2_HF, G2_EHF, G2_noHF, norm)
     bmbpt.order_HF_or_not(G3, G3_HF, G3_EHF, G3_noHF, norm)
+
+    diagrams2 = [diag for diag in diagrams if diag.two_or_three_body == 2]
+    diagrams3 = [diag for diag in diagrams if diag.two_or_three_body == 3]
+    print len(diagrams2)
+    print len(diagrams3)
+    diagrams2HF = [diag for diag in diagrams2 if diag.HF_type == "HF"]
+    diagrams2EHF = [diag for diag in diagrams2 if diag.HF_type == "EHF"]
+    diagrams2noHF = [diag for diag in diagrams2 if diag.HF_type == "noHF"]
+    diagrams3HF = [diag for diag in diagrams3 if diag.HF_type == "HF"]
+    diagrams3EHF = [diag for diag in diagrams3 if diag.HF_type == "EHF"]
+    diagrams3noHF = [diag for diag in diagrams3 if diag.HF_type == "noHF"]
 
     if use_parallel:
         nb_procs_max = 6 if three_N else 3
@@ -137,8 +152,16 @@ if theory == "BMBPT":
         G3_HF = mth.topologically_distinct_diags(G3_HF)
         G3_EHF = mth.topologically_distinct_diags(G3_EHF)
         G3_noHF = mth.topologically_distinct_diags(G3_noHF)
+        diagrams2HF = mth.topologically_distinct_diagrams(diagrams2HF)
+        diagrams2EHF = mth.topologically_distinct_diagrams(diagrams2EHF)
+        diagrams2noHF = mth.topologically_distinct_diagrams(diagrams2noHF)
+        diagrams3HF = mth.topologically_distinct_diagrams(diagrams3HF)
+        diagrams3EHF = mth.topologically_distinct_diagrams(diagrams3EHF)
+        diagrams3noHF = mth.topologically_distinct_diagrams(diagrams3noHF)
 
     G = G2_HF + G2_EHF + G2_noHF + G3_HF + G3_EHF + G3_noHF
+    diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF + diagrams3HF \
+        + diagrams3EHF + diagrams3noHF
     nb_2_HF = len(G2_HF)
     nb_2_EHF = len(G2_EHF)
     nb_2_noHF = len(G2_noHF)
@@ -147,6 +170,9 @@ if theory == "BMBPT":
     nb_3_EHF = len(G3_EHF)
     nb_3_noHF = len(G3_noHF)
     nb_3 = nb_3_HF + nb_3_EHF + nb_3_noHF
+    print
+    print len(diagrams)
+    print
 
 numdiag = len(G)
 print "Time ellapsed: ", datetime.now() - start_time
@@ -248,6 +274,7 @@ if theory == "BMBPT" and not norm:
     diag_expressions = []
     if write_time:
         G_time = []
+        diagrams_time = []
         time_indexes = []
         nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for diag in G:
@@ -323,7 +350,11 @@ if theory == "BMBPT" and not norm:
             diag_exp = prefactor + numerator + extra_factor + "\n"
         feynman_expressions.append(feynman_exp)
         diag_expressions.append(diag_exp)
+    # scanner.dump_all_objects("memory.dat")
     nb_time_diags = len(G_time)
+    diagrams_time = [tst.TimeStructureDiagram(diagram) for diagram in diagrams]
+    print len(diagrams_time)
+    # print [tst_diag.expr for tst_diag in diagrams_time]
 
 pr.disable()
 s = StringIO.StringIO()
@@ -331,6 +362,7 @@ sortby = 'cumulative'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
 ps.dump_stats("stats.dat")
+scanner.dump_all_objects("memory.dat")
 
 # Writing a feynmp file for each graph
 msg = 'Generate diagrams feymanmf instructions?'

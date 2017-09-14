@@ -89,6 +89,21 @@ def topologically_distinct_diags(diagrams):
     return diagrams
 
 
+def topologically_distinct_diagrams(diagrams):
+    """Return a list of diagrams all topologically distinct."""
+    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        graph = diagrams[i_diag].graph
+        diag_degrees = diagrams[i_diag].degrees
+        for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
+            if diag_degrees == diagrams[i_comp_diag].degrees:
+                if nx.is_isomorphic(graph, diagrams[i_comp_diag].graph,
+                                    node_match=nm):
+                    del diagrams[i_comp_diag]
+                    break
+    return diagrams
+
+
 def label_vertices(diagrams_list, theory_type, study_norm):
     """Account for different status of vertices in operator diagrams."""
     for diagram in diagrams_list:

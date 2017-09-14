@@ -70,7 +70,7 @@ class TimeStructureDiagram(mth.Diagram):
     def __init__(self, bmbpt_diag):
         mth.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
         if nx.is_arborescence(self.graph):
-            self.expr = r"\frac{1}{".join(tree_time_structure_den(self.graph)) \
-                + "}"
+            self.expr = "".join("\\frac{1}{"
+                                + tree_time_structure_den(self.graph) + "}")
         else:
             self.expr = ""

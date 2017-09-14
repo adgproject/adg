@@ -89,7 +89,7 @@ def omega_subgraph(diagram):
 
 
 def extract_numerator(diagram):
-    """"Return the numerator associated to a BMBPT diagram."""
+    """Return the numerator associated to a BMBPT diagram."""
     numerator = ""
     for vertex in diagram:
         # Attribute the correct operator to each vertex
@@ -299,8 +299,8 @@ class BmbptFeynmanDiagram(mth.Diagram):
             self.HF_type = "noHF"
         else:
             for node in xrange(1, len(self.graph)):
-                if self.graph[node].degree() == 2:
+                if self.graph.degree(node) == 2:
                     self.HF_type = "noHF"
                     break
-                if self.graph[len(self.graph)-1].degree() != 2:
+                if self.graph.degree(len(self.graph)-1) != 2:
                     self.HF_type = "EHF"
