@@ -99,6 +99,7 @@ def topologically_distinct_diagrams(diagrams):
             if diag_degrees == diagrams[i_comp_diag].degrees:
                 if nx.is_isomorphic(graph, diagrams[i_comp_diag].graph,
                                     node_match=nm):
+                    diagrams[i_diag].tags.append(diagrams[i_comp_diag].tags)
                     del diagrams[i_comp_diag]
                     break
     return diagrams

@@ -95,7 +95,7 @@ if theory == "BMBPT":
 
 mth.label_vertices(G, theory, norm)
 
-diagrams = [bmbpt.BmbptFeynmanDiagram(diag, norm) for diag in G]
+diagrams = [bmbpt.BmbptFeynmanDiagram(diag, norm, i) for i, diag in enumerate(G)]
 print len(diagrams)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
@@ -352,7 +352,14 @@ if theory == "BMBPT" and not norm:
         diag_expressions.append(diag_exp)
     # scanner.dump_all_objects("memory.dat")
     nb_time_diags = len(G_time)
-    diagrams_time = [tst.TimeStructureDiagram(diagram) for diagram in diagrams]
+    diagrams_time = [tst.TimeStructureDiagram(diagram, diagram.tags[0])
+                     for diagram in diagrams]
+    diagrams_time = mth.topologically_distinct_diagrams(diagrams_time)
+    for diag in diagrams:
+        for t_diag in diagrams_time:
+            if diag.tags[0] in t_diag.tags:
+                diag.time_tag = t_diag.tags[0]
+                break
     print len(diagrams_time)
     # print [tst_diag.expr for tst_diag in diagrams_time]
 

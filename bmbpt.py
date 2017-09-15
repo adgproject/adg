@@ -290,9 +290,10 @@ def write_vertices_values(latex_file, diagram):
 class BmbptFeynmanDiagram(mth.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties."""
 
-    def __init__(self, nx_graph, use_norm):
+    def __init__(self, nx_graph, use_norm, tag_num):
         mth.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
+        self.tags = [tag_num]
         if 2 not in self.degrees:
             self.HF_type = "HF"
         elif use_norm:
