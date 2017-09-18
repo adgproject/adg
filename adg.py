@@ -359,7 +359,9 @@ if theory == "BMBPT" and not norm:
         for t_diag in diagrams_time:
             if diag.tags[0] in t_diag.tags:
                 diag.time_tag = t_diag.tags[0]
+                diag.tst_is_tree = True
                 break
+        diag.attribute_expressions(diagrams_time)
     print len(diagrams_time)
     # print [tst_diag.expr for tst_diag in diagrams_time]
 

@@ -294,6 +294,10 @@ class BmbptFeynmanDiagram(mth.Diagram):
         mth.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
+        self.time_tag = -1
+        self.tst_is_tree = False
+        self.feynman_exp = ""
+        self.diag_exp = ""
         if 2 not in self.degrees:
             self.HF_type = "HF"
         elif use_norm:
@@ -305,3 +309,59 @@ class BmbptFeynmanDiagram(mth.Diagram):
                     break
                 if self.graph.degree(len(self.graph)-1) != 2:
                     self.HF_type = "EHF"
+
+    def attribute_expressions(self, time_diags):
+        """Attribute the correct Feynman and Goldstone expressions."""
+        norder = len(self.graph)
+        numerator = extract_numerator(self.graph)
+        denominator = ""
+        extra_factor = ""
+        if self.tst_is_tree:
+            for tdiag in time_diags:
+                if tdiag.tags[0] == self.time_tag:
+                    time_graph = tdiag.graph
+                    break
+            denominator = time_tree_denominator(self.graph,
+                                                time_graph, denominator)
+
+        elif (norder == 4) and (mth.number_of_sinks(self.graph) == 1):
+            testdiag = omega_subgraph(self.graph)
+            for i in range(2):
+                subgraph_stack = [nx.dag_longest_path(testdiag)[1]]
+                if i == 0:
+                    subgraph_stack.append(nx.dag_longest_path(testdiag)[0])
+                else:
+                    for vertex_1 in testdiag:
+                        test_vertex = True
+                        for vertex_2 in nx.dag_longest_path(testdiag):
+                            if vertex_1 == vertex_2:
+                                test_vertex = False
+                        if test_vertex:
+                            subgraph_stack.append(vertex_1)
+                subdiag = testdiag.subgraph(subgraph_stack)
+                denominator += "(" + extract_denom(self.graph, subdiag) + ")"
+            for vertex in self.graph:
+                if self.graph.out_degree(vertex) == 0:
+                    subdiag = self.graph.subgraph(vertex)
+            denominator_a = extract_denom(self.graph, subdiag)
+            denominator_abc = extract_denom(self.graph, testdiag)
+            extra_factor += "\\left[ \\frac{1}{" + denominator_a \
+                + "} + \\frac{1}{" + denominator_abc + "} \\right]"
+        # Determine the pre-factor
+        prefactor = "(-1)^%i " % (norder - 1)
+        if extract_BMBPT_crossing_sign(self.graph):
+            prefactor = "-" + prefactor
+        sym_fact = vertex_exchange_sym_factor(self.graph) \
+            + multiplicity_symmetry_factor(self.graph)
+        if sym_fact != "":
+            prefactor = "\\frac{" + prefactor + "}{" \
+                + sym_fact + "}\\sum_{k_i}"
+        else:
+            prefactor = prefactor + "\\sum_{k_i}"
+        self.feynman_exp = prefactor + numerator + "\\int_{0}^{\\tau}" \
+            + extract_integral(self.graph) + "\n"
+        if denominator != "":
+            self.diag_exp = prefactor + "\\frac{ " + numerator \
+                + " }{ " + denominator + " }" + extra_factor + "\n"
+        else:
+            self.diag_exp = prefactor + numerator + extra_factor + "\n"
