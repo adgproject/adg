@@ -190,18 +190,6 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
     fmf_file.close()
 
 
-# def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
-#     """Create and move the appropriate feynmanmp files to the right place."""
-#     for i, diagram in enumerate(diagrams_list):
-#         if diag_type == 'diag':
-#             diag_name = 'diag_%i' % i
-#             feynmf_generator(diagram, theory_type, diag_name)
-#         elif diag_type == 'time':
-#             diag_name = 'time_%i' % i
-#             feynmf_generator(diagram, 'MBPT', diag_name)
-#         shutil.move(diag_name + '.tex',
-#                     directory + "/Diagrams/" + diag_name + '.tex')
-
 def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
     """Create and move the appropriate feynmanmp files to the right place."""
     for diag in diagrams_list:

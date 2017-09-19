@@ -259,13 +259,12 @@ def write_BMBPT_section(result, diag_index, three_N, norm,
             result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
 
 
-def write_diag_exps(latex_file, i_diag, norder, feynman_expression,
-                    diag_expression):
+def write_diag_exps(latex_file, bmbpt_diag, norder):
     """Write the expressions associated to a diagram in the LaTeX file."""
     latex_file.write("\\begin{align}\n\\text{PO}%i" % norder
-                     + ".%i\n" % (i_diag + 1))
-    latex_file.write("&= " + feynman_expression + r" \nonumber \\" + "\n")
-    latex_file.write("&= " + diag_expression)
+                     + ".%i\n" % (bmbpt_diag.tags[0] + 1))
+    latex_file.write("&= " + bmbpt_diag.feynman_exp + r" \nonumber \\" + "\n")
+    latex_file.write("&= " + bmbpt_diag.diag_exp)
     latex_file.write("\\end{align}\n")
 
 
