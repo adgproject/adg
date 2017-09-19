@@ -95,7 +95,11 @@ if theory == "BMBPT":
 
 mth.label_vertices(G, theory, norm)
 
-diagrams = [bmbpt.BmbptFeynmanDiagram(diag, norm, i) for i, diag in enumerate(G)]
+if theory == 'BMBPT':
+    diagrams = [bmbpt.BmbptFeynmanDiagram(diag, norm, i)
+                for i, diag in enumerate(G)]
+elif theory == 'MBPT':
+    diagrams = [mbpt.MbptDiagram(diag, i) for i, diag in enumerate(G)]
 print len(diagrams)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
@@ -190,81 +194,6 @@ if theory == "BMBPT":
         if not norm:
             print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
         print "3N non-canonical diagrams: %i" % nb_3_noHF
-
-# Algebraic expressions:
-
-# Treatment of the algebraic expressions
-# To be extended to BMBPT in the future
-if theory == "MBPT":
-    mat_els = []
-    denoms = []
-    phases = []
-    nedges_eq = []
-    for diag in G:
-        type_edg = []
-        braket = ''
-        # Beware of the sign convention !!!
-        incidence = - nx.incidence_matrix(diag, oriented=True).todense()
-        nrow = diag.number_of_nodes()
-        ncol = diag.number_of_edges()
-        n_holes = 0
-        diffcols = set()
-        for col in range(ncol):
-            flat = list(incidence[:, col].A1)
-            if flat.index(1) < flat.index(-1):
-                n_holes += 1
-                type_edg.append('h')
-            else:
-                type_edg.append('p')
-            diffcols.add(repr(flat))
-
-        for row in range(nrow):
-            ket = ''
-            bra = ''
-            for col in range(ncol):
-                ######### Mtrx Elements ###########
-                if (incidence[row, col] == 1):
-                    if type_edg[col] == 'h':
-                        bra = bra + mbpt.line_label_h(col)
-                    else:
-                        bra = bra + mbpt.line_label_p(col)
-                if (incidence[row, col] == -1):
-                    if type_edg[col] == 'h':
-                        ket = ket + mbpt.line_label_h(col)
-                    else:
-                        ket = ket + mbpt.line_label_p(col)
-                ###################################
-            braket = braket + '\\braket{'+bra+'|H|'+ket+'}'
-        mat_els.append(braket)
-        denom = ''
-        for row in range(1, nrow):
-            denom = denom + '('
-            for col in range(ncol):
-                val_test = incidence[0:row, col].sum()
-                if val_test == 1:
-                    if type_edg[col] == 'h':
-                        denom = denom + ' +E_' + mbpt.line_label_h(col)
-                    else:
-                        denom = denom + ' +E_' + mbpt.line_label_p(col)
-                if val_test == -1:
-                    if type_edg[col] == 'h':
-                        denom = denom + '-E_' + mbpt.line_label_h(col)
-                    else:
-                        denom = denom + '-E_' + mbpt.line_label_p(col)
-            denom = denom + ')'
-        if '( +' in denom:
-            denom = denom.replace('( +', '(')
-        denom = denom.strip(' ')
-        denoms.append(denom)
-        phases.append('(-1)^{%i' % n_holes + '+l}')
-        # print incidence
-        eq_lines = np.array(incidence.transpose())
-        neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
-        n_sym = len(eq_lines)-len(neq_lines)
-        # CAVEAT !!! Valid only for *MBPT*
-        nedges_eq.append(2**n_sym)
-        # print "After neqlines"
-        # Loops
 
 
 # Treatment of the algebraic expressions
@@ -379,9 +308,11 @@ pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdraw:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    mth.create_feynmanmp_files(G, theory, directory, 'diag')
+    # mth.create_feynmanmp_files(G, theory, directory, 'diag')
+    mth.create_feynmanmp_files(diagrams, theory, directory, 'diag')
     if write_time:
-        mth.create_feynmanmp_files(G_time, theory, directory, 'time')
+        # mth.create_feynmanmp_files(G_time, theory, directory, 'time')
+        mth.create_feynmanmp_files(diagrams_time, theory, directory, 'time')
 
 msg = 'Include diagrams in tex?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
@@ -396,28 +327,36 @@ if theory == "BMBPT":
     if write_time:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
         time_diag_exps = {}
-        for i in xrange(nb_time_diags):
+        # for i in xrange(nb_time_diags):
+        for tdiag in diagrams_time:
+            # latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
+                            #  % (i+1))
             latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
-                             % (i+1))
+                             % (tdiag.tags[0]+1))
             if pdiag and pdraw:
                 latex_file.write('\n\\begin{center}\n')
-                time_file = open(directory + "/Diagrams/time_%i.tex" % i)
+                # time_file = open(directory + "/Diagrams/time_%i.tex" % i)
+                time_file = open(directory + "/Diagrams/time_%i.tex" % tdiag.tags[0])
                 latex_file.write(time_file.read())
                 latex_file.write('\n\\end{center}\n\n')
-            if nx.is_arborescence(G_time[i]):
+            # if nx.is_arborescence(G_time[i]):
+            if tdiag.is_tree:
                 latex_file.write("Tree: Yes\n\n")
                 latex_file.write("\\begin{equation}\n")
-                time_diag_exps.setdefault(i, "\\frac{1}{"
-                                          + tst.tree_time_structure_den(G_time[i])
-                                          + "}\n")
-                latex_file.write(time_diag_exps[i])
+                # time_diag_exps.setdefault(i, "\\frac{1}{"
+                                        #   + tst.tree_time_structure_den(G_time[i])
+                                        #   + "}\n")
+                # latex_file.write(time_diag_exps[i])
+                latex_file.write(tdiag.expr)
                 latex_file.write("\\end{equation}\n")
             else:
                 latex_file.write("Tree: No\n\n")
             latex_file.write("Related Feynman diagrams:")
-            for i_diag in range(0, numdiag):
-                if time_indexes[i_diag] == i:
-                    latex_file.write(" %i," % (i_diag+1))
+            # for i_diag in range(0, numdiag):
+            #     if time_indexes[i_diag] == i:
+            #         latex_file.write(" %i," % (i_diag+1))
+            for tag in tdiag.tags:
+                latex_file.write(" %i," % (tag+1))
             latex_file.write("\n\n")
     latex_file.write("\\section{Two-body diagrams}\n\n")
     latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
@@ -432,8 +371,7 @@ for i_diag in range(0, numdiag):
                                   feynman_expressions[i_diag],
                                   diag_expressions[i_diag])
     elif theory == "MBPT":
-        mbpt.write_diag_exp(latex_file, nedges_eq[i_diag], phases[i_diag],
-                            mat_els[i_diag], denoms[i_diag])
+        mbpt.write_diag_exp(latex_file, diagrams[i_diag])
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
         mth.draw_diagram(directory, latex_file, i_diag, 'diag')

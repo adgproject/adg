@@ -4,6 +4,7 @@ import copy
 import itertools
 import string
 import numpy as np
+import networkx as nx
 import methods as mth
 
 
@@ -52,12 +53,77 @@ def line_label_p(n):
     return labels[n]
 
 
-def write_diag_exp(latex_file, nedges_eq, phases, matrix_elements,
-                   denominators):
+def write_diag_exp(latex_file, mbpt_diag):
     """Write the expression associated to a diagram in the LaTeX file."""
-    diag_exp = "\\dfrac{1}{%i}" % nedges_eq + phases \
-        + "\\sum{\\dfrac{" + matrix_elements + "}{" \
-        + denominators + "}}\n"
     latex_file.write("\\begin{equation}\n")
-    latex_file.write(diag_exp)
+    latex_file.write(mbpt_diag.expr)
     latex_file.write("\\end{equation}\n")
+
+
+class MbptDiagram(mth.Diagram):
+    """Describes a MBPT diagram with its related properties."""
+
+    def __init__(self, mbpt_graph, tag_num):
+        mth.Diagram.__init__(self, mbpt_graph)
+        self.tags = [tag_num]
+        self.attribute_expression()
+
+    def attribute_expression(self):
+        """Initialize the expression associated to the diagram."""
+        type_edg = []
+        braket = ''
+        # Beware of the sign convention !!!
+        incidence = - nx.incidence_matrix(self.graph, oriented=True).todense()
+        nrow = self.graph.number_of_nodes()
+        ncol = self.graph.number_of_edges()
+        n_holes = 0
+        diffcols = set()
+        for col in range(ncol):
+            flat = list(incidence[:, col].A1)
+            if flat.index(1) < flat.index(-1):
+                n_holes += 1
+                type_edg.append('h')
+            else:
+                type_edg.append('p')
+            diffcols.add(repr(flat))
+
+        for row in xrange(nrow):
+            ket = ''
+            bra = ''
+            for col in xrange(ncol):
+                if (incidence[row, col] == 1):
+                    if type_edg[col] == 'h':
+                        bra += line_label_h(col)
+                    else:
+                        bra += line_label_p(col)
+                elif (incidence[row, col] == -1):
+                    if type_edg[col] == 'h':
+                        ket += line_label_h(col)
+                    else:
+                        ket += line_label_p(col)
+            braket += '\\braket{' + bra + '|H|' + ket + '}'
+        denom = ''
+        for row in xrange(1, nrow):
+            denom += '('
+            for col in range(ncol):
+                if incidence[0:row, col].sum() == 1:
+                    if type_edg[col] == 'h':
+                        denom += ' +E_' + line_label_h(col)
+                    else:
+                        denom += ' +E_' + line_label_p(col)
+                elif incidence[0:row, col].sum() == -1:
+                    if type_edg[col] == 'h':
+                        denom += '-E_' + line_label_h(col)
+                    else:
+                        denom += '-E_' + line_label_p(col)
+            denom += ')'
+        if '( +' in denom:
+            denom = denom.replace('( +', '(')
+        denom = denom.strip(' ')
+        phases = '(-1)^{%i' % n_holes + '+l}'
+        eq_lines = np.array(incidence.transpose())
+        neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
+        nedges_eq = 2**(len(eq_lines)-len(neq_lines))
+        self.expr = "\\dfrac{1}{%i}" % nedges_eq + phases \
+            + "\\sum{\\dfrac{" + braket + "}{" \
+            + denom + "}}\n"
