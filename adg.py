@@ -150,6 +150,8 @@ if theory == "BMBPT":
 
     diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF + diagrams3HF \
         + diagrams3EHF + diagrams3noHF
+    for ind, diagram in enumerate(diagrams):
+        diagram.tags[0] = ind
     nb_2_HF = len(diagrams2HF)
     nb_2_EHF = len(diagrams2EHF)
     nb_2_noHF = len(diagrams2noHF)
@@ -223,7 +225,6 @@ if theory == "BMBPT":
                              nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
     if write_time:
         latex_file.write("\\section{Associated time-structure diagrams}\n\n")
-        time_diag_exps = {}
         for tdiag in diagrams_time:
             latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                              % (tdiag.tags[0]+1))
@@ -246,19 +247,18 @@ if theory == "BMBPT":
     latex_file.write("\\section{Two-body diagrams}\n\n")
     latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
 
-for i_diag in range(0, numdiag):
-    diag = diagrams[i_diag]
+for diag in diagrams:
     if theory == "BMBPT":
-        bmbpt.write_BMBPT_section(latex_file, i_diag, three_N, norm,
+        bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,
                                   nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
-        latex_file.write("\\paragraph{Diagram %i:}\n" % (i_diag + 1))
+        latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0]+ 1))
         if not norm:
             bmbpt.write_diag_exps(latex_file, diag, norder)
     elif theory == "MBPT":
         mbpt.write_diag_exp(latex_file, diag)
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
-        mth.draw_diagram(directory, latex_file, i_diag, 'diag')
+        mth.draw_diagram(directory, latex_file, diag.tags[0], 'diag')
         if write_time:
             latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
                              % (diag.time_tag + 1))
