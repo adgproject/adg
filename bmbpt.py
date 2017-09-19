@@ -342,16 +342,20 @@ class BmbptFeynmanDiagram(mth.Diagram):
             for vertex in self.graph:
                 if self.graph.out_degree(vertex) == 0:
                     subdiag = self.graph.subgraph(vertex)
-            denominator_a = extract_denom(self.graph, subdiag)
-            denominator_abc = extract_denom(self.graph, testdiag)
-            extra_factor += "\\left[ \\frac{1}{" + denominator_a \
-                + "} + \\frac{1}{" + denominator_abc + "} \\right]"
+            extra_factor += "\\left[ \\frac{1}{" \
+                + extract_denom(self.graph, subdiag) \
+                + "} + \\frac{1}{" + extract_denom(self.graph, testdiag) \
+                + "} \\right]"
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
         if extract_BMBPT_crossing_sign(self.graph):
             prefactor = "-" + prefactor
-        sym_fact = vertex_exchange_sym_factor(self.graph) \
-            + multiplicity_symmetry_factor(self.graph)
+        sym_fact = ""
+        for vertex_degrees in self.io_degrees:
+            if self.io_degrees.count(vertex_degrees) >= 2:
+                sym_fact += vertex_exchange_sym_factor(self.graph)
+                break
+        sym_fact += multiplicity_symmetry_factor(self.graph)
         if sym_fact != "":
             prefactor = "\\frac{" + prefactor + "}{" \
                 + sym_fact + "}\\sum_{k_i}"

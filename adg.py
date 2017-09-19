@@ -78,10 +78,8 @@ with open(directory+"/Diagrams.list", "w") as f:
         i += 1
 
 # Graph part (computing, writing, drawing)
-G = []
-for diagram in diagrams:
-    G.append(nx.from_numpy_matrix(
-        diagram, create_using=nx.MultiDiGraph(), parallel_edges=True))
+G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
+                          parallel_edges=True) for diagram in diagrams]
 
 for i_diag in xrange(len(G)-1, -1, -1):
     if (nx.number_weakly_connected_components(G[i_diag])) != 1:
@@ -96,10 +94,10 @@ if theory == "BMBPT":
 mth.label_vertices(G, theory, norm)
 
 if theory == 'BMBPT':
-    diagrams = [bmbpt.BmbptFeynmanDiagram(diag, norm, i)
-                for i, diag in enumerate(G)]
+    diagrams = [bmbpt.BmbptFeynmanDiagram(graph, norm, ind)
+                for ind, graph in enumerate(G)]
 elif theory == 'MBPT':
-    diagrams = [mbpt.MbptDiagram(diag, i) for i, diag in enumerate(G)]
+    diagrams = [mbpt.MbptDiagram(graph, ind) for ind, graph in enumerate(G)]
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
@@ -251,7 +249,7 @@ for diag in diagrams:
     if theory == "BMBPT":
         bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,
                                   nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
-        latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0]+ 1))
+        latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
         if not norm:
             bmbpt.write_diag_exps(latex_file, diag, norder)
     elif theory == "MBPT":
@@ -280,4 +278,4 @@ latex_file.close()
 msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdfcompile:
-    mth.compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags)
+    mth.compile_and_clean(directory, pdiag, diagrams, write_time, diagrams_time)

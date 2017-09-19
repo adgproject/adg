@@ -94,9 +94,9 @@ def topologically_distinct_diagrams(diagrams):
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
         graph = diagrams[i_diag].graph
-        diag_degrees = diagrams[i_diag].degrees
+        diag_io_degrees = diagrams[i_diag].io_degrees
         for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
-            if diag_degrees == diagrams[i_comp_diag].degrees:
+            if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
                 if nx.is_isomorphic(graph, diagrams[i_comp_diag].graph,
                                     node_match=nm):
                     diagrams[i_diag].tags += diagrams[i_comp_diag].tags
@@ -240,7 +240,7 @@ def draw_diagram(directory, result_file, diagram_index, diag_type):
     result_file.write(diag_file.read())
 
 
-def compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags):
+def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
     """Compile result.pdf and delete useless files."""
     os.chdir(directory)
     os.system("pdflatex -shell-escape result.tex")
@@ -248,15 +248,15 @@ def compile_and_clean(directory, pdiag, numdiag, write_time, nb_time_diags):
         # Second compilation needed
         os.system("pdflatex -shell-escape result.tex")
         # Get rid of undesired feynmp files to keep a clean directory
-        for diagram in xrange(0, numdiag):
-            os.unlink("diag_%i.1" % diagram)
-            os.unlink("diag_%i.mp" % diagram)
-            os.unlink("diag_%i.log" % diagram)
+        for diagram in diagrams:
+            os.unlink("diag_%i.1" % diagram.tags[0])
+            os.unlink("diag_%i.mp" % diagram.tags[0])
+            os.unlink("diag_%i.log" % diagram.tags[0])
         if write_time:
-            for i_tdiag in xrange(nb_time_diags):
-                os.unlink("time_%i.1" % i_tdiag)
-                os.unlink("time_%i.mp" % i_tdiag)
-                os.unlink("time_%i.log" % i_tdiag)
+            for tdiag in time_diagrams:
+                os.unlink("time_%i.1" % tdiag.tags[0])
+                os.unlink("time_%i.mp" % tdiag.tags[0])
+                os.unlink("time_%i.log" % tdiag.tags[0])
     print "Result saved in "+directory + '/result.pdf'
 
 
@@ -267,4 +267,7 @@ class Diagram(object):
         self.graph = nx_graph
         self.degrees = sorted([degree for node, degree
                                in nx_graph.degree_iter()])
+        self.io_degrees = sorted((nx_graph.in_degree(node),
+                                  nx_graph.out_degree(node))
+                                 for node in nx_graph)
         self.max_degree = self.degrees[-1]
