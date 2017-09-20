@@ -297,6 +297,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
         self.tst_is_tree = False
         self.feynman_exp = ""
         self.diag_exp = ""
+        self.vert_exp = []
         if 2 not in self.degrees:
             self.HF_type = "HF"
         elif use_norm:
@@ -368,3 +369,18 @@ class BmbptFeynmanDiagram(mth.Diagram):
                 + " }{ " + denominator + " }" + extra_factor + "\n"
         else:
             self.diag_exp = prefactor + numerator + extra_factor + "\n"
+
+    def attribute_vertices_expressions(self):
+        """Attribute the appropriate expression to each vertex."""
+        vertices_expressions = []
+        for vertex in self.graph:
+            v_exp = "(" \
+                + "".join(" + E_{%s}" % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                          for prop in self.graph.in_edges_iter(vertex, keys=True)) \
+                + "".join(" - E_{%s}" % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                          for prop in self.graph.out_edges_iter(vertex, keys=True)) \
+                + ")"
+            if "( +" in v_exp:
+                v_exp = v_exp.replace("( +", "(")
+            vertices_expressions.append(v_exp)
+        self.vert_exp = vertices_expressions

@@ -228,7 +228,8 @@ if theory == "BMBPT":
                              % (tdiag.tags[0]+1))
             if pdiag and pdraw:
                 latex_file.write('\n\\begin{center}\n')
-                time_file = open(directory + "/Diagrams/time_%i.tex" % tdiag.tags[0])
+                time_file = open(directory
+                                 + "/Diagrams/time_%i.tex" % tdiag.tags[0])
                 latex_file.write(time_file.read())
                 latex_file.write('\n\\end{center}\n\n')
             if tdiag.is_tree:
