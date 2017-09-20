@@ -6,27 +6,27 @@ import networkx as nx
 import methods as mth
 
 
-def time_structure_graph(diagram):
-    """Return the time-structure graph associated to the diagram."""
-    time_diag = diagram.to_directed()
-    if time_diag.node[0]['operator']:
-        for vertex in xrange(1, len(time_diag)):
-            time_diag.add_edge(0, vertex)
-    for vertex_a in time_diag:
-        for vertex_b in time_diag:
-            while time_diag.number_of_edges(vertex_a, vertex_b) > 1:
-                time_diag.remove_edge(vertex_a, vertex_b)
-            if len(list(nx.all_simple_paths(time_diag,
+def time_structure_graph(graph):
+    """Return the time-structure graph associated to the graph."""
+    time_graph = graph.to_directed()
+    if time_graph.node[0]['operator']:
+        for vertex in xrange(1, len(time_graph)):
+            time_graph.add_edge(0, vertex)
+    for vertex_a in time_graph:
+        for vertex_b in time_graph:
+            while time_graph.number_of_edges(vertex_a, vertex_b) > 1:
+                time_graph.remove_edge(vertex_a, vertex_b)
+            if len(list(nx.all_simple_paths(time_graph,
                                             vertex_a, vertex_b))) > 1:
-                while len(nx.shortest_path(time_diag,
+                while len(nx.shortest_path(time_graph,
                                            vertex_a, vertex_b)) == 2:
-                    time_diag.remove_edge(vertex_a, vertex_b)
-    return time_diag
+                    time_graph.remove_edge(vertex_a, vertex_b)
+    return time_graph
 
 
-def has_tree_time_structure(diagram):
-    """Return True if the time structure of the diagram is a tree."""
-    diag_copy = diagram.to_directed()
+def has_tree_time_structure(graph):
+    """Return True if the time structure of the graph is a tree."""
+    diag_copy = graph.to_directed()
     for vertex in xrange(1, len(diag_copy)):
         if diag_copy.in_degree(vertex) == 0:
             diag_copy.add_edge(0, vertex)
@@ -43,23 +43,23 @@ def has_tree_time_structure(diagram):
     return nx.is_arborescence(time_diag)
 
 
-def tree_time_structure_den(time_diagram):
-    """Return the denominator associated to a tree time-structure diagram."""
+def tree_time_structure_den(time_graph):
+    """Return the denominator associated to a tree time-structure graph."""
     denominator = ""
     labels = list(string.ascii_lowercase)
     i = 0
-    for vertex in time_diagram:
-        if not time_diagram.node[vertex]['operator']:
-            time_diagram.node[vertex]['label'] = labels[i]
+    for vertex in time_graph:
+        if not time_graph.node[vertex]['operator']:
+            time_graph.node[vertex]['label'] = labels[i]
             i += 1
-    for vertex in time_diagram:
-        if not time_diagram.node[vertex]['operator']:
-            if time_diagram.out_degree(vertex) == 0:
-                denominator += time_diagram.node[vertex]['label']
+    for vertex in time_graph:
+        if not time_graph.node[vertex]['operator']:
+            if time_graph.out_degree(vertex) == 0:
+                denominator += time_graph.node[vertex]['label']
             else:
-                denominator += "(" + time_diagram.node[vertex]['label']
-                for descendant in nx.descendants(time_diagram, vertex):
-                    denominator += "+" + time_diagram.node[descendant]['label']
+                denominator += "(" + time_graph.node[vertex]['label']
+                for descendant in nx.descendants(time_graph, vertex):
+                    denominator += "+" + time_graph.node[descendant]['label']
                 denominator += ")"
     return denominator
 

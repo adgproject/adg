@@ -43,152 +43,152 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
     return [np.array(mat) for mat in matricesUniq]
 
 
-def order_2B_or_3B(diagrams, TwoB_diags, ThreeB_diags):
-    """Order the diagrams depending on their 2B or 3B effective status."""
-    for diag in diagrams:
+def order_2B_or_3B(graphs, TwoB_diags, ThreeB_diags):
+    """Order the graphs depending on their 2B or 3B effective status."""
+    for graph in graphs:
         max_deg = 0
-        for node in diag:
-            max_deg = max(max_deg, diag.degree(node))
+        for node in graph:
+            max_deg = max(max_deg, graph.degree(node))
         if max_deg == 6:
-            ThreeB_diags.append(diag)
+            ThreeB_diags.append(graph)
         else:
-            TwoB_diags.append(diag)
+            TwoB_diags.append(graph)
 
 
-def order_HF_or_not(diagrams, HF_diags, EHF_diags, noHF_diags, norm):
-    """Order the diagrams depending on their HF status."""
-    for diag in diagrams:
+def order_HF_or_not(graphs, HF_graphs, EHF_graphs, noHF_graphs, norm):
+    """Order the graphs depending on their HF status."""
+    for graph in graphs:
         test_HF = True
         test_EHF = True
-        for node in diag:
-            if diag.degree(node) == 2:
+        for node in graph:
+            if graph.degree(node) == 2:
                 test_HF = False
                 if node != 0:
                     test_EHF = False
         if test_HF:
-            HF_diags.append(diag)
+            HF_graphs.append(graph)
         elif (not test_EHF) or norm:
-            noHF_diags.append(diag)
+            noHF_graphs.append(graph)
         else:
-            EHF_diags.append(diag)
+            EHF_graphs.append(graph)
 
 
-def attribute_qp_labels(diagram):
+def attribute_qp_labels(graph):
     """Attribute the appropriate qp labels to the graph's propagators."""
     i = 1
-    for prop in diagram.edges_iter(keys=True):
-        diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
+    for prop in graph.edges_iter(keys=True):
+        graph.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
         i += 1
 
 
-def omega_subgraph(diagram):
+def omega_subgraph(graph):
     """Return the graph without any operator vertex."""
-    subgraph_stack = [vertex for vertex in diagram
-                      if diagram.node[vertex]['operator'] is False]
-    return diagram.subgraph(subgraph_stack)
+    subgraph_stack = [vertex for vertex in graph
+                      if graph.node[vertex]['operator'] is False]
+    return graph.subgraph(subgraph_stack)
 
 
-def extract_numerator(diagram):
-    """Return the numerator associated to a BMBPT diagram."""
+def extract_numerator(graph):
+    """Return the numerator associated to a BMBPT graph."""
     numerator = ""
-    for vertex in diagram:
+    for vertex in graph:
         # Attribute the correct operator to each vertex
-        if diagram.node[vertex]['operator']:
+        if graph.node[vertex]['operator']:
             numerator += "O"
         else:
             numerator += "\\Omega"
         # Attribute the good "type number" to each vertex
-        numerator = numerator + "^{%i" % diagram.out_degree(vertex) \
-            + "%i}_{" % diagram.in_degree(vertex)
+        numerator = numerator + "^{%i" % graph.out_degree(vertex) \
+            + "%i}_{" % graph.in_degree(vertex)
         # First add the qp states corresponding to propagators going out
-        for prop in diagram.out_edges_iter(vertex, keys=True):
-            numerator += diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+        for prop in graph.out_edges_iter(vertex, keys=True):
+            numerator += graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
         # Add the qp states corresponding to propagators coming in
         previous_vertex = vertex - 1
         while previous_vertex >= 0:
-            for prop in diagram.in_edges_iter(vertex, keys=True):
+            for prop in graph.in_edges_iter(vertex, keys=True):
                 if prop[0] == previous_vertex:
                     numerator += \
-                        diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                        graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
             previous_vertex -= 1
         numerator += "} "
     return numerator
 
 
-def extract_denom(start_diag, subdiagram):
-    """Extract the appropriate denominator using the subdiagram rule."""
+def extract_denom(start_graph, subgraph):
+    """Extract the appropriate denominator using the subgraph rule."""
     denomin = ""
-    for propa in start_diag.in_edges_iter(subdiagram, keys=True):
-        if subdiagram.has_edge(propa[0], propa[1], propa[2]) is False:
+    for propa in start_graph.in_edges_iter(subgraph, keys=True):
+        if subgraph.has_edge(propa[0], propa[1], propa[2]) is False:
             denomin += " + E_{%s}" \
-                % start_diag.edge[propa[0]][propa[1]][propa[2]]['qp_state']
-    for propa in start_diag.out_edges_iter(subdiagram, keys=True):
-        if subdiagram.has_edge(propa[0], propa[1], propa[2]) is False:
+                % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+    for propa in start_graph.out_edges_iter(subgraph, keys=True):
+        if subgraph.has_edge(propa[0], propa[1], propa[2]) is False:
             denomin += " - E_{%s}" \
-                % start_diag.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
     return denomin
 
 
-def time_tree_denominator(diagram, time_diagram, denominator):
-    """Add the denominator for a time-tree diagram."""
-    for vertex_i in range(1, len(time_diagram)):
-        subgraph_stack = [diagram.nodes()[vertex_i]]
-        for vertex_j in nx.descendants(time_diagram, vertex_i):
-            subgraph_stack.append(diagram.nodes()[vertex_j])
-        subdiag = diagram.subgraph(subgraph_stack)
-        denominator += "(" + extract_denom(diagram, subdiag) + ")"
+def time_tree_denominator(graph, time_graph, denominator):
+    """Add the denominator for a time-tree graph."""
+    for vertex_i in range(1, len(time_graph)):
+        subgraph_stack = [graph.nodes()[vertex_i]]
+        for vertex_j in nx.descendants(time_graph, vertex_i):
+            subgraph_stack.append(graph.nodes()[vertex_j])
+        subdiag = graph.subgraph(subgraph_stack)
+        denominator += "(" + extract_denom(graph, subdiag) + ")"
     return denominator
 
 
-def extract_integral(diagram):
-    """Return the integral part of the Feynman expression of the diagram."""
+def extract_integral(graph):
+    """Return the integral part of the Feynman expression of the graph."""
     integral = ""
-    norder = diagram.number_of_nodes()
+    norder = graph.number_of_nodes()
     pert_vertex_indices = range(1, norder)
     for vertex in pert_vertex_indices:
         integral += "\\mathrm{d}\\tau_%i" % vertex
     if norder > 2:
         for vertex_i in pert_vertex_indices:
             for vertex_j in pert_vertex_indices:
-                if diagram.has_edge(vertex_i, vertex_j):
+                if graph.has_edge(vertex_i, vertex_j):
                     integral += "\\theta(\\tau_%i" % vertex_j \
                         + "-\\tau_%i) " % vertex_i
     for vertex in pert_vertex_indices:
         integral += "e^{-\\tau_%i (" % vertex
-        for prop in diagram.in_edges_iter(vertex, keys=True):
+        for prop in graph.in_edges_iter(vertex, keys=True):
             integral += " + E_{%s}" \
-                % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-        for prop in diagram.out_edges_iter(vertex, keys=True):
+                % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+        for prop in graph.out_edges_iter(vertex, keys=True):
             integral += " - E_{%s}" \
-                % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
         integral += ")}"
     return integral
 
 
-def extract_BMBPT_crossing_sign(diagram):
+def extract_BMBPT_crossing_sign(graph):
     """Return True if there's a sign factor associated with crossing propagators.
 
     Use the fact that all lines propagate upwards and the
     canonical representation of the diagrams and vertices.
     """
     nb_crossings = 0
-    for vertex in diagram:
-        for propagator in diagram.out_edges_iter(vertex, keys=True):
+    for vertex in graph:
+        for propagator in graph.out_edges_iter(vertex, keys=True):
             for vertex_ante in xrange(propagator[0]):
                 for vertex_post in xrange(propagator[0]+1, propagator[1]):
-                    nb_crossings += diagram.number_of_edges(vertex_ante,
-                                                            vertex_post)
+                    nb_crossings += graph.number_of_edges(vertex_ante,
+                                                          vertex_post)
     return nb_crossings % 2 == 1
 
 
-def multiplicity_symmetry_factor(diagram):
+def multiplicity_symmetry_factor(graph):
     """Return the symmetry factor associated with propagators multiplicity."""
     factor = ""
     prop_multiplicity = [0 for i in xrange(6)]
-    for vertex_i in diagram:
-        for vertex_j in diagram:
-            if diagram.number_of_edges(vertex_i, vertex_j) >= 2:
-                prop_multiplicity[diagram.number_of_edges(
+    for vertex_i in graph:
+        for vertex_j in graph:
+            if graph.number_of_edges(vertex_i, vertex_j) >= 2:
+                prop_multiplicity[graph.number_of_edges(
                     vertex_i, vertex_j) - 1] += 1
 
     for prop_id, multiplicity in enumerate(prop_multiplicity):
@@ -199,17 +199,17 @@ def multiplicity_symmetry_factor(diagram):
     return factor
 
 
-def vertex_exchange_sym_factor(diagram):
+def vertex_exchange_sym_factor(graph):
     """Return the symmetry factor associated with vertex exchange."""
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
-    non_op_vertices = [vertex for vertex in diagram
-                       if diagram.node[vertex]['operator'] is False]
+    non_op_vertices = [vertex for vertex in graph
+                       if graph.node[vertex]['operator'] is False]
     for permutation in itertools.permutations(non_op_vertices,
                                               len(non_op_vertices)):
         mapping = dict(zip(non_op_vertices, permutation))
-        permuted_diag = nx.relabel_nodes(diagram, mapping, copy=True)
-        if nx.is_isomorphic(diagram, nx.intersection(diagram, permuted_diag)):
+        permuted_graph = nx.relabel_nodes(graph, mapping, copy=True)
+        if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
             factor += 2
     if factor != 0:
         return "%i" % factor
@@ -268,19 +268,19 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
     latex_file.write("\\end{align}\n")
 
 
-def write_vertices_values(latex_file, diagram):
-    """Write the qp energies associated to each vertex of the diagram."""
+def write_vertices_values(latex_file, graph):
+    """Write the qp energies associated to each vertex of the graph."""
     latex_file.write("\\begin{align*}\n")
     labels = list(string.ascii_lowercase)
-    for vertex in xrange(1, len(diagram)):
+    for vertex in xrange(1, len(graph)):
         latex_file.write(labels[vertex-1] + " &= ")
-        for prop in diagram.in_edges_iter(vertex, keys=True):
+        for prop in graph.in_edges_iter(vertex, keys=True):
             latex_file.write(" + E_{%s}"
-                             % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
-        for prop in diagram.out_edges_iter(vertex, keys=True):
+                             % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
+        for prop in graph.out_edges_iter(vertex, keys=True):
             latex_file.write(" - E_{%s}"
-                             % diagram.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
-        if vertex != len(diagram)-1:
+                             % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
+        if vertex != len(graph)-1:
             latex_file.write(r"\\")
         latex_file.write('\n')
     latex_file.write("\\end{align*}\n")

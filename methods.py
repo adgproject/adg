@@ -72,21 +72,21 @@ def empty_matrix_generation(size):
     return empty_matrix
 
 
-def topologically_distinct_diags(diagrams):
-    """Return a list of diagrams all topologically distinct."""
+def topologically_distinct_graphs(graphs):
+    """Return a list of graphs all topologically distinct."""
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
-        diag = diagrams[i_diag]
-        vert_degrees = sorted([degree for node, degree in diag.degree_iter()])
-        for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
+    for i_graph in xrange(len(graphs)-1, -1, -1):
+        graph = graphs[i_graph]
+        vert_degrees = sorted([degree for node, degree in graph.degree_iter()])
+        for i_comp_graph in xrange(i_graph+1, len(graphs), 1):
             if vert_degrees == sorted([
                     degree for node, degree
-                    in diagrams[i_comp_diag].degree_iter()]):
-                if nx.is_isomorphic(diag, diagrams[i_comp_diag],
+                    in graphs[i_comp_graph].degree_iter()]):
+                if nx.is_isomorphic(graph, graphs[i_comp_graph],
                                     node_match=nm):
-                    del diagrams[i_comp_diag]
+                    del graphs[i_comp_graph]
                     break
-    return diagrams
+    return graphs
 
 
 def topologically_distinct_diagrams(diagrams):
@@ -105,33 +105,33 @@ def topologically_distinct_diagrams(diagrams):
     return diagrams
 
 
-def label_vertices(diagrams_list, theory_type, study_norm):
+def label_vertices(graphs_list, theory_type, study_norm):
     """Account for different status of vertices in operator diagrams."""
-    for diagram in diagrams_list:
-        for node in diagram:
-            diagram.node[node]['operator'] = False
+    for graph in graphs_list:
+        for node in graph:
+            graph.node[node]['operator'] = False
         if (theory_type == "BMBPT") and not study_norm:
-            diagram.node[0]['operator'] = True
+            graph.node[0]['operator'] = True
 
 
-def has_only_branch_operator_subgraphs(diagram):
-    """Return True if diagram has operator subgraphs that are all branches."""
+def has_only_branch_operator_subgraphs(graph):
+    """Return True if graph has operator subgraphs that are all branches."""
     has_branch_subgraphs = True
-    for connected_subgraph in nx.weakly_connected_component_subgraphs(diagram):
+    for connected_subgraph in nx.weakly_connected_component_subgraphs(graph):
         if len(connected_subgraph) > 1:
             if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
                 has_branch_subgraphs = False
     return has_branch_subgraphs
 
 
-def number_of_sinks(diagram):
+def number_of_sinks(graph):
     """Return the number of vertices in the graph with no edges going out."""
-    return sum(1 for vertex in diagram if diagram.out_degree(vertex) == 0)
+    return sum(1 for vertex in graph if graph.out_degree(vertex) == 0)
 
 
-def feynmf_generator(start_diag, theory_type, diagram_name):
+def feynmf_generator(start_graph, theory_type, diagram_name):
     """Generate the feynmanmp instructions corresponding to the diagram."""
-    p_order = start_diag.number_of_nodes()
+    p_order = start_graph.number_of_nodes()
     diag_size = 20*p_order
 
     theories = ["MBPT", "BMBPT", "SCGF"]
@@ -148,7 +148,7 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in xrange(p_order-1):
         fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
-        if start_diag.node[vert]['operator']:
+        if start_graph.node[vert]['operator']:
             fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
         else:
             fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
@@ -158,14 +158,14 @@ def feynmf_generator(start_diag, theory_type, diagram_name):
     fmf_file.write("\\fmffreeze\n")
 
     # Loop over all elements of the graph to draw associated propagators
-    for vert_i in start_diag:
-        for vert_j in start_diag:
-            props_left_to_draw = start_diag.number_of_edges(vert_i, vert_j)
+    for vert_i in start_graph:
+        for vert_j in start_graph:
+            props_left_to_draw = start_graph.number_of_edges(vert_i, vert_j)
             # Special config for consecutive vertices
             if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
                 fmf_file.write("\\fmf{" + propa)
                 # Check for specific MBPT configuration
-                if start_diag.number_of_edges(vert_j, vert_i) == 1:
+                if start_graph.number_of_edges(vert_j, vert_i) == 1:
                     fmf_file.write(",right=0.5")
                 fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
                 props_left_to_draw -= 1
