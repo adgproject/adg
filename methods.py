@@ -267,7 +267,8 @@ class Diagram(object):
         self.graph = nx_graph
         self.degrees = sorted([degree for node, degree
                                in nx_graph.degree_iter()])
-        self.io_degrees = sorted((nx_graph.in_degree(node),
-                                  nx_graph.out_degree(node))
-                                 for node in nx_graph)
+        self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
+                                        nx_graph.out_degree(node))
+                                       for node in nx_graph)
+        self.io_degrees = sorted(self.unsort_io_degrees)
         self.max_degree = self.degrees[-1]

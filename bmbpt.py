@@ -192,20 +192,23 @@ def multiplicity_symmetry_factor(graph):
     return factor
 
 
-def vertex_exchange_sym_factor(graph):
+def vertex_exchange_sym_factor(diag):
     """Return the symmetry factor associated with vertex exchange."""
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
-    non_op_vertices = [vertex for vertex in graph
-                       if graph.node[vertex]['operator'] is False]
-    for permutation in itertools.permutations(non_op_vertices,
-                                              len(non_op_vertices)):
+    graph = diag.graph
+    perm_vertices = [vertex for vertex, degrees
+                     in enumerate(diag.unsort_io_degrees)
+                     if graph.node[vertex]['operator'] is False
+                     and diag.unsort_io_degrees.count(degrees) >= 2]
+    for permutation in itertools.permutations(perm_vertices):
         permuted_graph = nx.relabel_nodes(graph,
-                                          dict(zip(non_op_vertices, permutation)),
+                                          dict(zip(perm_vertices, permutation)),
                                           copy=True)
         if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
             factor += 2
     return "%i" % factor if factor != 0 else ""
+
 
 
 def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
@@ -338,9 +341,9 @@ class BmbptFeynmanDiagram(mth.Diagram):
         if extract_BMBPT_crossing_sign(self.graph):
             prefactor = "-%s" % prefactor
         sym_fact = ""
-        for vertex_degrees in self.io_degrees:
-            if self.io_degrees.count(vertex_degrees) >= 2:
-                sym_fact += vertex_exchange_sym_factor(self.graph)
+        for vertex_degrees in self.unsort_io_degrees:
+            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
+                sym_fact += vertex_exchange_sym_factor(self)
                 break
         sym_fact += multiplicity_symmetry_factor(self.graph)
         if sym_fact != "":
@@ -363,9 +366,11 @@ class BmbptFeynmanDiagram(mth.Diagram):
         for vertex in self.graph:
             v_exp = "(" \
                 + "".join(" + E_{%s}" % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                          for prop in self.graph.in_edges_iter(vertex, keys=True)) \
+                          for prop
+                          in self.graph.in_edges_iter(vertex, keys=True)) \
                 + "".join(" - E_{%s}" % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                          for prop in self.graph.out_edges_iter(vertex, keys=True)) \
+                          for prop
+                          in self.graph.out_edges_iter(vertex, keys=True)) \
                 + ")"
             if "( +" in v_exp:
                 v_exp = v_exp.replace("( +", "(")
