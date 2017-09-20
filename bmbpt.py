@@ -101,15 +101,16 @@ def extract_numerator(graph):
         numerator = numerator + "^{%i" % graph.out_degree(vertex) \
             + "%i}_{" % graph.in_degree(vertex)
         # First add the qp states corresponding to propagators going out
-        for prop in graph.out_edges_iter(vertex, keys=True):
-            numerator += graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+        numerator += "".join(graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                             for prop in graph.out_edges_iter(vertex,
+                                                              keys=True))
         # Add the qp states corresponding to propagators coming in
         previous_vertex = vertex - 1
         while previous_vertex >= 0:
-            for prop in graph.in_edges_iter(vertex, keys=True):
-                if prop[0] == previous_vertex:
-                    numerator += \
-                        graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+            numerator += "".join(graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                                 for prop in graph.in_edges_iter(vertex,
+                                                                 keys=True)
+                                 if prop[0] == previous_vertex)
             previous_vertex -= 1
         numerator += "} "
     return numerator
@@ -117,51 +118,43 @@ def extract_numerator(graph):
 
 def extract_denom(start_graph, subgraph):
     """Extract the appropriate denominator using the subgraph rule."""
-    denomin = ""
-    for propa in start_graph.in_edges_iter(subgraph, keys=True):
-        if subgraph.has_edge(propa[0], propa[1], propa[2]) is False:
-            denomin += " + E_{%s}" \
-                % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
-    for propa in start_graph.out_edges_iter(subgraph, keys=True):
-        if subgraph.has_edge(propa[0], propa[1], propa[2]) is False:
-            denomin += " - E_{%s}" \
-                % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+    denomin = "".join(" + E_{%s}"
+                      % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                      for propa
+                      in start_graph.in_edges_iter(subgraph, keys=True)
+                      if not subgraph.has_edge(propa[0], propa[1], propa[2]))
+    denomin += "".join(" - E_{%s}"
+                       % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                       for propa
+                       in start_graph.out_edges_iter(subgraph, keys=True)
+                       if not subgraph.has_edge(propa[0], propa[1], propa[2]))
     return denomin
 
 
 def time_tree_denominator(graph, time_graph, denominator):
     """Add the denominator for a time-tree graph."""
     for vertex_i in range(1, len(time_graph)):
-        subgraph_stack = [graph.nodes()[vertex_i]]
-        for vertex_j in nx.descendants(time_graph, vertex_i):
-            subgraph_stack.append(graph.nodes()[vertex_j])
+        subgraph_stack = [graph.nodes()[vertex_j]
+                          for vertex_j in nx.descendants(time_graph, vertex_i)]
+        subgraph_stack.append(graph.nodes()[vertex_i])
         subdiag = graph.subgraph(subgraph_stack)
-        denominator += "(" + extract_denom(graph, subdiag) + ")"
-    return denominator
+        denominator += "(%s)" % extract_denom(graph, subdiag)
+    return denominator.replace("( +", "(")
 
 
-def extract_integral(graph):
-    """Return the integral part of the Feynman expression of the graph."""
-    integral = ""
-    norder = graph.number_of_nodes()
-    pert_vertex_indices = range(1, norder)
-    for vertex in pert_vertex_indices:
-        integral += "\\mathrm{d}\\tau_%i" % vertex
-    if norder > 2:
+def extract_integral(diag):
+    """Return the integral part of the Feynman expression of the diag."""
+    graph = diag.graph
+    pert_vertex_indices = range(1, len(graph))
+    integral = "".join("\\mathrm{d}\\tau_%i" % vertex
+                       for vertex in pert_vertex_indices)
+    if len(graph) > 2:
         for vertex_i in pert_vertex_indices:
-            for vertex_j in pert_vertex_indices:
-                if graph.has_edge(vertex_i, vertex_j):
-                    integral += "\\theta(\\tau_%i" % vertex_j \
-                        + "-\\tau_%i) " % vertex_i
-    for vertex in pert_vertex_indices:
-        integral += "e^{-\\tau_%i (" % vertex
-        for prop in graph.in_edges_iter(vertex, keys=True):
-            integral += " + E_{%s}" \
-                % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-        for prop in graph.out_edges_iter(vertex, keys=True):
-            integral += " - E_{%s}" \
-                % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-        integral += ")}"
+            integral += "".join("\\theta(\\tau_%i-\\tau_%i) " % (vertex_j, vertex_i)
+                                for vertex_j in pert_vertex_indices
+                                if graph.has_edge(vertex_i, vertex_j))
+    integral += "".join("e^{-\\tau_%i %s}" % (vertex, diag.vert_exp[vertex])
+                        for vertex in pert_vertex_indices)
     return integral
 
 
@@ -207,14 +200,12 @@ def vertex_exchange_sym_factor(graph):
                        if graph.node[vertex]['operator'] is False]
     for permutation in itertools.permutations(non_op_vertices,
                                               len(non_op_vertices)):
-        mapping = dict(zip(non_op_vertices, permutation))
-        permuted_graph = nx.relabel_nodes(graph, mapping, copy=True)
+        permuted_graph = nx.relabel_nodes(graph,
+                                          dict(zip(non_op_vertices, permutation)),
+                                          copy=True)
         if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
             factor += 2
-    if factor != 0:
-        return "%i" % factor
-    else:
-        return ""
+    return "%i" % factor if factor != 0 else ""
 
 
 def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
@@ -268,19 +259,14 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
     latex_file.write("\\end{align}\n")
 
 
-def write_vertices_values(latex_file, graph):
-    """Write the qp energies associated to each vertex of the graph."""
+def write_vertices_values(latex_file, diag):
+    """Write the qp energies associated to each vertex of the diag."""
     latex_file.write("\\begin{align*}\n")
     labels = list(string.ascii_lowercase)
-    for vertex in xrange(1, len(graph)):
-        latex_file.write(labels[vertex-1] + " &= ")
-        for prop in graph.in_edges_iter(vertex, keys=True):
-            latex_file.write(" + E_{%s}"
-                             % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
-        for prop in graph.out_edges_iter(vertex, keys=True):
-            latex_file.write(" - E_{%s}"
-                             % graph.edge[prop[0]][prop[1]][prop[2]]['qp_state'])
-        if vertex != len(graph)-1:
+    for ind in range(1, len(diag.vert_exp)):
+        latex_file.write("%s &= " % labels[ind-1])
+        latex_file.write(diag.vert_exp[ind].replace("(", "").replace(")", ""))
+        if ind != len(diag.vert_exp)-1:
             latex_file.write(r"\\")
         latex_file.write('\n')
     latex_file.write("\\end{align*}\n")
@@ -312,6 +298,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
 
     def attribute_expressions(self, time_diags):
         """Attribute the correct Feynman and Goldstone expressions."""
+        self.attribute_vertices_expressions()
         norder = len(self.graph)
         numerator = extract_numerator(self.graph)
         denominator = ""
@@ -339,18 +326,17 @@ class BmbptFeynmanDiagram(mth.Diagram):
                         if test_vertex:
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
-                denominator += "(" + extract_denom(self.graph, subdiag) + ")"
+                denominator += "(%s)" % extract_denom(self.graph, subdiag)
             for vertex in self.graph:
                 if self.graph.out_degree(vertex) == 0:
                     subdiag = self.graph.subgraph(vertex)
-            extra_factor += "\\left[ \\frac{1}{" \
-                + extract_denom(self.graph, subdiag) \
-                + "} + \\frac{1}{" + extract_denom(self.graph, testdiag) \
-                + "} \\right]"
+            extra_factor = "\\left[ \\frac{1}{%s} + \\frac{1}{%s} \\right]" \
+                % (extract_denom(self.graph, subdiag),
+                   extract_denom(self.graph, testdiag))
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
         if extract_BMBPT_crossing_sign(self.graph):
-            prefactor = "-" + prefactor
+            prefactor = "-%s" % prefactor
         sym_fact = ""
         for vertex_degrees in self.io_degrees:
             if self.io_degrees.count(vertex_degrees) >= 2:
@@ -358,17 +344,18 @@ class BmbptFeynmanDiagram(mth.Diagram):
                 break
         sym_fact += multiplicity_symmetry_factor(self.graph)
         if sym_fact != "":
-            prefactor = "\\frac{" + prefactor + "}{" \
-                + sym_fact + "}\\sum_{k_i}"
+            prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact)
         else:
-            prefactor = prefactor + "\\sum_{k_i}"
-        self.feynman_exp = prefactor + numerator + "\\int_{0}^{\\tau}" \
-            + extract_integral(self.graph) + "\n"
+            prefactor = "%s\\sum_{k_i}" % prefactor
+        self.feynman_exp = "%s%s\\int_{0}^{\\tau}%s\n" % (prefactor, numerator,
+                                                          extract_integral(self))
         if denominator != "":
-            self.diag_exp = prefactor + "\\frac{ " + numerator \
-                + " }{ " + denominator + " }" + extra_factor + "\n"
+            self.diag_exp = "%s\\frac{%s}{%s} %s\n" % (prefactor,
+                                                       numerator,
+                                                       denominator,
+                                                       extra_factor)
         else:
-            self.diag_exp = prefactor + numerator + extra_factor + "\n"
+            self.diag_exp = "%s%s%s\n" % (prefactor, numerator, extra_factor)
 
     def attribute_vertices_expressions(self):
         """Attribute the appropriate expression to each vertex."""

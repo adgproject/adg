@@ -269,9 +269,8 @@ for diag in diagrams:
                 time_diag = tdiag
                 break
         latex_file.write("\\begin{equation}\n\\text{T}%i = " % (diag.time_tag + 1)
-                         + time_diag.expr
-                         + "\\end{equation}\n")
-        bmbpt.write_vertices_values(latex_file, diag.graph)
+                         + "%s\\end{equation}\n" % time_diag.expr)
+        bmbpt.write_vertices_values(latex_file, diag)
 enddoc = "\\end{document}"
 latex_file.write(enddoc)
 latex_file.close()

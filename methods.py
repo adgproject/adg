@@ -212,7 +212,7 @@ def write_file_header(directory, latex_file, pdiag, norder, theory):
         + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
     if pdiag:
-        header = header + "\\usepackage[force]{feynmp-auto}\n"
+        header = "%s\\usepackage{feynmp-auto}\n" % header
     land = False
     if norder > 3:
         msg = 'Expressions may be long, rotate pdf?'

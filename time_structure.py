@@ -57,10 +57,10 @@ def tree_time_structure_den(time_graph):
             if time_graph.out_degree(vertex) == 0:
                 denominator += time_graph.node[vertex]['label']
             else:
-                denominator += "(" + time_graph.node[vertex]['label']
-                for descendant in nx.descendants(time_graph, vertex):
-                    denominator += "+" + time_graph.node[descendant]['label']
-                denominator += ")"
+                denominator += "(%s" % time_graph.node[vertex]['label'] \
+                    + "".join("+ %s" % time_graph.node[descendant]['label']
+                              for descendant in nx.descendants(time_graph,
+                                                               vertex)) + ")"
     return denominator
 
 
@@ -72,8 +72,7 @@ class TimeStructureDiagram(mth.Diagram):
         self.tags = [tag_num]
         if nx.is_arborescence(self.graph):
             self.is_tree = True
-            self.expr = "".join("\\frac{1}{"
-                                + tree_time_structure_den(self.graph) + "}")
+            self.expr = "\\frac{1}{%s}" % tree_time_structure_den(self.graph)
         else:
             self.is_tree = False
             self.expr = ""
