@@ -160,22 +160,6 @@ if theory == "BMBPT":
     nb_3 = nb_3_HF + nb_3_EHF + nb_3_noHF
 
 numdiag = len(diagrams)
-print "Time ellapsed: ", datetime.now() - start_time
-print "Number of connected diagrams, ", numdiag
-
-if theory == "BMBPT":
-    print "\n2N valid diagrams: %i" % nb_2
-    print "2N energy canonical diagrams: %i" % nb_2_HF
-    if not norm:
-        print "2N canonical diagrams for a generic operator only: %i" % nb_2_EHF
-    print "2N non-canonical diagrams: %i\n" % nb_2_noHF
-    if three_N:
-        print "3N valid diagrams: %i" % nb_3
-        print "3N energy canonical diagrams: %i" % nb_3_HF
-        if not norm:
-            print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
-        print "3N non-canonical diagrams: %i" % nb_3_noHF
-
 
 # Treatment of the algebraic expressions
 nb_time_diags = 0
@@ -192,6 +176,23 @@ if theory == "BMBPT" and not norm:
                 break
         diag.attribute_expressions(diagrams_time)
     nb_time_diags = len(diagrams_time)
+
+print "Time ellapsed: ", datetime.now() - start_time
+print "Number of connected diagrams, ", numdiag
+
+if theory == "BMBPT":
+    print "\n2N valid diagrams: %i" % nb_2
+    print "2N energy canonical diagrams: %i" % nb_2_HF
+    if not norm:
+        print "2N canonical diagrams for a generic operator only: %i" % nb_2_EHF
+    print "2N non-canonical diagrams: %i\n" % nb_2_noHF
+    if three_N:
+        print "3N valid diagrams: %i" % nb_3
+        print "3N energy canonical diagrams: %i" % nb_3_HF
+        if not norm:
+            print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
+        print "3N non-canonical diagrams: %i" % nb_3_noHF
+
 
 pr.disable()
 s = StringIO.StringIO()
