@@ -10,7 +10,6 @@ import pstats
 import StringIO
 import numpy as np
 import networkx as nx
-from meliae import scanner
 import methods as mth
 import bmbpt
 import mbpt
@@ -63,7 +62,7 @@ start_time = datetime.now()
 if theory == "MBPT":
     diagrams = mbpt.diagram_generation(norder)
 elif theory == "BMBPT":
-    diagrams = bmbpt.BMBPT_generation(norder, three_N, norm)
+    diagrams = bmbpt.BMBPT_generation(norder, three_N)
 else:
     print "Invalid theory"
 numdiag = len(diagrams)
@@ -200,7 +199,6 @@ sortby = 'cumulative'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
 ps.dump_stats("stats.dat")
-scanner.dump_all_objects("memory.dat")
 
 # Writing a feynmp file for each graph
 msg = 'Generate diagrams feymanmf instructions?'

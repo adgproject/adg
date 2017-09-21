@@ -8,7 +8,7 @@ import methods as mth
 import networkx as nx
 
 
-def BMBPT_generation(p_order, three_N_use, norm_diagrams):
+def BMBPT_generation(p_order, three_N_use):
     """Generate diagrams for BMBPT from bottom up."""
     deg_max = 6 if three_N_use else 4
 
@@ -17,19 +17,17 @@ def BMBPT_generation(p_order, three_N_use, norm_diagrams):
 
     # Generate oriented adjacency matrices going vertex-wise
     vertices = range(p_order)
+    add = matrices.append
     for vertex in vertices:
         for sum_index in xrange(vertex+1, p_order):
             for mat_indx in xrange(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
-                if mat[sum_index][vertex] == 0:
-                    vert_degree = sum(mat[k][vertex]
-                                      + mat[vertex][k] for k in vertices)
-                    elem = 1
-                    while (elem + vert_degree) <= deg_max:
-                        temp_mat = copy.deepcopy(mat)
-                        temp_mat[vertex][sum_index] = elem
-                        matrices.append(temp_mat)
-                        elem += 1
+                elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
+                                         for k in vertices)
+                for elem in xrange(1, elem_max + 1, 1):
+                    temp_mat = copy.deepcopy(mat)
+                    temp_mat[vertex][sum_index] = elem
+                    add(temp_mat)
         mth.check_vertex_degree(matrices, three_N_use, vertex)
 
     # Checks to exclude non-conform matrices
