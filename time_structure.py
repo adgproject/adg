@@ -1,5 +1,4 @@
-"""Module containg methods relative to time-stucture diagrams,
-    to be called by ADG."""
+"""Module with functions relative to time-stucture diagrams, called by ADG."""
 
 import string
 import networkx as nx
@@ -64,10 +63,38 @@ def tree_time_structure_den(time_graph):
     return denominator
 
 
+def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
+                                time_diagrams):
+    """Write the appropriate section for tst diagrams in the LaTeX file."""
+    latex_file.write("\\section{Associated time-structure diagrams}\n\n")
+    for tdiag in time_diagrams:
+        latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
+                         % (tdiag.tags[0]+1))
+        if pdiag and pdraw:
+            latex_file.write('\n\\begin{center}\n')
+            time_file = open(directory
+                             + "/Diagrams/time_%i.tex" % tdiag.tags[0])
+            latex_file.write(time_file.read())
+            latex_file.write('\n\\end{center}\n\n')
+        if tdiag.is_tree:
+            latex_file.write("Tree: Yes\n\n")
+            latex_file.write("\\begin{equation}\n")
+            latex_file.write(tdiag.expr)
+            latex_file.write("\\end{equation}\n")
+        else:
+            latex_file.write("Tree: No\n\n")
+        latex_file.write("Related Feynman diagrams:")
+        feynman_diags = "".join(" %i," % (tag+1) for tag in tdiag.tags)
+        feynman_diags = feynman_diags.strip(",") + "."
+        latex_file.write(feynman_diags)
+        latex_file.write("\n\n")
+
+
 class TimeStructureDiagram(mth.Diagram):
     """Describes a time-structure diagram with its related properties."""
 
     def __init__(self, bmbpt_diag, tag_num):
+        """Generate a TST diagram out of a BMBPT one."""
         mth.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
         self.tags = [tag_num]
         if nx.is_arborescence(self.graph):

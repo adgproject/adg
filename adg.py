@@ -223,27 +223,9 @@ if theory == "BMBPT":
     bmbpt.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
                              nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
     if write_time:
-        latex_file.write("\\section{Associated time-structure diagrams}\n\n")
-        for tdiag in diagrams_time:
-            latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
-                             % (tdiag.tags[0]+1))
-            if pdiag and pdraw:
-                latex_file.write('\n\\begin{center}\n')
-                time_file = open(directory
-                                 + "/Diagrams/time_%i.tex" % tdiag.tags[0])
-                latex_file.write(time_file.read())
-                latex_file.write('\n\\end{center}\n\n')
-            if tdiag.is_tree:
-                latex_file.write("Tree: Yes\n\n")
-                latex_file.write("\\begin{equation}\n")
-                latex_file.write(tdiag.expr)
-                latex_file.write("\\end{equation}\n")
-            else:
-                latex_file.write("Tree: No\n\n")
-            latex_file.write("Related Feynman diagrams:")
-            for tag in tdiag.tags:
-                latex_file.write(" %i," % (tag+1))
-            latex_file.write("\n\n")
+        tst.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
+                                        diagrams_time)
+
     latex_file.write("\\section{Two-body diagrams}\n\n")
     latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
 
@@ -279,4 +261,5 @@ latex_file.close()
 msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdfcompile:
-    mth.compile_and_clean(directory, pdiag, diagrams, write_time, diagrams_time)
+    mth.compile_and_clean(directory, pdiag, diagrams,
+                          write_time, diagrams_time)

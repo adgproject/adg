@@ -64,6 +64,7 @@ class MbptDiagram(mth.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
     def __init__(self, mbpt_graph, tag_num):
+        """Generate a MBPT diagram using the appropriate NetworkX graph."""
         mth.Diagram.__init__(self, mbpt_graph)
         self.tags = [tag_num]
         self.attribute_expression()

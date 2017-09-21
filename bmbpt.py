@@ -150,7 +150,8 @@ def extract_integral(diag):
                        for vertex in pert_vertex_indices)
     if len(graph) > 2:
         for vertex_i in pert_vertex_indices:
-            integral += "".join("\\theta(\\tau_%i-\\tau_%i) " % (vertex_j, vertex_i)
+            integral += "".join("\\theta(\\tau_%i-\\tau_%i) " % (vertex_j,
+                                                                 vertex_i)
                                 for vertex_j in pert_vertex_indices
                                 if graph.has_edge(vertex_i, vertex_j))
     integral += "".join("e^{-\\tau_%i %s}" % (vertex, diag.vert_exp[vertex])
@@ -208,7 +209,6 @@ def vertex_exchange_sym_factor(diag):
         if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
             factor += 2
     return "%i" % factor if factor != 0 else ""
-
 
 
 def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
@@ -279,6 +279,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties."""
 
     def __init__(self, nx_graph, use_norm, tag_num):
+        """Generate a BMBPT diagrams using a NetworkX graph."""
         mth.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
