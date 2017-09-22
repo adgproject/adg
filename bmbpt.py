@@ -45,13 +45,14 @@ def BMBPT_generation(p_order, three_N_use):
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
     """Exclude some matrices that would spawn unconnected diagrams."""
+    empty_block = [0 for i in range(length_mat - max_filled_vertex - 1)]
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         mat = matrices[ind_mat]
         is_disconnected = True
-        for line in xrange(max_filled_vertex + 1):
-            for ind_elem in xrange(max_filled_vertex + 1, length_mat, 1):
-                if mat[line][ind_elem] != 0:
-                    is_disconnected = False
+        for line in mat[0:max_filled_vertex + 1]:
+            if line[max_filled_vertex + 1:length_mat] != empty_block:
+                is_disconnected = False
+                break
         if is_disconnected:
             del matrices[ind_mat]
 
