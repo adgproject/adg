@@ -54,9 +54,8 @@ def check_vertex_degree(matrices, three_N_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices."""
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
-        vertex_degree = sum(matrix[index][vertex_id]
-                            + matrix[vertex_id][index]
-                            for index in xrange(len(matrices[i_mat][0])))
+        vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
+                            for index in xrange(len(matrix[0])))
         if (vertex_degree != 2) and (vertex_degree != 4):
             if (not three_N_use) or (vertex_degree != 6):
                 del matrices[i_mat]

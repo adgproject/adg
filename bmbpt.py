@@ -29,6 +29,8 @@ def BMBPT_generation(p_order, three_N_use):
                     temp_mat[vertex][sum_index] = elem
                     add(temp_mat)
         mth.check_vertex_degree(matrices, three_N_use, vertex)
+        if 0 < vertex < p_order-1:
+            check_unconnected_spawn(matrices, vertex, p_order)
 
     # Checks to exclude non-conform matrices
     mth.check_degree(matrices, three_N_use)
@@ -39,6 +41,19 @@ def BMBPT_generation(p_order, three_N_use):
             matricesUniq.append(mat)
     matricesUniq.sort(reverse=True)
     return [np.array(mat) for mat in matricesUniq]
+
+
+def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
+    """Exclude some matrices that would spawn unconnected diagrams."""
+    for ind_mat in xrange(len(matrices)-1, -1, -1):
+        mat = matrices[ind_mat]
+        is_disconnected = True
+        for line in xrange(max_filled_vertex + 1):
+            for ind_elem in xrange(max_filled_vertex + 1, length_mat, 1):
+                if mat[line][ind_elem] != 0:
+                    is_disconnected = False
+        if is_disconnected:
+            del matrices[ind_mat]
 
 
 def order_2B_or_3B(graphs, TwoB_diags, ThreeB_diags):
