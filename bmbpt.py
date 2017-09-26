@@ -49,12 +49,26 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         mat = matrices[ind_mat]
         is_disconnected = True
-        for line in mat[0:max_filled_vertex + 1]:
-            if line[max_filled_vertex + 1:length_mat] != empty_block:
+        empty_lines = [index for index, line
+                       in enumerate(mat[0:max_filled_vertex + 1])
+                       if line[max_filled_vertex + 1:length_mat] == empty_block]
+        test_block = [0 for i in range(length_mat - len(empty_lines))]
+        for index in empty_lines:
+            test_line = copy.deepcopy(mat[index])
+            for index2 in empty_lines:
+                test_line.remove(mat[index][index2])
+            if test_line != test_block:
                 is_disconnected = False
                 break
-        if is_disconnected:
-            del matrices[ind_mat]
+        if is_disconnected and empty_lines != []:
+            for index, line in enumerate(mat[0:max_filled_vertex + 1]):
+                if index not in empty_lines:
+                    for index2 in empty_lines:
+                        if line[index2] != 0:
+                            is_disconnected = False
+                            break
+            if is_disconnected:
+                del matrices[ind_mat]
 
 
 def order_2B_or_3B(graphs, TwoB_diags, ThreeB_diags):
