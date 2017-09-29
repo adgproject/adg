@@ -114,18 +114,18 @@ if theory == "BMBPT":
         nb_procs_max = 6 if three_N else 3
         nb_processes = min(num_cores-1, nb_procs_max)
         pool = multiprocessing.Pool(nb_processes)
-        r1 = pool.apply_async(mth.topologically_distinct_diags,
+        r1 = pool.apply_async(mth.topologically_distinct_diagrams,
                               (diagrams2HF, ))
-        r2 = pool.apply_async(mth.topologically_distinct_diags,
+        r2 = pool.apply_async(mth.topologically_distinct_diagrams,
                               (diagrams2EHF, ))
-        r3 = pool.apply_async(mth.topologically_distinct_diags,
+        r3 = pool.apply_async(mth.topologically_distinct_diagrams,
                               (diagrams2noHF, ))
         if three_N:
-            r4 = pool.apply_async(mth.topologically_distinct_diags,
+            r4 = pool.apply_async(mth.topologically_distinct_diagrams,
                                   (diagrams3HF, ))
-            r5 = pool.apply_async(mth.topologically_distinct_diags,
+            r5 = pool.apply_async(mth.topologically_distinct_diagrams,
                                   (diagrams3EHF, ))
-            r6 = pool.apply_async(mth.topologically_distinct_diags,
+            r6 = pool.apply_async(mth.topologically_distinct_diagrams,
                                   (diagrams3noHF, ))
         G2_HF = r1.get()
         G2_EHF = r2.get()
