@@ -127,13 +127,13 @@ if theory == "BMBPT":
                                   (diagrams3EHF, ))
             r6 = pool.apply_async(mth.topologically_distinct_diagrams,
                                   (diagrams3noHF, ))
-        G2_HF = r1.get()
-        G2_EHF = r2.get()
-        G2_noHF = r3.get()
+        diagrams2HF = r1.get()
+        diagrams2EHF = r2.get()
+        diagrams2noHF = r3.get()
         if three_N:
-            G3_HF = r4.get()
-            G3_EHF = r5.get()
-            G3_noHF = r6.get()
+            diagrams3HF = r4.get()
+            diagrams3EHF = r5.get()
+            diagrams3noHF = r6.get()
         pool.close()
         pool.join()
 
