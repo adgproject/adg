@@ -336,10 +336,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
         denominator = ""
         extra_factor = ""
         if self.tst_is_tree:
-            for tdiag in time_diags:
-                if tdiag.tags[0] == self.time_tag:
-                    time_graph = tdiag.graph
-                    break
+            time_graph = time_diags[self.time_tag].graph
             denominator = time_tree_denominator(self.graph,
                                                 time_graph, denominator)
 
@@ -379,8 +376,8 @@ class BmbptFeynmanDiagram(mth.Diagram):
             prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact)
         else:
             prefactor = "%s\\sum_{k_i}" % prefactor
-        self.feynman_exp = "%s%s\\int_{0}^{\\tau}%s\n" % (prefactor, numerator,
-                                                          extract_integral(self))
+        self.feynman_exp = "%s%s\\int_{0}^{\\tau}%s\n" \
+                           % (prefactor, numerator, extract_integral(self))
         if denominator != "":
             self.diag_exp = "%s\\frac{%s}{%s} %s\n" % (prefactor,
                                                        numerator,
@@ -394,10 +391,12 @@ class BmbptFeynmanDiagram(mth.Diagram):
         vertices_expressions = []
         for vertex in self.graph:
             v_exp = "(" \
-                + "".join(" + E_{%s}" % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                + "".join(" + E_{%s}"
+                          % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
                           for prop
                           in self.graph.in_edges_iter(vertex, keys=True)) \
-                + "".join(" - E_{%s}" % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
+                + "".join(" - E_{%s}"
+                          % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
                           for prop
                           in self.graph.out_edges_iter(vertex, keys=True)) \
                 + ")"

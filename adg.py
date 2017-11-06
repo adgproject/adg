@@ -166,12 +166,14 @@ if theory == "BMBPT" and not norm:
     diagrams_time = [tst.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
     diagrams_time = mth.topologically_distinct_diagrams(diagrams_time)
+    for index, t_diag in enumerate(diagrams_time):
+        t_diag.tags.insert(0, index)
     for diag in diagrams:
         bmbpt.attribute_qp_labels(diag.graph)
         for t_diag in diagrams_time:
             if diag.tags[0] in t_diag.tags:
                 diag.time_tag = t_diag.tags[0]
-                diag.tst_is_tree = True
+                diag.tst_is_tree = t_diag.is_tree
                 break
         diag.attribute_expressions(diagrams_time)
     nb_time_diags = len(diagrams_time)

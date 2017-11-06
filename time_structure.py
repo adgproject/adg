@@ -84,7 +84,7 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
         else:
             latex_file.write("Tree: No\n\n")
         latex_file.write("Related Feynman diagrams:")
-        feynman_diags = "".join(" %i," % (tag+1) for tag in tdiag.tags)
+        feynman_diags = "".join(" %i," % (tag+1) for tag in tdiag.tags[1:])
         feynman_diags = feynman_diags.strip(",") + "."
         latex_file.write(feynman_diags)
         latex_file.write("\n\n")
