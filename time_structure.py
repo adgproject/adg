@@ -11,16 +11,7 @@ def time_structure_graph(graph):
     if time_graph.node[0]['operator']:
         for vertex in xrange(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
-    for vertex_a in time_graph:
-        for vertex_b in time_graph:
-            while time_graph.number_of_edges(vertex_a, vertex_b) > 1:
-                time_graph.remove_edge(vertex_a, vertex_b)
-            if len(list(nx.all_simple_paths(time_graph,
-                                            vertex_a, vertex_b))) > 1:
-                while len(nx.shortest_path(time_graph,
-                                           vertex_a, vertex_b)) == 2:
-                    time_graph.remove_edge(vertex_a, vertex_b)
-    return time_graph
+    return mth.to_skeleton(time_graph)
 
 
 def has_tree_time_structure(graph):
@@ -88,6 +79,45 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
         feynman_diags = feynman_diags.strip(",") + "."
         latex_file.write(feynman_diags)
         latex_file.write("\n\n")
+
+
+def treat_cycles(time_graph):
+    """Find and treat cycles in a TSD diagram."""
+    graphs = [time_graph]
+    for graph in graphs:
+        cycle_edges = nx.find_cycle(graph, orientation='ignore')
+        cycle_nodes = []
+        for edge in cycle_edges:
+            if edge[0] not in cycle_nodes:
+                cycle_nodes.append(edge[0])
+            if edge[1] not in cycle_nodes:
+                cycle_nodes.append(edge[1])
+        for node in cycle_nodes:
+            if graph.out_degree(node) == 2:
+                start_node = node
+            if graph.in_degree(node) == 2:
+                end_node = node
+        graphs += disentangle_cycle(time_graph, start_node, end_node)
+        graphs.remove(graph)
+
+
+def disentangle_cycle(time_graph, start_node, end_node):
+    """Separate a cycle in a sum of tree diagrams."""
+    paths = nx.all_simple_paths(time_graph, source=start_node, target=end_node)
+    old_graphs = [time_graph]
+    for insert_node in paths[0][1:]:
+        new_graphs = []
+        for graph in old_graphs:
+            for daughter_node in paths[1][1:]:
+                if daughter_node in graph.successors(paths[0][paths.index(insert_node)-1]):
+                    new_graph = graph.to_directed()
+                    new_graph.add_edge(insert_node, daughter_node)
+                    new_graph.add_edge(paths[1][paths.index(daughter_node)-1],
+                                       insert_node)
+                    mth.to_skeleton(new_graph)
+                    new_graphs.append(new_graph)
+        old_graphs = new_graphs
+    return new_graphs
 
 
 class TimeStructureDiagram(mth.Diagram):

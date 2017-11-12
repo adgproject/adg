@@ -259,6 +259,18 @@ def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
     print "Result saved in "+directory + '/result.pdf'
 
 
+def to_skeleton(graph):
+    """Return the bare skeleton of a graph, i.e. only non-redundant links."""
+    for vertex_a in graph:
+        for vertex_b in graph:
+            while graph.number_of_edges(vertex_a, vertex_b) > 1:
+                graph.remove_edge(vertex_a, vertex_b)
+            if len(list(nx.all_simple_paths(graph, vertex_a, vertex_b))) > 1:
+                while len(nx.shortest_path(graph, vertex_a, vertex_b)) == 2:
+                    graph.remove_edge(vertex_a, vertex_b)
+    return graph
+
+
 class Diagram(object):
     """Describes a diagram with its related properties."""
 
