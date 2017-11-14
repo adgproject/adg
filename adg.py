@@ -168,6 +168,8 @@ if theory == "BMBPT" and not norm:
     diagrams_time = mth.topologically_distinct_diagrams(diagrams_time)
     for index, t_diag in enumerate(diagrams_time):
         t_diag.tags.insert(0, index)
+        if not t_diag.is_tree:
+            t_diag.equivalent_trees = tst.treat_cycles(t_diag.graph)
     for diag in diagrams:
         bmbpt.attribute_qp_labels(diag.graph)
         for t_diag in diagrams_time:
