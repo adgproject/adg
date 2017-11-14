@@ -74,6 +74,17 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
             latex_file.write("\\end{equation}\n")
         else:
             latex_file.write("Tree: No\n\n")
+            latex_file.write("Equivalent tree diagrams:\n\n")
+            latex_file.write('\n\\begin{center}\n')
+            for index, graph in enumerate(tdiag.equivalent_trees):
+                mth.feynmf_generator(graph,
+                                     'MBPT',
+                                     'equivalent%i_%i' % (tdiag.tags[0],
+                                                          index))
+                diag_file = open("equivalent%i_%i.tex" % (tdiag.tags[0],
+                                                          index))
+                latex_file.write(diag_file.read())
+            latex_file.write('\n\\end{center}\n\n')
         latex_file.write("Related Feynman diagrams:")
         feynman_diags = "".join(" %i," % (tag+1) for tag in tdiag.tags[1:])
         feynman_diags = feynman_diags.strip(",") + "."
@@ -84,35 +95,46 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
 def treat_cycles(time_graph):
     """Find and treat cycles in a TSD diagram."""
     graphs = [time_graph]
-    for graph in graphs:
-        cycle_edges = nx.find_cycle(graph, orientation='ignore')
-        cycle_nodes = []
-        for edge in cycle_edges:
-            if edge[0] not in cycle_nodes:
-                cycle_nodes.append(edge[0])
-            if edge[1] not in cycle_nodes:
-                cycle_nodes.append(edge[1])
-        for node in cycle_nodes:
-            if graph.out_degree(node) == 2:
-                start_node = node
-            if graph.in_degree(node) == 2:
-                end_node = node
-        graphs += disentangle_cycle(time_graph, start_node, end_node)
-        graphs.remove(graph)
+    new_graphs = []
+    cycles_left = True
+    while cycles_left:
+        for graph in graphs:
+            cycle_edges = nx.find_cycle(graph, orientation='ignore')
+            cycle_nodes = []
+            for edge in cycle_edges:
+                if edge[0] not in cycle_nodes:
+                    cycle_nodes.append(edge[0])
+                if edge[1] not in cycle_nodes:
+                    cycle_nodes.append(edge[1])
+            for node in cycle_nodes:
+                if graph.out_degree(node) == 2:
+                    start_node = node
+                if graph.in_degree(node) == 2:
+                    end_node = node
+            new_graphs += disentangle_cycle(time_graph, start_node, end_node)
+        graphs = new_graphs
+        cycles_left = False
+        for graph in graphs:
+            if not nx.is_arborescence(graph):
+                cycles_left = True
+    return graphs
 
 
 def disentangle_cycle(time_graph, start_node, end_node):
     """Separate a cycle in a sum of tree diagrams."""
-    paths = nx.all_simple_paths(time_graph, source=start_node, target=end_node)
+    paths = list(nx.all_simple_paths(time_graph,
+                                     source=start_node,
+                                     target=end_node))
     old_graphs = [time_graph]
-    for insert_node in paths[0][1:]:
+    for insert_node in paths[0][1:-1]:
         new_graphs = []
         for graph in old_graphs:
             for daughter_node in paths[1][1:]:
-                if daughter_node in graph.successors(paths[0][paths.index(insert_node)-1]):
+                if daughter_node in nx.descendants(graph,
+                                                   paths[0][paths[0].index(insert_node)-1]):
                     new_graph = graph.to_directed()
                     new_graph.add_edge(insert_node, daughter_node)
-                    new_graph.add_edge(paths[1][paths.index(daughter_node)-1],
+                    new_graph.add_edge(paths[1][paths[1].index(daughter_node)-1],
                                        insert_node)
                     mth.to_skeleton(new_graph)
                     new_graphs.append(new_graph)
@@ -130,6 +152,8 @@ class TimeStructureDiagram(mth.Diagram):
         if nx.is_arborescence(self.graph):
             self.is_tree = True
             self.expr = "\\frac{1}{%s}" % tree_time_structure_den(self.graph)
+            self.equivalent_trees = []
         else:
             self.is_tree = False
             self.expr = ""
+            self.equivalent_trees = treat_cycles(self.graph)
