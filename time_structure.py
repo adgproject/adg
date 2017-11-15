@@ -100,19 +100,15 @@ def treat_cycles(time_graph):
     cycles_left = True
     while cycles_left:
         for graph in graphs:
-            if nx.is_arborescence(graph):
-                tree_graphs.append(graph)
-                graphs.remove(graph)
-            else:
-                cycle_nodes = find_cycle(graph)
-                new_graphs += disentangle_cycle(graph, cycle_nodes)
+            cycle_nodes = find_cycle(graph)
+            new_graphs += disentangle_cycle(graph, cycle_nodes)
         graphs = new_graphs
         new_graphs = []
         cycles_left = False
-        for graph in graphs:
-            if nx.is_arborescence(graph):
-                tree_graphs.append(graph)
-                graphs.remove(graph)
+        for graph_indx in xrange(len(graphs)-1, -1, -1):
+            if nx.is_arborescence(graphs[graph_indx]):
+                tree_graphs.append(graphs[graph_indx])
+                del graphs[graph_indx]
             else:
                 cycles_left = True
     return tree_graphs
@@ -144,13 +140,17 @@ def find_cycle(graph):
         if graph.out_degree(node_a) >= 2:
             for node_b in graph:
                 if graph.in_degree(node_b) == 2 \
-                and len(list(nx.all_simple_paths(graph, node_a, node_b))) == 2:
+                        and len(list(nx.all_simple_paths(graph,
+                                                         node_a,
+                                                         node_b))) == 2:
                     cycle_nodes = (node_a, node_b)
                     cycle_found = True
                     break
                 elif graph.in_degree(node_b) > 2 \
-                and len(list(nx.all_simple_paths(graph, node_a, node_b))) > 2 \
-                and graph.out_degree(node_a) == graph.in_degree(node_b):
+                        and len(list(nx.all_simple_paths(graph,
+                                                         node_a,
+                                                         node_b))) > 2 \
+                        and graph.out_degree(node_a) == graph.in_degree(node_b):
                     cycle_nodes = (node_a, node_b)
                     cycle_found = True
                     break
