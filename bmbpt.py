@@ -146,16 +146,19 @@ def extract_numerator(graph):
 
 def extract_denom(start_graph, subgraph):
     """Extract the appropriate denominator using the subgraph rule."""
-    denomin = "".join(" + E_{%s}"
-                      % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
-                      for propa
-                      in start_graph.in_edges_iter(subgraph, keys=True)
-                      if not subgraph.has_edge(propa[0], propa[1], propa[2]))
-    denomin += "".join(" - E_{%s}"
-                       % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
-                       for propa
-                       in start_graph.out_edges_iter(subgraph, keys=True)
-                       if not subgraph.has_edge(propa[0], propa[1], propa[2]))
+    denomin = r"\epsilon^{" \
+        + "".join("%s"
+                  % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                  for propa
+                  in start_graph.in_edges_iter(subgraph, keys=True)
+                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+        + "}_{" \
+        + "".join("%s"
+                  % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                  for propa
+                  in start_graph.out_edges_iter(subgraph, keys=True)
+                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+        + "}"
     return denomin
 
 
@@ -166,8 +169,8 @@ def time_tree_denominator(graph, time_graph, denominator):
                           for vertex_j in nx.descendants(time_graph, vertex_i)]
         subgraph_stack.append(graph.nodes()[vertex_i])
         subdiag = graph.subgraph(subgraph_stack)
-        denominator += "(%s)" % extract_denom(graph, subdiag)
-    return denominator.replace("( +", "(")
+        denominator += "%s\\ " % extract_denom(graph, subdiag)
+    return denominator
 
 
 def extract_integral(diag):
@@ -355,7 +358,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
                         if test_vertex:
                             subgraph_stack.append(vertex_1)
                 subdiag = testdiag.subgraph(subgraph_stack)
-                denominator += "(%s)" % extract_denom(self.graph, subdiag)
+                denominator += "%s\\ " % extract_denom(self.graph, subdiag)
             for vertex in self.graph:
                 if self.graph.out_degree(vertex) == 0:
                     subdiag = self.graph.subgraph(vertex)
@@ -390,17 +393,16 @@ class BmbptFeynmanDiagram(mth.Diagram):
         """Attribute the appropriate expression to each vertex."""
         vertices_expressions = []
         for vertex in self.graph:
-            v_exp = "(" \
-                + "".join(" + E_{%s}"
+            v_exp = r"\epsilon^{" \
+                + "".join("%s"
                           % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
                           for prop
                           in self.graph.in_edges_iter(vertex, keys=True)) \
-                + "".join(" - E_{%s}"
+                + "}_{" \
+                + "".join("%s"
                           % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
                           for prop
                           in self.graph.out_edges_iter(vertex, keys=True)) \
-                + ")"
-            if "( +" in v_exp:
-                v_exp = v_exp.replace("( +", "(")
+                + "}"
             vertices_expressions.append(v_exp)
         self.vert_exp = vertices_expressions
