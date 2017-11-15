@@ -111,7 +111,16 @@ def treat_cycles(time_graph):
                 del graphs[graph_indx]
             else:
                 cycles_left = True
-    return tree_graphs
+    tree_graphs_uniq = []
+    for t_graph in tree_graphs:
+        new_graph = True
+        for t_graph_uniq in tree_graphs_uniq:
+            if nx.edges(t_graph) == nx.edges(t_graph_uniq):
+                new_graph = False
+                break
+        if new_graph:
+            tree_graphs_uniq.append(t_graph)
+    return tree_graphs_uniq
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
