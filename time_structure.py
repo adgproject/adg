@@ -96,19 +96,26 @@ def treat_cycles(time_graph):
     """Find and treat cycles in a TSD diagram."""
     graphs = [time_graph]
     new_graphs = []
+    tree_graphs = []
     cycles_left = True
     while cycles_left:
         for graph in graphs:
-            cycle_nodes = find_cycle(graph)
-            new_graphs += disentangle_cycle(time_graph, cycle_nodes)
+            if nx.is_arborescence(graph):
+                tree_graphs.append(graph)
+                graphs.remove(graph)
+            else:
+                cycle_nodes = find_cycle(graph)
+                new_graphs += disentangle_cycle(graph, cycle_nodes)
         graphs = new_graphs
         new_graphs = []
         cycles_left = False
         for graph in graphs:
-            if not nx.is_arborescence(graph):
+            if nx.is_arborescence(graph):
+                tree_graphs.append(graph)
+                graphs.remove(graph)
+            else:
                 cycles_left = True
-                break
-    return graphs
+    return tree_graphs
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
@@ -116,31 +123,23 @@ def disentangle_cycle(time_graph, cycle_nodes):
     paths = list(nx.all_simple_paths(time_graph,
                                      cycle_nodes[0],
                                      cycle_nodes[1]))
-    old_graphs = [time_graph]
+    new_graphs = []
     for insert_node in paths[0][1:-1]:
-        new_graphs = []
-        for graph in old_graphs:
-            for daughter_node in paths[1][1:]:
-                if daughter_node in nx.descendants(graph,
-                                                   paths[0][paths[0].index(list(graph.predecessors(insert_node))[0])]):
-                    new_graph = graph.to_directed()
-                    new_graph.add_edge(insert_node, daughter_node)
-                    for test_node in paths[1]:
-                        if test_node in list(graph.predecessors(daughter_node)):
-                            mother_node = test_node
-                    new_graph.add_edge(mother_node, insert_node)
-                    mth.to_skeleton(new_graph)
-                    new_graphs.append(new_graph)
-        old_graphs = new_graphs
+        for daughter_node in paths[1][1:]:
+            new_graph = time_graph.to_directed()
+            new_graph.add_edge(insert_node, daughter_node)
+            for test_node in paths[1]:
+                if test_node in list(time_graph.predecessors(daughter_node)):
+                    mother_node = test_node
+            new_graph.add_edge(mother_node, insert_node)
+            mth.to_skeleton(new_graph)
+            new_graphs.append(new_graph)
     return new_graphs
 
 
 def find_cycle(graph):
     """Return start and end nodes for an elementary cycle."""
     cycle_found = False
-    print
-    for edge in graph.edges():
-        print edge
     for node_a in graph:
         if graph.out_degree(node_a) >= 2:
             for node_b in graph:
