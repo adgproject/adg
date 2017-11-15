@@ -256,6 +256,9 @@ def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
                 os.unlink("time_%i.1" % tdiag.tags[0])
                 os.unlink("time_%i.mp" % tdiag.tags[0])
                 os.unlink("time_%i.log" % tdiag.tags[0])
+        for filename in os.listdir('.'):
+            if filename.startswith('equivalent'):
+                os.unlink(filename)
     print "Result saved in "+directory + '/result.pdf'
 
 
