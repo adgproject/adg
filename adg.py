@@ -138,15 +138,15 @@ if theory == "BMBPT":
         pool.join()
 
     else:
-        diagrams2HF = mth.topologically_distinct_diagrams(diagrams2HF)
-        diagrams2EHF = mth.topologically_distinct_diagrams(diagrams2EHF)
-        diagrams2noHF = mth.topologically_distinct_diagrams(diagrams2noHF)
-        diagrams3HF = mth.topologically_distinct_diagrams(diagrams3HF)
-        diagrams3EHF = mth.topologically_distinct_diagrams(diagrams3EHF)
-        diagrams3noHF = mth.topologically_distinct_diagrams(diagrams3noHF)
+        mth.topologically_distinct_diagrams(diagrams2HF)
+        mth.topologically_distinct_diagrams(diagrams2EHF)
+        mth.topologically_distinct_diagrams(diagrams2noHF)
+        mth.topologically_distinct_diagrams(diagrams3HF)
+        mth.topologically_distinct_diagrams(diagrams3EHF)
+        mth.topologically_distinct_diagrams(diagrams3noHF)
 
-    diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF + diagrams3HF \
-        + diagrams3EHF + diagrams3noHF
+    diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF \
+        + diagrams3HF + diagrams3EHF + diagrams3noHF
     for ind, diagram in enumerate(diagrams):
         diagram.tags[0] = ind
     nb_2_HF = len(diagrams2HF)
@@ -165,7 +165,7 @@ nb_time_diags = 0
 if theory == "BMBPT" and not norm:
     diagrams_time = [tst.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
-    diagrams_time = mth.topologically_distinct_diagrams(diagrams_time)
+    mth.topologically_distinct_diagrams(diagrams_time)
     for index, t_diag in enumerate(diagrams_time):
         t_diag.tags.insert(0, index)
         if not t_diag.is_tree:
@@ -187,13 +187,15 @@ if theory == "BMBPT":
     print "\n2N valid diagrams: %i" % nb_2
     print "2N energy canonical diagrams: %i" % nb_2_HF
     if not norm:
-        print "2N canonical diagrams for a generic operator only: %i" % nb_2_EHF
+        print "2N canonical diagrams for a generic operator only: %i" \
+            % nb_2_EHF
     print "2N non-canonical diagrams: %i\n" % nb_2_noHF
     if three_N:
         print "3N valid diagrams: %i" % nb_3
         print "3N energy canonical diagrams: %i" % nb_3_HF
         if not norm:
-            print "3N canonical diagrams for a generic operator only: %i" % nb_3_EHF
+            print "3N canonical diagrams for a generic operator only: %i" \
+                % nb_3_EHF
         print "3N non-canonical diagrams: %i" % nb_3_noHF
 
 
@@ -253,11 +255,12 @@ for diag in diagrams:
             if diag.time_tag == tdiag.tags[0]:
                 time_diag = tdiag
                 break
-        latex_file.write("\\begin{equation}\n\\text{T}%i = " % (diag.time_tag + 1)
+        latex_file.write("\\begin{equation}\n\\text{T}%i = " % (diag.time_tag
+                                                                + 1)
                          + "%s\\end{equation}\n" % time_diag.expr)
         bmbpt.write_vertices_values(latex_file, diag)
-enddoc = "\\end{document}"
-latex_file.write(enddoc)
+
+latex_file.write("\\end{document}")
 latex_file.close()
 
 msg = 'Compile pdf?'

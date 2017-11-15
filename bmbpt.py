@@ -191,7 +191,7 @@ def extract_integral(diag):
 
 
 def extract_BMBPT_crossing_sign(graph):
-    """Return True if there's a sign factor associated with crossing propagators.
+    """Return True if there's a minus sign associated with crossing propagators.
 
     Use the fact that all lines propagate upwards and the
     canonical representation of the diagrams and vertices.
@@ -235,7 +235,8 @@ def vertex_exchange_sym_factor(diag):
                      and diag.unsort_io_degrees.count(degrees) >= 2]
     for permutation in itertools.permutations(perm_vertices):
         permuted_graph = nx.relabel_nodes(graph,
-                                          dict(zip(perm_vertices, permutation)),
+                                          dict(zip(perm_vertices,
+                                                   permutation)),
                                           copy=True)
         if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
             factor += 2
@@ -286,10 +287,11 @@ def write_BMBPT_section(result, diag_index, three_N, norm,
 
 def write_diag_exps(latex_file, bmbpt_diag, norder):
     """Write the expressions associated to a diagram in the LaTeX file."""
-    latex_file.write("\\begin{align}\n\\text{PO}%i" % norder
-                     + ".%i\n" % (bmbpt_diag.tags[0] + 1))
-    latex_file.write("&= " + bmbpt_diag.feynman_exp + r" \nonumber \\" + "\n")
-    latex_file.write("&= " + bmbpt_diag.diag_exp)
+    latex_file.write("\\begin{align}\n\\text{PO}%i.%i\n" % (norder,
+                                                            (bmbpt_diag.tags[0]
+                                                             + 1)))
+    latex_file.write("&= %s" % bmbpt_diag.feynman_exp + r" \nonumber \\" + "\n")
+    latex_file.write("&= %s" % bmbpt_diag.diag_exp)
     latex_file.write("\\end{align}\n")
 
 
@@ -298,8 +300,7 @@ def write_vertices_values(latex_file, diag):
     latex_file.write("\\begin{align*}\n")
     labels = list(string.ascii_lowercase)
     for ind in range(1, len(diag.vert_exp)):
-        latex_file.write("%s &= " % labels[ind-1])
-        latex_file.write(diag.vert_exp[ind].replace("(", "").replace(")", ""))
+        latex_file.write("%s &= %s" % (labels[ind-1], diag.vert_exp[ind]))
         if ind != len(diag.vert_exp)-1:
             latex_file.write(r"\\")
         latex_file.write('\n')

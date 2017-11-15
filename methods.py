@@ -138,15 +138,15 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
-    begin_file = "\\parbox{%i" % diag_size + "pt}{\\begin{fmffile}{" \
-        + diagram_name + "}\n\\begin{fmfgraph*}(%i" % diag_size \
-        + ",%i)\n" % diag_size
+    begin_file = "\\parbox{%ipt}{\\begin{fmffile}{%s}\n" % (diag_size,
+                                                            diagram_name) \
+        + "\\begin{fmfgraph*}(%i,%i)\n" % (diag_size, diag_size)
     fmf_file.write(begin_file)
 
     # Set the position of the vertices
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in xrange(p_order-1):
-        fmf_file.write("\\fmf{phantom}{v%i" % vert + ",v%i}\n" % (vert+1))
+        fmf_file.write("\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)))
         if start_graph.node[vert]['operator']:
             fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
         else:
@@ -162,11 +162,11 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
             props_left_to_draw = start_graph.number_of_edges(vert_i, vert_j)
             # Special config for consecutive vertices
             if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
-                fmf_file.write("\\fmf{" + propa)
+                fmf_file.write("\\fmf{%s" % propa)
                 # Check for specific MBPT configuration
                 if start_graph.number_of_edges(vert_j, vert_i) == 1:
                     fmf_file.write(",right=0.5")
-                fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
+                fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
                 props_left_to_draw -= 1
             while props_left_to_draw > 0:
                 fmf_file.write("\\fmf{" + propa + ",")
@@ -183,7 +183,7 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
                         fmf_file.write("0.5")
                     else:
                         fmf_file.write("0.6")
-                fmf_file.write("}{v%i," % vert_i + "v%i}\n" % vert_j)
+                fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
                 props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
@@ -198,8 +198,8 @@ def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
         elif diag_type == 'time':
             diag_name = 'time_%i' % diag.tags[0]
             feynmf_generator(diag.graph, 'MBPT', diag_name)
-        shutil.move(diag_name + '.tex',
-                    directory + "/Diagrams/" + diag_name + '.tex')
+        shutil.move('%s.tex' % diag_name,
+                    "%s/Diagrams/%s.tex" % (directory, diag_name))
 
 
 def write_file_header(directory, latex_file, pdiag, norder, theory):
@@ -259,7 +259,7 @@ def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
         for filename in os.listdir('.'):
             if filename.startswith('equivalent'):
                 os.unlink(filename)
-    print "Result saved in "+directory + '/result.pdf'
+    print "Result saved in %s/result.pdf" % directory
 
 
 def to_skeleton(graph):
