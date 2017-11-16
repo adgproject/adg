@@ -35,9 +35,7 @@ def no_loop(matrices):
 
 
 def check_degree(matrices, three_N_use):
-    """Check the degrees of the vertices
-    (i.e. its effective one-, two- or three-body structure).
-    """
+    """Discard matrices with wrong N-body character."""
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         for ind_i in xrange(len(matrix[0])):
@@ -118,7 +116,8 @@ def has_only_branch_operator_subgraphs(graph):
     has_branch_subgraphs = True
     for connected_subgraph in nx.weakly_connected_component_subgraphs(graph):
         if len(connected_subgraph) > 1:
-            if nx.dag_longest_path_length(connected_subgraph) != (len(connected_subgraph)-1):
+            if nx.dag_longest_path_length(connected_subgraph) != \
+                    (len(connected_subgraph)-1):
                 has_branch_subgraphs = False
     return has_branch_subgraphs
 
@@ -138,10 +137,9 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
-    begin_file = "\\parbox{%ipt}{\\begin{fmffile}{%s}\n" % (diag_size,
-                                                            diagram_name) \
-        + "\\begin{fmfgraph*}(%i,%i)\n" % (diag_size, diag_size)
-    fmf_file.write(begin_file)
+    fmf_file.write("\\parbox{%ipt}{\\begin{fmffile}{%s}\n" % (diag_size,
+                                                              diagram_name)
+                   + "\\begin{fmfgraph*}(%i,%i)\n" % (diag_size, diag_size))
 
     # Set the position of the vertices
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
@@ -152,8 +150,8 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
         else:
             fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
         fmf_file.write("}{v%i}\n" % vert)
-    fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}")
-    fmf_file.write("{v%i}\n" % (p_order-1))
+    fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n"
+                   % (p_order-1))
     fmf_file.write("\\fmffreeze\n")
 
     # Loop over all elements of the graph to draw associated propagators
@@ -169,7 +167,7 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
                 fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
                 props_left_to_draw -= 1
             while props_left_to_draw > 0:
-                fmf_file.write("\\fmf{" + propa + ",")
+                fmf_file.write("\\fmf{%s," % propa)
                 if props_left_to_draw % 2 == 1:
                     fmf_file.write("right=")
                 else:

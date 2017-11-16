@@ -75,8 +75,7 @@ def order_2B_or_3B(graphs, TwoB_diags, ThreeB_diags):
     """Order the graphs depending on their 2B or 3B effective status."""
     for graph in graphs:
         max_deg = 0
-        for node in graph:
-            max_deg = max(max_deg, graph.degree(node))
+        max_deg = (max(max_deg, graph.degree(node)) for node in graph)
         if max_deg == 6:
             ThreeB_diags.append(graph)
         else:
@@ -126,8 +125,8 @@ def extract_numerator(graph):
         else:
             numerator += "\\Omega"
         # Attribute the good "type number" to each vertex
-        numerator = numerator + "^{%i" % graph.out_degree(vertex) \
-            + "%i}_{" % graph.in_degree(vertex)
+        numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
+                                    graph.in_degree(vertex))
         # First add the qp states corresponding to propagators going out
         numerator += "".join(graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
                              for prop in graph.out_edges_iter(vertex,

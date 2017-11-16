@@ -40,14 +40,13 @@ if theory == "BMBPT":
         "Draw time-structure diagrams? (y/N)").lower() == 'y'
     print "Parallel Mode available"
     num_cores = multiprocessing.cpu_count()
-    print "There is %i" % num_cores + " core(s) available"
+    print "There is %i core(s) available" % num_cores
     use_parallel = raw_input("Use parallel processing? (y/N)").lower() == 'y'
+directory = '%s/Order-%i' % (theory, norder)
 if three_N:
-    directory = theory + '/Order-%i' % norder + 'with3N'
-else:
-    directory = theory + '/Order-%i' % norder
+    directory += 'with3N'
 if norm:
-    directory = directory + '_Norm'
+    directory += '_Norm'
 if not os.path.exists(directory):
     os.makedirs(directory)
 if not os.path.exists(directory+"/Diagrams"):

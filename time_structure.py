@@ -25,8 +25,8 @@ def has_tree_time_structure(graph):
         for vertex_j in diag_copy:
             lgst_path = []
             for path in nx.all_simple_paths(diag_copy,
-                                            source=vertex_i,
-                                            target=vertex_j):
+                                            vertex_i,
+                                            vertex_j):
                 if len(path) > len(lgst_path):
                     lgst_path = path
             time_diag.add_path(lgst_path)
@@ -89,24 +89,21 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                 latex_file.write(diag_file.read())
             latex_file.write('\n\\end{center}\n\n')
         latex_file.write("Related Feynman diagrams:")
-        feynman_diags = "".join(" %i," % (tag+1) for tag in tdiag.tags[1:])
-        feynman_diags = feynman_diags.strip(",") + "."
+        feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:]) \
+            + ".\n\n"
         latex_file.write(feynman_diags)
-        latex_file.write("\n\n")
 
 
 def treat_cycles(time_graph):
     """Find and treat cycles in a TSD diagram."""
     graphs = [time_graph]
-    new_graphs = []
     tree_graphs = []
     cycles_left = True
     while cycles_left:
-        for graph in graphs:
-            cycle_nodes = find_cycle(graph)
-            new_graphs += disentangle_cycle(graph, cycle_nodes)
-        graphs = new_graphs
-        new_graphs = []
+        for gr_index in xrange(len(graphs)-1, -1, -1):
+            graphs += disentangle_cycle(graphs[gr_index],
+                                        find_cycle(graphs[gr_index]))
+            del graphs[gr_index]
         cycles_left = False
         for graph_indx in xrange(len(graphs)-1, -1, -1):
             if nx.is_arborescence(graphs[graph_indx]):
@@ -151,18 +148,15 @@ def find_cycle(graph):
     for node_a in graph:
         if graph.out_degree(node_a) >= 2:
             for node_b in graph:
-                if graph.in_degree(node_b) == 2 \
+                if (graph.in_degree(node_b) == 2
+                    and len(list(nx.all_simple_paths(graph,
+                                                     node_a,
+                                                     node_b))) == 2) \
+                    or (graph.in_degree(node_b) > 2
                         and len(list(nx.all_simple_paths(graph,
                                                          node_a,
-                                                         node_b))) == 2:
-                    cycle_nodes = (node_a, node_b)
-                    cycle_found = True
-                    break
-                elif graph.in_degree(node_b) > 2 \
-                        and len(list(nx.all_simple_paths(graph,
-                                                         node_a,
-                                                         node_b))) > 2 \
-                        and graph.out_degree(node_a) == graph.in_degree(node_b):
+                                                         node_b))) > 2
+                        and graph.out_degree(node_a) == graph.in_degree(node_b)):
                     cycle_nodes = (node_a, node_b)
                     cycle_found = True
                     break
