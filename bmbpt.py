@@ -342,30 +342,18 @@ class BmbptFeynmanDiagram(mth.Diagram):
         if self.tst_is_tree:
             time_graph = time_diags[self.time_tag].graph
             denominator = time_tree_denominator(self.graph,
-                                                time_graph, denominator)
-
-        elif (norder == 4) and (mth.number_of_sinks(self.graph) == 1):
-            testdiag = omega_subgraph(self.graph)
-            for i in range(2):
-                subgraph_stack = [nx.dag_longest_path(testdiag)[1]]
-                if i == 0:
-                    subgraph_stack.append(nx.dag_longest_path(testdiag)[0])
-                else:
-                    for vertex_1 in testdiag:
-                        test_vertex = True
-                        for vertex_2 in nx.dag_longest_path(testdiag):
-                            if vertex_1 == vertex_2:
-                                test_vertex = False
-                        if test_vertex:
-                            subgraph_stack.append(vertex_1)
-                subdiag = testdiag.subgraph(subgraph_stack)
-                denominator += "%s\\ " % extract_denom(self.graph, subdiag)
-            for vertex in self.graph:
-                if self.graph.out_degree(vertex) == 0:
-                    subdiag = self.graph.subgraph(vertex)
-            extra_factor = "\\left[ \\frac{1}{%s} + \\frac{1}{%s} \\right]" \
-                % (extract_denom(self.graph, subdiag),
-                   extract_denom(self.graph, testdiag))
+                                                time_graph,
+                                                denominator)
+        else:
+            equivalent_t_graphs = time_diags[self.time_tag].equivalent_trees
+            extra_factor = "\\left[" \
+                + " + ".join("\\frac{1}{%s}"
+                             % time_tree_denominator(self.graph,
+                                                     equi_t_graph,
+                                                     "")
+                             for equi_t_graph
+                             in equivalent_t_graphs) \
+                + " \\right]"
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (norder - 1)
         if extract_BMBPT_crossing_sign(self.graph):
