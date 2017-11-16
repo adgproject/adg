@@ -170,6 +170,10 @@ if theory == "BMBPT" and not norm:
         t_diag.tags.insert(0, index)
         if not t_diag.is_tree:
             t_diag.equivalent_trees = tst.treat_cycles(t_diag.graph)
+            t_diag.expr = "".join("\\frac{1}{%s} +"
+                                  % tst.tree_time_structure_den(graph)
+                                  for graph
+                                  in t_diag.equivalent_trees).strip(" +")
     for diag in diagrams:
         bmbpt.attribute_qp_labels(diag.graph)
         for t_diag in diagrams_time:

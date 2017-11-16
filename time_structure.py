@@ -74,6 +74,9 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
             latex_file.write("\\end{equation}\n")
         else:
             latex_file.write("Tree: No\n\n")
+            latex_file.write("\\begin{equation}\n")
+            latex_file.write(tdiag.expr)
+            latex_file.write("\\end{equation}\n")
             latex_file.write("Equivalent tree diagrams:\n\n")
             latex_file.write('\n\\begin{center}\n')
             for index, graph in enumerate(tdiag.equivalent_trees):
