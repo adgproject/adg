@@ -232,10 +232,6 @@ if theory == "BMBPT":
     if write_time:
         tst.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                         diagrams_time)
-
-    latex_file.write("\\section{Two-body diagrams}\n\n")
-    latex_file.write("\\subsection{Two-body energy canonical diagrams}\n\n")
-
 for diag in diagrams:
     if theory == "BMBPT":
         bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,

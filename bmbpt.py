@@ -13,7 +13,7 @@ def BMBPT_generation(p_order, three_N_use):
     deg_max = 6 if three_N_use else 4
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    matrices = [mth.empty_matrix_generation(p_order)]
+    matrices = [[[0 for element in range(p_order)] for line in range(p_order)]]
 
     # Generate oriented adjacency matrices going vertex-wise
     vertices = range(p_order)
@@ -120,10 +120,7 @@ def extract_numerator(graph):
     numerator = ""
     for vertex in graph:
         # Attribute the correct operator to each vertex
-        if graph.node[vertex]['operator']:
-            numerator += "O"
-        else:
-            numerator += "\\Omega"
+        numerator += "O" if graph.node[vertex]['operator'] else "\\Omega"
         # Attribute the good "type number" to each vertex
         numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
                                     graph.in_degree(vertex))
@@ -269,7 +266,10 @@ def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
 def write_BMBPT_section(result, diag_index, three_N, norm,
                         nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF):
     """Write section and subsections for BMBPT result file."""
-    if (diag_index == nb_2_HF) and (not norm):
+    if diag_index == 0:
+        result.write("\\section{Two-body diagrams}\n\n")
+        result.write("\\subsection{Two-body energy canonical diagrams}\n\n")
+    elif (diag_index == nb_2_HF) and (not norm):
         result.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n\n")
     elif diag_index == nb_2_HF + nb_2_EHF:
         result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
@@ -289,9 +289,9 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
     latex_file.write("\\begin{align}\n\\text{PO}%i.%i\n" % (norder,
                                                             (bmbpt_diag.tags[0]
                                                              + 1)))
-    latex_file.write("&= %s" % bmbpt_diag.feynman_exp + r" \nonumber \\" + "\n")
-    latex_file.write("&= %s" % bmbpt_diag.diag_exp)
-    latex_file.write("\\end{align}\n")
+    latex_file.write("&= %s" % bmbpt_diag.feynman_exp
+                     + r" \nonumber \\" + "\n")
+    latex_file.write("&= %s\\end{align}\n" % bmbpt_diag.diag_exp)
 
 
 def write_vertices_values(latex_file, diag):
@@ -363,19 +363,14 @@ class BmbptFeynmanDiagram(mth.Diagram):
                 sym_fact += vertex_exchange_sym_factor(self)
                 break
         sym_fact += multiplicity_symmetry_factor(self.graph)
-        if sym_fact != "":
-            prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact)
-        else:
-            prefactor = "%s\\sum_{k_i}" % prefactor
+        prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
+            if sym_fact != "" else "%s\\sum_{k_i}" % prefactor
         self.feynman_exp = "%s%s\\int_{0}^{\\tau}%s\n" \
                            % (prefactor, numerator, extract_integral(self))
-        if denominator != "":
-            self.diag_exp = "%s\\frac{%s}{%s} %s\n" % (prefactor,
-                                                       numerator,
-                                                       denominator,
-                                                       extra_factor)
-        else:
-            self.diag_exp = "%s%s%s\n" % (prefactor, numerator, extra_factor)
+        self.diag_exp = "%s\\frac{%s}{%s} %s\n" % (prefactor, numerator,
+                                                   denominator, extra_factor) \
+            if denominator != "" \
+            else "%s%s%s\n" % (prefactor, numerator, extra_factor)
 
     def attribute_vertices_expressions(self):
         """Attribute the appropriate expression to each vertex."""

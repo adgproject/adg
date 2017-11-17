@@ -26,8 +26,7 @@ def no_loop(matrices):
         matrix = matrices[i_mat]
         for ind_i in xrange(len(matrix[0])):
             for ind_j in xrange(ind_i+1):
-                if (matrix[ind_i][ind_j] != 0) \
-                  and (matrix[ind_j][ind_i] != 0):
+                if (matrix[ind_i][ind_j] != 0) and (matrix[ind_j][ind_i] != 0):
                     test_no_loop = False
                     break
         if not test_no_loop:
@@ -57,16 +56,6 @@ def check_vertex_degree(matrices, three_N_use, vertex_id):
         if (vertex_degree != 2) and (vertex_degree != 4):
             if (not three_N_use) or (vertex_degree != 6):
                 del matrices[i_mat]
-
-
-def empty_matrix_generation(size):
-    """Generate an empty matrix of size (size,size)."""
-    empty_matrix = []
-    for line in range(size):
-        empty_matrix.append([])
-        for element in range(size):
-            empty_matrix[line].append(0)
-    return empty_matrix
 
 
 def topologically_distinct_graphs(graphs):
@@ -145,10 +134,9 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in xrange(p_order-1):
         fmf_file.write("\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)))
-        if start_graph.node[vert]['operator']:
-            fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick")
-        else:
-            fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
+        fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
+                       if start_graph.node[vert]['operator']
+                       else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
         fmf_file.write("}{v%i}\n" % vert)
     fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n"
                    % (p_order-1))
@@ -168,19 +156,14 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
                 props_left_to_draw -= 1
             while props_left_to_draw > 0:
                 fmf_file.write("\\fmf{%s," % propa)
-                if props_left_to_draw % 2 == 1:
-                    fmf_file.write("right=")
-                else:
-                    fmf_file.write("left=")
+                fmf_file.write("right=" if props_left_to_draw % 2 == 1
+                               else "left=")
                 if (props_left_to_draw == 6) or (props_left_to_draw == 5):
                     fmf_file.write("0.9")
                 elif (props_left_to_draw == 4) or (props_left_to_draw == 3):
                     fmf_file.write("0.75")
                 elif (props_left_to_draw == 2) or (props_left_to_draw == 1):
-                    if abs(vert_i-vert_j) == 1:
-                        fmf_file.write("0.5")
-                    else:
-                        fmf_file.write("0.6")
+                    fmf_file.write("0.5" if abs(vert_i-vert_j) == 1 else "0.6")
                 fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
                 props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
@@ -190,12 +173,10 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
 def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
     """Create and move the appropriate feynmanmp files to the right place."""
     for diag in diagrams_list:
-        if diag_type == 'diag':
-            diag_name = 'diag_%i' % diag.tags[0]
-            feynmf_generator(diag.graph, theory_type, diag_name)
-        elif diag_type == 'time':
-            diag_name = 'time_%i' % diag.tags[0]
-            feynmf_generator(diag.graph, 'MBPT', diag_name)
+        diag_name = '%s%i' % (diag_type, diag.tags[0])
+        feynmf_generator(diag.graph,
+                         'MBPT' if diag_type == 'time' else theory_type,
+                         diag_name)
         shutil.move('%s.tex' % diag_name,
                     "%s/Diagrams/%s.tex" % (directory, diag_name))
 
@@ -215,25 +196,21 @@ def write_file_header(directory, latex_file, pdiag, norder, theory):
         msg = 'Expressions may be long, rotate pdf?'
         land = raw_input("%s (y/N) " % msg).lower() == 'y'
     if land:
-        header = header + "\\usepackage[landscape]{geometry}\n"
+        header = "%s\\usepackage[landscape]{geometry}\n" % header
 
     header = header \
         + "\\title{Diagrams and algebraic expressions at order %i" % norder \
-        + " in " + theory + "}\n" \
+        + " in %s}\n" % theory \
         + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
-    latex_file.write(header)
-    begdoc = "\\begin{document}\n"
-    latex_file.write(begdoc)
+    latex_file.write("%s\\begin{document}\n" % header)
     latex_file.write("\\maketitle\n")
     latex_file.write("\\graphicspath{{Diagrams/}}")
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
     """Copy the diagram feynmanmp instructions in the result file."""
-    if diag_type == 'diag':
-        diag_file = open(directory+"/Diagrams/diag_%i.tex" % diagram_index)
-    elif diag_type == 'time':
-        diag_file = open(directory+"/Diagrams/time_%i.tex" % diagram_index)
+    diag_file = open(directory+"/Diagrams/%s%i.tex" % (diag_type,
+                                                       diagram_index))
     result_file.write(diag_file.read())
 
 

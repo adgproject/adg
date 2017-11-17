@@ -62,21 +62,13 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
         latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                          % (tdiag.tags[0]+1))
         if pdiag and pdraw:
-            latex_file.write('\n\\begin{center}\n')
             time_file = open(directory
                              + "/Diagrams/time_%i.tex" % tdiag.tags[0])
-            latex_file.write(time_file.read())
-            latex_file.write('\n\\end{center}\n\n')
-        if tdiag.is_tree:
-            latex_file.write("Tree: Yes\n\n")
-            latex_file.write("\\begin{equation}\n")
-            latex_file.write(tdiag.expr)
-            latex_file.write("\\end{equation}\n")
-        else:
-            latex_file.write("Tree: No\n\n")
-            latex_file.write("\\begin{equation}\n")
-            latex_file.write(tdiag.expr)
-            latex_file.write("\\end{equation}\n")
+            latex_file.write('\n\\begin{center}\n%s\n\\end{center}\n\n'
+                             % time_file.read())
+        latex_file.write("Tree: Yes\n\n" if tdiag.is_tree else "Tree: No\n\n")
+        latex_file.write("\\begin{equation}\n%s\\end{equation}\n" % tdiag.expr)
+        if not tdiag.is_tree:
             latex_file.write("Equivalent tree diagrams:\n\n")
             latex_file.write('\n\\begin{center}\n')
             for index, graph in enumerate(tdiag.equivalent_trees):
@@ -88,10 +80,9 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                                           index))
                 latex_file.write(diag_file.read())
             latex_file.write('\n\\end{center}\n\n')
-        latex_file.write("Related Feynman diagrams:")
         feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:]) \
             + ".\n\n"
-        latex_file.write(feynman_diags)
+        latex_file.write("Related Feynman diagrams:%s" % feynman_diags)
 
 
 def treat_cycles(time_graph):
@@ -149,9 +140,9 @@ def find_cycle(graph):
         if graph.out_degree(node_a) >= 2:
             for node_b in graph:
                 if (graph.in_degree(node_b) == 2
-                    and len(list(nx.all_simple_paths(graph,
-                                                     node_a,
-                                                     node_b))) == 2) \
+                        and len(list(nx.all_simple_paths(graph,
+                                                         node_a,
+                                                         node_b))) == 2) \
                     or (graph.in_degree(node_b) > 2
                         and len(list(nx.all_simple_paths(graph,
                                                          node_a,

@@ -16,8 +16,10 @@ def seed(n):
 def diagram_generation(n):
     """Generate the diagrams for the MBPT case."""
     seeds = seed(n)
-    all = [[[0 if i != j else 1 for i in range(n)] for j in k] for k in seeds]
-    traceless = mth.no_trace(all)
+    all_matrices = [[[0 if i != j else 1 for i in range(n)]
+                     for j in k]
+                    for k in seeds]
+    traceless = mth.no_trace(all_matrices)
     coeffs = [i for i in itertools.combinations_with_replacement(
         range(len(traceless)), 2)]
     double = []
@@ -33,10 +35,7 @@ def diagram_generation(n):
         if matrix not in doubleUniq:
             doubleUniq.append(matrix)
     doubleUniq.sort(reverse=True)
-    mbpt_diagrams = []
-    for matrix in doubleUniq:
-        mbpt_diagrams.append(np.array(matrix))
-    return mbpt_diagrams
+    return [np.array(matrix) for matrix in doubleUniq]
 
 
 def line_label_h(n):
@@ -93,38 +92,27 @@ class MbptDiagram(mth.Diagram):
             bra = ''
             for col in xrange(ncol):
                 if (incidence[row, col] == 1):
-                    if type_edg[col] == 'h':
-                        bra += line_label_h(col)
-                    else:
-                        bra += line_label_p(col)
+                    bra += line_label_h(col) if type_edg[col] == 'h' \
+                        else line_label_p(col)
                 elif (incidence[row, col] == -1):
-                    if type_edg[col] == 'h':
-                        ket += line_label_h(col)
-                    else:
-                        ket += line_label_p(col)
-            braket += '\\braket{' + bra + '|H|' + ket + '}'
+                    ket += line_label_h(col) if type_edg[col] == 'h' \
+                        else line_label_p(col)
+            braket += '\\braket{%s|H|%s}' % (bra, ket)
         denom = ''
         for row in xrange(1, nrow):
             denom += '('
             for col in range(ncol):
                 if incidence[0:row, col].sum() == 1:
-                    if type_edg[col] == 'h':
-                        denom += ' +E_' + line_label_h(col)
-                    else:
-                        denom += ' +E_' + line_label_p(col)
+                    denom += '+E_' + line_label_h(col) if type_edg[col] == 'h'\
+                        else '+E_' + line_label_p(col)
                 elif incidence[0:row, col].sum() == -1:
-                    if type_edg[col] == 'h':
-                        denom += '-E_' + line_label_h(col)
-                    else:
-                        denom += '-E_' + line_label_p(col)
+                    denom += '-E_' + line_label_h(col) if type_edg[col] == 'h'\
+                        else '-E_' + line_label_p(col)
             denom += ')'
-        if '( +' in denom:
-            denom = denom.replace('( +', '(')
-        denom = denom.strip(' ')
-        phases = '(-1)^{%i' % n_holes + '+l}'
+        denom = denom.replace('( +', '(').strip(' ')
+        phases = '(-1)^{%i+l}' % n_holes
         eq_lines = np.array(incidence.transpose())
         neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         nedges_eq = 2**(len(eq_lines)-len(neq_lines))
-        self.expr = "\\dfrac{1}{%i}" % nedges_eq + phases \
-            + "\\sum{\\dfrac{" + braket + "}{" \
-            + denom + "}}\n"
+        self.expr = "\\dfrac{1}{%i}%s" % (nedges_eq, phases) \
+            + "\\sum{\\dfrac{%s}{%s}}\n" % (braket, denom)
