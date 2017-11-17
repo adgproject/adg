@@ -1,5 +1,6 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
+import os
 import string
 import networkx as nx
 import methods as mth
@@ -79,6 +80,8 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                 diag_file = open("equivalent%i_%i.tex" % (tdiag.tags[0],
                                                           index))
                 latex_file.write(diag_file.read())
+                diag_file.close()
+                os.unlink("./equivalent%i_%i.tex" % (tdiag.tags[0], index))
             latex_file.write('\n\\end{center}\n\n')
         feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:]) \
             + ".\n\n"

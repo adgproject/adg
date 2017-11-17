@@ -173,7 +173,7 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
 def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
     """Create and move the appropriate feynmanmp files to the right place."""
     for diag in diagrams_list:
-        diag_name = '%s%i' % (diag_type, diag.tags[0])
+        diag_name = '%s_%i' % (diag_type, diag.tags[0])
         feynmf_generator(diag.graph,
                          'MBPT' if diag_type == 'time' else theory_type,
                          diag_name)
@@ -209,9 +209,10 @@ def write_file_header(directory, latex_file, pdiag, norder, theory):
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
     """Copy the diagram feynmanmp instructions in the result file."""
-    diag_file = open(directory+"/Diagrams/%s%i.tex" % (diag_type,
-                                                       diagram_index))
+    diag_file = open(directory+"/Diagrams/%s_%i.tex" % (diag_type,
+                                                        diagram_index))
     result_file.write(diag_file.read())
+    diag_file.close()
 
 
 def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
@@ -222,17 +223,9 @@ def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
         # Second compilation needed
         os.system("pdflatex -shell-escape result.tex")
         # Get rid of undesired feynmp files to keep a clean directory
-        for diagram in diagrams:
-            os.unlink("diag_%i.1" % diagram.tags[0])
-            os.unlink("diag_%i.mp" % diagram.tags[0])
-            os.unlink("diag_%i.log" % diagram.tags[0])
-        if write_time:
-            for tdiag in time_diagrams:
-                os.unlink("time_%i.1" % tdiag.tags[0])
-                os.unlink("time_%i.mp" % tdiag.tags[0])
-                os.unlink("time_%i.log" % tdiag.tags[0])
         for filename in os.listdir('.'):
-            if filename.startswith('equivalent'):
+            if filename.startswith("time") or filename.startswith("diag") \
+                    or filename.startswith("equivalent"):
                 os.unlink(filename)
     print "Result saved in %s/result.pdf" % directory
 
