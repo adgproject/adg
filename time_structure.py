@@ -59,6 +59,7 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                 time_diagrams):
     """Write the appropriate section for tst diagrams in the LaTeX file."""
     latex_file.write("\\section{Associated time-structure diagrams}\n\n")
+    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for tdiag in time_diagrams:
         latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                          % (tdiag.tags[0]+1))
@@ -71,6 +72,18 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
         latex_file.write("\\begin{equation}\n%s\\end{equation}\n" % tdiag.expr)
         if not tdiag.is_tree:
             latex_file.write("Equivalent tree diagrams:\n\n")
+            for eq_t_graph in tdiag.equivalent_trees:
+                for comp_tdiag in time_diagrams:
+                    if sorted(tuple((eq_t_graph.in_degree(node),
+                                     eq_t_graph.out_degree(node))
+                                    for node in eq_t_graph)) \
+                                == comp_tdiag.io_degrees \
+                            and comp_tdiag.is_tree:
+                        if nx.is_isomorphic(eq_t_graph,
+                                            comp_tdiag.graph,
+                                            node_match=nm):
+                            latex_file.write(" %s," % comp_tdiag.tags[0])
+                            break
             latex_file.write('\n\\begin{center}\n')
             for index, graph in enumerate(tdiag.equivalent_trees):
                 mth.feynmf_generator(graph,
