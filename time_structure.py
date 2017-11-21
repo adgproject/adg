@@ -55,11 +55,27 @@ def tree_time_structure_den(time_graph):
     return denominator
 
 
+def equivalent_labelled_TSDs(equivalent_trees, labelled_TSDs):
+    """Return the list of labelled TSDs corresponding to equivalent TSDs."""
+    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    eq_labelled_TSDs = ""
+    for eq_tree_graph in equivalent_trees:
+        for comp_tdiag in labelled_TSDs:
+            if sorted(tuple((eq_tree_graph.in_degree(node),
+                             eq_tree_graph.out_degree(node))
+                            for node in eq_tree_graph)) \
+                    == comp_tdiag.io_degrees \
+                    and comp_tdiag.is_tree:
+                if nx.is_isomorphic(eq_tree_graph, comp_tdiag.graph, nm):
+                    eq_labelled_TSDs += " T%s," % (comp_tdiag.tags[0]+1)
+                    break
+    return "".join("%s." % eq_labelled_TSDs.strip(','))
+
+
 def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                 time_diagrams):
     """Write the appropriate section for tst diagrams in the LaTeX file."""
     latex_file.write("\\section{Associated time-structure diagrams}\n\n")
-    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for tdiag in time_diagrams:
         latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                          % (tdiag.tags[0]+1))
@@ -71,19 +87,9 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
         latex_file.write("Tree: Yes\n\n" if tdiag.is_tree else "Tree: No\n\n")
         latex_file.write("\\begin{equation}\n%s\\end{equation}\n" % tdiag.expr)
         if not tdiag.is_tree:
-            latex_file.write("Equivalent tree diagrams:\n\n")
-            for eq_t_graph in tdiag.equivalent_trees:
-                for comp_tdiag in time_diagrams:
-                    if sorted(tuple((eq_t_graph.in_degree(node),
-                                     eq_t_graph.out_degree(node))
-                                    for node in eq_t_graph)) \
-                                == comp_tdiag.io_degrees \
-                            and comp_tdiag.is_tree:
-                        if nx.is_isomorphic(eq_t_graph,
-                                            comp_tdiag.graph,
-                                            node_match=nm):
-                            latex_file.write(" %s," % comp_tdiag.tags[0])
-                            break
+            latex_file.write("Equivalent tree diagrams: %s\n\n"
+                             % equivalent_labelled_TSDs(tdiag.equivalent_trees,
+                                                        time_diagrams))
             latex_file.write('\n\\begin{center}\n')
             for index, graph in enumerate(tdiag.equivalent_trees):
                 mth.feynmf_generator(graph,
@@ -96,9 +102,8 @@ def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                 diag_file.close()
                 os.unlink("./equivalent%i_%i.tex" % (tdiag.tags[0], index))
             latex_file.write('\n\\end{center}\n\n')
-        feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:]) \
-            + ".\n\n"
-        latex_file.write("Related Feynman diagrams:%s" % feynman_diags)
+        feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
+        latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
 
 
 def treat_cycles(time_graph):
@@ -163,7 +168,8 @@ def find_cycle(graph):
                         and len(list(nx.all_simple_paths(graph,
                                                          node_a,
                                                          node_b))) > 2
-                        and graph.out_degree(node_a) == graph.in_degree(node_b)):
+                        and graph.out_degree(node_a)
+                        == graph.in_degree(node_b)):
                     cycle_nodes = (node_a, node_b)
                     cycle_found = True
                     break
