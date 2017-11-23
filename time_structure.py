@@ -148,6 +148,7 @@ def disentangle_cycle(time_graph, cycle_nodes):
             for test_node in paths[1]:
                 if test_node in list(time_graph.predecessors(daughter_node)):
                     mother_node = test_node
+                    break
             new_graph.add_edge(mother_node, insert_node)
             mth.to_skeleton(new_graph)
             new_graphs.append(new_graph)
@@ -160,18 +161,14 @@ def find_cycle(graph):
     for node_a in graph:
         if graph.out_degree(node_a) >= 2:
             for node_b in graph:
-                if (graph.in_degree(node_b) == 2
-                        and len(list(nx.all_simple_paths(graph,
-                                                         node_a,
-                                                         node_b))) == 2) \
-                    or (graph.in_degree(node_b) > 2
-                        and len(list(nx.all_simple_paths(graph,
-                                                         node_a,
-                                                         node_b))) > 2
-                        and graph.out_degree(node_a)
-                        == graph.in_degree(node_b)):
+                paths = list(nx.all_simple_paths(graph, node_a, node_b))
+                if graph.in_degree(node_b) >= 2 and len(paths) >= 2:
                     cycle_nodes = (node_a, node_b)
                     cycle_found = True
+                    for test_node in paths[0][1:-1]:
+                        if test_node in paths[1][1:-1]:
+                            cycle_found = False
+                            break
                     break
         if cycle_found:
             break
