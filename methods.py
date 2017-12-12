@@ -63,11 +63,11 @@ def topologically_distinct_graphs(graphs):
     nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     for i_graph in xrange(len(graphs)-1, -1, -1):
         graph = graphs[i_graph]
-        vert_degrees = sorted([degree for node, degree in graph.degree_iter()])
+        vert_degrees = sorted([graph.degree(node) for node in graph])
         for i_comp_graph in xrange(i_graph+1, len(graphs), 1):
             if vert_degrees == sorted([
-                    degree for node, degree
-                    in graphs[i_comp_graph].degree_iter()]):
+                    graphs[i_comp_graph].degree(node) for node
+                    in graphs[i_comp_graph]]):
                 if nx.is_isomorphic(graph, graphs[i_comp_graph],
                                     node_match=nm):
                     del graphs[i_comp_graph]
@@ -247,8 +247,7 @@ class Diagram(object):
 
     def __init__(self, nx_graph):
         self.graph = nx_graph
-        self.degrees = sorted([degree for node, degree
-                               in nx_graph.degree_iter()])
+        self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
                                         nx_graph.out_degree(node))
                                        for node in nx_graph)

@@ -103,8 +103,8 @@ def order_HF_or_not(graphs, HF_graphs, EHF_graphs, noHF_graphs, norm):
 def attribute_qp_labels(graph):
     """Attribute the appropriate qp labels to the graph's propagators."""
     i = 1
-    for prop in graph.edges_iter(keys=True):
-        graph.edge[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
+    for prop in graph.edges(keys=True):
+        graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
         i += 1
 
 
@@ -125,15 +125,13 @@ def extract_numerator(graph):
         numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
                                     graph.in_degree(vertex))
         # First add the qp states corresponding to propagators going out
-        numerator += "".join(graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                             for prop in graph.out_edges_iter(vertex,
-                                                              keys=True))
+        numerator += "".join(graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                             for prop in graph.out_edges(vertex, keys=True))
         # Add the qp states corresponding to propagators coming in
         previous_vertex = vertex - 1
         while previous_vertex >= 0:
-            numerator += "".join(graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                                 for prop in graph.in_edges_iter(vertex,
-                                                                 keys=True)
+            numerator += "".join(graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                                 for prop in graph.in_edges(vertex, keys=True)
                                  if prop[0] == previous_vertex)
             previous_vertex -= 1
         numerator += "} "
@@ -144,15 +142,15 @@ def extract_denom(start_graph, subgraph):
     """Extract the appropriate denominator using the subgraph rule."""
     denomin = r"\epsilon^{" \
         + "".join("%s"
-                  % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
                   for propa
-                  in start_graph.in_edges_iter(subgraph, keys=True)
+                  in start_graph.in_edges(subgraph, keys=True)
                   if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
         + "}_{" \
         + "".join("%s"
-                  % start_graph.edge[propa[0]][propa[1]][propa[2]]['qp_state']
+                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
                   for propa
-                  in start_graph.out_edges_iter(subgraph, keys=True)
+                  in start_graph.out_edges(subgraph, keys=True)
                   if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
         + "}"
     return denomin
@@ -194,7 +192,7 @@ def extract_BMBPT_crossing_sign(graph):
     """
     nb_crossings = 0
     for vertex in graph:
-        for propagator in graph.out_edges_iter(vertex, keys=True):
+        for propagator in graph.out_edges(vertex, keys=True):
             for vertex_ante in xrange(propagator[0]):
                 for vertex_post in xrange(propagator[0]+1, propagator[1]):
                     nb_crossings += graph.number_of_edges(vertex_ante,
@@ -378,14 +376,12 @@ class BmbptFeynmanDiagram(mth.Diagram):
         for vertex in self.graph:
             v_exp = r"\epsilon^{" \
                 + "".join("%s"
-                          % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                          for prop
-                          in self.graph.in_edges_iter(vertex, keys=True)) \
+                          % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                          for prop in self.graph.in_edges(vertex, keys=True)) \
                 + "}_{" \
                 + "".join("%s"
-                          % self.graph.edge[prop[0]][prop[1]][prop[2]]['qp_state']
-                          for prop
-                          in self.graph.out_edges_iter(vertex, keys=True)) \
+                          % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                          for prop in self.graph.out_edges(vertex, keys=True)) \
                 + "}"
             vertices_expressions.append(v_exp)
         self.vert_exp = vertices_expressions
