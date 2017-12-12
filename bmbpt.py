@@ -159,9 +159,9 @@ def extract_denom(start_graph, subgraph):
 def time_tree_denominator(graph, time_graph, denominator):
     """Add the denominator for a time-tree graph."""
     for vertex_i in range(1, len(time_graph)):
-        subgraph_stack = [graph.nodes()[vertex_j]
+        subgraph_stack = [vertex_j
                           for vertex_j in nx.descendants(time_graph, vertex_i)]
-        subgraph_stack.append(graph.nodes()[vertex_i])
+        subgraph_stack.append(vertex_i)
         subdiag = graph.subgraph(subgraph_stack)
         denominator += "%s\\ " % extract_denom(graph, subdiag)
     return denominator
