@@ -240,10 +240,10 @@ def vertex_exchange_sym_factor(diag):
 def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
                        nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF):
     """Write overall header for BMBPT result file."""
-    tex_file.write("Valid diagrams: %i\n\n" % numdiag)
-    tex_file.write("2N valid diagrams: %i\n\n" %
-                   (nb_2_HF + nb_2_EHF + nb_2_noHF))
-    tex_file.write("2N canonical diagrams for the energy: %i\n\n" % nb_2_HF)
+    tex_file.write("Valid diagrams: %i\n\n" % numdiag
+                   + "2N valid diagrams: %i\n\n" % (nb_2_HF
+                                                    + nb_2_EHF + nb_2_noHF)
+                   + "2N canonical diagrams for the energy: %i\n\n" % nb_2_HF)
     if not norm:
         tex_file.write(
             "2N canonical diagrams for a generic operator only: %i\n\n"
@@ -265,17 +265,16 @@ def write_BMBPT_section(result, diag_index, three_N, norm,
                         nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF):
     """Write section and subsections for BMBPT result file."""
     if diag_index == 0:
-        result.write("\\section{Two-body diagrams}\n\n")
-        result.write("\\subsection{Two-body energy canonical diagrams}\n\n")
+        result.write("\\section{Two-body diagrams}\n\n"
+                     + "\\subsection{Two-body energy canonical diagrams}\n\n")
     elif (diag_index == nb_2_HF) and (not norm):
         result.write("\\subsection{Two-body canonical diagrams for a generic operator only}\n\n")
     elif diag_index == nb_2_HF + nb_2_EHF:
         result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
     if three_N:
         if diag_index == nb_2:
-            result.write("\\section{Three-body diagrams}\n\n")
-            result.write(
-                "\\subsection{Three-body energy canonical diagrams}\n\n")
+            result.write("\\section{Three-body diagrams}\n\n"
+                         + "\\subsection{Three-body energy canonical diagrams}\n\n")
         elif (diag_index == nb_2 + nb_3_HF) and (not norm):
             result.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
         elif diag_index == nb_2 + nb_3_HF + nb_3_EHF:
@@ -286,10 +285,10 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
     """Write the expressions associated to a diagram in the LaTeX file."""
     latex_file.write("\\begin{align}\n\\text{PO}%i.%i\n" % (norder,
                                                             (bmbpt_diag.tags[0]
-                                                             + 1)))
-    latex_file.write("&= %s" % bmbpt_diag.feynman_exp
-                     + r" \nonumber \\" + "\n")
-    latex_file.write("&= %s\\end{align}\n" % bmbpt_diag.diag_exp)
+                                                             + 1))
+                     + "&= %s" % bmbpt_diag.feynman_exp
+                     + r" \nonumber \\" + "\n"
+                     + "&= %s\\end{align}\n" % bmbpt_diag.diag_exp)
 
 
 def write_vertices_values(latex_file, diag):
@@ -310,6 +309,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
     def __init__(self, nx_graph, use_norm, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph."""
         mth.Diagram.__init__(self, nx_graph)
+        self.type = 'BMBPT'
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
         self.time_tag = -1
@@ -331,7 +331,8 @@ class BmbptFeynmanDiagram(mth.Diagram):
 
     def attribute_expressions(self, time_diags):
         """Attribute the correct Feynman and Goldstone expressions."""
-        self.attribute_vertices_expressions()
+        self.vert_exp = [self.vertex_expression(vertex)
+                         for vertex in self.graph]
         norder = len(self.graph)
         numerator = extract_numerator(self.graph)
         denominator = ""
@@ -370,18 +371,15 @@ class BmbptFeynmanDiagram(mth.Diagram):
             if denominator != "" \
             else "%s%s%s\n" % (prefactor, numerator, extra_factor)
 
-    def attribute_vertices_expressions(self):
-        """Attribute the appropriate expression to each vertex."""
-        vertices_expressions = []
-        for vertex in self.graph:
-            v_exp = r"\epsilon^{" \
-                + "".join("%s"
-                          % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                          for prop in self.graph.in_edges(vertex, keys=True)) \
-                + "}_{" \
-                + "".join("%s"
-                          % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                          for prop in self.graph.out_edges(vertex, keys=True)) \
-                + "}"
-            vertices_expressions.append(v_exp)
-        self.vert_exp = vertices_expressions
+    def vertex_expression(self, vertex):
+        """Return the expression associated to a given vertex."""
+        expression = r"\epsilon^{" \
+            + "".join("%s"
+                      % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                      for prop in self.graph.in_edges(vertex, keys=True)) \
+            + "}_{" \
+            + "".join("%s"
+                      % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                      for prop in self.graph.out_edges(vertex, keys=True)) \
+            + "}"
+        return expression

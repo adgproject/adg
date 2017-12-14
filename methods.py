@@ -246,6 +246,7 @@ class Diagram(object):
     """Describes a diagram with its related properties."""
 
     def __init__(self, nx_graph):
+        self.type = 'Diagram'
         self.graph = nx_graph
         self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),

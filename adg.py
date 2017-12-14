@@ -160,11 +160,18 @@ if theory == "BMBPT":
 numdiag = len(diagrams)
 
 # Treatment of the algebraic expressions
-nb_time_diags = 0
 if theory == "BMBPT" and not norm:
+
+    # Production of the time-structure diagrams
+
     diagrams_time = [tst.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
-    mth.topologically_distinct_diagrams(diagrams_time)
+    tree_TSDs = [tsd for tsd in diagrams_time if tsd.is_tree]
+    non_tree_TSDs = [tsd for tsd in diagrams_time if not tsd.is_tree]
+    mth.topologically_distinct_diagrams(tree_TSDs)
+    nb_tree_TSDs = len(tree_TSDs)
+    mth.topologically_distinct_diagrams(non_tree_TSDs)
+    diagrams_time = tree_TSDs + non_tree_TSDs
     for index, t_diag in enumerate(diagrams_time):
         t_diag.tags.insert(0, index)
         if not t_diag.is_tree:
@@ -173,6 +180,9 @@ if theory == "BMBPT" and not norm:
                                      % tst.tree_time_structure_den(graph)
                                      for graph
                                      in t_diag.equivalent_trees)
+
+    # Production of the BMBPT expressions
+
     for diag in diagrams:
         bmbpt.attribute_qp_labels(diag.graph)
         for t_diag in diagrams_time:
@@ -181,7 +191,6 @@ if theory == "BMBPT" and not norm:
                 diag.tst_is_tree = t_diag.is_tree
                 break
         diag.attribute_expressions(diagrams_time)
-    nb_time_diags = len(diagrams_time)
 
 print "Time ellapsed: ", datetime.now() - start_time
 print "Number of connected diagrams, ", numdiag
@@ -231,7 +240,7 @@ if theory == "BMBPT":
                              nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
     if write_time:
         tst.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
-                                        diagrams_time)
+                                        diagrams_time, nb_tree_TSDs)
 for diag in diagrams:
     if theory == "BMBPT":
         bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,
