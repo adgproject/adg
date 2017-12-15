@@ -337,7 +337,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
         numerator = extract_numerator(self.graph)
         denominator = time_tree_denominator(self.graph,
                                             time_diags[self.time_tag].graph) \
-            if self.tst_ist_tree else ""
+            if self.tst_is_tree else ""
         extra_factor = "" if self.tst_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"
