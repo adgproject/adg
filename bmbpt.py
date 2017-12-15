@@ -156,8 +156,9 @@ def extract_denom(start_graph, subgraph):
     return denomin
 
 
-def time_tree_denominator(graph, time_graph, denominator):
-    """Add the denominator for a time-tree graph."""
+def time_tree_denominator(graph, time_graph):
+    """Return the denominator for a time-tree graph."""
+    denominator = ""
     for vertex_i in range(1, len(time_graph)):
         subgraph_stack = [vertex_j
                           for vertex_j in nx.descendants(time_graph, vertex_i)]
@@ -333,27 +334,19 @@ class BmbptFeynmanDiagram(mth.Diagram):
         """Attribute the correct Feynman and Goldstone expressions."""
         self.vert_exp = [self.vertex_expression(vertex)
                          for vertex in self.graph]
-        norder = len(self.graph)
         numerator = extract_numerator(self.graph)
-        denominator = ""
-        extra_factor = ""
-        if self.tst_is_tree:
-            time_graph = time_diags[self.time_tag].graph
-            denominator = time_tree_denominator(self.graph,
-                                                time_graph,
-                                                denominator)
-        else:
-            equivalent_t_graphs = time_diags[self.time_tag].equivalent_trees
-            extra_factor = "\\left[" \
-                + " + ".join("\\frac{1}{%s}"
-                             % time_tree_denominator(self.graph,
-                                                     equi_t_graph,
-                                                     "")
-                             for equi_t_graph
-                             in equivalent_t_graphs) \
-                + " \\right]"
+        denominator = time_tree_denominator(self.graph,
+                                            time_diags[self.time_tag].graph) \
+            if self.tst_ist_tree else ""
+        extra_factor = "" if self.tst_is_tree \
+            else "\\left[" \
+            + " + ".join("\\frac{1}{%s}"
+                         % time_tree_denominator(self.graph, equi_t_graph)
+                         for equi_t_graph
+                         in time_diags[self.time_tag].equivalent_trees) \
+            + " \\right]"
         # Determine the pre-factor
-        prefactor = "(-1)^%i " % (norder - 1)
+        prefactor = "(-1)^%i " % (len(self.graph) - 1)
         if extract_BMBPT_crossing_sign(self.graph):
             prefactor = "-%s" % prefactor
         sym_fact = ""
@@ -364,6 +357,7 @@ class BmbptFeynmanDiagram(mth.Diagram):
         sym_fact += multiplicity_symmetry_factor(self.graph)
         prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
             if sym_fact != "" else "%s\\sum_{k_i}" % prefactor
+        # Set the Feynman and Goldstone expressions
         self.feynman_exp = "%s%s\\int_{0}^{\\tau}%s\n" \
                            % (prefactor, numerator, extract_integral(self))
         self.diag_exp = "%s\\frac{%s}{%s} %s\n" % (prefactor, numerator,
