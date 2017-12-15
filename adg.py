@@ -186,7 +186,7 @@ if theory == "BMBPT" and not norm:
     for diag in diagrams:
         bmbpt.attribute_qp_labels(diag.graph)
         for t_diag in diagrams_time:
-            if diag.tags[0] in t_diag.tags:
+            if diag.tags[0] in t_diag.tags[1:]:
                 diag.time_tag = t_diag.tags[0]
                 diag.tst_is_tree = t_diag.is_tree
                 break
