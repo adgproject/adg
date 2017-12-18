@@ -180,12 +180,19 @@ if theory == "BMBPT" and not norm:
 
     diagrams_time = [tst.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
-    tree_TSDs = [tsd for tsd in diagrams_time if tsd.is_tree]
-    non_tree_TSDs = [tsd for tsd in diagrams_time if not tsd.is_tree]
+
+    tree_TSDs = []
+    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
+        if diagrams_time[i_diag].is_tree:
+            tree_TSDs.append(diagrams_time[i_diag])
+            del diagrams_time[i_diag]
+
     mth.topologically_distinct_diagrams(tree_TSDs)
     nb_tree_TSDs = len(tree_TSDs)
-    mth.topologically_distinct_diagrams(non_tree_TSDs)
-    diagrams_time = tree_TSDs + non_tree_TSDs
+
+    mth.topologically_distinct_diagrams(diagrams_time)
+    diagrams_time = tree_TSDs + diagrams_time
+
     for index, t_diag in enumerate(diagrams_time):
         t_diag.tags.insert(0, index)
         if not t_diag.is_tree:
