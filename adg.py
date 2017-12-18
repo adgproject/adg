@@ -99,15 +99,29 @@ elif theory == 'MBPT':
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
-    diagrams2 = [diag for diag in diagrams if diag.two_or_three_body == 2]
-    diagrams3 = [diag for diag in diagrams if diag.two_or_three_body == 3]
+    diagrams2HF = []
+    diagrams2EHF = []
+    diagrams2noHF = []
+    diagrams3HF = []
+    diagrams3EHF = []
+    diagrams3noHF = []
 
-    diagrams2HF = [diag for diag in diagrams2 if diag.HF_type == "HF"]
-    diagrams2EHF = [diag for diag in diagrams2 if diag.HF_type == "EHF"]
-    diagrams2noHF = [diag for diag in diagrams2 if diag.HF_type == "noHF"]
-    diagrams3HF = [diag for diag in diagrams3 if diag.HF_type == "HF"]
-    diagrams3EHF = [diag for diag in diagrams3 if diag.HF_type == "EHF"]
-    diagrams3noHF = [diag for diag in diagrams3 if diag.HF_type == "noHF"]
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        if diagrams[i_diag].two_or_three_body == 2:
+            if diagrams[i_diag].HF_type == "HF":
+                diagrams2HF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "EHF":
+                diagrams2EHF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "noHF":
+                diagrams2noHF.append(diagrams[i_diag])
+        elif diagrams[i_diag].two_or_three_body == 3:
+            if diagrams[i_diag].HF_type == "HF":
+                diagrams3HF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "EHF":
+                diagrams3EHF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "noHF":
+                diagrams3noHF.append(diagrams[i_diag])
+        del diagrams[i_diag]
 
     if use_parallel:
         nb_procs_max = 6 if three_N else 3
