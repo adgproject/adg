@@ -330,20 +330,19 @@ class BmbptFeynmanDiagram(mth.Diagram):
                 if self.graph.degree(len(self.graph)-1) != 2:
                     self.HF_type = "EHF"
 
-    def attribute_expressions(self, time_diags):
+    def attribute_expressions(self, TSD):
         """Attribute the correct Feynman and Goldstone expressions."""
         self.vert_exp = [self.vertex_expression(vertex)
                          for vertex in self.graph]
         numerator = extract_numerator(self.graph)
-        denominator = time_tree_denominator(self.graph,
-                                            time_diags[self.time_tag].graph) \
+        time_graph = nx.relabel_nodes(TSD.graph, TSD.perms[self.tags[0]])
+        denominator = time_tree_denominator(self.graph, time_graph) \
             if self.tst_is_tree else ""
         extra_factor = "" if self.tst_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"
                          % time_tree_denominator(self.graph, equi_t_graph)
-                         for equi_t_graph
-                         in time_diags[self.time_tag].equivalent_trees) \
+                         for equi_t_graph in TSD.equivalent_trees) \
             + " \\right]"
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (len(self.graph) - 1)

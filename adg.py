@@ -211,7 +211,7 @@ if theory == "BMBPT" and not norm:
                 diag.time_tag = t_diag.tags[0]
                 diag.tst_is_tree = t_diag.is_tree
                 break
-        diag.attribute_expressions(diagrams_time)
+        diag.attribute_expressions(diagrams_time[diag.time_tag])
 
 print "Time ellapsed: ", datetime.now() - start_time
 print "Number of connected diagrams, ", numdiag
@@ -259,9 +259,12 @@ mth.write_file_header(directory, latex_file, pdiag, norder, theory)
 if theory == "BMBPT":
     bmbpt.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
                              nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
-    if write_time:
-        tst.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
-                                        diagrams_time, nb_tree_TSDs)
+
+latex_file.write("\\tableofcontents\n\n")
+
+if theory == "BMBPT" and write_time:
+    tst.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
+                                    diagrams_time, nb_tree_TSDs)
 for diag in diagrams:
     if theory == "BMBPT":
         bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,

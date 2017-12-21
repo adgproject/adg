@@ -77,15 +77,23 @@ def topologically_distinct_graphs(graphs):
 
 def topologically_distinct_diagrams(diagrams):
     """Return a list of diagrams all topologically distinct."""
-    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    iso = nx.algorithms.isomorphism
+    nm = iso.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
         graph = diagrams[i_diag].graph
         diag_io_degrees = diagrams[i_diag].io_degrees
         for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
             if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
-                if nx.is_isomorphic(graph, diagrams[i_comp_diag].graph,
-                                    node_match=nm):
+                matcher = iso.DiGraphMatcher(graph,
+                                             diagrams[i_comp_diag].graph,
+                                             node_match=nm)
+                if matcher.is_isomorphic():
                     diagrams[i_diag].tags += diagrams[i_comp_diag].tags
+                    if diagrams[i_diag].type == 'TSD':
+                        diagrams[i_diag].perms.update(
+                            diagrams[i_comp_diag].perms)
+                        diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
+                            = matcher.mapping
                     del diagrams[i_comp_diag]
                     break
     return diagrams

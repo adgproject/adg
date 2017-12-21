@@ -187,6 +187,7 @@ class TimeStructureDiagram(mth.Diagram):
         mth.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
         self.type = 'TSD'
         self.tags = [tag_num]
+        self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
         self.equivalent_trees = []
         if nx.is_arborescence(self.graph):
             self.is_tree = True
