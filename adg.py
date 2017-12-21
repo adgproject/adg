@@ -290,7 +290,9 @@ for diag in diagrams:
         latex_file.write("\\begin{equation}\n\\text{T}%i = " % (diag.time_tag
                                                                 + 1)
                          + "%s\\end{equation}\n" % time_diag.expr)
-        bmbpt.write_vertices_values(latex_file, diag)
+        bmbpt.write_vertices_values(latex_file,
+                                    diag,
+                                    time_diag.perms[diag.tags[0]])
 
 latex_file.write("\\end{document}")
 latex_file.close()

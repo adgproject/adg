@@ -292,12 +292,13 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
                      + "&= %s\\end{align}\n" % bmbpt_diag.diag_exp)
 
 
-def write_vertices_values(latex_file, diag):
+def write_vertices_values(latex_file, diag, mapping):
     """Write the qp energies associated to each vertex of the diag."""
     latex_file.write("\\begin{align*}\n")
     labels = list(string.ascii_lowercase)
     for ind in range(1, len(diag.vert_exp)):
-        latex_file.write("%s &= %s" % (labels[ind-1], diag.vert_exp[ind]))
+        latex_file.write("%s &= %s" % (labels[ind-1],
+                                       diag.vert_exp[mapping[ind]]))
         if ind != len(diag.vert_exp)-1:
             latex_file.write(r"\\")
         latex_file.write('\n')
@@ -335,13 +336,16 @@ class BmbptFeynmanDiagram(mth.Diagram):
         self.vert_exp = [self.vertex_expression(vertex)
                          for vertex in self.graph]
         numerator = extract_numerator(self.graph)
-        time_graph = nx.relabel_nodes(TSD.graph, TSD.perms[self.tags[0]])
-        denominator = time_tree_denominator(self.graph, time_graph) \
+        denominator = time_tree_denominator(self.graph,
+                                            nx.relabel_nodes(TSD.graph,
+                                                             TSD.perms[self.tags[0]])) \
             if self.tst_is_tree else ""
         extra_factor = "" if self.tst_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"
-                         % time_tree_denominator(self.graph, equi_t_graph)
+                         % time_tree_denominator(self.graph,
+                                                 nx.relabel_nodes(equi_t_graph,
+                                                                  TSD.perms[self.tags[0]]))
                          for equi_t_graph in TSD.equivalent_trees) \
             + " \\right]"
         # Determine the pre-factor
