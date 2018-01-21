@@ -4,7 +4,7 @@ import copy
 import itertools
 import string
 import numpy as np
-import methods as mth
+import methods as gen
 import networkx as nx
 
 
@@ -28,13 +28,13 @@ def BMBPT_generation(p_order, three_N_use):
                     temp_mat = copy.deepcopy(mat)
                     temp_mat[vertex][sum_index] = elem
                     add(temp_mat)
-        mth.check_vertex_degree(matrices, three_N_use, vertex)
+        gen.check_vertex_degree(matrices, three_N_use, vertex)
         if 0 < vertex < p_order-1:
             check_unconnected_spawn(matrices, vertex, p_order)
 
     # Checks to exclude non-conform matrices
-    mth.check_degree(matrices, three_N_use)
-    mth.no_loop(matrices)
+    gen.check_degree(matrices, three_N_use)
+    gen.no_loop(matrices)
     matricesUniq = []
     for mat in matrices:
         if mat not in matricesUniq:
@@ -305,17 +305,17 @@ def write_vertices_values(latex_file, diag, mapping):
     latex_file.write("\\end{align*}\n")
 
 
-class BmbptFeynmanDiagram(mth.Diagram):
+class BmbptFeynmanDiagram(gen.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties."""
 
     def __init__(self, nx_graph, use_norm, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph."""
-        mth.Diagram.__init__(self, nx_graph)
+        gen.Diagram.__init__(self, nx_graph)
         self.type = 'BMBPT'
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
         self.time_tag = -1
-        self.tst_is_tree = False
+        self.tsd_is_tree = False
         self.feynman_exp = ""
         self.diag_exp = ""
         self.vert_exp = []
@@ -339,8 +339,8 @@ class BmbptFeynmanDiagram(mth.Diagram):
         denominator = time_tree_denominator(self.graph,
                                             nx.relabel_nodes(TSD.graph,
                                                              TSD.perms[self.tags[0]])) \
-            if self.tst_is_tree else ""
-        extra_factor = "" if self.tst_is_tree \
+            if self.tsd_is_tree else ""
+        extra_factor = "" if self.tsd_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"
                          % time_tree_denominator(self.graph,

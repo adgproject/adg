@@ -3,7 +3,7 @@
 import os
 import string
 import networkx as nx
-import methods as mth
+import methods as gen
 
 
 def time_structure_graph(graph):
@@ -12,7 +12,7 @@ def time_structure_graph(graph):
     if time_graph.node[0]['operator']:
         for vertex in xrange(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
-    return mth.to_skeleton(time_graph)
+    return gen.to_skeleton(time_graph)
 
 
 def has_tree_time_structure(graph):
@@ -73,7 +73,7 @@ def equivalent_labelled_TSDs(equivalent_trees, labelled_TSDs):
 def draw_equivalent_tree_TSDs(time_diagram, latex_file):
     """Draw the equivalent tree TSDs for a given non-tree TSD."""
     for index, graph in enumerate(time_diagram.equivalent_trees):
-        mth.feynmf_generator(graph,
+        gen.feynmf_generator(graph,
                              'MBPT',
                              'equivalent%i_%i' % (time_diagram.tags[0], index))
         diag_file = open("equivalent%i_%i.tex" % (time_diagram.tags[0], index))
@@ -84,7 +84,7 @@ def draw_equivalent_tree_TSDs(time_diagram, latex_file):
 
 def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                 time_diagrams, nb_tree_TSDs):
-    """Write the appropriate section for tst diagrams in the LaTeX file."""
+    """Write the appropriate section for tsd diagrams in the LaTeX file."""
     latex_file.write("\\section{Time-structure diagrams}\n\n")
     latex_file.write("\\subsection{Tree diagrams}\n\n")
     for tdiag in time_diagrams:
@@ -154,7 +154,7 @@ def disentangle_cycle(time_graph, cycle_nodes):
                     mother_node = test_node
                     break
             new_graph.add_edge(mother_node, insert_node)
-            mth.to_skeleton(new_graph)
+            gen.to_skeleton(new_graph)
             new_graphs.append(new_graph)
     return new_graphs
 
@@ -179,12 +179,12 @@ def find_cycle(graph):
     return cycle_nodes
 
 
-class TimeStructureDiagram(mth.Diagram):
+class TimeStructureDiagram(gen.Diagram):
     """Describes a time-structure diagram with its related properties."""
 
     def __init__(self, bmbpt_diag, tag_num):
-        """Generate a TST diagram out of a BMBPT one."""
-        mth.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
+        """Generate a tsd diagram out of a BMBPT one."""
+        gen.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
         self.type = 'TSD'
         self.tags = [tag_num]
         self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}

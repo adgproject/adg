@@ -5,7 +5,7 @@ import itertools
 import string
 import numpy as np
 import networkx as nx
-import methods as mth
+import methods as gen
 
 
 def seed(n):
@@ -19,7 +19,7 @@ def diagram_generation(n):
     all_matrices = [[[0 if i != j else 1 for i in range(n)]
                      for j in k]
                     for k in seeds]
-    traceless = mth.no_trace(all_matrices)
+    traceless = gen.no_trace(all_matrices)
     coeffs = [i for i in itertools.combinations_with_replacement(
         range(len(traceless)), 2)]
     double = []
@@ -59,12 +59,12 @@ def write_diag_exp(latex_file, mbpt_diag):
     latex_file.write("\\end{equation}\n")
 
 
-class MbptDiagram(mth.Diagram):
+class MbptDiagram(gen.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph."""
-        mth.Diagram.__init__(self, mbpt_graph)
+        gen.Diagram.__init__(self, mbpt_graph)
         self.type = 'MBPT'
         self.tags = [tag_num]
         self.attribute_expression()

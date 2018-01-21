@@ -10,10 +10,10 @@ import pstats
 import StringIO
 import numpy as np
 import networkx as nx
-import methods as mth
+import general_routines as gen
 import bmbpt
 import mbpt
-import time_structure as tst
+import time_structure as tsd
 
 
 print "#####################"
@@ -89,7 +89,7 @@ if theory == "BMBPT":
         if not nx.is_directed_acyclic_graph(G[i_diag]):
             del G[i_diag]
 
-mth.label_vertices(G, theory, norm)
+gen.label_vertices(G, theory, norm)
 
 if theory == 'BMBPT':
     diagrams = [bmbpt.BmbptFeynmanDiagram(graph, norm, ind)
@@ -127,18 +127,18 @@ if theory == "BMBPT":
         nb_procs_max = 6 if three_N else 3
         nb_processes = min(num_cores-1, nb_procs_max)
         pool = multiprocessing.Pool(nb_processes)
-        r1 = pool.apply_async(mth.topologically_distinct_diagrams,
+        r1 = pool.apply_async(gen.topologically_distinct_diagrams,
                               (diagrams2HF, ))
-        r2 = pool.apply_async(mth.topologically_distinct_diagrams,
+        r2 = pool.apply_async(gen.topologically_distinct_diagrams,
                               (diagrams2EHF, ))
-        r3 = pool.apply_async(mth.topologically_distinct_diagrams,
+        r3 = pool.apply_async(gen.topologically_distinct_diagrams,
                               (diagrams2noHF, ))
         if three_N:
-            r4 = pool.apply_async(mth.topologically_distinct_diagrams,
+            r4 = pool.apply_async(gen.topologically_distinct_diagrams,
                                   (diagrams3HF, ))
-            r5 = pool.apply_async(mth.topologically_distinct_diagrams,
+            r5 = pool.apply_async(gen.topologically_distinct_diagrams,
                                   (diagrams3EHF, ))
-            r6 = pool.apply_async(mth.topologically_distinct_diagrams,
+            r6 = pool.apply_async(gen.topologically_distinct_diagrams,
                                   (diagrams3noHF, ))
         diagrams2HF = r1.get()
         diagrams2EHF = r2.get()
@@ -151,12 +151,12 @@ if theory == "BMBPT":
         pool.join()
 
     else:
-        mth.topologically_distinct_diagrams(diagrams2HF)
-        mth.topologically_distinct_diagrams(diagrams2EHF)
-        mth.topologically_distinct_diagrams(diagrams2noHF)
-        mth.topologically_distinct_diagrams(diagrams3HF)
-        mth.topologically_distinct_diagrams(diagrams3EHF)
-        mth.topologically_distinct_diagrams(diagrams3noHF)
+        gen.topologically_distinct_diagrams(diagrams2HF)
+        gen.topologically_distinct_diagrams(diagrams2EHF)
+        gen.topologically_distinct_diagrams(diagrams2noHF)
+        gen.topologically_distinct_diagrams(diagrams3HF)
+        gen.topologically_distinct_diagrams(diagrams3EHF)
+        gen.topologically_distinct_diagrams(diagrams3noHF)
 
     diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF \
         + diagrams3HF + diagrams3EHF + diagrams3noHF
@@ -178,7 +178,7 @@ if theory == "BMBPT" and not norm:
 
     # Production of the time-structure diagrams
 
-    diagrams_time = [tst.TimeStructureDiagram(diagram, diagram.tags[0])
+    diagrams_time = [tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
 
     tree_TSDs = []
@@ -187,18 +187,18 @@ if theory == "BMBPT" and not norm:
             tree_TSDs.append(diagrams_time[i_diag])
             del diagrams_time[i_diag]
 
-    mth.topologically_distinct_diagrams(tree_TSDs)
+    gen.topologically_distinct_diagrams(tree_TSDs)
     nb_tree_TSDs = len(tree_TSDs)
 
-    mth.topologically_distinct_diagrams(diagrams_time)
+    gen.topologically_distinct_diagrams(diagrams_time)
     diagrams_time = tree_TSDs + diagrams_time
 
     for index, t_diag in enumerate(diagrams_time):
         t_diag.tags.insert(0, index)
         if not t_diag.is_tree:
-            t_diag.equivalent_trees = tst.treat_cycles(t_diag.graph)
+            t_diag.equivalent_trees = tsd.treat_cycles(t_diag.graph)
             t_diag.expr = " + ".join("\\frac{1}{%s}"
-                                     % tst.tree_time_structure_den(graph)
+                                     % tsd.tree_time_structure_den(graph)
                                      for graph
                                      in t_diag.equivalent_trees)
 
@@ -209,7 +209,7 @@ if theory == "BMBPT" and not norm:
         for t_diag in diagrams_time:
             if diag.tags[0] in t_diag.tags[1:]:
                 diag.time_tag = t_diag.tags[0]
-                diag.tst_is_tree = t_diag.is_tree
+                diag.tsd_is_tree = t_diag.is_tree
                 break
         diag.attribute_expressions(diagrams_time[diag.time_tag])
 
@@ -245,16 +245,16 @@ pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdraw:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    mth.create_feynmanmp_files(diagrams, theory, directory, 'diag')
+    gen.create_feynmanmp_files(diagrams, theory, directory, 'diag')
     if write_time:
-        mth.create_feynmanmp_files(diagrams_time, theory, directory, 'time')
+        gen.create_feynmanmp_files(diagrams_time, theory, directory, 'time')
 
 msg = 'Include diagrams in tex?'
 pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
 
 # Write everything down in a nice LaTeX file
 latex_file = open(directory + '/result.tex', 'w')
-mth.write_file_header(directory, latex_file, pdiag, norder, theory)
+gen.write_file_header(directory, latex_file, pdiag, norder, theory)
 
 if theory == "BMBPT":
     bmbpt.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
@@ -263,7 +263,7 @@ if theory == "BMBPT":
 latex_file.write("\\tableofcontents\n\n")
 
 if theory == "BMBPT" and write_time:
-    tst.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
+    tsd.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                     diagrams_time, nb_tree_TSDs)
 for diag in diagrams:
     if theory == "BMBPT":
@@ -276,11 +276,11 @@ for diag in diagrams:
         mbpt.write_diag_exp(latex_file, diag)
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
-        mth.draw_diagram(directory, latex_file, diag.tags[0], 'diag')
+        gen.draw_diagram(directory, latex_file, diag.tags[0], 'diag')
         if write_time:
             latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
                              % (diag.time_tag + 1))
-            mth.draw_diagram(directory, latex_file, diag.time_tag, 'time')
+            gen.draw_diagram(directory, latex_file, diag.time_tag, 'time')
         latex_file.write('\n\\end{center}\n\n')
     if theory == 'BMBPT' and write_time:
         for tdiag in diagrams_time:
@@ -300,5 +300,5 @@ latex_file.close()
 msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
 if pdfcompile:
-    mth.compile_and_clean(directory, pdiag, diagrams,
+    gen.compile_and_clean(directory, pdiag, diagrams,
                           write_time, diagrams_time)
