@@ -213,6 +213,9 @@ if theory == "BMBPT" and not norm:
                 break
         diag.attribute_expressions(diagrams_time[diag.time_tag])
 
+else:
+    diagrams_time = []
+
 print "Time ellapsed: ", datetime.now() - start_time
 print "Number of connected diagrams, ", numdiag
 

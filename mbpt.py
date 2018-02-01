@@ -5,7 +5,7 @@ import itertools
 import string
 import numpy as np
 import networkx as nx
-import methods as gen
+import general_routines as gen
 
 
 def seed(n):

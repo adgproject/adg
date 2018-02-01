@@ -3,7 +3,7 @@
 import os
 import string
 import networkx as nx
-import methods as gen
+import general_routines as gen
 
 
 def time_structure_graph(graph):

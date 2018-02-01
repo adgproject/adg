@@ -4,7 +4,7 @@ import copy
 import itertools
 import string
 import numpy as np
-import methods as gen
+import general_routines as gen
 import networkx as nx
 
 
