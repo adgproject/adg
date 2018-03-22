@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import multiprocessing
 from datetime import datetime
 import shutil
 import cProfile
@@ -38,10 +37,6 @@ if theory == "BMBPT":
         "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
     write_time = raw_input(
         "Draw time-structure diagrams? (y/N)").lower() == 'y'
-    print "Parallel Mode available"
-    num_cores = multiprocessing.cpu_count()
-    print "There is %i core(s) available" % num_cores
-    use_parallel = raw_input("Use parallel processing? (y/N)").lower() == 'y'
 directory = '%s/Order-%i' % (theory, norder)
 if three_N:
     directory += 'with3N'
@@ -123,40 +118,12 @@ if theory == "BMBPT":
                 diagrams3noHF.append(diagrams[i_diag])
         del diagrams[i_diag]
 
-    if use_parallel:
-        nb_procs_max = 6 if three_N else 3
-        nb_processes = min(num_cores-1, nb_procs_max)
-        pool = multiprocessing.Pool(nb_processes)
-        r1 = pool.apply_async(gen.topologically_distinct_diagrams,
-                              (diagrams2HF, ))
-        r2 = pool.apply_async(gen.topologically_distinct_diagrams,
-                              (diagrams2EHF, ))
-        r3 = pool.apply_async(gen.topologically_distinct_diagrams,
-                              (diagrams2noHF, ))
-        if three_N:
-            r4 = pool.apply_async(gen.topologically_distinct_diagrams,
-                                  (diagrams3HF, ))
-            r5 = pool.apply_async(gen.topologically_distinct_diagrams,
-                                  (diagrams3EHF, ))
-            r6 = pool.apply_async(gen.topologically_distinct_diagrams,
-                                  (diagrams3noHF, ))
-        diagrams2HF = r1.get()
-        diagrams2EHF = r2.get()
-        diagrams2noHF = r3.get()
-        if three_N:
-            diagrams3HF = r4.get()
-            diagrams3EHF = r5.get()
-            diagrams3noHF = r6.get()
-        pool.close()
-        pool.join()
-
-    else:
-        gen.topologically_distinct_diagrams(diagrams2HF)
-        gen.topologically_distinct_diagrams(diagrams2EHF)
-        gen.topologically_distinct_diagrams(diagrams2noHF)
-        gen.topologically_distinct_diagrams(diagrams3HF)
-        gen.topologically_distinct_diagrams(diagrams3EHF)
-        gen.topologically_distinct_diagrams(diagrams3noHF)
+    gen.topologically_distinct_diagrams(diagrams2HF)
+    gen.topologically_distinct_diagrams(diagrams2EHF)
+    gen.topologically_distinct_diagrams(diagrams2noHF)
+    gen.topologically_distinct_diagrams(diagrams3HF)
+    gen.topologically_distinct_diagrams(diagrams3EHF)
+    gen.topologically_distinct_diagrams(diagrams3noHF)
 
     diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF \
         + diagrams3HF + diagrams3EHF + diagrams3noHF
