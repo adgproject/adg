@@ -145,17 +145,17 @@ def disentangle_cycle(time_graph, cycle_nodes):
                                      cycle_nodes[0],
                                      cycle_nodes[1]))
     new_graphs = []
-    for insert_node in paths[0][1:-1]:
-        for daughter_node in paths[1][1:]:
-            new_graph = time_graph.to_directed()
-            new_graph.add_edge(insert_node, daughter_node)
-            for test_node in paths[1]:
-                if test_node in list(time_graph.predecessors(daughter_node)):
-                    mother_node = test_node
-                    break
-            new_graph.add_edge(mother_node, insert_node)
-            gen.to_skeleton(new_graph)
-            new_graphs.append(new_graph)
+    insert_node = paths[0][1]
+    for daughter_node in paths[1][1:]:
+        new_graph = time_graph.to_directed()
+        new_graph.add_edge(insert_node, daughter_node)
+        for test_node in paths[1]:
+            if test_node in list(time_graph.predecessors(daughter_node)):
+                mother_node = test_node
+                break
+        new_graph.add_edge(mother_node, insert_node)
+        gen.to_skeleton(new_graph)
+        new_graphs.append(new_graph)
     return new_graphs
 
 
