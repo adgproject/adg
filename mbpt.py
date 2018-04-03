@@ -41,14 +41,14 @@ def diagram_generation(n):
 def line_label_h(n):
     """Select appropriate label for hole line."""
     labels = list(string.ascii_lowercase)
-    labels = labels[0:15]
+    labels = labels[0:13]
     return labels[n]
 
 
 def line_label_p(n):
     """Select appropriate label for particle line."""
     labels = list(string.ascii_lowercase)
-    labels = labels[15:-1]
+    labels = labels[13:-1]
     return labels[n]
 
 
