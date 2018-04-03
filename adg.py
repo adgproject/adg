@@ -138,6 +138,37 @@ if theory == "BMBPT":
     nb_3_noHF = len(diagrams3noHF)
     nb_3 = nb_3_HF + nb_3_EHF + nb_3_noHF
 
+elif theory == "MBPT":
+    singles = []
+    doubles = []
+    triples = []
+    quadruples = []
+    quintuples_and_higher = []
+
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        if diagrams[i_diag].excitation_level == 1:
+            singles.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level == 2:
+            doubles.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level == 3:
+            triples.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level == 4:
+            quadruples.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level >= 5:
+            quintuples_and_higher.append(diagrams[i_diag])
+        else:
+            print "Zero or negative excitation level!\n"
+            exit()
+        del diagrams[i_diag]
+
+    diagrams = singles + doubles + triples + quadruples \
+        + quintuples_and_higher
+    nb_singles = len(singles)
+    nb_doubles = len(doubles)
+    nb_triples = len(triples)
+    nb_quadruples = len(quadruples)
+    nb_quintuples_and_higher = len(quintuples_and_higher)
+
 numdiag = len(diagrams)
 
 # Treatment of the algebraic expressions
@@ -200,6 +231,13 @@ if theory == "BMBPT":
             print "3N canonical diagrams for a generic operator only: %i" \
                 % nb_3_EHF
         print "3N non-canonical diagrams: %i" % nb_3_noHF
+elif theory == "MBPT":
+    print "\nValid diagrams: %i\n" % numdiag
+    print "Singles: %i" % nb_singles
+    print "Doubles: %i" % nb_doubles
+    print "Triples: %i" % nb_triples
+    print "Quadruples: %i" % nb_quadruples
+    print "Quintuples and higher: %i" % nb_quintuples_and_higher
 
 
 pr.disable()
@@ -229,13 +267,17 @@ gen.write_file_header(directory, latex_file, pdiag, norder, theory)
 if theory == "BMBPT":
     bmbpt.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
                              nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
+elif theory == "MBPT":
+    mbpt.write_MBPT_header(latex_file, numdiag, nb_singles, nb_doubles,
+                           nb_triples, nb_quadruples,
+                           nb_quintuples_and_higher)
 
 latex_file.write("\\tableofcontents\n\n")
 
 if theory == "BMBPT" and write_time:
     tsd.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                     diagrams_time, nb_tree_TSDs)
-for diag in diagrams:
+for diag_idx, diag in enumerate(diagrams):
     if theory == "BMBPT":
         bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,
                                   nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
@@ -243,6 +285,9 @@ for diag in diagrams:
         if not norm:
             bmbpt.write_diag_exps(latex_file, diag, norder)
     elif theory == "MBPT":
+        mbpt.write_MBPT_section(latex_file, diag_idx, nb_singles, nb_doubles,
+                                nb_triples, nb_quadruples,
+                                nb_quintuples_and_higher)
         mbpt.write_diag_exp(latex_file, diag)
     if pdiag and pdraw:
         latex_file.write('\n\\begin{center}\n')
@@ -266,6 +311,15 @@ for diag in diagrams:
 
 latex_file.write("\\end{document}")
 latex_file.close()
+
+# Produce an output adapted to Christian Drischler's format
+if theory == "MBPT":
+    if raw_input("Produce a CD output file? ").lower() == 'y':
+        CD_file = open(directory + '/CD_output.txt', 'w')
+        for idx, diag in enumerate(diagrams):
+            CD_file.write('config[%i] = %s\n' % (idx + 1, diag.CD))
+        CD_file.write('\n')
+        CD_file.close()
 
 msg = 'Compile pdf?'
 pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
