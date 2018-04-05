@@ -89,8 +89,8 @@ def write_MBPT_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
 def print_CD_output(directory, diagrams):
     """Print a computer-readable file for C. Drischler's framework."""
     CD_file = open(directory + '/CD_output.txt', 'w')
-    for idx, diag in enumerate(diagrams):
-        CD_file.write('config[%i] = %s\n' % (idx + 1, diag.CD))
+    for diag in diagrams:
+        CD_file.write('config[%i] = %s\n' % (diag.tags[0] + 1, diag.CD))
     CD_file.write('\n')
     CD_file.close()
 
@@ -121,6 +121,9 @@ def order_diagrams(diagrams):
 
     diagrams = singles + doubles + triples + quadruples \
         + quintuples_and_higher
+
+    for ind, diagram in enumerate(diagrams):
+        diagram.tags[0] = ind
 
     return diagrams, len(singles), len(doubles), len(triples), \
         len(quadruples), len(quintuples_and_higher)

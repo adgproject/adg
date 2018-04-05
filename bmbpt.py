@@ -460,3 +460,24 @@ class BmbptFeynmanDiagram(gen.Diagram):
                       for prop in self.graph.out_edges(vertex, keys=True)) \
             + "}"
         return expression
+
+    def write_graph(self, latex_file, directory, write_time):
+        """Write the BMBPT graph and its associated TSD to the LaTeX file."""
+        latex_file.write('\n\\begin{center}\n')
+        gen.draw_diagram(directory, latex_file, self.tags[0], 'diag')
+        if write_time:
+            latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
+                             % (self.time_tag + 1))
+            gen.draw_diagram(directory, latex_file, self.time_tag, 'time')
+        latex_file.write('\n\\end{center}\n\n')
+
+    def write_tsd_info(self, diagrams_time, latex_file):
+        """Write info related to the BMBPT associated TSD to the LaTeX file."""
+        for tdiag in diagrams_time:
+            if self.time_tag == tdiag.tags[0]:
+                time_diag = tdiag
+                break
+        latex_file.write("\\begin{equation}\n\\text{T}%i = " % (self.time_tag
+                                                                + 1)
+                         + "%s\\end{equation}\n" % time_diag.expr)
+        write_vertices_values(latex_file, self, time_diag.perms[self.tags[0]])

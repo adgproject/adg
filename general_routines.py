@@ -262,3 +262,10 @@ class Diagram(object):
                                        for node in nx_graph)
         self.io_degrees = sorted(self.unsort_io_degrees)
         self.max_degree = self.degrees[-1]
+        self.tags = [0]
+
+    def write_graph(self, latex_file, directory, write_time):
+        """Write the graph of the diagram to the LaTeX file."""
+        latex_file.write('\n\\begin{center}\n')
+        draw_diagram(directory, latex_file, self.tags[0], 'diag')
+        latex_file.write('\n\\end{center}\n\n')

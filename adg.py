@@ -59,8 +59,7 @@ elif theory == "BMBPT":
     diagrams = bmbpt.BMBPT_generation(norder, three_N)
 else:
     print "Invalid theory"
-numdiag = len(diagrams)
-print "Number of possible diagrams, ", numdiag
+print "Number of possible diagrams, ", len(diagrams)
 
 i = 0
 with open(directory+"/Diagrams.list", "w") as f:
@@ -180,7 +179,7 @@ latex_file.write("\\tableofcontents\n\n")
 if theory == "BMBPT" and write_time:
     tsd.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
                                     diagrams_time, nb_tree_TSDs)
-for diag_idx, diag in enumerate(diagrams):
+for diag in diagrams:
     if theory == "BMBPT":
         bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,
                                   nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
@@ -188,29 +187,17 @@ for diag_idx, diag in enumerate(diagrams):
         if not norm:
             bmbpt.write_diag_exps(latex_file, diag, norder)
     elif theory == "MBPT":
-        mbpt.write_MBPT_section(latex_file, diag_idx, nb_singles, nb_doubles,
-                                nb_triples, nb_quadruples,
+        mbpt.write_MBPT_section(latex_file, diag.tags[0], nb_singles,
+                                nb_doubles, nb_triples, nb_quadruples,
                                 nb_quintuples_and_higher)
+        latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
         mbpt.write_diag_exp(latex_file, diag)
+
     if pdiag and pdraw:
-        latex_file.write('\n\\begin{center}\n')
-        gen.draw_diagram(directory, latex_file, diag.tags[0], 'diag')
-        if write_time:
-            latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
-                             % (diag.time_tag + 1))
-            gen.draw_diagram(directory, latex_file, diag.time_tag, 'time')
-        latex_file.write('\n\\end{center}\n\n')
+        diag.write_graph(latex_file, directory, write_time)
+
     if theory == 'BMBPT' and write_time:
-        for tdiag in diagrams_time:
-            if diag.time_tag == tdiag.tags[0]:
-                time_diag = tdiag
-                break
-        latex_file.write("\\begin{equation}\n\\text{T}%i = " % (diag.time_tag
-                                                                + 1)
-                         + "%s\\end{equation}\n" % time_diag.expr)
-        bmbpt.write_vertices_values(latex_file,
-                                    diag,
-                                    time_diag.perms[diag.tags[0]])
+        diag.write_tsd_info(diagrams_time, latex_file)
 
 latex_file.write("\\end{document}")
 latex_file.close()
