@@ -236,3 +236,20 @@ class MbptDiagram(gen.Diagram):
             else:
                 type_edg.append('p')
         return type_edg
+
+    def is_complex_conjug_of(self, test_diagram):
+        """Return True if the diagram and test_diagram are complex conjugate."""
+        is_conjug = True
+        if (self.excitation_level != test_diagram.excitation_level) \
+                or (self.graph.number_of_edges() != test_diagram.graph.number_of_edges()):
+            is_conjug = False
+            return is_conjug
+        vertex_max = self.graph.number_of_nodes()
+        for vertex_a in self.graph:
+            for vertex_b in self.graph:
+                if self.graph.number_of_edges(vertex_a, vertex_b) \
+                        != test_diagram.graph.number_of_edges(vertex_max-vertex_a,
+                                                              vertex_max-vertex_b):
+                    is_conjug = False
+                    break
+        return is_conjug
