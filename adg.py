@@ -94,111 +94,24 @@ elif theory == 'MBPT':
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if theory == "BMBPT":
-    diagrams2HF = []
-    diagrams2EHF = []
-    diagrams2noHF = []
-    diagrams3HF = []
-    diagrams3EHF = []
-    diagrams3noHF = []
-
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
-        if diagrams[i_diag].two_or_three_body == 2:
-            if diagrams[i_diag].HF_type == "HF":
-                diagrams2HF.append(diagrams[i_diag])
-            elif diagrams[i_diag].HF_type == "EHF":
-                diagrams2EHF.append(diagrams[i_diag])
-            elif diagrams[i_diag].HF_type == "noHF":
-                diagrams2noHF.append(diagrams[i_diag])
-        elif diagrams[i_diag].two_or_three_body == 3:
-            if diagrams[i_diag].HF_type == "HF":
-                diagrams3HF.append(diagrams[i_diag])
-            elif diagrams[i_diag].HF_type == "EHF":
-                diagrams3EHF.append(diagrams[i_diag])
-            elif diagrams[i_diag].HF_type == "noHF":
-                diagrams3noHF.append(diagrams[i_diag])
-        del diagrams[i_diag]
-
-    gen.topologically_distinct_diagrams(diagrams2HF)
-    gen.topologically_distinct_diagrams(diagrams2EHF)
-    gen.topologically_distinct_diagrams(diagrams2noHF)
-    gen.topologically_distinct_diagrams(diagrams3HF)
-    gen.topologically_distinct_diagrams(diagrams3EHF)
-    gen.topologically_distinct_diagrams(diagrams3noHF)
-
-    diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF \
-        + diagrams3HF + diagrams3EHF + diagrams3noHF
-    for ind, diagram in enumerate(diagrams):
-        diagram.tags[0] = ind
-    nb_2_HF = len(diagrams2HF)
-    nb_2_EHF = len(diagrams2EHF)
-    nb_2_noHF = len(diagrams2noHF)
+    diagrams, nb_2_HF, nb_2_EHF, nb_2_noHF, \
+        nb_3_HF, nb_3_EHF, nb_3_noHF = bmbpt.order_diagrams(diagrams)
     nb_2 = nb_2_HF + nb_2_EHF + nb_2_noHF
-    nb_3_HF = len(diagrams3HF)
-    nb_3_EHF = len(diagrams3EHF)
-    nb_3_noHF = len(diagrams3noHF)
     nb_3 = nb_3_HF + nb_3_EHF + nb_3_noHF
 
 elif theory == "MBPT":
-    singles = []
-    doubles = []
-    triples = []
-    quadruples = []
-    quintuples_and_higher = []
-
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
-        if diagrams[i_diag].excitation_level == 1:
-            singles.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 2:
-            doubles.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 3:
-            triples.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 4:
-            quadruples.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level >= 5:
-            quintuples_and_higher.append(diagrams[i_diag])
-        else:
-            print "Zero or negative excitation level!\n"
-            exit()
-        del diagrams[i_diag]
-
-    diagrams = singles + doubles + triples + quadruples \
-        + quintuples_and_higher
-    nb_singles = len(singles)
-    nb_doubles = len(doubles)
-    nb_triples = len(triples)
-    nb_quadruples = len(quadruples)
-    nb_quintuples_and_higher = len(quintuples_and_higher)
+    diagrams, nb_singles, nb_doubles, nb_triples, nb_quadruples, \
+        nb_quintuples_and_higher = mbpt.order_diagrams(diagrams)
 
 numdiag = len(diagrams)
 
 # Treatment of the algebraic expressions
 if theory == "BMBPT" and not norm:
 
-    # Production of the time-structure diagrams
-
     diagrams_time = [tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
 
-    tree_TSDs = []
-    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
-        if diagrams_time[i_diag].is_tree:
-            tree_TSDs.append(diagrams_time[i_diag])
-            del diagrams_time[i_diag]
-
-    gen.topologically_distinct_diagrams(tree_TSDs)
-    nb_tree_TSDs = len(tree_TSDs)
-
-    gen.topologically_distinct_diagrams(diagrams_time)
-    diagrams_time = tree_TSDs + diagrams_time
-
-    for index, t_diag in enumerate(diagrams_time):
-        t_diag.tags.insert(0, index)
-        if not t_diag.is_tree:
-            t_diag.equivalent_trees = tsd.treat_cycles(t_diag.graph)
-            t_diag.expr = " + ".join("\\frac{1}{%s}"
-                                     % tsd.tree_time_structure_den(graph)
-                                     for graph
-                                     in t_diag.equivalent_trees)
+    diagrams_time, nb_tree_TSDs = bmbpt.treat_TSDs(diagrams_time)
 
     bmbpt.produce_expressions(diagrams, diagrams_time)
 

@@ -95,6 +95,37 @@ def print_CD_output(directory, diagrams):
     CD_file.close()
 
 
+def order_diagrams(diagrams):
+    """Order the MBPT diagrams and return the number of diags for each type."""
+    singles = []
+    doubles = []
+    triples = []
+    quadruples = []
+    quintuples_and_higher = []
+
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        if diagrams[i_diag].excitation_level == 1:
+            singles.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level == 2:
+            doubles.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level == 3:
+            triples.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level == 4:
+            quadruples.append(diagrams[i_diag])
+        elif diagrams[i_diag].excitation_level >= 5:
+            quintuples_and_higher.append(diagrams[i_diag])
+        else:
+            print "Zero or negative excitation level!\n"
+            exit()
+        del diagrams[i_diag]
+
+    diagrams = singles + doubles + triples + quadruples \
+        + quintuples_and_higher
+
+    return diagrams, len(singles), len(doubles), len(triples), \
+        len(quadruples), len(quintuples_and_higher)
+
+
 class MbptDiagram(gen.Diagram):
     """Describes a MBPT diagram with its related properties."""
 

@@ -319,7 +319,7 @@ def produce_expressions(diagrams, diagrams_time):
 
 
 def treat_TSDs(diagrams_time):
-    """Order TSDs, produce their expressions, return the number of trees."""
+    """Order TSDs, produce their expressions, return also number of trees."""
 
     tree_TSDs = []
     for i_diag in xrange(len(diagrams_time)-1, -1, -1):
@@ -340,7 +340,49 @@ def treat_TSDs(diagrams_time):
                                      % tsd.tree_time_structure_den(graph)
                                      for graph
                                      in t_diag.equivalent_trees)
-    return len(tree_TSDs)
+    return diagrams_time, len(tree_TSDs)
+
+
+def order_diagrams(diagrams):
+    """Order the BMBPT diagrams and return number of diags for each type."""
+    diagrams2HF = []
+    diagrams2EHF = []
+    diagrams2noHF = []
+    diagrams3HF = []
+    diagrams3EHF = []
+    diagrams3noHF = []
+
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        if diagrams[i_diag].two_or_three_body == 2:
+            if diagrams[i_diag].HF_type == "HF":
+                diagrams2HF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "EHF":
+                diagrams2EHF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "noHF":
+                diagrams2noHF.append(diagrams[i_diag])
+        elif diagrams[i_diag].two_or_three_body == 3:
+            if diagrams[i_diag].HF_type == "HF":
+                diagrams3HF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "EHF":
+                diagrams3EHF.append(diagrams[i_diag])
+            elif diagrams[i_diag].HF_type == "noHF":
+                diagrams3noHF.append(diagrams[i_diag])
+        del diagrams[i_diag]
+
+    gen.topologically_distinct_diagrams(diagrams2HF)
+    gen.topologically_distinct_diagrams(diagrams2EHF)
+    gen.topologically_distinct_diagrams(diagrams2noHF)
+    gen.topologically_distinct_diagrams(diagrams3HF)
+    gen.topologically_distinct_diagrams(diagrams3EHF)
+    gen.topologically_distinct_diagrams(diagrams3noHF)
+
+    diagrams = diagrams2HF + diagrams2EHF + diagrams2noHF \
+        + diagrams3HF + diagrams3EHF + diagrams3noHF
+    for ind, diagram in enumerate(diagrams):
+        diagram.tags[0] = ind
+
+    return diagrams, len(diagrams2HF), len(diagrams2EHF), len(diagrams2noHF), \
+        len(diagrams3HF), len(diagrams3EHF), len(diagrams3noHF)
 
 
 class BmbptFeynmanDiagram(gen.Diagram):
