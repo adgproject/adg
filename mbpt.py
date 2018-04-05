@@ -86,6 +86,15 @@ def write_MBPT_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
         result.write("\\section{Quintuples and higher}\n\n")
 
 
+def print_CD_output(directory, diagrams):
+    """Print a computer-readable file for C. Drischler's framework."""
+    CD_file = open(directory + '/CD_output.txt', 'w')
+    for idx, diag in enumerate(diagrams):
+        CD_file.write('config[%i] = %s\n' % (idx + 1, diag.CD))
+    CD_file.write('\n')
+    CD_file.close()
+
+
 class MbptDiagram(gen.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
@@ -160,7 +169,7 @@ class MbptDiagram(gen.Diagram):
         self.CD = "{%i, {%s}, {%s}};" % (nedges_eq, braket_CD, denom_CD)
 
     def calc_excitation(self):
-        """Returns an integer coding for the excitation level of the diag."""
+        """Return an integer coding for the excitation level of the diag."""
         max_excited_states = 0
         for row in xrange(1, self.graph.number_of_nodes()):
             nb_excited_states = 0

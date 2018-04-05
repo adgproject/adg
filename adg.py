@@ -200,16 +200,7 @@ if theory == "BMBPT" and not norm:
                                      for graph
                                      in t_diag.equivalent_trees)
 
-    # Production of the BMBPT expressions
-
-    for diag in diagrams:
-        bmbpt.attribute_qp_labels(diag.graph)
-        for t_diag in diagrams_time:
-            if diag.tags[0] in t_diag.tags[1:]:
-                diag.time_tag = t_diag.tags[0]
-                diag.tsd_is_tree = t_diag.is_tree
-                break
-        diag.attribute_expressions(diagrams_time[diag.time_tag])
+    bmbpt.produce_expressions(diagrams, diagrams_time)
 
 else:
     diagrams_time = []
@@ -257,8 +248,7 @@ if pdraw:
     if write_time:
         gen.create_feynmanmp_files(diagrams_time, theory, directory, 'time')
 
-msg = 'Include diagrams in tex?'
-pdiag = raw_input("%s (y/N) " % msg).lower() == 'y'
+pdiag = raw_input("Include diagrams in tex? (y/N) ").lower() == 'y'
 
 # Write everything down in a nice LaTeX file
 latex_file = open(directory + '/result.tex', 'w')
@@ -314,15 +304,9 @@ latex_file.close()
 
 # Produce an output adapted to Christian Drischler's format
 if theory == "MBPT":
-    if raw_input("Produce a CD output file? ").lower() == 'y':
-        CD_file = open(directory + '/CD_output.txt', 'w')
-        for idx, diag in enumerate(diagrams):
-            CD_file.write('config[%i] = %s\n' % (idx + 1, diag.CD))
-        CD_file.write('\n')
-        CD_file.close()
+    if raw_input("Produce a CD output file? (y/N) ").lower() == 'y':
+        mbpt.print_CD_output(directory, diagrams)
 
-msg = 'Compile pdf?'
-pdfcompile = raw_input("%s (y/N) " % msg).lower() == 'y'
-if pdfcompile:
-    gen.compile_and_clean(directory, pdiag, diagrams,
-                          write_time, diagrams_time)
+if raw_input("Compile pdf? (y/N) ").lower() == 'y':
+    gen.compile_and_clean(directory, pdiag, diagrams, write_time,
+                          diagrams_time)

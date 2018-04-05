@@ -6,6 +6,7 @@ import string
 import numpy as np
 import general_routines as gen
 import networkx as nx
+import time_structure as tsd
 
 
 def BMBPT_generation(p_order, three_N_use):
@@ -303,6 +304,43 @@ def write_vertices_values(latex_file, diag, mapping):
             latex_file.write(r"\\")
         latex_file.write('\n')
     latex_file.write("\\end{align*}\n")
+
+
+def produce_expressions(diagrams, diagrams_time):
+    """Produce and store the expressions associated to the BMBPT diagrams."""
+    for diag in diagrams:
+        attribute_qp_labels(diag.graph)
+        for t_diag in diagrams_time:
+            if diag.tags[0] in t_diag.tags[1:]:
+                diag.time_tag = t_diag.tags[0]
+                diag.tsd_is_tree = t_diag.is_tree
+                break
+        diag.attribute_expressions(diagrams_time[diag.time_tag])
+
+
+def treat_TSDs(diagrams_time):
+    """Order TSDs, produce their expressions, return the number of trees."""
+
+    tree_TSDs = []
+    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
+        if diagrams_time[i_diag].is_tree:
+            tree_TSDs.append(diagrams_time[i_diag])
+            del diagrams_time[i_diag]
+
+    gen.topologically_distinct_diagrams(tree_TSDs)
+    gen.topologically_distinct_diagrams(diagrams_time)
+
+    diagrams_time = tree_TSDs + diagrams_time
+
+    for index, t_diag in enumerate(diagrams_time):
+        t_diag.tags.insert(0, index)
+        if not t_diag.is_tree:
+            t_diag.equivalent_trees = tsd.treat_cycles(t_diag.graph)
+            t_diag.expr = " + ".join("\\frac{1}{%s}"
+                                     % tsd.tree_time_structure_den(graph)
+                                     for graph
+                                     in t_diag.equivalent_trees)
+    return len(tree_TSDs)
 
 
 class BmbptFeynmanDiagram(gen.Diagram):
