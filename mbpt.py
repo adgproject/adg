@@ -143,11 +143,14 @@ def order_diagrams(diagrams):
 def attribute_conjugate(diagrams):
     """Attribute to each diagram its complex conjugate."""
     for idx, diag1 in enumerate(diagrams):
-        for diag2 in diagrams[idx+1:]:
-            if diag1.is_complex_conjug_of(diag2):
-                diag1.complex_conjugate = diag2.tags[0]
-                diag2.complex_conjugate = diag1.tags[0]
-                break
+        if diag1.complex_conjugate == -1:
+            for diag2 in diagrams[idx+1:]:
+                if diag2.complex_conjugate != -1:
+                    break
+                if diag1.is_complex_conjug_of(diag2):
+                    diag1.complex_conjugate = diag2.tags[0]
+                    diag2.complex_conjugate = diag1.tags[0]
+                    break
 
 
 class MbptDiagram(gen.Diagram):
