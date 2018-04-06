@@ -101,6 +101,7 @@ if theory == "BMBPT":
 elif theory == "MBPT":
     diagrams, nb_singles, nb_doubles, nb_triples, nb_quadruples, \
         nb_quintuples_and_higher = mbpt.order_diagrams(diagrams)
+    mbpt.attribute_conjugate(diagrams)
 
 numdiag = len(diagrams)
 
@@ -191,6 +192,9 @@ for diag in diagrams:
                                 nb_doubles, nb_triples, nb_quadruples,
                                 nb_quintuples_and_higher)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
+        if diag.complex_conjugate >= 0:
+            latex_file.write("Complex conjugate diagram: %i\n"
+                             % (diag.complex_conjugate + 1))
         mbpt.write_diag_exp(latex_file, diag)
 
     if pdiag and pdraw:

@@ -129,6 +129,16 @@ def order_diagrams(diagrams):
         len(quadruples), len(quintuples_and_higher)
 
 
+def attribute_conjugate(diagrams):
+    """Attribute to each diagram its complex conjugate."""
+    for idx, diag1 in enumerate(diagrams):
+        for diag2 in diagrams[idx+1:]:
+            if diag1.is_complex_conjug_of(diag2):
+                diag1.complex_conjugate = diag2.tags[0]
+                diag2.complex_conjugate = diag1.tags[0]
+                break
+
+
 class MbptDiagram(gen.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
@@ -142,6 +152,7 @@ class MbptDiagram(gen.Diagram):
                                                oriented=True).todense()
         self.attribute_expression()
         self.excitation_level = self.calc_excitation()
+        self.complex_conjugate = -1
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
@@ -241,15 +252,16 @@ class MbptDiagram(gen.Diagram):
         """Return True if the diagram and test_diagram are complex conjugate."""
         is_conjug = True
         if (self.excitation_level != test_diagram.excitation_level) \
-                or (self.graph.number_of_edges() != test_diagram.graph.number_of_edges()):
+                or (self.graph.number_of_edges()
+                    != test_diagram.graph.number_of_edges()):
             is_conjug = False
             return is_conjug
         vertex_max = self.graph.number_of_nodes()
         for vertex_a in self.graph:
             for vertex_b in self.graph:
                 if self.graph.number_of_edges(vertex_a, vertex_b) \
-                        != test_diagram.graph.number_of_edges(vertex_max-vertex_a,
-                                                              vertex_max-vertex_b):
+                        != test_diagram.graph.reverse().number_of_edges(
+                                vertex_max-1-vertex_a, vertex_max-1-vertex_b):
                     is_conjug = False
                     break
         return is_conjug
