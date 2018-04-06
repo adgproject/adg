@@ -102,7 +102,7 @@ def print_CD_output(directory, diagrams):
     with open(directory+"/CD_adj_matrices.list", "w") as f:
         for idx, diagram in enumerate(diagrams):
             f.write("Diagram n: %i\n" % (idx + 1))
-            np.savetxt(f, nx.to_numpy_matrix(diagram.graph), fmt='%d')
+            np.savetxt(f, diagram.adjacency_mat, fmt='%d')
             f.write("\n")
 
 
@@ -145,12 +145,11 @@ def attribute_conjugate(diagrams):
     for idx, diag1 in enumerate(diagrams):
         if diag1.complex_conjugate == -1:
             for diag2 in diagrams[idx+1:]:
-                if diag2.complex_conjugate != -1:
-                    break
-                if diag1.is_complex_conjug_of(diag2):
-                    diag1.complex_conjugate = diag2.tags[0]
-                    diag2.complex_conjugate = diag1.tags[0]
-                    break
+                if diag2.complex_conjugate == -1:
+                    if diag1.is_complex_conjug_of(diag2):
+                        diag1.complex_conjugate = diag2.tags[0]
+                        diag2.complex_conjugate = diag1.tags[0]
+                        break
 
 
 class MbptDiagram(gen.Diagram):
@@ -167,6 +166,7 @@ class MbptDiagram(gen.Diagram):
         self.attribute_expression()
         self.excitation_level = self.calc_excitation()
         self.complex_conjugate = -1
+        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
@@ -269,17 +269,8 @@ class MbptDiagram(gen.Diagram):
     def is_complex_conjug_of(self, test_diagram):
         """Return True if the diagram and test_diagram are complex conjugate."""
         is_conjug = True
-        if (self.excitation_level != test_diagram.excitation_level) \
-                or (self.graph.number_of_edges()
-                    != test_diagram.graph.number_of_edges()):
+        # Check the adjacency mat against the anti-transposed one of test_diag
+        if not np.array_equal(self.adjacency_mat,
+                              test_diagram.adjacency_mat[::-1, ::-1].T):
             is_conjug = False
-            return is_conjug
-        vertex_max = self.graph.number_of_nodes()
-        for vertex_a in self.graph:
-            for vertex_b in self.graph:
-                if self.graph.number_of_edges(vertex_a, vertex_b) \
-                        != test_diagram.graph.reverse().number_of_edges(
-                                vertex_max-1-vertex_a, vertex_max-1-vertex_b):
-                    is_conjug = False
-                    break
         return is_conjug
