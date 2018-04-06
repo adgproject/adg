@@ -38,17 +38,23 @@ def diagram_generation(n):
     return [np.array(matrix) for matrix in doubleUniq]
 
 
-def line_label_h(n):
+def line_label_h(n, order):
     """Select appropriate label for hole line."""
     labels = list(string.ascii_lowercase)
-    labels = labels[0:13]
+    if order < 5:
+        labels = labels[0:6]
+    else:
+        labels = labels[0:13]
     return labels[n]
 
 
-def line_label_p(n):
+def line_label_p(n, order):
     """Select appropriate label for particle line."""
     labels = list(string.ascii_lowercase)
-    labels = labels[13:-1]
+    if order < 5:
+        labels = labels[6:-1]
+    else:
+        labels = labels[13:-1]
     return labels[n]
 
 
@@ -93,6 +99,11 @@ def print_CD_output(directory, diagrams):
         CD_file.write('config[%i] = %s\n' % (diag.tags[0] + 1, diag.CD))
     CD_file.write('\n')
     CD_file.close()
+    with open(directory+"/CD_adj_matrices.list", "w") as f:
+        for idx, diagram in enumerate(diagrams):
+            f.write("Diagram n: %i\n" % (idx + 1))
+            np.savetxt(f, nx.to_numpy_matrix(diagram.graph), fmt='%d')
+            f.write("\n")
 
 
 def order_diagrams(diagrams):
@@ -168,16 +179,16 @@ class MbptDiagram(gen.Diagram):
             bra_CD = ''
             for col in xrange(ncol):
                 if self.incidence[row, col] == 1:
-                    bra += line_label_h(col) if type_edg[col] == 'h' \
-                        else line_label_p(col)
-                    bra_CD += line_label_h(col) if type_edg[col] == 'h' \
-                        else line_label_p(col)
+                    bra += line_label_h(col, nrow) if type_edg[col] == 'h' \
+                        else line_label_p(col, nrow)
+                    bra_CD += line_label_h(col, nrow) if type_edg[col] == 'h' \
+                        else line_label_p(col, nrow)
                     bra_CD += ", "
                 elif self.incidence[row, col] == -1:
-                    ket += line_label_h(col) if type_edg[col] == 'h' \
-                        else line_label_p(col)
-                    ket_CD += line_label_h(col) if type_edg[col] == 'h' \
-                        else line_label_p(col)
+                    ket += line_label_h(col, nrow) if type_edg[col] == 'h' \
+                        else line_label_p(col, nrow)
+                    ket_CD += line_label_h(col, nrow) if type_edg[col] == 'h' \
+                        else line_label_p(col, nrow)
                     ket_CD += ", "
             braket += '\\braket{%s|H|%s}' % (bra, ket)
             braket_CD += '{%s, %s}, ' % (bra_CD.strip(', '),
@@ -190,16 +201,20 @@ class MbptDiagram(gen.Diagram):
             denom_CD += '{'
             for col in range(ncol):
                 if self.incidence[0:row, col].sum() == 1:
-                    denom += '+E_' + line_label_h(col) if type_edg[col] == 'h'\
-                        else '+E_' + line_label_p(col)
-                    denom_CD += line_label_h(col) if type_edg[col] == 'h'\
-                        else line_label_p(col)
+                    denom += '+E_' + line_label_h(col, nrow) \
+                        if type_edg[col] == 'h'\
+                        else '+E_' + line_label_p(col, nrow)
+                    denom_CD += line_label_h(col, nrow) \
+                        if type_edg[col] == 'h'\
+                        else line_label_p(col, nrow)
                     denom_CD += ', '
                 elif self.incidence[0:row, col].sum() == -1:
-                    denom += '-E_' + line_label_h(col) if type_edg[col] == 'h'\
-                        else '-E_' + line_label_p(col)
-                    denom_CD += line_label_h(col) if type_edg[col] == 'h'\
-                        else line_label_p(col)
+                    denom += '-E_' + line_label_h(col, nrow) \
+                        if type_edg[col] == 'h'\
+                        else '-E_' + line_label_p(col, nrow)
+                    denom_CD += line_label_h(col, nrow) \
+                        if type_edg[col] == 'h'\
+                        else line_label_p(col, nrow)
                     denom_CD += ', '
             denom += ')'
             denom_CD = denom_CD.strip(', ') + '}, '

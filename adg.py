@@ -61,13 +61,11 @@ else:
     print "Invalid theory"
 print "Number of possible diagrams, ", len(diagrams)
 
-i = 0
 with open(directory+"/Diagrams.list", "w") as f:
-    for diagram in diagrams:
-        f.write("Diagram n: %i" % i)
-        np.savetxt(f, diagram)
+    for idx, diagram in enumerate(diagrams):
+        f.write("Diagram n: %i\n" % (idx + 1))
+        np.savetxt(f, diagram, fmt='%d')
         f.write("\n")
-        i += 1
 
 # Graph part (computing, writing, drawing)
 G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
