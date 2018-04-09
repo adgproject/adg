@@ -442,8 +442,9 @@ class BmbptFeynmanDiagram(gen.Diagram):
         prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
             if sym_fact != "" else "%s\\sum_{k_i}" % prefactor
         # Set the Feynman and Goldstone expressions
-        self.feynman_exp = "%s%s\\int_{0}^{\\tau}%s\n" \
-                           % (prefactor, numerator, extract_integral(self))
+        self.feynman_exp = \
+            "\\lim\\limits_{\\tau \\to \\infty}%s%s\\int_{0}^{\\tau}%s\n" \
+            % (prefactor, numerator, extract_integral(self))
         self.diag_exp = "%s\\frac{%s}{%s} %s\n" % (prefactor, numerator,
                                                    denominator, extra_factor) \
             if denominator != "" \
