@@ -142,9 +142,10 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in xrange(p_order-1):
         fmf_file.write("\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)))
-        fmf_file.write("\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
-                       if start_graph.node[vert]['operator']
-                       else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
+        fmf_file.write(
+            "\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
+            if start_graph.node[vert]['operator']
+            else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
         fmf_file.write("}{v%i}\n" % vert)
     fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n"
                    % (p_order-1))
@@ -254,6 +255,7 @@ class Diagram(object):
     """Describes a diagram with its related properties."""
 
     def __init__(self, nx_graph):
+        """Generate a Diagram object starting from the NetwiorkX graph."""
         self.type = 'Diagram'
         self.graph = nx_graph
         self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])

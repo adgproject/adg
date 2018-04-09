@@ -52,7 +52,8 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
         is_disconnected = True
         empty_lines = [index for index, line
                        in enumerate(mat[0:max_filled_vertex + 1])
-                       if line[max_filled_vertex + 1:length_mat] == empty_block]
+                       if line[max_filled_vertex + 1:length_mat]
+                       == empty_block]
         test_block = [0 for i in range(length_mat - len(empty_lines))]
         for index in empty_lines:
             test_line = copy.deepcopy(mat[index])
@@ -131,9 +132,10 @@ def extract_numerator(graph):
         # Add the qp states corresponding to propagators coming in
         previous_vertex = vertex - 1
         while previous_vertex >= 0:
-            numerator += "".join(graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                                 for prop in graph.in_edges(vertex, keys=True)
-                                 if prop[0] == previous_vertex)
+            numerator += "".join(
+                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                for prop in graph.in_edges(vertex, keys=True)
+                if prop[0] == previous_vertex)
             previous_vertex -= 1
         numerator += "} "
     return numerator
@@ -275,8 +277,9 @@ def write_BMBPT_section(result, diag_index, three_N, norm,
         result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
     if three_N:
         if diag_index == nb_2:
-            result.write("\\section{Three-body diagrams}\n\n"
-                         + "\\subsection{Three-body energy canonical diagrams}\n\n")
+            result.write(
+                "\\section{Three-body diagrams}\n\n"
+                + "\\subsection{Three-body energy canonical diagrams}\n\n")
         elif (diag_index == nb_2 + nb_3_HF) and (not norm):
             result.write("\\subsection{Three-body canonical diagrams for a generic operator only}\n\n")
         elif diag_index == nb_2 + nb_3_HF + nb_3_EHF:
@@ -320,7 +323,6 @@ def produce_expressions(diagrams, diagrams_time):
 
 def treat_TSDs(diagrams_time):
     """Order TSDs, produce their expressions, return also number of trees."""
-
     tree_TSDs = []
     for i_diag in xrange(len(diagrams_time)-1, -1, -1):
         if diagrams_time[i_diag].is_tree:
@@ -416,16 +418,15 @@ class BmbptFeynmanDiagram(gen.Diagram):
         self.vert_exp = [self.vertex_expression(vertex)
                          for vertex in self.graph]
         numerator = extract_numerator(self.graph)
-        denominator = time_tree_denominator(self.graph,
-                                            nx.relabel_nodes(TSD.graph,
-                                                             TSD.perms[self.tags[0]])) \
+        denominator = time_tree_denominator(
+            self.graph, nx.relabel_nodes(TSD.graph, TSD.perms[self.tags[0]])) \
             if self.tsd_is_tree else ""
         extra_factor = "" if self.tsd_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"
-                         % time_tree_denominator(self.graph,
-                                                 nx.relabel_nodes(equi_t_graph,
-                                                                  TSD.perms[self.tags[0]]))
+                         % time_tree_denominator(
+                             self.graph, nx.relabel_nodes(
+                                 equi_t_graph, TSD.perms[self.tags[0]]))
                          for equi_t_graph in TSD.equivalent_trees) \
             + " \\right]"
         # Determine the pre-factor
@@ -466,8 +467,9 @@ class BmbptFeynmanDiagram(gen.Diagram):
         latex_file.write('\n\\begin{center}\n')
         gen.draw_diagram(directory, latex_file, self.tags[0], 'diag')
         if write_time:
-            latex_file.write('\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
-                             % (self.time_tag + 1))
+            latex_file.write(
+                '\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
+                % (self.time_tag + 1))
             gen.draw_diagram(directory, latex_file, self.time_tag, 'time')
         latex_file.write('\n\\end{center}\n\n')
 
