@@ -273,7 +273,7 @@ class MbptDiagram(gen.Diagram):
         return type_edg
 
     def is_complex_conjug_of(self, test_diagram):
-        """Return True if the diagram and test_diagram are complex conjugate."""
+        """Return True if self and test_diagram are complex conjugate."""
         is_conjug = True
         # Check the adjacency mat against the anti-transposed one of test_diag
         if not np.array_equal(self.adjacency_mat,
