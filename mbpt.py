@@ -95,10 +95,16 @@ def write_MBPT_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
 def print_CD_output(directory, diagrams):
     """Print a computer-readable file for C. Drischler's framework."""
     CD_file = open(directory + '/CD_output.txt', 'w')
+    conjug_file = open(directory + '/CD_conjug_pairs.list', 'w')
     for diag in diagrams:
         CD_file.write('config[%i] = %s\n' % (diag.tags[0] + 1, diag.CD))
+        if (diag.complex_conjugate != -1) \
+                and (diag.complex_conjugate > diag.tags[0]):
+            conjug_file.write("%i\t%i\n" % (diag.tags[0] + 1,
+                                            diag.complex_conjugate + 1))
     CD_file.write('\n')
     CD_file.close()
+    conjug_file.close()
     with open(directory+"/CD_adj_matrices.list", "w") as f:
         for idx, diagram in enumerate(diagrams):
             f.write("Diagram n: %i\n" % (idx + 1))
