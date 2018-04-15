@@ -8,14 +8,10 @@ import networkx as nx
 import general_routines as gen
 
 
-def seed(n):
-    """Generate all 1-magic square of dimension n."""
-    return [k for k in itertools.permutations(range(n), n)]
-
-
 def diagram_generation(n):
     """Generate the diagrams for the MBPT case."""
-    seeds = seed(n)
+    # Generate all 1-magic square of dimension n
+    seeds = [k for k in itertools.permutations(range(n), n)]
     all_matrices = [[[0 if i != j else 1 for i in range(n)]
                      for j in k]
                     for k in seeds]
@@ -36,26 +32,6 @@ def diagram_generation(n):
             doubleUniq.append(matrix)
     doubleUniq.sort(reverse=True)
     return [np.array(matrix) for matrix in doubleUniq]
-
-
-def line_label_h(n, order):
-    """Select appropriate label for hole line."""
-    labels = list(string.ascii_lowercase)
-    if order < 5:
-        labels = labels[0:6]
-    else:
-        labels = labels[0:13]
-    return labels[n]
-
-
-def line_label_p(n, order):
-    """Select appropriate label for particle line."""
-    labels = list(string.ascii_lowercase)
-    if order < 5:
-        labels = labels[6:-1]
-    else:
-        labels = labels[13:-1]
-    return labels[n]
 
 
 def write_diag_exp(latex_file, mbpt_diag):
@@ -228,18 +204,6 @@ class MbptDiagram(gen.Diagram):
             if edge[0] > edge[1]:
                 nb_holes += 1
         return nb_holes
-
-    def edges_type(self):
-        """Return a list with the types of the graph edges."""
-        ncol = self.graph.number_of_edges()
-        type_edg = []
-        for col in range(ncol):
-            flat = list(self.incidence[:, col].A1)
-            if flat.index(1) < flat.index(-1):
-                type_edg.append('h')
-            else:
-                type_edg.append('p')
-        return type_edg
 
     def is_complex_conjug_of(self, test_diagram):
         """Return True if self and test_diagram are complex conjugate."""
