@@ -7,6 +7,7 @@ import numpy as np
 import general_routines as gen
 import networkx as nx
 import time_structure as tsd
+import general_routines as gen
 
 
 def BMBPT_generation(p_order, three_N_use):
@@ -141,24 +142,6 @@ def extract_numerator(graph):
     return numerator
 
 
-def extract_denom(start_graph, subgraph):
-    """Extract the appropriate denominator using the subgraph rule."""
-    denomin = r"\epsilon^{" \
-        + "".join("%s"
-                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
-                  for propa
-                  in start_graph.in_edges(subgraph, keys=True)
-                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
-        + "}_{" \
-        + "".join("%s"
-                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
-                  for propa
-                  in start_graph.out_edges(subgraph, keys=True)
-                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
-        + "}"
-    return denomin
-
-
 def time_tree_denominator(graph, time_graph):
     """Return the denominator for a time-tree graph."""
     denominator = ""
@@ -167,7 +150,7 @@ def time_tree_denominator(graph, time_graph):
                           for vertex_j in nx.descendants(time_graph, vertex_i)]
         subgraph_stack.append(vertex_i)
         subdiag = graph.subgraph(subgraph_stack)
-        denominator += "%s\\ " % extract_denom(graph, subdiag)
+        denominator += "%s\\ " % gen.extract_denom(graph, subdiag)
     return denominator
 
 

@@ -158,6 +158,23 @@ def attribute_conjugate(diagrams):
                         break
 
 
+def extract_CD_denom(start_graph, subgraph):
+    """Extract the appropriate CD denominator using the subgraph rule."""
+    denomin = "{" \
+        + "".join("%s, "
+                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
+                  for propa
+                  in start_graph.in_edges(subgraph, keys=True)
+                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+        + "".join("%s, "
+                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
+                  for propa
+                  in start_graph.out_edges(subgraph, keys=True)
+                  if not subgraph.has_edge(propa[0], propa[1], propa[2]))
+    denomin = denomin.strip(', ') + '}'
+    return denomin
+
+
 class MbptDiagram(gen.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
@@ -169,6 +186,7 @@ class MbptDiagram(gen.Diagram):
         # Beware of the sign convention !!!
         self.incidence = - nx.incidence_matrix(self.graph,
                                                oriented=True).todense()
+        self.attribute_ph_labels()
         self.attribute_expression()
         self.excitation_level = self.calc_excitation()
         self.complex_conjugate = -1
@@ -176,66 +194,17 @@ class MbptDiagram(gen.Diagram):
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
-        type_edg = self.edges_type()
-        braket = ''
-        braket_CD = ''
-        nrow = self.graph.number_of_nodes()
-        ncol = self.graph.number_of_edges()
-        for row in xrange(nrow):
-            ket = ''
-            bra = ''
-            ket_CD = ''
-            bra_CD = ''
-            for col in xrange(ncol):
-                if self.incidence[row, col] == 1:
-                    bra += line_label_h(col, nrow) if type_edg[col] == 'h' \
-                        else line_label_p(col, nrow)
-                    bra_CD += line_label_h(col, nrow) if type_edg[col] == 'h' \
-                        else line_label_p(col, nrow)
-                    bra_CD += ", "
-                elif self.incidence[row, col] == -1:
-                    ket += line_label_h(col, nrow) if type_edg[col] == 'h' \
-                        else line_label_p(col, nrow)
-                    ket_CD += line_label_h(col, nrow) if type_edg[col] == 'h' \
-                        else line_label_p(col, nrow)
-                    ket_CD += ", "
-            braket += '\\braket{%s|H|%s}' % (bra, ket)
-            braket_CD += '{%s, %s}, ' % (bra_CD.strip(', '),
-                                         ket_CD.strip(', '))
-        braket_CD = braket_CD.strip(', ')
-        denom = ''
-        denom_CD = ''
-        for row in xrange(1, nrow):
-            denom += '('
-            denom_CD += '{'
-            for col in range(ncol):
-                if self.incidence[0:row, col].sum() == 1:
-                    denom += '+E_' + line_label_h(col, nrow) \
-                        if type_edg[col] == 'h'\
-                        else '+E_' + line_label_p(col, nrow)
-                    denom_CD += line_label_h(col, nrow) \
-                        if type_edg[col] == 'h'\
-                        else line_label_p(col, nrow)
-                    denom_CD += ', '
-                elif self.incidence[0:row, col].sum() == -1:
-                    denom += '-E_' + line_label_h(col, nrow) \
-                        if type_edg[col] == 'h'\
-                        else '-E_' + line_label_p(col, nrow)
-                    denom_CD += line_label_h(col, nrow) \
-                        if type_edg[col] == 'h'\
-                        else line_label_p(col, nrow)
-                    denom_CD += ', '
-            denom += ')'
-            denom_CD = denom_CD.strip(', ') + '}, '
-        denom_CD = denom_CD.strip(', ')
-        denom = denom.replace('( +', '(').strip(' ')
         phases = '(-1)^{%i+l}' % self.count_hole_lines()
         eq_lines = np.array(self.incidence.transpose())
         neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         nedges_eq = 2**(len(eq_lines)-len(neq_lines))
+
         self.expr = "\\dfrac{1}{%i}%s" % (nedges_eq, phases) \
-            + "\\sum{\\dfrac{%s}{%s}}\n" % (braket, denom)
-        self.CD = "{%i, {%s}, {%s}};" % (nedges_eq, braket_CD, denom_CD)
+            + "\\sum{\\dfrac{%s}{%s}}\n" % (self.extract_numerator(),
+                                            self.extract_denominator())
+        self.CD = "{%i, {%s}, {%s}};" % (nedges_eq,
+                                         self.CD_numerator(),
+                                         self.CD_denominator())
 
     def calc_excitation(self):
         """Return an integer coding for the excitation level of the diag."""
@@ -280,3 +249,81 @@ class MbptDiagram(gen.Diagram):
                               test_diagram.adjacency_mat[::-1, ::-1].T):
             is_conjug = False
         return is_conjug
+
+    def attribute_ph_labels(self):
+        """Attribute the appropriate qp labels to the graph's propagators."""
+        labels = list(string.ascii_lowercase)
+        # Labelling needs to be shifted for higher orders
+        if len(self.graph) < 6:
+            h_labels = labels[0:8]
+            p_labels = labels[8:]
+        else:
+            h_labels = labels[0:13]
+            p_labels = labels[13:]
+        for prop in self.graph.edges(keys=True):
+            if prop[0] < prop[1]:
+                self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] \
+                    = h_labels.pop(0)
+            else:
+                self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] \
+                    = p_labels.pop(0)
+
+    def extract_denominator(self):
+        """Return the denominator for a MBPT graph."""
+        denominator = ""
+        graph = self.graph
+        for vertex_i in range(1, len(graph)):
+            stack = [vertex_j for vertex_j in graph if vertex_j >= vertex_i]
+            denominator += "%s\\ " % gen.extract_denom(graph,
+                                                       graph.subgraph(stack))
+        return denominator
+
+    def CD_denominator(self):
+        """Return the CD-formatted denominator of the graph."""
+        denominator = ""
+        graph = self.graph
+        for vertex_i in range(1, len(graph)):
+            substack = [vertex_j
+                        for vertex_j in graph
+                        if vertex_j >= vertex_i]
+            denominator += "%s, " % extract_CD_denom(graph,
+                                                     graph.subgraph(substack))
+        return denominator.strip(', ')
+
+    def extract_numerator(self):
+        """Return the numerator associated to a MBPT graph."""
+        graph = self.graph
+        numerator = ""
+        for vertex in graph:
+            # Attribute the correct operator to each vertex
+            numerator += "O_{" if graph.node[vertex]['operator'] \
+                               else "\\Omega_{"
+            # First add the qp states corresponding to propagators going out
+            numerator += "".join(
+                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                for prop in graph.out_edges(vertex, keys=True))
+            # Add the qp states corresponding to propagators coming in
+            numerator += "".join(
+                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                for prop in graph.in_edges(vertex, keys=True)) \
+                + "} "
+        return numerator
+
+    def CD_numerator(self):
+        """Return the numerator under CD format."""
+        graph = self.graph
+        numerator = ""
+        for vertex in graph:
+            # Attribute the correct operator to each vertex
+            numerator += "{"
+            # First add the qp states corresponding to propagators going out
+            numerator += ", ".join(
+                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                for prop in graph.out_edges(vertex, keys=True))
+            numerator += ', '
+            # Add the qp states corresponding to propagators coming in
+            numerator += ", ".join(
+                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
+                for prop in graph.in_edges(vertex, keys=True))
+            numerator = numerator.strip(', ') + "}, "
+        return numerator.strip(', ')

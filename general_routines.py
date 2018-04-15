@@ -251,6 +251,24 @@ def to_skeleton(graph):
     return graph
 
 
+def extract_denom(start_graph, subgraph):
+    """Extract the appropriate denominator using the subgraph rule."""
+    denomin = r"\epsilon^{" \
+        + "".join("%s"
+                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
+                  for propa
+                  in start_graph.in_edges(subgraph, keys=True)
+                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+        + "}_{" \
+        + "".join("%s"
+                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
+                  for propa
+                  in start_graph.out_edges(subgraph, keys=True)
+                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+        + "}"
+    return denomin
+
+
 class Diagram(object):
     """Describes a diagram with its related properties."""
 
