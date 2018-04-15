@@ -124,9 +124,9 @@ def number_of_sinks(graph):
     return sum(1 for vertex in graph if graph.out_degree(vertex) == 0)
 
 
-def feynmf_generator(start_graph, theory_type, diagram_name):
+def feynmf_generator(graph, theory_type, diagram_name):
     """Generate the feynmanmp instructions corresponding to the diagram."""
-    p_order = start_graph.number_of_nodes()
+    p_order = graph.number_of_nodes()
     diag_size = 20*p_order
 
     theories = ["MBPT", "BMBPT", "SCGF"]
@@ -144,7 +144,7 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
         fmf_file.write("\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)))
         fmf_file.write(
             "\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
-            if start_graph.node[vert]['operator']
+            if graph.node[vert]['operator']
             else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
         fmf_file.write("}{v%i}\n" % vert)
     fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n"
@@ -152,14 +152,14 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
     fmf_file.write("\\fmffreeze\n")
 
     # Loop over all elements of the graph to draw associated propagators
-    for vert_i in start_graph:
-        for vert_j in start_graph:
-            props_left_to_draw = start_graph.number_of_edges(vert_i, vert_j)
+    for vert_i in graph:
+        for vert_j in graph:
+            props_left_to_draw = graph.number_of_edges(vert_i, vert_j)
             # Special config for consecutive vertices
             if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
                 fmf_file.write("\\fmf{%s" % propa)
                 # Check for specific MBPT configuration
-                if start_graph.number_of_edges(vert_j, vert_i) == 1:
+                if graph.number_of_edges(vert_j, vert_i) == 1:
                     fmf_file.write(",right=0.5")
                 fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
                 props_left_to_draw -= 1
@@ -169,7 +169,9 @@ def feynmf_generator(start_graph, theory_type, diagram_name):
                                else "left=")
                 if (props_left_to_draw == 6) or (props_left_to_draw == 5):
                     fmf_file.write("0.9")
-                elif (props_left_to_draw == 4) or (props_left_to_draw == 3):
+                elif (props_left_to_draw == 4) or (props_left_to_draw == 3) \
+                     or ((props_left_to_draw == 1) and
+                         (graph.number_of_edges(vert_j, vert_i) == 2)):
                     fmf_file.write("0.75")
                 elif (props_left_to_draw == 2) or (props_left_to_draw == 1):
                     fmf_file.write("0.5" if abs(vert_i-vert_j) == 1 else "0.6")
