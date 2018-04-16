@@ -259,11 +259,8 @@ class MbptDiagram(gen.Diagram):
         graph = self.graph
         numerator = ""
         for vertex in graph:
-            # Attribute the correct operator to each vertex
-            numerator += "O_{" if graph.node[vertex]['operator'] \
-                               else "\\Omega_{"
             # First add the qp states corresponding to propagators going out
-            numerator += "".join(
+            numerator += "v_{" + "".join(
                 graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
                 for prop in graph.out_edges(vertex, keys=True))
             # Add the qp states corresponding to propagators coming in
