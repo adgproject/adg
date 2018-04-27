@@ -73,48 +73,12 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
                 del matrices[ind_mat]
 
 
-def order_2B_or_3B(graphs, TwoB_diags, ThreeB_diags):
-    """Order the graphs depending on their 2B or 3B effective status."""
-    for graph in graphs:
-        max_deg = 0
-        max_deg = (max(max_deg, graph.degree(node)) for node in graph)
-        if max_deg == 6:
-            ThreeB_diags.append(graph)
-        else:
-            TwoB_diags.append(graph)
-
-
-def order_HF_or_not(graphs, HF_graphs, EHF_graphs, noHF_graphs, norm):
-    """Order the graphs depending on their HF status."""
-    for graph in graphs:
-        test_HF = True
-        test_EHF = True
-        for node in graph:
-            if graph.degree(node) == 2:
-                test_HF = False
-                if node != 0:
-                    test_EHF = False
-        if test_HF:
-            HF_graphs.append(graph)
-        elif (not test_EHF) or norm:
-            noHF_graphs.append(graph)
-        else:
-            EHF_graphs.append(graph)
-
-
 def attribute_qp_labels(graph):
     """Attribute the appropriate qp labels to the graph's propagators."""
     i = 1
     for prop in graph.edges(keys=True):
         graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % i
         i += 1
-
-
-def omega_subgraph(graph):
-    """Return the graph without any operator vertex."""
-    subgraph_stack = [vertex for vertex in graph
-                      if graph.node[vertex]['operator'] is False]
-    return graph.subgraph(subgraph_stack)
 
 
 def extract_numerator(graph):

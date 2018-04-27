@@ -58,23 +58,6 @@ def check_vertex_degree(matrices, three_N_use, vertex_id):
                 del matrices[i_mat]
 
 
-def topologically_distinct_graphs(graphs):
-    """Return a list of graphs all topologically distinct."""
-    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-    for i_graph in xrange(len(graphs)-1, -1, -1):
-        graph = graphs[i_graph]
-        vert_degrees = sorted([graph.degree(node) for node in graph])
-        for i_comp_graph in xrange(i_graph+1, len(graphs), 1):
-            if vert_degrees == sorted([
-                    graphs[i_comp_graph].degree(node) for node
-                    in graphs[i_comp_graph]]):
-                if nx.is_isomorphic(graph, graphs[i_comp_graph],
-                                    node_match=nm):
-                    del graphs[i_comp_graph]
-                    break
-    return graphs
-
-
 def topologically_distinct_diagrams(diagrams):
     """Return a list of diagrams all topologically distinct."""
     iso = nx.algorithms.isomorphism
@@ -106,22 +89,6 @@ def label_vertices(graphs_list, theory_type, study_norm):
             graph.node[node]['operator'] = False
         if (theory_type == "BMBPT") and not study_norm:
             graph.node[0]['operator'] = True
-
-
-def has_only_branch_operator_subgraphs(graph):
-    """Return True if graph has operator subgraphs that are all branches."""
-    has_branch_subgraphs = True
-    for connected_subgraph in nx.weakly_connected_component_subgraphs(graph):
-        if len(connected_subgraph) > 1:
-            if nx.dag_longest_path_length(connected_subgraph) != \
-                    (len(connected_subgraph)-1):
-                has_branch_subgraphs = False
-    return has_branch_subgraphs
-
-
-def number_of_sinks(graph):
-    """Return the number of vertices in the graph with no edges going out."""
-    return sum(1 for vertex in graph if graph.out_degree(vertex) == 0)
 
 
 def feynmf_generator(graph, theory_type, diagram_name):

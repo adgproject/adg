@@ -15,23 +15,6 @@ def time_structure_graph(graph):
     return gen.to_skeleton(time_graph)
 
 
-def has_tree_time_structure(graph):
-    """Return True if the time structure of the graph is a tree."""
-    diag_copy = graph.to_directed()
-    for vertex in xrange(1, len(diag_copy)):
-        if diag_copy.in_degree(vertex) == 0:
-            diag_copy.add_edge(0, vertex)
-    time_diag = nx.DiGraph()
-    for vertex_i in diag_copy:
-        for vertex_j in diag_copy:
-            lgst_path = []
-            for path in nx.all_simple_paths(diag_copy, vertex_i, vertex_j):
-                if len(path) > len(lgst_path):
-                    lgst_path = path
-            time_diag.add_path(lgst_path)
-    return nx.is_arborescence(time_diag)
-
-
 def tree_time_structure_den(time_graph):
     """Return the denominator associated to a tree time-structure graph."""
     denominator = ""
