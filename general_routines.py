@@ -33,7 +33,7 @@ def no_loop(matrices):
             del matrices[i_mat]
 
 
-def check_degree(matrices, three_N_use):
+def check_degree(matrices, three_body_use):
     """Discard matrices with wrong N-body character."""
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
@@ -42,26 +42,27 @@ def check_degree(matrices, three_N_use):
                          + matrix[ind_j][ind_i]
                          for ind_j in xrange(len(matrix[0])))
             if (degree != 2) and (degree != 4):
-                if (not three_N_use) or (degree != 6):
+                if (not three_body_use) or (degree != 6):
                     del matrices[i_mat]
                     break
 
 
-def check_vertex_degree(matrices, three_N_use, vertex_id):
+def check_vertex_degree(matrices, three_body_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices."""
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
                             for index in xrange(len(matrix[0])))
         if (vertex_degree != 2) and (vertex_degree != 4):
-            if (not three_N_use) or (vertex_degree != 6):
+            if (not three_body_use) or (vertex_degree != 6):
                 del matrices[i_mat]
 
 
 def topologically_distinct_diagrams(diagrams):
     """Return a list of diagrams all topologically distinct."""
+    import time_structure as tsd
     iso = nx.algorithms.isomorphism
-    nm = iso.categorical_node_match('operator', False)
+    op_nm = iso.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
         graph = diagrams[i_diag].graph
         diag_io_degrees = diagrams[i_diag].io_degrees
@@ -69,10 +70,10 @@ def topologically_distinct_diagrams(diagrams):
             if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
                 matcher = iso.DiGraphMatcher(graph,
                                              diagrams[i_comp_diag].graph,
-                                             node_match=nm)
+                                             node_match=op_nm)
                 if matcher.is_isomorphic():
                     diagrams[i_diag].tags += diagrams[i_comp_diag].tags
-                    if diagrams[i_diag].type == 'TSD':
+                    if isinstance(diagrams[i_diag], tsd.TimeStructureDiagram):
                         diagrams[i_diag].perms.update(
                             diagrams[i_comp_diag].perms)
                         diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
@@ -180,9 +181,7 @@ def write_file_header(latex_file, pdiag, norder, theory):
         + "\\title{Diagrams and algebraic expressions at order %i" % norder \
         + " in %s}\n" % theory \
         + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
-    latex_file.write("%s\\begin{document}\n" % header)
-    latex_file.write("\\maketitle\n")
-    latex_file.write("\\graphicspath{{Diagrams/}}")
+    latex_file.write("%s\\begin{document}\n\\maketitle\n" % header)
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
@@ -242,8 +241,7 @@ class Diagram(object):
     """Describes a diagram with its related properties."""
 
     def __init__(self, nx_graph):
-        """Generate a Diagram object starting from the NetwiorkX graph."""
-        self.type = 'Diagram'
+        """Generate a Diagram object starting from the NetworkX graph."""
         self.graph = nx_graph
         self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),

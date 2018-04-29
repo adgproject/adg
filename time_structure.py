@@ -36,21 +36,21 @@ def tree_time_structure_den(time_graph):
     return denominator
 
 
-def equivalent_labelled_TSDs(equivalent_trees, labelled_TSDs):
+def equivalent_labelled_TSDs(equivalent_trees, labelled_tsds):
     """Return the list of labelled TSDs corresponding to equivalent TSDs."""
-    nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
-    eq_labelled_TSDs = ""
+    op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    eq_labelled_tsds = ""
     for eq_tree_graph in equivalent_trees:
-        for comp_tdiag in labelled_TSDs:
+        for comp_tdiag in labelled_tsds:
             if sorted(tuple((eq_tree_graph.in_degree(node),
                              eq_tree_graph.out_degree(node))
                             for node in eq_tree_graph)) \
                     == comp_tdiag.io_degrees \
                     and comp_tdiag.is_tree:
-                if nx.is_isomorphic(eq_tree_graph, comp_tdiag.graph, nm):
-                    eq_labelled_TSDs += " T%s," % (comp_tdiag.tags[0]+1)
+                if nx.is_isomorphic(eq_tree_graph, comp_tdiag.graph, op_nm):
+                    eq_labelled_tsds += " T%s," % (comp_tdiag.tags[0]+1)
                     break
-    return "".join("%s." % eq_labelled_TSDs.strip(','))
+    return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
 def draw_equivalent_tree_TSDs(time_diagram, latex_file):
@@ -66,12 +66,12 @@ def draw_equivalent_tree_TSDs(time_diagram, latex_file):
 
 
 def write_section(latex_file, directory, pdiag, pdraw, time_diagrams,
-                  nb_tree_TSDs):
+                  nb_tree_tsds):
     """Write the appropriate section for tsd diagrams in the LaTeX file."""
     latex_file.write("\\section{Time-structure diagrams}\n\n")
     latex_file.write("\\subsection{Tree diagrams}\n\n")
     for tdiag in time_diagrams:
-        if tdiag.tags[0] == nb_tree_TSDs:
+        if tdiag.tags[0] == nb_tree_tsds:
             latex_file.write("\\subsection{Non-tree diagrams}\n\n")
         latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                          % (tdiag.tags[0]+1))
@@ -145,18 +145,17 @@ def disentangle_cycle(time_graph, cycle_nodes):
 def find_cycle(graph):
     """Return start and end nodes for an elementary cycle."""
     cycle_found = False
-    for node_a in graph:
-        if graph.out_degree(node_a) >= 2:
-            for node_b in graph:
-                paths = list(nx.all_simple_paths(graph, node_a, node_b))
-                if graph.in_degree(node_b) >= 2 and len(paths) >= 2:
-                    cycle_nodes = (node_a, node_b)
-                    cycle_found = True
-                    for test_node in paths[0][1:-1]:
-                        if test_node in paths[1][1:-1]:
-                            cycle_found = False
-                            break
-                    break
+    for node_a in (node for node in graph if graph.out_degree(node) >= 2):
+        for node_b in (node for node in graph if graph.in_degree(node) >= 2):
+            paths = list(nx.all_simple_paths(graph, node_a, node_b))
+            if len(paths) >= 2:
+                cycle_nodes = (node_a, node_b)
+                cycle_found = True
+                for test_node in paths[0][1:-1]:
+                    if test_node in paths[1][1:-1]:
+                        cycle_found = False
+                        break
+                break
         if cycle_found:
             break
     return cycle_nodes
@@ -168,7 +167,6 @@ class TimeStructureDiagram(gen.Diagram):
     def __init__(self, bmbpt_diag, tag_num):
         """Generate a tsd diagram out of a BMBPT one."""
         gen.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
-        self.type = 'TSD'
         self.tags = [tag_num]
         self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
         self.equivalent_trees = []

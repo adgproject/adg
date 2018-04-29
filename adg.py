@@ -54,9 +54,9 @@ pr.enable()
 print "Running"
 START_TIME = datetime.now()
 if THEORY == "MBPT":
-    diagrams = mbpt.diagram_generation(norder)
+    diagrams = mbpt.diagrams_generation(norder)
 elif THEORY == "BMBPT":
-    diagrams = bmbpt.BMBPT_generation(norder, THREE_N)
+    diagrams = bmbpt.diagrams_generation(norder, THREE_N)
 else:
     print "Invalid THEORY"
 print "Number of possible diagrams, ", len(diagrams)
@@ -91,10 +91,10 @@ elif THEORY == 'MBPT':
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if THEORY == "BMBPT":
-    diagrams, NB_2_HF, NB_2_EHF, NB_2_noHF, \
-        NB_3_HF, NB_3_EHF, NB_3_noHF = bmbpt.order_diagrams(diagrams)
-    NB_2 = NB_2_HF + NB_2_EHF + NB_2_noHF
-    NB_3 = NB_3_HF + NB_3_EHF + NB_3_noHF
+    diagrams, NB_2_HF, NB_2_EHF, NB_2_NOT_HF, \
+        NB_3_HF, NB_3_EHF, NB_3_NOT_HF = bmbpt.order_diagrams(diagrams)
+    NB_2 = NB_2_HF + NB_2_EHF + NB_2_NOT_HF
+    NB_3 = NB_3_HF + NB_3_EHF + NB_3_NOT_HF
 
 elif THEORY == "MBPT":
     diagrams, NB_SINGLES, NB_DOUBLES, NB_TRIPLES, NB_QUADRUPLES, \
@@ -125,14 +125,14 @@ if THEORY == "BMBPT":
     if not NORM:
         print "2N canonical diagrams for a generic operator only: %i" \
             % NB_2_EHF
-    print "2N non-canonical diagrams: %i\n" % NB_2_noHF
+    print "2N non-canonical diagrams: %i\n" % NB_2_NOT_HF
     if THREE_N:
         print "3N valid diagrams: %i" % NB_3
         print "3N energy canonical diagrams: %i" % NB_3_HF
         if not NORM:
             print "3N canonical diagrams for a generic operator only: %i" \
                 % NB_3_EHF
-        print "3N non-canonical diagrams: %i" % NB_3_noHF
+        print "3N non-canonical diagrams: %i" % NB_3_NOT_HF
 elif THEORY == "MBPT":
     print "\nValid diagrams: %i\n" % NUMDIAG
     print "Singles: %i" % NB_SINGLES
@@ -167,7 +167,7 @@ gen.write_file_header(latex_file, PDIAG, norder, THEORY)
 
 if THEORY == "BMBPT":
     bmbpt.write_header(latex_file, NUMDIAG, THREE_N, NORM, NB_2_HF, NB_2_EHF,
-                       NB_2_noHF, NB_3_HF, NB_3_EHF, NB_3_noHF)
+                       NB_2_NOT_HF, NB_3_HF, NB_3_EHF, NB_3_NOT_HF)
 elif THEORY == "MBPT":
     mbpt.write_header(latex_file, NUMDIAG, NB_SINGLES, NB_DOUBLES, NB_TRIPLES,
                       NB_QUADRUPLES, NB_QUINTUPLES_AND_HIGHER)
@@ -205,7 +205,7 @@ latex_file.close()
 # Produce an output adapted to Christian Drischler's format
 if THEORY == "MBPT":
     if raw_input("Produce a CD output file? (y/N) ").lower() == 'y':
-        mbpt.print_CD_output(directory, diagrams)
+        mbpt.print_cd_output(directory, diagrams)
 
 if raw_input("Compile pdf? (y/N) ").lower() == 'y':
     gen.compile_and_clean(directory, PDIAG)

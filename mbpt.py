@@ -8,7 +8,7 @@ import networkx as nx
 import general_routines as gen
 
 
-def diagram_generation(order):
+def diagrams_generation(order):
     """Generate the diagrams for the MBPT case."""
     # Generate all 1-magic square of dimension order
     seeds = [k for k in itertools.permutations(range(order), order)]
@@ -68,24 +68,24 @@ def write_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
         result.write("\\section{Quintuples and higher}\n\n")
 
 
-def print_CD_output(directory, diagrams):
+def print_cd_output(directory, diagrams):
     """Print a computer-readable file for C. Drischler's framework."""
-    CD_file = open(directory + '/CD_output.txt', 'w')
+    cd_file = open(directory + '/CD_output.txt', 'w')
     conjug_file = open(directory + '/CD_conjug_pairs.list', 'w')
     for diag in diagrams:
-        CD_file.write('config[%i] = %s\n' % (diag.tags[0] + 1, diag.CD))
+        cd_file.write('config[%i] = %s\n' % (diag.tags[0] + 1, diag.cd_expr))
         if (diag.complex_conjugate != -1) \
                 and (diag.complex_conjugate > diag.tags[0]):
             conjug_file.write("%i\t%i\n" % (diag.tags[0] + 1,
                                             diag.complex_conjugate + 1))
-    CD_file.write('\n')
-    CD_file.close()
+    cd_file.write('\n')
+    cd_file.close()
     conjug_file.close()
-    with open(directory+"/CD_adj_matrices.list", "w") as f:
+    with open(directory+"/CD_adj_matrices.list", "w") as mat_file:
         for idx, diagram in enumerate(diagrams):
-            f.write("Diagram n: %i\n" % (idx + 1))
-            np.savetxt(f, diagram.adjacency_mat, fmt='%d')
-            f.write("\n")
+            mat_file.write("Diagram n: %i\n" % (idx + 1))
+            np.savetxt(mat_file, diagram.adjacency_mat, fmt='%d')
+            mat_file.write("\n")
 
 
 def order_diagrams(diagrams):
@@ -134,7 +134,7 @@ def attribute_conjugate(diagrams):
                         break
 
 
-def extract_CD_denom(start_graph, subgraph):
+def extract_cd_denom(start_graph, subgraph):
     """Extract the appropriate CD denominator using the subgraph rule."""
     denomin = "{" \
         + "".join("%s, "
@@ -157,7 +157,6 @@ class MbptDiagram(gen.Diagram):
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph."""
         gen.Diagram.__init__(self, mbpt_graph)
-        self.type = 'MBPT'
         self.tags = [tag_num]
         # Beware of the sign convention !!!
         self.incidence = - nx.incidence_matrix(self.graph,
@@ -178,9 +177,9 @@ class MbptDiagram(gen.Diagram):
         self.expr = "\\dfrac{1}{%i}%s" % (nedges_eq, phases) \
             + "\\sum{\\dfrac{%s}{%s}}\n" % (self.extract_numerator(),
                                             self.extract_denominator())
-        self.CD = "{%i, {%s}, {%s}};" % (nedges_eq,
-                                         self.CD_numerator(),
-                                         self.CD_denominator())
+        self.cd_expr = "{%i, {%s}, {%s}};" % (nedges_eq,
+                                              self.cd_numerator(),
+                                              self.cd_denominator())
 
     def calc_excitation(self):
         """Return an integer coding for the excitation level of the diag."""
@@ -242,7 +241,7 @@ class MbptDiagram(gen.Diagram):
                                                        graph.subgraph(stack))
         return denominator
 
-    def CD_denominator(self):
+    def cd_denominator(self):
         """Return the CD-formatted denominator of the graph."""
         denominator = ""
         graph = self.graph
@@ -250,7 +249,7 @@ class MbptDiagram(gen.Diagram):
             substack = [vertex_j
                         for vertex_j in graph
                         if vertex_j >= vertex_i]
-            denominator += "%s, " % extract_CD_denom(graph,
+            denominator += "%s, " % extract_cd_denom(graph,
                                                      graph.subgraph(substack))
         return denominator.strip(', ')
 
@@ -270,7 +269,7 @@ class MbptDiagram(gen.Diagram):
                 + "} "
         return numerator
 
-    def CD_numerator(self):
+    def cd_numerator(self):
         """Return the numerator under CD format."""
         graph = self.graph
         numerator = ""
