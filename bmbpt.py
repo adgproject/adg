@@ -14,7 +14,7 @@ def BMBPT_generation(p_order, three_N_use):
     deg_max = 6 if three_N_use else 4
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    matrices = [[[0 for element in range(p_order)] for line in range(p_order)]]
+    matrices = [[[0 for _ in range(p_order)] for _ in range(p_order)]]
 
     # Generate oriented adjacency matrices going vertex-wise
     vertices = range(p_order)
@@ -36,17 +36,17 @@ def BMBPT_generation(p_order, three_N_use):
     # Checks to exclude non-conform matrices
     gen.check_degree(matrices, three_N_use)
     gen.no_loop(matrices)
-    matricesUniq = []
+    matrices_uniq = []
     for mat in matrices:
-        if mat not in matricesUniq:
-            matricesUniq.append(mat)
-    matricesUniq.sort(reverse=True)
-    return [np.array(mat) for mat in matricesUniq]
+        if mat not in matrices_uniq:
+            matrices_uniq.append(mat)
+    matrices_uniq.sort(reverse=True)
+    return [np.array(mat) for mat in matrices_uniq]
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
     """Exclude some matrices that would spawn unconnected diagrams."""
-    empty_block = [0 for i in range(length_mat - max_filled_vertex - 1)]
+    empty_block = [0 for _ in range(length_mat - max_filled_vertex - 1)]
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         mat = matrices[ind_mat]
         is_disconnected = True
@@ -54,7 +54,7 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
                        in enumerate(mat[0:max_filled_vertex + 1])
                        if line[max_filled_vertex + 1:length_mat]
                        == empty_block]
-        test_block = [0 for i in range(length_mat - len(empty_lines))]
+        test_block = [0 for _ in range(length_mat - len(empty_lines))]
         for index in empty_lines:
             test_line = copy.deepcopy(mat[index])
             for index2 in empty_lines:
@@ -153,7 +153,7 @@ def extract_BMBPT_crossing_sign(graph):
 def multiplicity_symmetry_factor(graph):
     """Return the symmetry factor associated with propagators multiplicity."""
     factor = ""
-    prop_multiplicity = [0 for i in xrange(6)]
+    prop_multiplicity = [0 for _ in xrange(6)]
     for vertex_i in graph:
         for vertex_j in graph:
             if graph.number_of_edges(vertex_i, vertex_j) >= 2:
@@ -187,8 +187,8 @@ def vertex_exchange_sym_factor(diag):
     return "%i" % factor if factor != 0 else ""
 
 
-def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
-                       nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF):
+def write_header(tex_file, numdiag, three_N, norm, nb_2_HF, nb_2_EHF,
+                 nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF):
     """Write overall header for BMBPT result file."""
     tex_file.write("Valid diagrams: %i\n\n" % numdiag
                    + "2N valid diagrams: %i\n\n" % (nb_2_HF
@@ -211,8 +211,8 @@ def write_BMBPT_header(tex_file, numdiag, three_N, norm, nb_2_HF,
         tex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_noHF)
 
 
-def write_BMBPT_section(result, diag_index, three_N, norm,
-                        nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF):
+def write_section(result, diag_index, three_N, norm, nb_2, nb_2_HF, nb_2_EHF,
+                  nb_3_HF, nb_3_EHF):
     """Write section and subsections for BMBPT result file."""
     if diag_index == 0:
         result.write("\\section{Two-body diagrams}\n\n"

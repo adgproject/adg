@@ -65,8 +65,8 @@ def draw_equivalent_tree_TSDs(time_diagram, latex_file):
         os.unlink("./equivalent%i_%i.tex" % (time_diagram.tags[0], index))
 
 
-def write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
-                                time_diagrams, nb_tree_TSDs):
+def write_section(latex_file, directory, pdiag, pdraw, time_diagrams,
+                  nb_tree_TSDs):
     """Write the appropriate section for tsd diagrams in the LaTeX file."""
     latex_file.write("\\section{Time-structure diagrams}\n\n")
     latex_file.write("\\subsection{Tree diagrams}\n\n")

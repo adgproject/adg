@@ -10,8 +10,8 @@ def no_trace(matrices):
     traceless_matrices = []
     for matrix in matrices:
         test_traceless = True
-        for ind_i, n in enumerate(matrix):
-            if n[ind_i] == 1:
+        for ind_i, line in enumerate(matrix):
+            if line[ind_i] != 0:
                 test_traceless = False
                 break
         if test_traceless:
@@ -137,8 +137,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
                 if (props_left_to_draw == 6) or (props_left_to_draw == 5):
                     fmf_file.write("0.9")
                 elif (props_left_to_draw == 4) or (props_left_to_draw == 3) \
-                     or ((props_left_to_draw == 1) and
-                         (graph.number_of_edges(vert_j, vert_i) == 2)):
+                    or ((props_left_to_draw == 1) and
+                        (graph.number_of_edges(vert_j, vert_i) == 2)):
                     fmf_file.write("0.75")
                 elif (props_left_to_draw == 2) or (props_left_to_draw == 1):
                     fmf_file.write("0.5" if abs(vert_i-vert_j) == 1 else "0.6")
@@ -159,7 +159,7 @@ def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
                     "%s/Diagrams/%s.tex" % (directory, diag_name))
 
 
-def write_file_header(directory, latex_file, pdiag, norder, theory):
+def write_file_header(latex_file, pdiag, norder, theory):
     """Write the header of the result tex file."""
     header = "\\documentclass[10pt,a4paper]{article}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
@@ -193,7 +193,7 @@ def draw_diagram(directory, result_file, diagram_index, diag_type):
     diag_file.close()
 
 
-def compile_and_clean(directory, pdiag, diagrams, write_time, time_diagrams):
+def compile_and_clean(directory, pdiag):
     """Compile result.pdf and delete useless files."""
     os.chdir(directory)
     os.system("pdflatex -shell-escape result.tex")

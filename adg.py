@@ -26,22 +26,22 @@ norder = int(raw_input('Order of the diagrams?\n'))
 while norder < 2:
     print "Perturbative order too small!"
     norder = int(raw_input('Order of the diagrams?\n'))
-theory = raw_input('MBPT or BMBPT?\n').upper()
+THEORY = raw_input('MBPT or BMBPT?\n').upper()
 
-three_N = False
-norm = False
-write_time = False
-if theory == "BMBPT":
-    three_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
-    norm = raw_input(
+THREE_N = False
+NORM = False
+WRITE_TIME = False
+if THEORY == "BMBPT":
+    THREE_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
+    NORM = raw_input(
         "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
-    write_time = raw_input(
+    WRITE_TIME = raw_input(
         "Draw time-structure diagrams? (y/N)").lower() == 'y'
-directory = '%s/Order-%i' % (theory, norder)
-if three_N:
+directory = '%s/Order-%i' % (THEORY, norder)
+if THREE_N:
     directory += 'with3N'
-if norm:
-    directory += '_Norm'
+if NORM:
+    directory += '_NORM'
 if not os.path.exists(directory):
     os.makedirs(directory)
 if not os.path.exists(directory+"/Diagrams"):
@@ -52,13 +52,13 @@ pr.enable()
 
 # Start computing everything
 print "Running"
-start_time = datetime.now()
-if theory == "MBPT":
+START_TIME = datetime.now()
+if THEORY == "MBPT":
     diagrams = mbpt.diagram_generation(norder)
-elif theory == "BMBPT":
-    diagrams = bmbpt.BMBPT_generation(norder, three_N)
+elif THEORY == "BMBPT":
+    diagrams = bmbpt.BMBPT_generation(norder, THREE_N)
 else:
-    print "Invalid theory"
+    print "Invalid THEORY"
 print "Number of possible diagrams, ", len(diagrams)
 
 with open(directory+"/Diagrams.list", "w") as f:
@@ -76,35 +76,35 @@ for i_diag in xrange(len(G)-1, -1, -1):
         del G[i_diag]
 
 # Specific check for loop diagrams in BMBPT
-if theory == "BMBPT":
+if THEORY == "BMBPT":
     for i_diag in xrange(len(G)-1, -1, -1):
         if not nx.is_directed_acyclic_graph(G[i_diag]):
             del G[i_diag]
 
-gen.label_vertices(G, theory, norm)
+gen.label_vertices(G, THEORY, NORM)
 
-if theory == 'BMBPT':
-    diagrams = [bmbpt.BmbptFeynmanDiagram(graph, norm, ind)
+if THEORY == 'BMBPT':
+    diagrams = [bmbpt.BmbptFeynmanDiagram(graph, NORM, ind)
                 for ind, graph in enumerate(G)]
-elif theory == 'MBPT':
+elif THEORY == 'MBPT':
     diagrams = [mbpt.MbptDiagram(graph, ind) for ind, graph in enumerate(G)]
 
 # Ordering the diagrams in a convenient way and checking them for doubles
-if theory == "BMBPT":
-    diagrams, nb_2_HF, nb_2_EHF, nb_2_noHF, \
-        nb_3_HF, nb_3_EHF, nb_3_noHF = bmbpt.order_diagrams(diagrams)
-    nb_2 = nb_2_HF + nb_2_EHF + nb_2_noHF
-    nb_3 = nb_3_HF + nb_3_EHF + nb_3_noHF
+if THEORY == "BMBPT":
+    diagrams, NB_2_HF, NB_2_EHF, NB_2_noHF, \
+        NB_3_HF, NB_3_EHF, NB_3_noHF = bmbpt.order_diagrams(diagrams)
+    NB_2 = NB_2_HF + NB_2_EHF + NB_2_noHF
+    NB_3 = NB_3_HF + NB_3_EHF + NB_3_noHF
 
-elif theory == "MBPT":
-    diagrams, nb_singles, nb_doubles, nb_triples, nb_quadruples, \
-        nb_quintuples_and_higher = mbpt.order_diagrams(diagrams)
+elif THEORY == "MBPT":
+    diagrams, NB_SINGLES, NB_DOUBLES, NB_TRIPLES, NB_QUADRUPLES, \
+        NB_QUINTUPLES_AND_HIGHER = mbpt.order_diagrams(diagrams)
     mbpt.attribute_conjugate(diagrams)
 
-numdiag = len(diagrams)
+NUMDIAG = len(diagrams)
 
 # Treatment of the algebraic expressions
-if theory == "BMBPT" and not norm:
+if THEORY == "BMBPT" and not NORM:
 
     diagrams_time = [tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                      for diagram in diagrams]
@@ -116,30 +116,30 @@ if theory == "BMBPT" and not norm:
 else:
     diagrams_time = []
 
-print "Time ellapsed: ", datetime.now() - start_time
-print "Number of connected diagrams, ", numdiag
+print "Time ellapsed: ", datetime.now() - START_TIME
+print "Number of connected diagrams, ", NUMDIAG
 
-if theory == "BMBPT":
-    print "\n2N valid diagrams: %i" % nb_2
-    print "2N energy canonical diagrams: %i" % nb_2_HF
-    if not norm:
+if THEORY == "BMBPT":
+    print "\n2N valid diagrams: %i" % NB_2
+    print "2N energy canonical diagrams: %i" % NB_2_HF
+    if not NORM:
         print "2N canonical diagrams for a generic operator only: %i" \
-            % nb_2_EHF
-    print "2N non-canonical diagrams: %i\n" % nb_2_noHF
-    if three_N:
-        print "3N valid diagrams: %i" % nb_3
-        print "3N energy canonical diagrams: %i" % nb_3_HF
-        if not norm:
+            % NB_2_EHF
+    print "2N non-canonical diagrams: %i\n" % NB_2_noHF
+    if THREE_N:
+        print "3N valid diagrams: %i" % NB_3
+        print "3N energy canonical diagrams: %i" % NB_3_HF
+        if not NORM:
             print "3N canonical diagrams for a generic operator only: %i" \
-                % nb_3_EHF
-        print "3N non-canonical diagrams: %i" % nb_3_noHF
-elif theory == "MBPT":
-    print "\nValid diagrams: %i\n" % numdiag
-    print "Singles: %i" % nb_singles
-    print "Doubles: %i" % nb_doubles
-    print "Triples: %i" % nb_triples
-    print "Quadruples: %i" % nb_quadruples
-    print "Quintuples and higher: %i" % nb_quintuples_and_higher
+                % NB_3_EHF
+        print "3N non-canonical diagrams: %i" % NB_3_noHF
+elif THEORY == "MBPT":
+    print "\nValid diagrams: %i\n" % NUMDIAG
+    print "Singles: %i" % NB_SINGLES
+    print "Doubles: %i" % NB_DOUBLES
+    print "Triples: %i" % NB_TRIPLES
+    print "Quadruples: %i" % NB_QUADRUPLES
+    print "Quintuples and higher: %i" % NB_QUINTUPLES_AND_HIGHER
 
 
 pr.disable()
@@ -150,65 +150,62 @@ ps.print_stats()
 ps.dump_stats("stats.dat")
 
 # Writing a feynmp file for each graph
-msg = 'Generate diagrams feymanmf instructions?'
-pdraw = raw_input("%s (y/N) " % msg).lower() == 'y'
-if pdraw:
+PDRAW = raw_input(
+    "Generate diagrams feymanmf instructions? (y/N) ").lower() == 'y'
+if PDRAW:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    gen.create_feynmanmp_files(diagrams, theory, directory, 'diag')
-    if write_time:
-        gen.create_feynmanmp_files(diagrams_time, theory, directory, 'time')
+    gen.create_feynmanmp_files(diagrams, THEORY, directory, 'diag')
+    if WRITE_TIME:
+        gen.create_feynmanmp_files(diagrams_time, THEORY, directory, 'time')
 
-pdiag = raw_input("Include diagrams in tex? (y/N) ").lower() == 'y'
+PDIAG = raw_input("Include diagrams in tex? (y/N) ").lower() == 'y'
 
 # Write everything down in a nice LaTeX file
 latex_file = open(directory + '/result.tex', 'w')
-gen.write_file_header(directory, latex_file, pdiag, norder, theory)
+gen.write_file_header(latex_file, PDIAG, norder, THEORY)
 
-if theory == "BMBPT":
-    bmbpt.write_BMBPT_header(latex_file, numdiag, three_N, norm, nb_2_HF,
-                             nb_2_EHF, nb_2_noHF, nb_3_HF, nb_3_EHF, nb_3_noHF)
-elif theory == "MBPT":
-    mbpt.write_MBPT_header(latex_file, numdiag, nb_singles, nb_doubles,
-                           nb_triples, nb_quadruples,
-                           nb_quintuples_and_higher)
+if THEORY == "BMBPT":
+    bmbpt.write_header(latex_file, NUMDIAG, THREE_N, NORM, NB_2_HF, NB_2_EHF,
+                       NB_2_noHF, NB_3_HF, NB_3_EHF, NB_3_noHF)
+elif THEORY == "MBPT":
+    mbpt.write_header(latex_file, NUMDIAG, NB_SINGLES, NB_DOUBLES, NB_TRIPLES,
+                      NB_QUADRUPLES, NB_QUINTUPLES_AND_HIGHER)
 
 latex_file.write("\\tableofcontents\n\n")
 
-if theory == "BMBPT" and write_time:
-    tsd.write_time_diagrams_section(latex_file, directory, pdiag, pdraw,
-                                    diagrams_time, nb_tree_TSDs)
+if THEORY == "BMBPT" and WRITE_TIME:
+    tsd.write_section(latex_file, directory, PDIAG, PDRAW, diagrams_time,
+                      nb_tree_TSDs)
 for diag in diagrams:
-    if theory == "BMBPT":
-        bmbpt.write_BMBPT_section(latex_file, diag.tags[0], three_N, norm,
-                                  nb_2, nb_2_HF, nb_2_EHF, nb_3_HF, nb_3_EHF)
+    if THEORY == "BMBPT":
+        bmbpt.write_section(latex_file, diag.tags[0], THREE_N, NORM,
+                            NB_2, NB_2_HF, NB_2_EHF, NB_3_HF, NB_3_EHF)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
-        if not norm:
+        if not NORM:
             bmbpt.write_diag_exps(latex_file, diag, norder)
-    elif theory == "MBPT":
-        mbpt.write_MBPT_section(latex_file, diag.tags[0], nb_singles,
-                                nb_doubles, nb_triples, nb_quadruples,
-                                nb_quintuples_and_higher)
+    elif THEORY == "MBPT":
+        mbpt.write_section(latex_file, diag.tags[0], NB_SINGLES, NB_DOUBLES,
+                           NB_TRIPLES, NB_QUADRUPLES)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
         if diag.complex_conjugate >= 0:
             latex_file.write("Complex conjugate diagram: %i\n"
                              % (diag.complex_conjugate + 1))
         mbpt.write_diag_exp(latex_file, diag)
 
-    if pdiag and pdraw:
-        diag.write_graph(latex_file, directory, write_time)
+    if PDIAG and PDRAW:
+        diag.write_graph(latex_file, directory, WRITE_TIME)
 
-    if theory == 'BMBPT' and write_time:
+    if THEORY == 'BMBPT' and WRITE_TIME:
         diag.write_tsd_info(diagrams_time, latex_file)
 
 latex_file.write("\\end{document}")
 latex_file.close()
 
 # Produce an output adapted to Christian Drischler's format
-if theory == "MBPT":
+if THEORY == "MBPT":
     if raw_input("Produce a CD output file? (y/N) ").lower() == 'y':
         mbpt.print_CD_output(directory, diagrams)
 
 if raw_input("Compile pdf? (y/N) ").lower() == 'y':
-    gen.compile_and_clean(directory, pdiag, diagrams, write_time,
-                          diagrams_time)
+    gen.compile_and_clean(directory, PDIAG)

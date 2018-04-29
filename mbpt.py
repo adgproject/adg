@@ -8,11 +8,11 @@ import networkx as nx
 import general_routines as gen
 
 
-def diagram_generation(n):
+def diagram_generation(order):
     """Generate the diagrams for the MBPT case."""
-    # Generate all 1-magic square of dimension n
-    seeds = [k for k in itertools.permutations(range(n), n)]
-    all_matrices = [[[0 if i != j else 1 for i in range(n)]
+    # Generate all 1-magic square of dimension order
+    seeds = [k for k in itertools.permutations(range(order), order)]
+    all_matrices = [[[0 if i != j else 1 for i in range(order)]
                      for j in k]
                     for k in seeds]
     traceless = gen.no_trace(all_matrices)
@@ -26,12 +26,12 @@ def diagram_generation(n):
             for j, elem in enumerate(line):
                 matrix[i][j] += elem
         double.append(matrix)
-    doubleUniq = []
+    double_uniq = []
     for matrix in double:
-        if matrix not in doubleUniq:
-            doubleUniq.append(matrix)
-    doubleUniq.sort(reverse=True)
-    return [np.array(matrix) for matrix in doubleUniq]
+        if matrix not in double_uniq:
+            double_uniq.append(matrix)
+    double_uniq.sort(reverse=True)
+    return [np.array(matrix) for matrix in double_uniq]
 
 
 def write_diag_exp(latex_file, mbpt_diag):
@@ -41,8 +41,8 @@ def write_diag_exp(latex_file, mbpt_diag):
     latex_file.write("\\end{equation}\n")
 
 
-def write_MBPT_header(tex_file, numdiag, nb_singles, nb_doubles, nb_triples,
-                      nb_quadruples, nb_quintuples_and_higher):
+def write_header(tex_file, numdiag, nb_singles, nb_doubles, nb_triples,
+                 nb_quadruples, nb_quintuples_and_higher):
     """Write tha appropriate header for the LaTeX file for MBPT diagrams."""
     tex_file.write("Valid diagrams: %i\n\n" % numdiag
                    + "Singles: %i\n\n" % nb_singles
@@ -53,8 +53,8 @@ def write_MBPT_header(tex_file, numdiag, nb_singles, nb_doubles, nb_triples,
                    % nb_quintuples_and_higher)
 
 
-def write_MBPT_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
-                       nb_quadruples, nb_quintuples_and_higher):
+def write_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
+                  nb_quadruples):
     """Write sections for MBPT result file."""
     if diag_index == 0 and nb_singles != 0:
         result.write("\\section{Singles}\n\n")
