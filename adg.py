@@ -7,6 +7,7 @@ import shutil
 import cProfile
 import pstats
 import StringIO
+import argparse
 import numpy as np
 import networkx as nx
 import general_routines as gen
@@ -14,6 +15,34 @@ import bmbpt
 import mbpt
 import time_structure as tsd
 
+parser = argparse.ArgumentParser(description="Automatic Diagram Generator\n\n"
+                                 + "Generates diagrams at a given order for a "
+                                 + "range of many-body formalisms")
+parser.add_argument("-o", "--order", type=int, choices=range(2, 10),
+                    help="order of the diagrams (>=2)")
+parser.add_argument("-t", "--theory", type=str, choices=['MBPT', 'BMBPT'],
+                    help="theory of interest: MBPT or BMBPT")
+parser.add_argument("-i", "--interactive", action="store_true",
+                    help="execute ADG in interactive mode")
+parser.add_argument("-n", "--norm", action="store_true",
+                    help="study norm BMBPT diagrams instead of operator ones")
+parser.add_argument("-3N", "--with_three_body", action="store_true",
+                    help="use two and three-body forces for BMBPT diagrams")
+parser.add_argument("-dt", "--draw_tsds", action="store_true",
+                    help="draw Time-Structure Diagrams (BMBPT)")
+parser.add_argument("-d", "--draw_diags", action="store_true",
+                    help="draw the diagrms using FeynMF")
+parser.add_argument("-c", "--compile", action="store_true",
+                    help="compile the LaTeX output file with PDFLaTeX")
+parser.add_argument("-cd", "--cd_output", action="store_true",
+                    help="produce output for C. Drischler's framework (MBPT)")
+args = parser.parse_args()
+
+if (not args.interactive) and ((args.order is None) or (args.theory is None)):
+    print "\nPlease either run the interactive mode, or the batch mode by"
+    print "providing the theory and the order for the desired diagrams.\n"
+    print "Use 'python2 adg.py -h' for help.\n"
+    exit()
 
 print "#####################"
 print "# Automatic Diagram #"
@@ -21,22 +50,40 @@ print "#     Generator     #"
 print "#    RDL,JR,PA,MD   #"
 print "#####################"
 
+if args.interactive:
+    args.order = int(raw_input('Order of the diagrams?\n'))
+    while args.order < 2:
+        print "Perturbative order too small!"
+        args.order = int(raw_input('Order of the diagrams?\n'))
+    args.theory = raw_input('MBPT or BMBPT?\n').upper()
 
-norder = int(raw_input('Order of the diagrams?\n'))
-while norder < 2:
-    print "Perturbative order too small!"
-    norder = int(raw_input('Order of the diagrams?\n'))
-THEORY = raw_input('MBPT or BMBPT?\n').upper()
+    if args.theory == "BMBPT":
+        args.with_three_body = raw_input(
+            "Include three-body forces? (y/N)").lower() == 'y'
+        args.norm = raw_input(
+            "Compute norm diagrams, not operator ones? (y/N)").lower() == 'y'
+        args.draw_tsds = raw_input(
+            "Draw time-structure diagrams? (y/N)").lower() == 'y'
 
-THREE_N = False
-NORM = False
-WRITE_TIME = False
-if THEORY == "BMBPT":
-    THREE_N = raw_input("Include three-body forces? (y/N)").lower() == 'y'
-    NORM = raw_input(
-        "Compute norm kernel instead of operator kernel? (y/N)").lower() == 'y'
-    WRITE_TIME = raw_input(
-        "Draw time-structure diagrams? (y/N)").lower() == 'y'
+    args.draw_diags = raw_input(
+        "Generate diagrams FeynMF instructions in TeX file? (y/N) ").lower() == 'y'
+
+    PDIAG = raw_input("Include diagrams in tex? (y/N) ").lower() == 'y'
+    if args.theory == "MBPT":
+        args.cd_output = raw_input(
+            "Produce a CD output file? (y/N) ").lower() == 'y'
+    args.compile = raw_input("Compile pdf? (y/N) ").lower() == 'y'
+
+THEORY = args.theory
+THREE_N = args.with_three_body
+NORM = args.norm
+norder = args.order
+WRITE_TIME = args.draw_tsds
+DO_COMPILE = args.compile
+CD_OUTPUT = args.cd_output
+PDRAW = args.draw_diags
+PDIAG = PDRAW
+
 directory = '%s/Order-%i' % (THEORY, norder)
 if THREE_N:
     directory += 'with3N'
@@ -150,16 +197,12 @@ ps.print_stats()
 ps.dump_stats("stats.dat")
 
 # Writing a feynmp file for each graph
-PDRAW = raw_input(
-    "Generate diagrams feymanmf instructions? (y/N) ").lower() == 'y'
 if PDRAW:
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
     gen.create_feynmanmp_files(diagrams, THEORY, directory, 'diag')
     if WRITE_TIME:
         gen.create_feynmanmp_files(diagrams_time, THEORY, directory, 'time')
-
-PDIAG = raw_input("Include diagrams in tex? (y/N) ").lower() == 'y'
 
 # Write everything down in a nice LaTeX file
 latex_file = open(directory + '/result.tex', 'w')
@@ -203,9 +246,8 @@ latex_file.write("\\end{document}")
 latex_file.close()
 
 # Produce an output adapted to Christian Drischler's format
-if THEORY == "MBPT":
-    if raw_input("Produce a CD output file? (y/N) ").lower() == 'y':
-        mbpt.print_cd_output(directory, diagrams)
+if CD_OUTPUT:
+    mbpt.print_cd_output(directory, diagrams)
 
-if raw_input("Compile pdf? (y/N) ").lower() == 'y':
+if DO_COMPILE:
     gen.compile_and_clean(directory, PDIAG)
