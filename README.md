@@ -1,28 +1,43 @@
-### Goal ###
-The aim of this project is to provide a tool generating and calculating diagrams
-for a given formalism. This formalism reduces to a set of rules which constrains
-the generated adjacency matrices' structure.
+# ADG - Automatic Diagram Generator
 
-### Status ###
-As for now, the code is capable of handling two differents formalisms, i.e. MBPT
-and BMBPT. On the long run, its extension to SCGF might be considered.
-    - For MBPT, the code generates all canonical (i.e. HF) diagrams at any given
-    order.
-    - For BMBPT, the code generates all diagrams for norm or operator kernels at
-    any order. Its is capable of handling kernekl operator Feynman expressions
-    up to a sign and a symmetry factor, as well as the Goldstone expressions for
-    some specific diagrams, up to the same restrictions. Extension of the
-    expression generation ot norm diagrams will be considered in a near future.
+## Description
+ADG is a tool generating diagrams and producing their expressions for given
+many-body formalisms. Diagrammatic rules from the formalism are combined with
+graph theory objects to produce diagrams and expressions in a fast, simple and
+error-safe way.
 
-### Dependencies ###
-In order to run the code, you will need a Python install > 2.7.1
+## Status
+As for now, the code is capable of handling two differents formalisms, i.e.
+Many-Body Perturbation Theory (MBPT) and Bogoliubov Many-Body Perturbation
+Theory (BMBPT).
+  - For MBPT, the code generates all canonical (i.e. HF) diagrams at any given
+    order along with their expression and additional information
+    (conjugate diagram, excitation level...).
+  - For BMBPT, the code generates all diagrams for norm or operator kernels,
+    and the time-dependent and time-integrated expressions for all operator
+    diagrams.
+
+## Future developments
+Extensions under discussions are norm diagrams for BMBPT as well as diagrams
+and expressions generation for Gorkov Self-Consistent Green's Functions (GSCGF).
+
+## Install
+
+## Dependencies
+In order to run the code, you will need a Python install >= 2.7.1
   - Python libraries:
-  	* networkx (for graph treatment)
-	* numpy
+  	* networkx >= 2.0
+      * numpy
 
-### Use ###
-(To be modified for faster runs)
+## Use
 To run the program and generate the diagrams
-	python adg.py
+```
+python2 adg.py
+```
 
-(Last README update: April 28th 2017)
+## Citing
+If you use ADG in your research work, we kindly ask you to cite the following
+paper: []
+
+## License
+ADG is licensed under
