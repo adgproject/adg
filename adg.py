@@ -1,7 +1,6 @@
 #!/bin/bash /usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
 from datetime import datetime
 import shutil
 import cProfile
@@ -26,15 +25,7 @@ print "#####################"
 if run_commands.interactive:
     run_commands = gen.interactive_interface(run_commands)
 
-directory = '%s/Order-%i' % (run_commands.theory, run_commands.order)
-if run_commands.with_three_body:
-    directory += 'with3N'
-if run_commands.norm:
-    directory += '_run_commands.norm'
-if not os.path.exists(directory):
-    os.makedirs(directory)
-if not os.path.exists(directory+"/Diagrams"):
-    os.makedirs(directory+"/Diagrams")
+directory = gen.attribute_directory(run_commands)
 
 pr = cProfile.Profile()
 pr.enable()
@@ -42,14 +33,7 @@ pr.enable()
 # Start computing everything
 print "Running"
 START_TIME = datetime.now()
-if run_commands.theory == "MBPT":
-    diagrams = mbpt.diagrams_generation(run_commands.order)
-elif run_commands.theory == "BMBPT":
-    diagrams = bmbpt.diagrams_generation(run_commands.order,
-                                         run_commands.with_three_body)
-else:
-    print "Invalid run_commands.theory"
-print "Number of possible diagrams, ", len(diagrams)
+diagrams = gen.generate_diagrams(run_commands)
 
 with open(directory+"/Diagrams.list", "w") as f:
     for idx, diagram in enumerate(diagrams):

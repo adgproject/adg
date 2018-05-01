@@ -79,6 +79,35 @@ def interactive_interface(commands):
     return commands
 
 
+def attribute_directory(commands):
+    """Create missing directories and return the working directory."""
+    directory = '%s/Order-%i' % (commands.theory, commands.order)
+    if commands.with_three_body:
+        directory += 'with3N'
+    if commands.norm:
+        directory += '_run_commands.norm'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    if not os.path.exists(directory+"/Diagrams"):
+        os.makedirs(directory+"/Diagrams")
+    return directory
+
+
+def generate_diagrams(commands):
+    """Return a list with diagrams of the appropriate type."""
+    import mbpt
+    import bmbpt
+    if commands.theory == "MBPT":
+        diagrams = mbpt.diagrams_generation(commands.order)
+    elif commands.theory == "BMBPT":
+        diagrams = bmbpt.diagrams_generation(commands.order,
+                                             commands.with_three_body)
+    else:
+        print "Invalid theory!"
+    print "Number of possible diagrams, ", len(diagrams)
+    return diagrams
+
+
 def no_trace(matrices):
     """Select matrices with full 0 diagonal."""
     traceless_matrices = []
