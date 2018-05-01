@@ -2,7 +2,81 @@
 
 import os
 import shutil
+import argparse
 import networkx as nx
+
+
+def parse_command_line():
+    """Return a Namespace with the appropriate commands for the run."""
+    parser = argparse.ArgumentParser(
+        description="Automatic Diagram Generator\n\n"
+        + "Generates diagrams at a given order for a "
+        + "range of many-body formalisms")
+    parser.add_argument(
+        "-o", "--order", type=int, choices=range(2, 10),
+        help="order of the diagrams (>=2)")
+    parser.add_argument(
+        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT'],
+        help="theory of interest: MBPT or BMBPT")
+    parser.add_argument(
+        "-i", "--interactive", action="store_true",
+        help="execute ADG in interactive mode")
+    parser.add_argument(
+        "-n", "--norm", action="store_true",
+        help="study norm BMBPT diagrams instead of operator ones")
+    parser.add_argument(
+        "-3N", "--with_three_body", action="store_true",
+        help="use two and three-body forces for BMBPT diagrams")
+    parser.add_argument(
+        "-dt", "--draw_tsds", action="store_true",
+        help="draw Time-Structure Diagrams (BMBPT)")
+    parser.add_argument(
+        "-d", "--draw_diags", action="store_true",
+        help="draw the diagrms using FeynMF")
+    parser.add_argument(
+        "-c", "--compile", action="store_true",
+        help="compile the LaTeX output file with PDFLaTeX")
+    parser.add_argument(
+        "-cd", "--cd_output", action="store_true",
+        help="produce output for C. Drischler's framework (MBPT)")
+    args = parser.parse_args()
+
+    if (not args.interactive) and ((args.order is None)
+                                   or (args.theory is None)):
+        print "\nPlease either run the interactive mode, or the batch mode by"
+        print "providing the theory and the order for the desired diagrams.\n"
+        print "Use 'python2 adg.py -h' for help.\n"
+        exit()
+
+    return args
+
+
+def interactive_interface(commands):
+    """Run the interactive interface mode, return the appropriate commands."""
+    commands.order = int(raw_input('Order of the diagrams?\n'))
+    while commands.order < 2:
+        print "Perturbative order too small!"
+        commands.order = int(raw_input('Order of the diagrams?\n'))
+    commands.theory = raw_input('MBPT or BMBPT?\n').upper()
+
+    if commands.theory == "BMBPT":
+        commands.with_three_body = raw_input(
+            "Include three-body forces? (y/N)").lower() == 'y'
+        commands.norm = raw_input(
+            "Compute norm diagrams, not operator ones? (y/N)").lower() == 'y'
+        commands.draw_tsds = raw_input(
+            "Draw time-structure diagrams? (y/N)").lower() == 'y'
+
+    commands.draw_diags = raw_input(
+        "Generate diagrams FeynMF instructions in TeX file? (y/N) "
+        ).lower() == 'y'
+
+    if commands.theory == "MBPT":
+        commands.cd_output = raw_input(
+            "Produce a CD output file? (y/N) ").lower() == 'y'
+    commands.compile = raw_input("Compile pdf? (y/N) ").lower() == 'y'
+
+    return commands
 
 
 def no_trace(matrices):
