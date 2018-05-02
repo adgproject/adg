@@ -273,11 +273,7 @@ def write_file_header(latex_file, pdiag, norder, theory):
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
     if pdiag:
         header = "%s\\usepackage{feynmp-auto}\n" % header
-    land = False
     if norder > 3:
-        msg = 'Expressions may be long, rotate pdf?'
-        land = raw_input("%s (y/N) " % msg).lower() == 'y'
-    if land:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
     header = header \
