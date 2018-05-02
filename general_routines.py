@@ -9,34 +9,50 @@ import networkx as nx
 def parse_command_line():
     """Return a Namespace with the appropriate commands for the run."""
     parser = argparse.ArgumentParser(
-        description="Automatic Diagram Generator\n\n"
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="AUTOMATIC DIAGRAM GENERATOR\n\n"
         + "Generates diagrams at a given order for a "
         + "range of many-body formalisms")
-    parser.add_argument(
+    basic_args = parser.add_argument_group(
+        title="Basic arguments",
+        description="For ADG to run, you need either to run it in\n"
+        + "interactive mode or to provide a theory of interest and an order\n"
+        + "at which to run the calculation.")
+    run_args = parser.add_argument_group(
+        title="Run arguments",
+        description="Those arguments control the content of the ouput files.\n"
+        )
+    mbpt_args = parser.add_argument_group(
+        title="MBPT-specific arguments",
+        description="Arguments available only for MBPT calculations.\n")
+    bmbpt_args = parser.add_argument_group(
+        title="BMBPT-specific arguments",
+        description="Arguments available only for BMBPT calculations.\n")
+    basic_args.add_argument(
         "-o", "--order", type=int, choices=range(2, 10),
         help="order of the diagrams (>=2)")
-    parser.add_argument(
+    basic_args.add_argument(
         "-t", "--theory", type=str, choices=['MBPT', 'BMBPT'],
         help="theory of interest: MBPT or BMBPT")
-    parser.add_argument(
+    basic_args.add_argument(
         "-i", "--interactive", action="store_true",
         help="execute ADG in interactive mode")
-    parser.add_argument(
+    bmbpt_args.add_argument(
         "-n", "--norm", action="store_true",
         help="study norm BMBPT diagrams instead of operator ones")
-    parser.add_argument(
+    bmbpt_args.add_argument(
         "-3N", "--with_three_body", action="store_true",
         help="use two and three-body forces for BMBPT diagrams")
-    parser.add_argument(
+    bmbpt_args.add_argument(
         "-dt", "--draw_tsds", action="store_true",
         help="draw Time-Structure Diagrams (BMBPT)")
-    parser.add_argument(
+    run_args.add_argument(
         "-d", "--draw_diags", action="store_true",
-        help="draw the diagrms using FeynMF")
-    parser.add_argument(
+        help="draw the diagrams using FeynMF")
+    run_args.add_argument(
         "-c", "--compile", action="store_true",
         help="compile the LaTeX output file with PDFLaTeX")
-    parser.add_argument(
+    mbpt_args.add_argument(
         "-cd", "--cd_output", action="store_true",
         help="produce output for C. Drischler's framework (MBPT)")
     args = parser.parse_args()
