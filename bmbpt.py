@@ -211,28 +211,31 @@ def write_header(tex_file, three_body_use, norm, diags_nbs):
             "3N non-canonical diagrams: %i\n\n" % diags_nbs['nb_3_not_hf'])
 
 
-def write_section(result, diag_index, three_body, norm, diags_nbs):
+def write_section(result, diag, commands, diags_nbs):
     """Write section and subsections for BMBPT result file."""
-    if diag_index == 0:
+    if diag.tags[0] == 0:
         result.write("\\section{Two-body diagrams}\n\n"
                      + "\\subsection{Two-body energy canonical diagrams}\n\n")
-    elif (diag_index == diags_nbs['nb_2_hf']) and (not norm):
+    elif (diag.tags[0] == diags_nbs['nb_2_hf']) and (not commands.norm):
         result.write("\\subsection{Two-body canonical diagrams " +
                      "for a generic operator only}\n\n")
-    elif diag_index == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
+    elif diag.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
         result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
-    if three_body:
-        if diag_index == diags_nbs['nb_2']:
+    if commands.with_three_body:
+        if diag.tags[0] == diags_nbs['nb_2']:
             result.write(
                 "\\section{Three-body diagrams}\n\n"
                 + "\\subsection{Three-body energy canonical diagrams}\n\n")
-        elif (diag_index == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']) \
-                and (not norm):
+        elif (diag.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']) \
+                and (not commands.norm):
             result.write("\\subsection{Three-body canonical diagrams " +
                          "for a generic operator only}\n\n")
-        elif diag_index == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
+        elif diag.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
                 + diags_nbs['nb_3_ehf']:
             result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
+    result.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
+    if not commands.norm:
+        write_diag_exps(result, diag, commands.order)
 
 
 def write_diag_exps(latex_file, bmbpt_diag, norder):

@@ -40,7 +40,6 @@ if run_commands.theory == "BMBPT":
 
 elif run_commands.theory == "MBPT":
     diagrams, diags_per_type = mbpt.order_diagrams(diagrams)
-    mbpt.attribute_conjugate(diagrams)
 
 # Treatment of the algebraic expressions
 if run_commands.theory == "BMBPT" and not run_commands.norm:
@@ -81,19 +80,9 @@ if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
                       diagrams_time, nb_tree_TSDs)
 for diag in diagrams:
     if run_commands.theory == "BMBPT":
-        bmbpt.write_section(latex_file, diag.tags[0],
-                            run_commands.with_three_body, run_commands.norm,
-                            diags_per_type)
-        latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
-        if not run_commands.norm:
-            bmbpt.write_diag_exps(latex_file, diag, run_commands.order)
+        bmbpt.write_section(latex_file, diag, run_commands, diags_per_type)
     elif run_commands.theory == "MBPT":
-        mbpt.write_section(latex_file, diag.tags[0], diags_per_type)
-        latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
-        if diag.complex_conjugate >= 0:
-            latex_file.write("Complex conjugate diagram: %i\n"
-                             % (diag.complex_conjugate + 1))
-        mbpt.write_diag_exp(latex_file, diag)
+        mbpt.write_section(latex_file, diag, diags_per_type)
 
     if run_commands.draw_diags:
         diag.write_graph(latex_file, directory, run_commands.draw_tsds)

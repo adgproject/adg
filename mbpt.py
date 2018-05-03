@@ -52,20 +52,25 @@ def write_header(tex_file, diags_nbs):
                    % diags_nbs['quintuples+'])
 
 
-def write_section(result, diag_index, diags_nbs):
+def write_section(result, diag, diags_nbs):
     """Write sections for MBPT result file."""
-    if diag_index == 0 and diags_nbs['singles'] != 0:
+    if diag.tags[0] == 0 and diags_nbs['singles'] != 0:
         result.write("\\section{Singles}\n\n")
-    elif diag_index == diags_nbs['singles']:
+    elif diag.tags[0] == diags_nbs['singles']:
         result.write("\\section{Doubles}\n\n")
-    elif diag_index == diags_nbs['singles'] + diags_nbs['doubles']:
+    elif diag.tags[0] == diags_nbs['singles'] + diags_nbs['doubles']:
         result.write("\\section{Triples}\n\n")
-    elif diag_index == (diags_nbs['singles'] + diags_nbs['doubles']
-                        + diags_nbs['triples']):
+    elif diag.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
+                          + diags_nbs['triples']):
         result.write("\\section{Quadruples}\n\n")
-    elif diag_index == (diags_nbs['singles'] + diags_nbs['doubles']
-                        + diags_nbs['triples'] + diags_nbs['quadruples']):
+    elif diag.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
+                          + diags_nbs['triples'] + diags_nbs['quadruples']):
         result.write("\\section{Quintuples and higher}\n\n")
+    result.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
+    if diag.complex_conjugate >= 0:
+        result.write("Complex conjugate diagram: %i\n"
+                     % (diag.complex_conjugate + 1))
+    write_diag_exp(result, diag)
 
 
 def print_cd_output(directory, diagrams):
@@ -117,6 +122,8 @@ def order_diagrams(diagrams):
 
     for ind, diagram in enumerate(diagrams):
         diagram.tags[0] = ind
+
+    attribute_conjugate(diagrams)
 
     diags_nb_per_type = {
         'nb_diags': len(diagrams),
