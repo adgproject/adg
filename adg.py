@@ -39,11 +39,8 @@ if run_commands.theory == "BMBPT":
     diagrams, diags_per_type = bmbpt.order_diagrams(diagrams)
 
 elif run_commands.theory == "MBPT":
-    diagrams, NB_SINGLES, NB_DOUBLES, NB_TRIPLES, NB_QUADRUPLES, \
-        NB_QUINTUPLES_AND_HIGHER = mbpt.order_diagrams(diagrams)
+    diagrams, diags_per_type = mbpt.order_diagrams(diagrams)
     mbpt.attribute_conjugate(diagrams)
-
-NUMDIAG = len(diagrams)
 
 # Treatment of the algebraic expressions
 if run_commands.theory == "BMBPT" and not run_commands.norm:
@@ -59,7 +56,7 @@ else:
     diagrams_time = []
 
 print "Time ellapsed: ", datetime.now() - START_TIME
-print "Number of connected diagrams, ", NUMDIAG
+print "Number of connected diagrams, ", diags_per_type['nb_diags']
 
 if run_commands.theory == "BMBPT":
     print "\n2N valid diagrams: %i" % diags_per_type['nb_2']
@@ -76,12 +73,12 @@ if run_commands.theory == "BMBPT":
                 % diags_per_type['nb_3_ehf']
         print "3N non-canonical diagrams: %i" % diags_per_type['nb_3_not_hf']
 elif run_commands.theory == "MBPT":
-    print "\nValid diagrams: %i\n" % NUMDIAG
-    print "Singles: %i" % NB_SINGLES
-    print "Doubles: %i" % NB_DOUBLES
-    print "Triples: %i" % NB_TRIPLES
-    print "Quadruples: %i" % NB_QUADRUPLES
-    print "Quintuples and higher: %i" % NB_QUINTUPLES_AND_HIGHER
+    print "\nValid diagrams: %i\n" % diags_per_type['nb_diags']
+    print "Singles: %i" % diags_per_type['singles']
+    print "Doubles: %i" % diags_per_type['doubles']
+    print "Triples: %i" % diags_per_type['triples']
+    print "Quadruples: %i" % diags_per_type['quadruples']
+    print "Quintuples and higher: %i" % diags_per_type['quintuples+']
 
 
 pr.disable()
@@ -110,8 +107,7 @@ if run_commands.theory == "BMBPT":
     bmbpt.write_header(latex_file, run_commands.with_three_body,
                        run_commands.norm, diags_per_type)
 elif run_commands.theory == "MBPT":
-    mbpt.write_header(latex_file, NUMDIAG, NB_SINGLES, NB_DOUBLES, NB_TRIPLES,
-                      NB_QUADRUPLES, NB_QUINTUPLES_AND_HIGHER)
+    mbpt.write_header(latex_file, diags_per_type)
 
 latex_file.write("\\tableofcontents\n\n")
 
@@ -128,8 +124,7 @@ for diag in diagrams:
         if not run_commands.norm:
             bmbpt.write_diag_exps(latex_file, diag, run_commands.order)
     elif run_commands.theory == "MBPT":
-        mbpt.write_section(latex_file, diag.tags[0], NB_SINGLES, NB_DOUBLES,
-                           NB_TRIPLES, NB_QUADRUPLES)
+        mbpt.write_section(latex_file, diag.tags[0], diags_per_type)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
         if diag.complex_conjugate >= 0:
             latex_file.write("Complex conjugate diagram: %i\n"
