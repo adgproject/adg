@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import shutil
 import cProfile
 import pstats
 import StringIO
+import run_routines as run
 import general_routines as gen
 import bmbpt
 import mbpt
 import time_structure as tsd
 
 
-run_commands = gen.parse_command_line()
+run_commands = run.parse_command_line()
 
 print "#####################"
 print "# Automatic Diagram #"
@@ -21,9 +21,9 @@ print "#    RDL,JR,PA,MD   #"
 print "#####################"
 
 if run_commands.interactive:
-    run_commands = gen.interactive_interface(run_commands)
+    run_commands = run.interactive_interface(run_commands)
 
-directory = gen.attribute_directory(run_commands)
+directory = run.attribute_directory(run_commands)
 
 pr = cProfile.Profile()
 pr.enable()
@@ -32,7 +32,7 @@ pr.enable()
 print "Running"
 START_TIME = datetime.now()
 
-diagrams = gen.generate_diagrams(run_commands)
+diagrams = run.generate_diagrams(run_commands)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if run_commands.theory == "BMBPT":
@@ -57,7 +57,7 @@ else:
 
 print "Time ellapsed: ", datetime.now() - START_TIME
 
-gen.print_diags_numbers(run_commands, diags_per_type)
+run.print_diags_numbers(run_commands, diags_per_type)
 
 pr.disable()
 s = StringIO.StringIO()
@@ -68,13 +68,13 @@ ps.dump_stats("stats.dat")
 
 # Writing a feynmp file for each graph
 if run_commands.draw_diags:
-    gen.prepare_drawing_instructions(directory, run_commands,
+    run.prepare_drawing_instructions(directory, run_commands,
                                      diagrams, diagrams_time)
 
 # Write everything down in a nice LaTeX file
 latex_file = open(directory + '/result.tex', 'w')
 
-gen.write_file_header(latex_file, run_commands, diags_per_type)
+run.write_file_header(latex_file, run_commands, diags_per_type)
 
 if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
     tsd.write_section(latex_file, directory, run_commands.draw_diags,
@@ -109,4 +109,4 @@ if run_commands.cd_output:
     mbpt.print_cd_output(directory, diagrams)
 
 if run_commands.compile:
-    gen.compile_and_clean(directory, run_commands.draw_diags)
+    run.compile_and_clean(directory, run_commands.draw_diags)
