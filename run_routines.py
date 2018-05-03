@@ -242,10 +242,10 @@ def write_file_header(latex_file, commands, diags_nbs):
 def compile_and_clean(directory, pdiag):
     """Compile result.pdf and delete useless files."""
     os.chdir(directory)
-    os.system("pdflatex -shell-escape result.tex")
+    os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     if pdiag:
         # Second compilation needed
-        os.system("pdflatex -shell-escape result.tex")
+        os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
         # Get rid of undesired feynmp files to keep a clean directory
         for filename in os.listdir('.'):
             if filename.startswith("time") or filename.startswith("diag") \
