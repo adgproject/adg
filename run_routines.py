@@ -6,7 +6,7 @@ import shutil
 import networkx as nx
 import mbpt
 import bmbpt
-import general_routines as gen
+import generic_diag as gen
 
 
 def parse_command_line():
@@ -194,10 +194,10 @@ def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
     """Write FeynMP files for the different diagrams."""
     shutil.copy('feynmp.mp', directory + '/feynmp.mp')
     shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    gen.create_feynmanmp_files(diagrams, commands.theory, directory, 'diag')
+    create_feynmanmp_files(diagrams, commands.theory, directory, 'diag')
     if commands.draw_tsds:
-        gen.create_feynmanmp_files(diagrams_time, commands.theory,
-                                   directory, 'time')
+        create_feynmanmp_files(diagrams_time, commands.theory,
+                               directory, 'time')
 
 
 def create_feynmanmp_files(diagrams, theory, directory, diag_type):

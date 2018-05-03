@@ -6,7 +6,7 @@ import string
 import numpy as np
 import networkx as nx
 import time_structure as tsd
-import general_routines as gen
+import generic_diag as gen
 
 
 def diagrams_generation(p_order, three_body_use):
