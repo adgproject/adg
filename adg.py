@@ -56,30 +56,8 @@ else:
     diagrams_time = []
 
 print "Time ellapsed: ", datetime.now() - START_TIME
-print "Number of connected diagrams, ", diags_per_type['nb_diags']
 
-if run_commands.theory == "BMBPT":
-    print "\n2N valid diagrams: %i" % diags_per_type['nb_2']
-    print "2N energy canonical diagrams: %i" % diags_per_type['nb_2_hf']
-    if not run_commands.norm:
-        print "2N canonical diagrams for a generic operator only: %i" \
-            % diags_per_type['nb_2_ehf']
-    print "2N non-canonical diagrams: %i\n" % diags_per_type['nb_2_not_hf']
-    if run_commands.with_three_body:
-        print "3N valid diagrams: %i" % diags_per_type['nb_3']
-        print "3N energy canonical diagrams: %i" % diags_per_type['nb_3_hf']
-        if not run_commands.norm:
-            print "3N canonical diagrams for a generic operator only: %i" \
-                % diags_per_type['nb_3_ehf']
-        print "3N non-canonical diagrams: %i" % diags_per_type['nb_3_not_hf']
-elif run_commands.theory == "MBPT":
-    print "\nValid diagrams: %i\n" % diags_per_type['nb_diags']
-    print "Singles: %i" % diags_per_type['singles']
-    print "Doubles: %i" % diags_per_type['doubles']
-    print "Triples: %i" % diags_per_type['triples']
-    print "Quadruples: %i" % diags_per_type['quadruples']
-    print "Quintuples and higher: %i" % diags_per_type['quintuples+']
-
+gen.print_diags_numbers(run_commands, diags_per_type)
 
 pr.disable()
 s = StringIO.StringIO()

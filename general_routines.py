@@ -146,6 +146,33 @@ def generate_diagrams(commands):
     return diagrams
 
 
+def print_diags_numbers(commands, diags_nbs):
+    """Print the number of diagrams for each major type."""
+    print "Number of connected diagrams, ", diags_nbs['nb_diags']
+
+    if commands.theory == "BMBPT":
+        print "\n2N valid diagrams: %i" % diags_nbs['nb_2']
+        print "2N energy canonical diagrams: %i" % diags_nbs['nb_2_hf']
+        if not commands.norm:
+            print "2N canonical diagrams for a generic operator only: %i" \
+                % diags_nbs['nb_2_ehf']
+        print "2N non-canonical diagrams: %i\n" % diags_nbs['nb_2_not_hf']
+        if commands.with_three_body:
+            print "3N valid diagrams: %i" % diags_nbs['nb_3']
+            print "3N energy canonical diagrams: %i" % diags_nbs['nb_3_hf']
+            if not commands.norm:
+                print "3N canonical diagrams for a generic operator only: %i" \
+                    % diags_nbs['nb_3_ehf']
+            print "3N non-canonical diagrams: %i" % diags_nbs['nb_3_not_hf']
+    elif commands.theory == "MBPT":
+        print "\nValid diagrams: %i\n" % diags_nbs['nb_diags']
+        print "Singles: %i" % diags_nbs['singles']
+        print "Doubles: %i" % diags_nbs['doubles']
+        print "Triples: %i" % diags_nbs['triples']
+        print "Quadruples: %i" % diags_nbs['quadruples']
+        print "Quintuples and higher: %i" % diags_nbs['quintuples+']
+
+
 def no_trace(matrices):
     """Select matrices with full 0 diagonal."""
     traceless_matrices = []
