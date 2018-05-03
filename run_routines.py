@@ -215,8 +215,9 @@ def write_file_header(latex_file, commands, diags_nbs):
     """Write the header of the result tex file."""
     header = "\\documentclass[10pt,a4paper]{article}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
+        + "\\usepackage[T1]{fontenc}\n" \
+        + "\\usepackage{lmodern}\n" \
         + "\\usepackage[hyperindex=true]{hyperref}" \
-        + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
         + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
     if commands.draw_diags:
@@ -228,7 +229,7 @@ def write_file_header(latex_file, commands, diags_nbs):
         + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
         % (commands.order, commands.theory) \
         + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
-    latex_file.write("%s\\begin{document}\n\\maketitle\n" % header)
+    latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":
         bmbpt.write_header(latex_file, commands.with_three_body,
@@ -236,7 +237,7 @@ def write_file_header(latex_file, commands, diags_nbs):
     elif commands.theory == "MBPT":
         mbpt.write_header(latex_file, diags_nbs)
 
-    latex_file.write("\\tableofcontents\n\n")
+    latex_file.write("\n\\tableofcontents\n\n")
 
 
 def compile_and_clean(directory, pdiag):
