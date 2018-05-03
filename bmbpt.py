@@ -184,50 +184,54 @@ def vertex_exchange_sym_factor(diag):
     return "%i" % factor if factor != 0 else ""
 
 
-def write_header(tex_file, nb_diags, three_body_use, norm, nb_2_hf, nb_2_ehf,
-                 nb_2_not_hf, nb_3_hf, nb_3_ehf, nb_3_not_hf):
+def write_header(tex_file, three_body_use, norm, diags_nbs):
     """Write overall header for BMBPT result file."""
     tex_file.write(
-        "Valid diagrams: %i\n\n" % nb_diags
-        + "2N valid diagrams: %i\n\n" % (nb_2_hf + nb_2_ehf + nb_2_not_hf)
-        + "2N canonical diagrams for the energy: %i\n\n" % nb_2_hf)
+        "Valid diagrams: %i\n\n" % diags_nbs['nb_diags']
+        + "2N valid diagrams: %i\n\n" % diags_nbs['nb_2']
+        + "2N canonical diagrams for the energy: %i\n\n"
+        % diags_nbs['nb_2_hf'])
     if not norm:
         tex_file.write(
             "2N canonical diagrams for a generic operator only: %i\n\n"
-            % nb_2_ehf)
-    tex_file.write("2N non-canonical diagrams: %i\n\n" % nb_2_not_hf)
+            % diags_nbs['nb_2_ehf'])
+    tex_file.write(
+        "2N non-canonical diagrams: %i\n\n" % diags_nbs['nb_2_not_hf'])
     if three_body_use:
         tex_file.write(
-            "3N valid diagrams: %i\n\n" % (nb_3_hf + nb_3_ehf + nb_3_not_hf))
+            "3N valid diagrams: %i\n\n" % diags_nbs['nb_3_hf'])
         tex_file.write(
-            "3N canonical diagrams for the energy: %i\n\n" % nb_3_hf)
+            "3N canonical diagrams for the energy: %i\n\n"
+            % diags_nbs['nb_3_hf'])
         if not norm:
             tex_file.write(
                 "3N canonical diagrams for a generic operator only: %i\n\n"
-                % nb_3_ehf)
-        tex_file.write("3N non-canonical diagrams: %i\n\n" % nb_3_not_hf)
+                % diags_nbs['nb_3_ehf'])
+        tex_file.write(
+            "3N non-canonical diagrams: %i\n\n" % diags_nbs['nb_3_not_hf'])
 
 
-def write_section(result, diag_index, three_body, norm, nb_2, nb_2_hf,
-                  nb_2_ehf, nb_3_hf, nb_3_ehf):
+def write_section(result, diag_index, three_body, norm, diags_nbs):
     """Write section and subsections for BMBPT result file."""
     if diag_index == 0:
         result.write("\\section{Two-body diagrams}\n\n"
                      + "\\subsection{Two-body energy canonical diagrams}\n\n")
-    elif (diag_index == nb_2_hf) and (not norm):
+    elif (diag_index == diags_nbs['nb_2_hf']) and (not norm):
         result.write("\\subsection{Two-body canonical diagrams " +
                      "for a generic operator only}\n\n")
-    elif diag_index == nb_2_hf + nb_2_ehf:
+    elif diag_index == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
         result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
     if three_body:
-        if diag_index == nb_2:
+        if diag_index == diags_nbs['nb_2']:
             result.write(
                 "\\section{Three-body diagrams}\n\n"
                 + "\\subsection{Three-body energy canonical diagrams}\n\n")
-        elif (diag_index == nb_2 + nb_3_hf) and (not norm):
+        elif (diag_index == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']) \
+                and (not norm):
             result.write("\\subsection{Three-body canonical diagrams " +
                          "for a generic operator only}\n\n")
-        elif diag_index == nb_2 + nb_3_hf + nb_3_ehf:
+        elif diag_index == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
+                + diags_nbs['nb_3_ehf']:
             result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
 
 
@@ -328,9 +332,21 @@ def order_diagrams(diagrams):
     for ind, diagram in enumerate(diagrams):
         diagram.tags[0] = ind
 
-    return diagrams, len(diagrams_2_hf), len(diagrams_2_ehf), \
-        len(diagrams_2_not_hf), len(diagrams_3_hf), len(diagrams_3_ehf), \
-        len(diagrams_3_not_hf)
+    diags_nb_per_type = {
+        'nb_2_hf': len(diagrams_2_hf),
+        'nb_2_ehf': len(diagrams_2_ehf),
+        'nb_2_not_hf': len(diagrams_2_not_hf),
+        'nb_3_hf': len(diagrams_3_hf),
+        'nb_3_ehf': len(diagrams_3_ehf),
+        'nb_3_not_hf': len(diagrams_3_not_hf),
+        'nb_diags': len(diagrams),
+        'nb_2': (len(diagrams_2_hf) + len(diagrams_2_ehf)
+                 + len(diagrams_2_not_hf)),
+        'nb_3': (len(diagrams_3_hf) + len(diagrams_3_ehf)
+                 + len(diagrams_3_not_hf))
+        }
+
+    return diagrams, diags_nb_per_type
 
 
 class BmbptFeynmanDiagram(gen.Diagram):

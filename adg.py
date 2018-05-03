@@ -36,10 +36,7 @@ diagrams = gen.generate_diagrams(run_commands)
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if run_commands.theory == "BMBPT":
-    diagrams, NB_2_HF, NB_2_EHF, NB_2_NOT_HF, \
-        NB_3_HF, NB_3_EHF, NB_3_NOT_HF = bmbpt.order_diagrams(diagrams)
-    NB_2 = NB_2_HF + NB_2_EHF + NB_2_NOT_HF
-    NB_3 = NB_3_HF + NB_3_EHF + NB_3_NOT_HF
+    diagrams, diags_per_type = bmbpt.order_diagrams(diagrams)
 
 elif run_commands.theory == "MBPT":
     diagrams, NB_SINGLES, NB_DOUBLES, NB_TRIPLES, NB_QUADRUPLES, \
@@ -65,19 +62,19 @@ print "Time ellapsed: ", datetime.now() - START_TIME
 print "Number of connected diagrams, ", NUMDIAG
 
 if run_commands.theory == "BMBPT":
-    print "\n2N valid diagrams: %i" % NB_2
-    print "2N energy canonical diagrams: %i" % NB_2_HF
+    print "\n2N valid diagrams: %i" % diags_per_type['nb_2']
+    print "2N energy canonical diagrams: %i" % diags_per_type['nb_2_hf']
     if not run_commands.norm:
         print "2N canonical diagrams for a generic operator only: %i" \
-            % NB_2_EHF
-    print "2N non-canonical diagrams: %i\n" % NB_2_NOT_HF
+            % diags_per_type['nb_2_ehf']
+    print "2N non-canonical diagrams: %i\n" % diags_per_type['nb_2_not_hf']
     if run_commands.with_three_body:
-        print "3N valid diagrams: %i" % NB_3
-        print "3N energy canonical diagrams: %i" % NB_3_HF
+        print "3N valid diagrams: %i" % diags_per_type['nb_3']
+        print "3N energy canonical diagrams: %i" % diags_per_type['nb_3_hf']
         if not run_commands.norm:
             print "3N canonical diagrams for a generic operator only: %i" \
-                % NB_3_EHF
-        print "3N non-canonical diagrams: %i" % NB_3_NOT_HF
+                % diags_per_type['nb_3_ehf']
+        print "3N non-canonical diagrams: %i" % diags_per_type['nb_3_not_hf']
 elif run_commands.theory == "MBPT":
     print "\nValid diagrams: %i\n" % NUMDIAG
     print "Singles: %i" % NB_SINGLES
@@ -110,9 +107,8 @@ gen.write_file_header(latex_file, run_commands.draw_diags, run_commands.order,
                       run_commands.theory)
 
 if run_commands.theory == "BMBPT":
-    bmbpt.write_header(latex_file, NUMDIAG, run_commands.with_three_body,
-                       run_commands.norm, NB_2_HF, NB_2_EHF, NB_2_NOT_HF,
-                       NB_3_HF, NB_3_EHF, NB_3_NOT_HF)
+    bmbpt.write_header(latex_file, run_commands.with_three_body,
+                       run_commands.norm, diags_per_type)
 elif run_commands.theory == "MBPT":
     mbpt.write_header(latex_file, NUMDIAG, NB_SINGLES, NB_DOUBLES, NB_TRIPLES,
                       NB_QUADRUPLES, NB_QUINTUPLES_AND_HIGHER)
@@ -127,7 +123,7 @@ for diag in diagrams:
     if run_commands.theory == "BMBPT":
         bmbpt.write_section(latex_file, diag.tags[0],
                             run_commands.with_three_body, run_commands.norm,
-                            NB_2, NB_2_HF, NB_2_EHF, NB_3_HF, NB_3_EHF)
+                            diags_per_type)
         latex_file.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
         if not run_commands.norm:
             bmbpt.write_diag_exps(latex_file, diag, run_commands.order)
