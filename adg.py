@@ -6,8 +6,6 @@ import shutil
 import cProfile
 import pstats
 import StringIO
-import numpy as np
-import networkx as nx
 import general_routines as gen
 import bmbpt
 import mbpt
@@ -33,35 +31,8 @@ pr.enable()
 # Start computing everything
 print "Running"
 START_TIME = datetime.now()
+
 diagrams = gen.generate_diagrams(run_commands)
-
-with open(directory+"/Diagrams.list", "w") as f:
-    for idx, diagram in enumerate(diagrams):
-        f.write("Diagram n: %i\n" % (idx + 1))
-        np.savetxt(f, diagram, fmt='%d')
-        f.write("\n")
-
-# Graph part (computing, writing, drawing)
-G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
-                          parallel_edges=True) for diagram in diagrams]
-
-for i_diag in xrange(len(G)-1, -1, -1):
-    if (nx.number_weakly_connected_components(G[i_diag])) != 1:
-        del G[i_diag]
-
-# Specific check for loop diagrams in BMBPT
-if run_commands.theory == "BMBPT":
-    for i_diag in xrange(len(G)-1, -1, -1):
-        if not nx.is_directed_acyclic_graph(G[i_diag]):
-            del G[i_diag]
-
-gen.label_vertices(G, run_commands.theory, run_commands.norm)
-
-if run_commands.theory == 'BMBPT':
-    diagrams = [bmbpt.BmbptFeynmanDiagram(graph, run_commands.norm, ind)
-                for ind, graph in enumerate(G)]
-elif run_commands.theory == 'MBPT':
-    diagrams = [mbpt.MbptDiagram(graph, ind) for ind, graph in enumerate(G)]
 
 # Ordering the diagrams in a convenient way and checking them for doubles
 if run_commands.theory == "BMBPT":

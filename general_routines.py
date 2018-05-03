@@ -121,6 +121,28 @@ def generate_diagrams(commands):
     else:
         print "Invalid theory!"
     print "Number of possible diagrams, ", len(diagrams)
+
+    G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
+                              parallel_edges=True) for diagram in diagrams]
+
+    for i_diag in xrange(len(G)-1, -1, -1):
+        if (nx.number_weakly_connected_components(G[i_diag])) != 1:
+            del G[i_diag]
+
+    # Specific check for loop diagrams in BMBPT
+    if commands.theory == "BMBPT":
+        for i_diag in xrange(len(G)-1, -1, -1):
+            if not nx.is_directed_acyclic_graph(G[i_diag]):
+                del G[i_diag]
+
+    label_vertices(G, commands.theory, commands.norm)
+
+    if commands.theory == 'BMBPT':
+        diagrams = [bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
+                    for ind, graph in enumerate(G)]
+    elif commands.theory == 'MBPT':
+        diagrams = [mbpt.MbptDiagram(graph, ind)
+                    for ind, graph in enumerate(G)]
     return diagrams
 
 
