@@ -12,7 +12,10 @@ def parse_command_line():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="AUTOMATIC DIAGRAM GENERATOR\n\n"
         + "Generates diagrams at a given order for a "
-        + "range of many-body formalisms")
+        + "range of many-body formalisms",
+        epilog="If a theory is chosen in batch mode, all flags associated\n"
+        + "will automatically be deactivated to avoid conflicts.\n\n")
+
     basic_args = parser.add_argument_group(
         title="Basic arguments",
         description="For ADG to run, you need either to run it in\n"
@@ -28,6 +31,7 @@ def parse_command_line():
     bmbpt_args = parser.add_argument_group(
         title="BMBPT-specific arguments",
         description="Arguments available only for BMBPT calculations.\n")
+
     basic_args.add_argument(
         "-o", "--order", type=int, choices=range(2, 10),
         help="order of the diagrams (>=2)")
@@ -37,6 +41,7 @@ def parse_command_line():
     basic_args.add_argument(
         "-i", "--interactive", action="store_true",
         help="execute ADG in interactive mode")
+
     bmbpt_args.add_argument(
         "-n", "--norm", action="store_true",
         help="study norm BMBPT diagrams instead of operator ones")
@@ -46,15 +51,18 @@ def parse_command_line():
     bmbpt_args.add_argument(
         "-dt", "--draw_tsds", action="store_true",
         help="draw Time-Structure Diagrams (BMBPT)")
+
     run_args.add_argument(
         "-d", "--draw_diags", action="store_true",
         help="draw the diagrams using FeynMF")
     run_args.add_argument(
         "-c", "--compile", action="store_true",
         help="compile the LaTeX output file with PDFLaTeX")
+
     mbpt_args.add_argument(
         "-cd", "--cd_output", action="store_true",
         help="produce output for C. Drischler's framework (MBPT)")
+
     args = parser.parse_args()
 
     if (not args.interactive) and ((args.order is None)
@@ -63,6 +71,14 @@ def parse_command_line():
         print "providing the theory and the order for the desired diagrams.\n"
         print "Use 'python2 adg.py -h' for help.\n"
         exit()
+
+    # Avoid conflicting flags
+    if args.theory != 'BMBPT' and not args.interactive:
+        args.with_three_body = None
+        args.norm = None
+        args.draw_tsds = None
+    if args.theory != 'MBPT' and not args.interactive:
+        args.cd_output = None
 
     return args
 
