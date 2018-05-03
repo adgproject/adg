@@ -68,30 +68,16 @@ ps.dump_stats("stats.dat")
 
 # Writing a feynmp file for each graph
 if run_commands.draw_diags:
-    shutil.copy('feynmp.mp', directory + '/feynmp.mp')
-    shutil.copy('feynmp.sty', directory + '/feynmp.sty')
-    gen.create_feynmanmp_files(diagrams, run_commands.theory,
-                               directory, 'diag')
-    if run_commands.draw_tsds:
-        gen.create_feynmanmp_files(diagrams_time, run_commands.theory,
-                                   directory, 'time')
+    gen.prepare_drawing_instructions(directory, run_commands,
+                                     diagrams, diagrams_time)
 
 # Write everything down in a nice LaTeX file
 latex_file = open(directory + '/result.tex', 'w')
-gen.write_file_header(latex_file, run_commands.draw_diags, run_commands.order,
-                      run_commands.theory)
 
-if run_commands.theory == "BMBPT":
-    bmbpt.write_header(latex_file, run_commands.with_three_body,
-                       run_commands.norm, diags_per_type)
-elif run_commands.theory == "MBPT":
-    mbpt.write_header(latex_file, diags_per_type)
-
-latex_file.write("\\tableofcontents\n\n")
+gen.write_file_header(latex_file, run_commands, diags_per_type)
 
 if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
-    tsd.write_section(latex_file, directory,
-                      run_commands.draw_diags, run_commands.draw_diags,
+    tsd.write_section(latex_file, directory, run_commands.draw_diags,
                       diagrams_time, nb_tree_TSDs)
 for diag in diagrams:
     if run_commands.theory == "BMBPT":

@@ -189,6 +189,16 @@ def print_diags_numbers(commands, diags_nbs):
         print "Quintuples and higher: %i" % diags_nbs['quintuples+']
 
 
+def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
+    """Write FeynMP files for the different diagrams."""
+    shutil.copy('feynmp.mp', directory + '/feynmp.mp')
+    shutil.copy('feynmp.sty', directory + '/feynmp.sty')
+    create_feynmanmp_files(diagrams, commands.theory, directory, 'diag')
+    if commands.draw_tsds:
+        create_feynmanmp_files(diagrams_time, commands.theory,
+                               directory, 'time')
+
+
 def no_trace(matrices):
     """Select matrices with full 0 diagonal."""
     traceless_matrices = []
@@ -344,24 +354,34 @@ def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
                     "%s/Diagrams/%s.tex" % (directory, diag_name))
 
 
-def write_file_header(latex_file, pdiag, norder, theory):
+def write_file_header(latex_file, commands, diags_nbs):
     """Write the header of the result tex file."""
+    import mbpt
+    import bmbpt
     header = "\\documentclass[10pt,a4paper]{article}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
         + "\\usepackage[hyperindex=true]{hyperref}" \
         + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
         + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
-    if pdiag:
+    if commands.draw_diags:
         header = "%s\\usepackage{feynmp-auto}\n" % header
-    if norder > 3:
+    if commands.order > 3:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
     header = header \
-        + "\\title{Diagrams and algebraic expressions at order %i" % norder \
-        + " in %s}\n" % theory \
+        + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
+        % (commands.order, commands.theory) \
         + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
     latex_file.write("%s\\begin{document}\n\\maketitle\n" % header)
+
+    if commands.theory == "BMBPT":
+        bmbpt.write_header(latex_file, commands.with_three_body,
+                           commands.norm, diags_nbs)
+    elif commands.theory == "MBPT":
+        mbpt.write_header(latex_file, diags_nbs)
+
+    latex_file.write("\\tableofcontents\n\n")
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
