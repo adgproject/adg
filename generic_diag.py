@@ -1,7 +1,5 @@
 """Module containg methods to be called by ADG."""
 
-import os
-import shutil
 import networkx as nx
 
 
@@ -149,62 +147,12 @@ def feynmf_generator(graph, theory_type, diagram_name):
     fmf_file.close()
 
 
-def create_feynmanmp_files(diagrams_list, theory_type, directory, diag_type):
-    """Create and move the appropriate feynmanmp files to the right place."""
-    for diag in diagrams_list:
-        diag_name = '%s_%i' % (diag_type, diag.tags[0])
-        feynmf_generator(diag.graph,
-                         'MBPT' if diag_type == 'time' else theory_type,
-                         diag_name)
-        shutil.move('%s.tex' % diag_name,
-                    "%s/Diagrams/%s.tex" % (directory, diag_name))
-
-
-def write_file_header(latex_file, pdiag, norder, theory):
-    """Write the header of the result tex file."""
-    header = "\\documentclass[10pt,a4paper]{article}\n" \
-        + "\\usepackage[utf8]{inputenc}\n" \
-        + "\\usepackage[hyperindex=true]{hyperref}" \
-        + "\\usepackage{braket}\n\\usepackage{graphicx}\n" \
-        + "\\usepackage[english]{babel}\n\\usepackage{amsmath}\n" \
-        + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
-    if pdiag:
-        header = "%s\\usepackage{feynmp-auto}\n" % header
-    land = False
-    if norder > 3:
-        msg = 'Expressions may be long, rotate pdf?'
-        land = raw_input("%s (y/N) " % msg).lower() == 'y'
-    if land:
-        header = "%s\\usepackage[landscape]{geometry}\n" % header
-
-    header = header \
-        + "\\title{Diagrams and algebraic expressions at order %i" % norder \
-        + " in %s}\n" % theory \
-        + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
-    latex_file.write("%s\\begin{document}\n\\maketitle\n" % header)
-
-
 def draw_diagram(directory, result_file, diagram_index, diag_type):
     """Copy the diagram feynmanmp instructions in the result file."""
     diag_file = open(directory+"/Diagrams/%s_%i.tex" % (diag_type,
                                                         diagram_index))
     result_file.write(diag_file.read())
     diag_file.close()
-
-
-def compile_and_clean(directory, pdiag):
-    """Compile result.pdf and delete useless files."""
-    os.chdir(directory)
-    os.system("pdflatex -shell-escape result.tex")
-    if pdiag:
-        # Second compilation needed
-        os.system("pdflatex -shell-escape result.tex")
-        # Get rid of undesired feynmp files to keep a clean directory
-        for filename in os.listdir('.'):
-            if filename.startswith("time") or filename.startswith("diag") \
-                    or filename.startswith("equivalent"):
-                os.unlink(filename)
-    print "Result saved in %s/result.pdf" % directory
 
 
 def to_skeleton(graph):

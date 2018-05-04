@@ -5,7 +5,7 @@ import itertools
 import string
 import numpy as np
 import networkx as nx
-import general_routines as gen
+import generic_diag as gen
 
 
 def diagrams_generation(order):
@@ -41,31 +41,36 @@ def write_diag_exp(latex_file, mbpt_diag):
     latex_file.write("\\end{equation}\n")
 
 
-def write_header(tex_file, numdiag, nb_singles, nb_doubles, nb_triples,
-                 nb_quadruples, nb_quintuples_and_higher):
+def write_header(tex_file, diags_nbs):
     """Write tha appropriate header for the LaTeX file for MBPT diagrams."""
-    tex_file.write("Valid diagrams: %i\n\n" % numdiag
-                   + "Singles: %i\n\n" % nb_singles
-                   + "Doubles: %i\n\n" % nb_doubles
-                   + "Triples: %i\n\n" % nb_triples
-                   + "Quadruples: %i\n\n" % nb_quadruples
+    tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags']
+                   + "Singles: %i\n\n" % diags_nbs['singles']
+                   + "Doubles: %i\n\n" % diags_nbs['doubles']
+                   + "Triples: %i\n\n" % diags_nbs['triples']
+                   + "Quadruples: %i\n\n" % diags_nbs['quadruples']
                    + "Quintuples and higher excitation levels: %i\n\n"
-                   % nb_quintuples_and_higher)
+                   % diags_nbs['quintuples+'])
 
 
-def write_section(result, diag_index, nb_singles, nb_doubles, nb_triples,
-                  nb_quadruples):
+def write_section(result, diag, diags_nbs):
     """Write sections for MBPT result file."""
-    if diag_index == 0 and nb_singles != 0:
+    if diag.tags[0] == 0 and diags_nbs['singles'] != 0:
         result.write("\\section{Singles}\n\n")
-    elif diag_index == nb_singles:
+    elif diag.tags[0] == diags_nbs['singles']:
         result.write("\\section{Doubles}\n\n")
-    elif diag_index == nb_singles + nb_doubles:
+    elif diag.tags[0] == diags_nbs['singles'] + diags_nbs['doubles']:
         result.write("\\section{Triples}\n\n")
-    elif diag_index == nb_singles + nb_doubles + nb_triples:
+    elif diag.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
+                          + diags_nbs['triples']):
         result.write("\\section{Quadruples}\n\n")
-    elif diag_index == nb_singles + nb_doubles + nb_triples + nb_quadruples:
+    elif diag.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
+                          + diags_nbs['triples'] + diags_nbs['quadruples']):
         result.write("\\section{Quintuples and higher}\n\n")
+    result.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
+    if diag.complex_conjugate >= 0:
+        result.write("Complex conjugate diagram: %i\n"
+                     % (diag.complex_conjugate + 1))
+    write_diag_exp(result, diag)
 
 
 def print_cd_output(directory, diagrams):
@@ -118,8 +123,18 @@ def order_diagrams(diagrams):
     for ind, diagram in enumerate(diagrams):
         diagram.tags[0] = ind
 
-    return diagrams, len(singles), len(doubles), len(triples), \
-        len(quadruples), len(quintuples_and_higher)
+    attribute_conjugate(diagrams)
+
+    diags_nb_per_type = {
+        'nb_diags': len(diagrams),
+        'singles': len(singles),
+        'doubles': len(doubles),
+        'triples': len(triples),
+        'quadruples': len(quadruples),
+        'quintuples+': len(quintuples_and_higher)
+        }
+
+    return diagrams, diags_nb_per_type
 
 
 def attribute_conjugate(diagrams):
