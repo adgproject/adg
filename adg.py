@@ -6,7 +6,6 @@ import cProfile
 import pstats
 import StringIO
 import run_routines as run
-import generic_diag as gen
 import bmbpt
 import mbpt
 import time_structure as tsd
