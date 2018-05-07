@@ -18,11 +18,10 @@ def time_structure_graph(graph):
 def tree_time_structure_den(time_graph):
     """Return the denominator associated to a tree time-structure graph."""
     denominator = ""
-    labels = list(string.ascii_lowercase)
     i = 0
     for vertex in time_graph:
         if not time_graph.node[vertex]['operator']:
-            time_graph.node[vertex]['label'] = labels[i]
+            time_graph.node[vertex]['label'] = 'a_%i' % (i + 1)
             i += 1
     for vertex in time_graph:
         if not time_graph.node[vertex]['operator']:

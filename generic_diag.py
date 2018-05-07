@@ -173,13 +173,13 @@ def extract_denom(start_graph, subgraph):
         + "".join("%s"
                   % propa[3]['qp_state']
                   for propa
-                  in start_graph.in_edges(subgraph, keys=True, data=True)
+                  in start_graph.out_edges(subgraph, keys=True, data=True)
                   if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
         + "}_{" \
         + "".join("%s"
                   % propa[3]['qp_state']
                   for propa
-                  in start_graph.out_edges(subgraph, keys=True, data=True)
+                  in start_graph.in_edges(subgraph, keys=True, data=True)
                   if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
         + "}"
     return denomin

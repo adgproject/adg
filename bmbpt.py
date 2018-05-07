@@ -252,10 +252,8 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
 def write_vertices_values(latex_file, diag, mapping):
     """Write the qp energies associated to each vertex of the diag."""
     latex_file.write("\\begin{align*}\n")
-    labels = list(string.ascii_lowercase)
     for ind in range(1, len(diag.vert_exp)):
-        latex_file.write("%s &= %s" % (labels[ind-1],
-                                       diag.vert_exp[mapping[ind]]))
+        latex_file.write("a_%i &= %s" % (ind, diag.vert_exp[mapping[ind]]))
         if ind != len(diag.vert_exp)-1:
             latex_file.write(r"\\")
         latex_file.write('\n')
@@ -427,12 +425,12 @@ class BmbptFeynmanDiagram(gen.Diagram):
             + "".join("%s"
                       % prop[3]['qp_state']
                       for prop
-                      in self.graph.in_edges(vertex, keys=True, data=True)) \
+                      in self.graph.out_edges(vertex, keys=True, data=True)) \
             + "}_{" \
             + "".join("%s"
                       % prop[3]['qp_state']
                       for prop
-                      in self.graph.out_edges(vertex, keys=True, data=True)) \
+                      in self.graph.in_edges(vertex, keys=True, data=True)) \
             + "}"
         return expression
 
