@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import cProfile
-import pstats
-import StringIO
 import run_routines as run
 import bmbpt
 import mbpt
@@ -23,9 +20,6 @@ if run_commands.interactive:
     run_commands = run.interactive_interface(run_commands)
 
 directory = run.attribute_directory(run_commands)
-
-pr = cProfile.Profile()
-pr.enable()
 
 # Start computing everything
 print "Running"
@@ -56,13 +50,6 @@ else:
 print "Time ellapsed: ", datetime.now() - START_TIME
 
 run.print_diags_numbers(run_commands, diags_per_type)
-
-pr.disable()
-s = StringIO.StringIO()
-sortby = 'cumulative'
-ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-ps.print_stats()
-ps.dump_stats("stats.dat")
 
 # Writing a feynmp file for each graph
 if run_commands.draw_diags:
