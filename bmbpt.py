@@ -74,8 +74,8 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
 
 def attribute_qp_labels(graph):
     """Attribute the appropriate qp labels to the graph's propagators."""
-    for idx, prop in enumerate(graph.edges(keys=True)):
-        graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] = "k_{%i}" % (idx+1)
+    for idx, prop in enumerate(graph.edges(keys=True, data=True)):
+        prop[3]['qp_state'] = "k_{%i}" % (idx+1)
 
 
 def extract_numerator(graph):
@@ -88,14 +88,15 @@ def extract_numerator(graph):
         numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
                                     graph.in_degree(vertex))
         # First add the qp states corresponding to propagators going out
-        numerator += "".join(graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                             for prop in graph.out_edges(vertex, keys=True))
+        numerator += "".join(prop[3]['qp_state']
+                             for prop
+                             in graph.out_edges(vertex, keys=True, data=True))
         # Add the qp states corresponding to propagators coming in
         previous_vertex = vertex - 1
         while previous_vertex >= 0:
             numerator += "".join(
-                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                for prop in graph.in_edges(vertex, keys=True)
+                prop[3]['qp_state']
+                for prop in graph.in_edges(vertex, keys=True, data=True)
                 if prop[0] == previous_vertex)
             previous_vertex -= 1
         numerator += "} "
@@ -424,12 +425,14 @@ class BmbptFeynmanDiagram(gen.Diagram):
         """Return the expression associated to a given vertex."""
         expression = r"\epsilon^{" \
             + "".join("%s"
-                      % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                      for prop in self.graph.in_edges(vertex, keys=True)) \
+                      % prop[3]['qp_state']
+                      for prop
+                      in self.graph.in_edges(vertex, keys=True, data=True)) \
             + "}_{" \
             + "".join("%s"
-                      % self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                      for prop in self.graph.out_edges(vertex, keys=True)) \
+                      % prop[3]['qp_state']
+                      for prop
+                      in self.graph.out_edges(vertex, keys=True, data=True)) \
             + "}"
         return expression
 

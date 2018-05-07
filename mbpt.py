@@ -153,14 +153,14 @@ def extract_cd_denom(start_graph, subgraph):
     """Extract the appropriate CD denominator using the subgraph rule."""
     denomin = "{" \
         + "".join("%s, "
-                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
+                  % propa[3]['qp_state']
                   for propa
-                  in start_graph.in_edges(subgraph, keys=True)
+                  in start_graph.in_edges(subgraph, keys=True, data=True)
                   if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
         + "".join("%s, "
-                  % start_graph.adj[propa[0]][propa[1]][propa[2]]['qp_state']
+                  % propa[3]['qp_state']
                   for propa
-                  in start_graph.out_edges(subgraph, keys=True)
+                  in start_graph.out_edges(subgraph, keys=True, data=True)
                   if not subgraph.has_edge(propa[0], propa[1], propa[2]))
     denomin = denomin.strip(', ') + '}'
     return denomin
@@ -240,13 +240,11 @@ class MbptDiagram(gen.Diagram):
         else:
             h_labels = labels[0:13]
             p_labels = labels[13:]
-        for prop in self.graph.edges(keys=True):
+        for prop in self.graph.edges(keys=True, data=True):
             if prop[0] < prop[1]:
-                self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] \
-                    = h_labels.pop(0)
+                prop[3]['qp_state'] = h_labels.pop(0)
             else:
-                self.graph.adj[prop[0]][prop[1]][prop[2]]['qp_state'] \
-                    = p_labels.pop(0)
+                prop[3]['qp_state'] = p_labels.pop(0)
 
     def extract_denominator(self):
         """Return the denominator for a MBPT graph."""
@@ -277,12 +275,12 @@ class MbptDiagram(gen.Diagram):
         for vertex in graph:
             # First add the qp states corresponding to propagators going out
             numerator += "v_{" + "".join(
-                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                for prop in graph.out_edges(vertex, keys=True))
+                prop[3]['qp_state']
+                for prop in graph.out_edges(vertex, keys=True, data=True))
             # Add the qp states corresponding to propagators coming in
             numerator += "".join(
-                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                for prop in graph.in_edges(vertex, keys=True)) \
+                prop[3]['qp_state']
+                for prop in graph.in_edges(vertex, keys=True, data=True)) \
                 + "} "
         return numerator
 
@@ -295,13 +293,13 @@ class MbptDiagram(gen.Diagram):
             numerator += "{"
             # First add the qp states corresponding to propagators going out
             numerator += ", ".join(
-                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                for prop in graph.out_edges(vertex, keys=True))
+                prop[3]['qp_state']
+                for prop in graph.out_edges(vertex, keys=True, data=True))
             numerator += ', '
             # Add the qp states corresponding to propagators coming in
             numerator += ", ".join(
-                graph.adj[prop[0]][prop[1]][prop[2]]['qp_state']
-                for prop in graph.in_edges(vertex, keys=True))
+                prop[3]['qp_state']
+                for prop in graph.in_edges(vertex, keys=True, data=True))
             numerator = numerator.strip(', ') + "}, "
         return numerator.strip(', ')
 
