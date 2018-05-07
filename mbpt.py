@@ -181,10 +181,12 @@ class MbptDiagram(gen.Diagram):
         self.excitation_level = self.calc_excitation()
         self.complex_conjugate = -1
         self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
+        self.loops_number()
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
-        phases = '(-1)^{%i+l}' % self.count_hole_lines()
+        phases = '(-1)^{%i-%i}' % (self.count_hole_lines(),
+                                   self.loops_number())
         eq_lines = np.array(self.incidence.transpose())
         neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         nedges_eq = 2**(len(eq_lines)-len(neq_lines))
@@ -302,3 +304,24 @@ class MbptDiagram(gen.Diagram):
                 for prop in graph.in_edges(vertex, keys=True))
             numerator = numerator.strip(', ') + "}, "
         return numerator.strip(', ')
+
+    def loops_number(self):
+        """Return the number of loops in the diagram as an integer."""
+        nb_loops = 0
+        nb_checked_props = 0
+        diag = self.graph
+        nx.set_edge_attributes(diag, False, 'checked')
+        while nb_checked_props < diag.number_of_edges():
+            prop = list(edge for edge in diag.edges(keys=True, data=True)
+                        if edge[3]['checked'] is False)[0]
+            while prop[3]['checked'] is False:
+                prop[3]['checked'] = True
+                nb_checked_props += 1
+                left_right_label = list(diag.in_edges(prop[1],
+                                                      keys=True,
+                                                      data=True)).index(prop)
+                prop = list(diag.out_edges(prop[1],
+                                           keys=True,
+                                           data=True))[left_right_label]
+            nb_loops += 1
+        return nb_loops
