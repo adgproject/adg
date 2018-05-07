@@ -192,8 +192,6 @@ def print_diags_numbers(commands, diags_nbs):
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
     """Write FeynMP files for the different diagrams."""
-    shutil.copy('feynmp.mp', directory + '/feynmp.mp')
-    shutil.copy('feynmp.sty', directory + '/feynmp.sty')
     create_feynmanmp_files(diagrams, commands.theory, directory, 'diag')
     if commands.draw_tsds:
         create_feynmanmp_files(diagrams_time, commands.theory,

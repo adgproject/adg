@@ -104,6 +104,9 @@ def feynmf_generator(graph, theory_type, diagram_name):
                                                               diagram_name)
                    + "\\begin{fmfgraph*}(%i,%i)\n" % (diag_size, diag_size))
 
+    # Define the appropriate line propagator_style
+    fmf_file.write(propagator_style(propa))
+
     # Set the position of the vertices
     fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
     for vert in xrange(p_order-1):
@@ -145,6 +148,24 @@ def feynmf_generator(graph, theory_type, diagram_name):
                 props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
+
+
+def propagator_style(prop_type):
+    """Return the FeynMF definition for the appropriate propagator type."""
+    line_styles = {}
+
+    line_styles['prop_pm'] = "\\fmfcmd{style_def prop_pm expr p =\n" \
+        + "draw_plain p;\nshrink(.7);\n" \
+        + "\tcfill (marrow (p, .25));\n" \
+        + "\tcfill (marrow (p, .75))\n" \
+        + "endshrink;\nenddef;}\n"
+
+    line_styles['half_prop'] = "\\fmfcmd{style_def half_prop expr p =\n" \
+        + "draw_plain p;\nshrink(.7);\n" \
+        + "\tcfill (marrow (p, .5))\n" \
+        + "endshrink;\nenddef;}\n"
+
+    return line_styles[prop_type]
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
