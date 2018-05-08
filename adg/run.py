@@ -72,7 +72,7 @@ def parse_command_line():
                                    or (args.theory is None)):
         print "\nPlease either run the interactive mode, or the batch mode by"
         print "providing the theory and the order for the desired diagrams.\n"
-        print "Use 'python2 adg.py -h' for help.\n"
+        print "Use 'adg -h' for help.\n"
         exit()
 
     # Avoid conflicting flags
