@@ -2,7 +2,6 @@
 
 import copy
 import itertools
-import string
 import numpy as np
 import networkx as nx
 import time_structure as tsd
