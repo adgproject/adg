@@ -6,7 +6,7 @@ import shutil
 import networkx as nx
 import adg.mbpt
 import adg.bmbpt
-import adg.generic_diag as gen
+import adg.diag
 
 
 def parse_command_line():
@@ -152,7 +152,7 @@ def generate_diagrams(commands):
             if not nx.is_directed_acyclic_graph(G[i_diag]):
                 del G[i_diag]
 
-    gen.label_vertices(G, commands.theory, commands.norm)
+    adg.diag.label_vertices(G, commands.theory, commands.norm)
 
     if commands.theory == 'BMBPT':
         diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
@@ -202,9 +202,9 @@ def create_feynmanmp_files(diagrams, theory, directory, diag_type):
     """Create and move the appropriate feynmanmp files to the right place."""
     for diag in diagrams:
         diag_name = '%s_%i' % (diag_type, diag.tags[0])
-        gen.feynmf_generator(diag.graph,
-                             'MBPT' if diag_type == 'time' else theory,
-                             diag_name)
+        adg.diag.feynmf_generator(diag.graph,
+                                  'MBPT' if diag_type == 'time' else theory,
+                                  diag_name)
         shutil.move('%s.tex' % diag_name,
                     "%s/Diagrams/%s.tex" % (directory, diag_name))
 
