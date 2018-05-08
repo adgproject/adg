@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import adg.run_routines as run
+import adg.run
 import adg.bmbpt
 import adg.mbpt
-import adg.time_structure as tsd
+import adg.tsd
 
 
 def main():
     """Launch the ADG program."""
-    run_commands = run.parse_command_line()
+    run_commands = adg.run.parse_command_line()
 
     print "#####################"
     print "# Automatic Diagram #"
@@ -19,15 +19,15 @@ def main():
     print "#####################"
 
     if run_commands.interactive:
-        run_commands = run.interactive_interface(run_commands)
+        run_commands = adg.run.interactive_interface(run_commands)
 
-    directory = run.attribute_directory(run_commands)
+    directory = adg.run.attribute_directory(run_commands)
 
     # Start computing everything
     print "Running"
     START_TIME = datetime.now()
 
-    diagrams = run.generate_diagrams(run_commands)
+    diagrams = adg.run.generate_diagrams(run_commands)
 
     # Ordering the diagrams in a convenient way and checking them for doubles
     if run_commands.theory == "BMBPT":
@@ -39,7 +39,7 @@ def main():
     # Treatment of the algebraic expressions
     if run_commands.theory == "BMBPT" and not run_commands.norm:
 
-        diagrams_time = [tsd.TimeStructureDiagram(diagram, diagram.tags[0])
+        diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                          for diagram in diagrams]
 
         diagrams_time, nb_tree_TSDs = adg.bmbpt.treat_TSDs(diagrams_time)
@@ -51,21 +51,21 @@ def main():
 
     print "Time ellapsed: ", datetime.now() - START_TIME
 
-    run.print_diags_numbers(run_commands, diags_per_type)
+    adg.run.print_diags_numbers(run_commands, diags_per_type)
 
     # Writing a feynmp file for each graph
     if run_commands.draw_diags:
-        run.prepare_drawing_instructions(directory, run_commands,
-                                         diagrams, diagrams_time)
+        adg.run.prepare_drawing_instructions(directory, run_commands,
+                                             diagrams, diagrams_time)
 
     # Write everything down in a nice LaTeX file
     latex_file = open(directory + '/result.tex', 'w')
 
-    run.write_file_header(latex_file, run_commands, diags_per_type)
+    adg.run.write_file_header(latex_file, run_commands, diags_per_type)
 
     if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
-        tsd.write_section(latex_file, directory, run_commands.draw_diags,
-                          diagrams_time, nb_tree_TSDs)
+        adg.tsd.write_section(latex_file, directory, run_commands.draw_diags,
+                              diagrams_time, nb_tree_TSDs)
     for diag in diagrams:
         if run_commands.theory == "BMBPT":
             adg.bmbpt.write_section(latex_file, diag,
@@ -87,7 +87,7 @@ def main():
         adg.mbpt.print_cd_output(directory, diagrams)
 
     if run_commands.compile:
-        run.compile_and_clean(directory, run_commands.draw_diags)
+        adg.run.compile_and_clean(directory, run_commands.draw_diags)
 
 
 if __name__ == "__main__":

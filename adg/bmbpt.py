@@ -5,8 +5,8 @@ import itertools
 import string
 import numpy as np
 import networkx as nx
-import adg.time_structure as tsd
-import adg.generic_diag as gen
+import adg.tsd
+import adg.diag
 
 
 def diagrams_generation(p_order, three_body_use):
@@ -29,13 +29,13 @@ def diagrams_generation(p_order, three_body_use):
                     temp_mat = copy.deepcopy(mat)
                     temp_mat[vertex][sum_index] = elem
                     add(temp_mat)
-        gen.check_vertex_degree(matrices, three_body_use, vertex)
+        adg.diag.check_vertex_degree(matrices, three_body_use, vertex)
         if 0 < vertex < p_order-1:
             check_unconnected_spawn(matrices, vertex, p_order)
 
     # Checks to exclude non-conform matrices
-    gen.check_degree(matrices, three_body_use)
-    gen.no_loop(matrices)
+    adg.diag.check_degree(matrices, three_body_use)
+    adg.diag.no_loop(matrices)
     matrices_uniq = []
     for mat in matrices:
         if mat not in matrices_uniq:
@@ -111,7 +111,7 @@ def time_tree_denominator(graph, time_graph):
                           for vertex_j in nx.descendants(time_graph, vertex_i)]
         subgraph_stack.append(vertex_i)
         subdiag = graph.subgraph(subgraph_stack)
-        denominator += "%s\\ " % gen.extract_denom(graph, subdiag)
+        denominator += "%s\\ " % adg.diag.extract_denom(graph, subdiag)
     return denominator
 
 
@@ -280,17 +280,17 @@ def treat_TSDs(diagrams_time):
             tree_tsds.append(diagrams_time[i_diag])
             del diagrams_time[i_diag]
 
-    gen.topologically_distinct_diagrams(tree_tsds)
-    gen.topologically_distinct_diagrams(diagrams_time)
+    adg.diag.topologically_distinct_diagrams(tree_tsds)
+    adg.diag.topologically_distinct_diagrams(diagrams_time)
 
     diagrams_time = tree_tsds + diagrams_time
 
     for index, t_diag in enumerate(diagrams_time):
         t_diag.tags.insert(0, index)
         if not t_diag.is_tree:
-            t_diag.equivalent_trees = tsd.treat_cycles(t_diag.graph)
+            t_diag.equivalent_trees = adg.tsd.treat_cycles(t_diag.graph)
             t_diag.expr = " + ".join("\\frac{1}{%s}"
-                                     % tsd.tree_time_structure_den(graph)
+                                     % adg.tsd.tree_time_structure_den(graph)
                                      for graph
                                      in t_diag.equivalent_trees)
     return diagrams_time, len(tree_tsds)
@@ -322,12 +322,12 @@ def order_diagrams(diagrams):
                 diagrams_3_not_hf.append(diagrams[i_diag])
         del diagrams[i_diag]
 
-    gen.topologically_distinct_diagrams(diagrams_2_hf)
-    gen.topologically_distinct_diagrams(diagrams_2_ehf)
-    gen.topologically_distinct_diagrams(diagrams_2_not_hf)
-    gen.topologically_distinct_diagrams(diagrams_3_hf)
-    gen.topologically_distinct_diagrams(diagrams_3_ehf)
-    gen.topologically_distinct_diagrams(diagrams_3_not_hf)
+    adg.diag.topologically_distinct_diagrams(diagrams_2_hf)
+    adg.diag.topologically_distinct_diagrams(diagrams_2_ehf)
+    adg.diag.topologically_distinct_diagrams(diagrams_2_not_hf)
+    adg.diag.topologically_distinct_diagrams(diagrams_3_hf)
+    adg.diag.topologically_distinct_diagrams(diagrams_3_ehf)
+    adg.diag.topologically_distinct_diagrams(diagrams_3_not_hf)
 
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
         + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf
@@ -351,12 +351,12 @@ def order_diagrams(diagrams):
     return diagrams, diags_nb_per_type
 
 
-class BmbptFeynmanDiagram(gen.Diagram):
+class BmbptFeynmanDiagram(adg.diag.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties."""
 
     def __init__(self, nx_graph, use_norm, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph."""
-        gen.Diagram.__init__(self, nx_graph)
+        adg.diag.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
         self.time_tag = -1
@@ -437,12 +437,12 @@ class BmbptFeynmanDiagram(gen.Diagram):
     def write_graph(self, latex_file, directory, write_time):
         """Write the BMBPT graph and its associated TSD to the LaTeX file."""
         latex_file.write('\n\\begin{center}\n')
-        gen.draw_diagram(directory, latex_file, self.tags[0], 'diag')
+        adg.diag.draw_diagram(directory, latex_file, self.tags[0], 'diag')
         if write_time:
             latex_file.write(
                 '\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
                 % (self.time_tag + 1))
-            gen.draw_diagram(directory, latex_file, self.time_tag, 'time')
+            adg.diag.draw_diagram(directory, latex_file, self.time_tag, 'time')
         latex_file.write('\n\\end{center}\n\n')
 
     def write_tsd_info(self, diagrams_time, latex_file):

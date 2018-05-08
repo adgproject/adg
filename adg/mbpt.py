@@ -5,7 +5,7 @@ import itertools
 import string
 import numpy as np
 import networkx as nx
-import adg.generic_diag as gen
+import adg.diag
 
 
 def diagrams_generation(order):
@@ -15,7 +15,7 @@ def diagrams_generation(order):
     all_matrices = [[[0 if i != j else 1 for i in range(order)]
                      for j in k]
                     for k in seeds]
-    traceless = gen.no_trace(all_matrices)
+    traceless = adg.diag.no_trace(all_matrices)
     coeffs = [i for i in itertools.combinations_with_replacement(
         range(len(traceless)), 2)]
     double = []
@@ -166,12 +166,12 @@ def extract_cd_denom(start_graph, subgraph):
     return denomin
 
 
-class MbptDiagram(gen.Diagram):
+class MbptDiagram(adg.diag.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph."""
-        gen.Diagram.__init__(self, mbpt_graph)
+        adg.diag.Diagram.__init__(self, mbpt_graph)
         self.tags = [tag_num]
         # Beware of the sign convention !!!
         self.incidence = - nx.incidence_matrix(self.graph,
@@ -252,8 +252,8 @@ class MbptDiagram(gen.Diagram):
         graph = self.graph
         for vertex_i in range(1, len(graph)):
             stack = [vertex_j for vertex_j in graph if vertex_j >= vertex_i]
-            denominator += "%s\\ " % gen.extract_denom(graph,
-                                                       graph.subgraph(stack))
+            denominator += "%s\\ " % adg.diag.extract_denom(
+                graph, graph.subgraph(stack))
         return denominator
 
     def cd_denominator(self):
