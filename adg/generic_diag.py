@@ -58,7 +58,7 @@ def check_vertex_degree(matrices, three_body_use, vertex_id):
 
 def topologically_distinct_diagrams(diagrams):
     """Return a list of diagrams all topologically distinct."""
-    import time_structure as tsd
+    import adg.time_structure as tsd
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):

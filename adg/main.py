@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import run_routines as run
-import bmbpt
-import mbpt
-import time_structure as tsd
+import adg.run_routines as run
+import adg.bmbpt
+import adg.mbpt
+import adg.time_structure as tsd
 
 
 def main():
@@ -31,10 +31,10 @@ def main():
 
     # Ordering the diagrams in a convenient way and checking them for doubles
     if run_commands.theory == "BMBPT":
-        diagrams, diags_per_type = bmbpt.order_diagrams(diagrams)
+        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
 
     elif run_commands.theory == "MBPT":
-        diagrams, diags_per_type = mbpt.order_diagrams(diagrams)
+        diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
 
     # Treatment of the algebraic expressions
     if run_commands.theory == "BMBPT" and not run_commands.norm:
@@ -42,9 +42,9 @@ def main():
         diagrams_time = [tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                          for diagram in diagrams]
 
-        diagrams_time, nb_tree_TSDs = bmbpt.treat_TSDs(diagrams_time)
+        diagrams_time, nb_tree_TSDs = adg.bmbpt.treat_TSDs(diagrams_time)
 
-        bmbpt.produce_expressions(diagrams, diagrams_time)
+        adg.bmbpt.produce_expressions(diagrams, diagrams_time)
 
     else:
         diagrams_time = []
@@ -68,9 +68,10 @@ def main():
                           diagrams_time, nb_tree_TSDs)
     for diag in diagrams:
         if run_commands.theory == "BMBPT":
-            bmbpt.write_section(latex_file, diag, run_commands, diags_per_type)
+            adg.bmbpt.write_section(latex_file, diag,
+                                    run_commands, diags_per_type)
         elif run_commands.theory == "MBPT":
-            mbpt.write_section(latex_file, diag, diags_per_type)
+            adg.mbpt.write_section(latex_file, diag, diags_per_type)
 
         if run_commands.draw_diags:
             diag.write_graph(latex_file, directory, run_commands.draw_tsds)
@@ -83,7 +84,7 @@ def main():
 
     # Produce an output adapted to Christian Drischler's format
     if run_commands.cd_output:
-        mbpt.print_cd_output(directory, diagrams)
+        adg.mbpt.print_cd_output(directory, diagrams)
 
     if run_commands.compile:
         run.compile_and_clean(directory, run_commands.draw_diags)

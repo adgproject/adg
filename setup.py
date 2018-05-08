@@ -2,6 +2,8 @@
 
 
 import sys
+from setuptools import setup
+import adg
 
 main_dependencies = [
     "setuptools"
@@ -20,15 +22,15 @@ for dep in main_dependencies:
         sys.exit(1)
 
 
-from setuptools import setup
-import adg
-
-
 setup(
     name='ADG - Automated Diagram Generator',
+    version=adg.__version__,
     maintainer='Pierre Arthuis',
     maintainer_email='pierre.arthuis@pm.me',
-    url='https://github.com/alejandrogallo/papis',
+    author=adg.__author__,
+    author_email=adg.__email__,
+    license=adg.__license__,
+    url='',
     install_requires=[
         "networkx>=2.0",
         "numpy",

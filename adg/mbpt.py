@@ -5,7 +5,7 @@ import itertools
 import string
 import numpy as np
 import networkx as nx
-import generic_diag as gen
+import adg.generic_diag as gen
 
 
 def diagrams_generation(order):

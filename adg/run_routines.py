@@ -4,9 +4,9 @@ import os
 import argparse
 import shutil
 import networkx as nx
-import mbpt
-import bmbpt
-import generic_diag as gen
+import adg.mbpt
+import adg.bmbpt
+import adg.generic_diag as gen
 
 
 def parse_command_line():
@@ -131,10 +131,10 @@ def attribute_directory(commands):
 def generate_diagrams(commands):
     """Return a list with diagrams of the appropriate type."""
     if commands.theory == "MBPT":
-        diagrams = mbpt.diagrams_generation(commands.order)
+        diagrams = adg.mbpt.diagrams_generation(commands.order)
     elif commands.theory == "BMBPT":
-        diagrams = bmbpt.diagrams_generation(commands.order,
-                                             commands.with_three_body)
+        diagrams = adg.bmbpt.diagrams_generation(commands.order,
+                                                 commands.with_three_body)
     else:
         print "Invalid theory!"
     print "Number of possible diagrams, ", len(diagrams)
@@ -155,10 +155,10 @@ def generate_diagrams(commands):
     gen.label_vertices(G, commands.theory, commands.norm)
 
     if commands.theory == 'BMBPT':
-        diagrams = [bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
+        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
                     for ind, graph in enumerate(G)]
     elif commands.theory == 'MBPT':
-        diagrams = [mbpt.MbptDiagram(graph, ind)
+        diagrams = [adg.mbpt.MbptDiagram(graph, ind)
                     for ind, graph in enumerate(G)]
     return diagrams
 
@@ -230,10 +230,10 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":
-        bmbpt.write_header(latex_file, commands.with_three_body,
-                           commands.norm, diags_nbs)
+        adg.bmbpt.write_header(latex_file, commands.with_three_body,
+                               commands.norm, diags_nbs)
     elif commands.theory == "MBPT":
-        mbpt.write_header(latex_file, diags_nbs)
+        adg.mbpt.write_header(latex_file, diags_nbs)
 
     latex_file.write("\n\\tableofcontents\n\n")
 

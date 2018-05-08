@@ -3,7 +3,7 @@
 import os
 import string
 import networkx as nx
-import generic_diag as gen
+import adg.generic_diag as gen
 
 
 def time_structure_graph(graph):
