@@ -35,7 +35,7 @@ setup(
         "networkx>=2.0",
         "numpy",
     ],
-    python_requires='>=2.7',
+    python_requires='>=2.7.1',
     classifiers=[
         'Operating System :: MacOS',
         'Operating System :: POSIX',
