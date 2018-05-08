@@ -23,7 +23,7 @@ for dep in main_dependencies:
 
 
 setup(
-    name='ADG - Automated Diagram Generator',
+    name='adg',
     version=adg.__version__,
     maintainer='Pierre Arthuis',
     maintainer_email='pierre.arthuis@pm.me',
@@ -35,7 +35,7 @@ setup(
         "networkx>=2.0",
         "numpy",
     ],
-    python_requires='=2.7',
+    python_requires='>=2.7',
     classifiers=[
         'Operating System :: MacOS',
         'Operating System :: POSIX',
