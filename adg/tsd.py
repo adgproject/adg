@@ -1,9 +1,8 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
 import os
-import string
 import networkx as nx
-import generic_diag as gen
+import adg.diag
 
 
 def time_structure_graph(graph):
@@ -12,7 +11,7 @@ def time_structure_graph(graph):
     if time_graph.node[0]['operator']:
         for vertex in xrange(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
-    return gen.to_skeleton(time_graph)
+    return adg.diag.to_skeleton(time_graph)
 
 
 def tree_time_structure_den(time_graph):
@@ -35,7 +34,7 @@ def tree_time_structure_den(time_graph):
     return denominator
 
 
-def equivalent_labelled_TSDs(equivalent_trees, labelled_tsds):
+def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     """Return the list of labelled TSDs corresponding to equivalent TSDs."""
     op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     eq_labelled_tsds = ""
@@ -52,12 +51,13 @@ def equivalent_labelled_TSDs(equivalent_trees, labelled_tsds):
     return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
-def draw_equivalent_tree_TSDs(time_diagram, latex_file):
+def draw_equivalent_tree_tsds(time_diagram, latex_file):
     """Draw the equivalent tree TSDs for a given non-tree TSD."""
     for index, graph in enumerate(time_diagram.equivalent_trees):
-        gen.feynmf_generator(graph,
-                             'MBPT',
-                             'equivalent%i_%i' % (time_diagram.tags[0], index))
+        adg.diag.feynmf_generator(graph,
+                                  'MBPT',
+                                  'equivalent%i_%i' % (time_diagram.tags[0],
+                                                       index))
         diag_file = open("equivalent%i_%i.tex" % (time_diagram.tags[0], index))
         latex_file.write(diag_file.read())
         diag_file.close()
@@ -82,10 +82,10 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
                          % (tdiag.tags[0]+1, tdiag.expr))
         if not tdiag.is_tree:
             latex_file.write("Equivalent tree diagrams: %s\n\n"
-                             % equivalent_labelled_TSDs(tdiag.equivalent_trees,
+                             % equivalent_labelled_tsds(tdiag.equivalent_trees,
                                                         time_diagrams))
             latex_file.write('\n\\begin{center}\n')
-            draw_equivalent_tree_TSDs(tdiag, latex_file)
+            draw_equivalent_tree_tsds(tdiag, latex_file)
             latex_file.write('\n\\end{center}\n\n')
         feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
         latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
@@ -135,7 +135,7 @@ def disentangle_cycle(time_graph, cycle_nodes):
                 mother_node = test_node
                 break
         new_graph.add_edge(mother_node, insert_node)
-        gen.to_skeleton(new_graph)
+        adg.diag.to_skeleton(new_graph)
         new_graphs.append(new_graph)
     return new_graphs
 
@@ -159,12 +159,12 @@ def find_cycle(graph):
     return cycle_nodes
 
 
-class TimeStructureDiagram(gen.Diagram):
+class TimeStructureDiagram(adg.diag.Diagram):
     """Describes a time-structure diagram with its related properties."""
 
     def __init__(self, bmbpt_diag, tag_num):
         """Generate a tsd diagram out of a BMBPT one."""
-        gen.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
+        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
         self.tags = [tag_num]
         self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
         self.equivalent_trees = []

@@ -22,6 +22,14 @@ Extensions under discussions are norm diagrams for BMBPT as well as diagrams
 and expressions generation for Gorkov Self-Consistent Green's Functions (GSCGF).
 
 ## Install
+To install ADG starting, download the source files and run
+```
+pip install <project_folder>
+```
+If you want to install ADG in ```develop``` mode, then run
+```
+pip install -e <project_folder>
+```
 
 ## Dependencies
 In order to run the code, you will need a Python install >= 2.7.1
@@ -37,7 +45,7 @@ which are standard packages in most recent distributions.
 ## Use
 To run the program and generate BMBPT diagrams at order 4 for example, use
 ```
-python2 adg.py -o 4 -t BMBPT -d -c
+adg -o 4 -t BMBPT -d -c
 ```
 where the ```-o``` flag is for the order, ```-t``` for the type of theory,
 ```-d``` indicates you want the diagrams to be drawn and ```-c``` that you want
@@ -45,12 +53,12 @@ ADG to compile the LaTeX output.
 
 You can alternatively run the program in interactive mode by typing
 ```
-python2 adg.py -i
+adg -i
 ```
 
 Finally, to obtain more information on all the available flags, use
 ```
-python2 adg.py -h
+adg -h
 ```
 
 ## Citing

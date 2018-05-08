@@ -4,9 +4,9 @@ import os
 import argparse
 import shutil
 import networkx as nx
-import mbpt
-import bmbpt
-import generic_diag as gen
+import adg.mbpt
+import adg.bmbpt
+import adg.diag
 
 
 def parse_command_line():
@@ -131,35 +131,35 @@ def attribute_directory(commands):
 def generate_diagrams(commands):
     """Return a list with diagrams of the appropriate type."""
     if commands.theory == "MBPT":
-        diagrams = mbpt.diagrams_generation(commands.order)
+        diagrams = adg.mbpt.diagrams_generation(commands.order)
     elif commands.theory == "BMBPT":
-        diagrams = bmbpt.diagrams_generation(commands.order,
-                                             commands.with_three_body)
+        diagrams = adg.bmbpt.diagrams_generation(commands.order,
+                                                 commands.with_three_body)
     else:
         print "Invalid theory!"
     print "Number of possible diagrams, ", len(diagrams)
 
-    G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
-                              parallel_edges=True) for diagram in diagrams]
+    diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
+                                  parallel_edges=True) for diagram in diagrams]
 
-    for i_diag in xrange(len(G)-1, -1, -1):
-        if (nx.number_weakly_connected_components(G[i_diag])) != 1:
-            del G[i_diag]
+    for i_diag in xrange(len(diags)-1, -1, -1):
+        if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
+            del diags[i_diag]
 
     # Specific check for loop diagrams in BMBPT
     if commands.theory == "BMBPT":
-        for i_diag in xrange(len(G)-1, -1, -1):
-            if not nx.is_directed_acyclic_graph(G[i_diag]):
-                del G[i_diag]
+        for i_diag in xrange(len(diags)-1, -1, -1):
+            if not nx.is_directed_acyclic_graph(diags[i_diag]):
+                del diags[i_diag]
 
-    gen.label_vertices(G, commands.theory, commands.norm)
+    adg.diag.label_vertices(diags, commands.theory, commands.norm)
 
     if commands.theory == 'BMBPT':
-        diagrams = [bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
-                    for ind, graph in enumerate(G)]
+        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
+                    for ind, graph in enumerate(diags)]
     elif commands.theory == 'MBPT':
-        diagrams = [mbpt.MbptDiagram(graph, ind)
-                    for ind, graph in enumerate(G)]
+        diagrams = [adg.mbpt.MbptDiagram(graph, ind)
+                    for ind, graph in enumerate(diags)]
     return diagrams
 
 
@@ -202,9 +202,9 @@ def create_feynmanmp_files(diagrams, theory, directory, diag_type):
     """Create and move the appropriate feynmanmp files to the right place."""
     for diag in diagrams:
         diag_name = '%s_%i' % (diag_type, diag.tags[0])
-        gen.feynmf_generator(diag.graph,
-                             'MBPT' if diag_type == 'time' else theory,
-                             diag_name)
+        adg.diag.feynmf_generator(diag.graph,
+                                  'MBPT' if diag_type == 'time' else theory,
+                                  diag_name)
         shutil.move('%s.tex' % diag_name,
                     "%s/Diagrams/%s.tex" % (directory, diag_name))
 
@@ -230,10 +230,10 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":
-        bmbpt.write_header(latex_file, commands.with_three_body,
-                           commands.norm, diags_nbs)
+        adg.bmbpt.write_header(latex_file, commands.with_three_body,
+                               commands.norm, diags_nbs)
     elif commands.theory == "MBPT":
-        mbpt.write_header(latex_file, diags_nbs)
+        adg.mbpt.write_header(latex_file, diags_nbs)
 
     latex_file.write("\n\\tableofcontents\n\n")
 

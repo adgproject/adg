@@ -1,4 +1,4 @@
-"""Module containg methods to be called by ADG."""
+"""Routines and class for all types of diagrams, inherited by others."""
 
 import networkx as nx
 
@@ -58,7 +58,7 @@ def check_vertex_degree(matrices, three_body_use, vertex_id):
 
 def topologically_distinct_diagrams(diagrams):
     """Return a list of diagrams all topologically distinct."""
-    import time_structure as tsd
+    import adg.tsd
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
@@ -71,7 +71,8 @@ def topologically_distinct_diagrams(diagrams):
                                              node_match=op_nm)
                 if matcher.is_isomorphic():
                     diagrams[i_diag].tags += diagrams[i_comp_diag].tags
-                    if isinstance(diagrams[i_diag], tsd.TimeStructureDiagram):
+                    if isinstance(diagrams[i_diag],
+                                  adg.tsd.TimeStructureDiagram):
                         diagrams[i_diag].perms.update(
                             diagrams[i_comp_diag].perms)
                         diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
