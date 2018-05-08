@@ -1,4 +1,4 @@
-"""Module containg methods to be called by ADG."""
+"""Routines and class for all types of diagrams, inherited by others."""
 
 import networkx as nx
 

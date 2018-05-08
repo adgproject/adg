@@ -1,7 +1,6 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
 import os
-import string
 import networkx as nx
 import adg.diag
 
@@ -35,7 +34,7 @@ def tree_time_structure_den(time_graph):
     return denominator
 
 
-def equivalent_labelled_TSDs(equivalent_trees, labelled_tsds):
+def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     """Return the list of labelled TSDs corresponding to equivalent TSDs."""
     op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     eq_labelled_tsds = ""
@@ -52,7 +51,7 @@ def equivalent_labelled_TSDs(equivalent_trees, labelled_tsds):
     return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
-def draw_equivalent_tree_TSDs(time_diagram, latex_file):
+def draw_equivalent_tree_tsds(time_diagram, latex_file):
     """Draw the equivalent tree TSDs for a given non-tree TSD."""
     for index, graph in enumerate(time_diagram.equivalent_trees):
         adg.diag.feynmf_generator(graph,
@@ -83,10 +82,10 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
                          % (tdiag.tags[0]+1, tdiag.expr))
         if not tdiag.is_tree:
             latex_file.write("Equivalent tree diagrams: %s\n\n"
-                             % equivalent_labelled_TSDs(tdiag.equivalent_trees,
+                             % equivalent_labelled_tsds(tdiag.equivalent_trees,
                                                         time_diagrams))
             latex_file.write('\n\\begin{center}\n')
-            draw_equivalent_tree_TSDs(tdiag, latex_file)
+            draw_equivalent_tree_tsds(tdiag, latex_file)
             latex_file.write('\n\\end{center}\n\n')
         feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
         latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)

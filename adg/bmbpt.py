@@ -1,4 +1,4 @@
-"""Module containg methods relative to BMBPT, to be called by ADG."""
+"""Routines and class for Bogoliubov MBPT diagrams."""
 
 import copy
 import itertools
@@ -272,7 +272,7 @@ def produce_expressions(diagrams, diagrams_time):
         diag.attribute_expressions(diagrams_time[diag.time_tag])
 
 
-def treat_TSDs(diagrams_time):
+def treat_tsds(diagrams_time):
     """Order TSDs, produce their expressions, return also number of trees."""
     tree_tsds = []
     for i_diag in xrange(len(diagrams_time)-1, -1, -1):
@@ -384,9 +384,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         denominator = time_tree_denominator(
             self.graph,
             nx.relabel_nodes(time_diag.graph,
-                             time_diag.perms[self.tags[0]]
-                             )
-            ) if self.tsd_is_tree else ""
+                             time_diag.perms[self.tags[0]])
+        ) if self.tsd_is_tree else ""
         extra_factor = "" if self.tsd_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"

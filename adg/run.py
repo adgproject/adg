@@ -139,27 +139,27 @@ def generate_diagrams(commands):
         print "Invalid theory!"
     print "Number of possible diagrams, ", len(diagrams)
 
-    G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
-                              parallel_edges=True) for diagram in diagrams]
+    diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
+                                  parallel_edges=True) for diagram in diagrams]
 
-    for i_diag in xrange(len(G)-1, -1, -1):
-        if (nx.number_weakly_connected_components(G[i_diag])) != 1:
-            del G[i_diag]
+    for i_diag in xrange(len(diags)-1, -1, -1):
+        if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
+            del diags[i_diag]
 
     # Specific check for loop diagrams in BMBPT
     if commands.theory == "BMBPT":
-        for i_diag in xrange(len(G)-1, -1, -1):
-            if not nx.is_directed_acyclic_graph(G[i_diag]):
-                del G[i_diag]
+        for i_diag in xrange(len(diags)-1, -1, -1):
+            if not nx.is_directed_acyclic_graph(diags[i_diag]):
+                del diags[i_diag]
 
-    adg.diag.label_vertices(G, commands.theory, commands.norm)
+    adg.diag.label_vertices(diags, commands.theory, commands.norm)
 
     if commands.theory == 'BMBPT':
         diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
-                    for ind, graph in enumerate(G)]
+                    for ind, graph in enumerate(diags)]
     elif commands.theory == 'MBPT':
         diagrams = [adg.mbpt.MbptDiagram(graph, ind)
-                    for ind, graph in enumerate(G)]
+                    for ind, graph in enumerate(diags)]
     return diagrams
 
 

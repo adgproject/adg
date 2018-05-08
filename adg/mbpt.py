@@ -1,4 +1,4 @@
-"""Module containg methods relative to MBPT, to be called by ADG."""
+"""Routines and class for Many-Body Perturbation Theory diagrams."""
 
 import copy
 import itertools

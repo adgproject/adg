@@ -1,5 +1,4 @@
-#!/bin/bash /usr/bin/python
-# -*- coding: utf-8 -*-
+"""Main routine of the Automated Diagram Generator."""
 
 from datetime import datetime
 import adg.run
@@ -25,7 +24,7 @@ def main():
 
     # Start computing everything
     print "Running"
-    START_TIME = datetime.now()
+    start_time = datetime.now()
 
     diagrams = adg.run.generate_diagrams(run_commands)
 
@@ -42,14 +41,14 @@ def main():
         diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                          for diagram in diagrams]
 
-        diagrams_time, nb_tree_TSDs = adg.bmbpt.treat_TSDs(diagrams_time)
+        diagrams_time, nb_tree_tsds = adg.bmbpt.treat_tsds(diagrams_time)
 
         adg.bmbpt.produce_expressions(diagrams, diagrams_time)
 
     else:
         diagrams_time = []
 
-    print "Time ellapsed: ", datetime.now() - START_TIME
+    print "Time ellapsed: ", datetime.now() - start_time
 
     adg.run.print_diags_numbers(run_commands, diags_per_type)
 
@@ -65,7 +64,7 @@ def main():
 
     if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
         adg.tsd.write_section(latex_file, directory, run_commands.draw_diags,
-                              diagrams_time, nb_tree_TSDs)
+                              diagrams_time, nb_tree_tsds)
     for diag in diagrams:
         if run_commands.theory == "BMBPT":
             adg.bmbpt.write_section(latex_file, diag,
