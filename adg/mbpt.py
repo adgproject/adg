@@ -9,7 +9,15 @@ import adg.diag
 
 
 def diagrams_generation(order):
-    """Generate the diagrams for the MBPT case."""
+    """Generate the diagrams for the MBPT case.
+
+    Args:
+        order (int): The perturbative order of interest.
+
+    Returns:
+        (list): A list of NumPy arrays with the diagrams adjacency matrices.
+
+    """
     # Generate all 1-magic square of dimension order
     seeds = [k for k in itertools.permutations(range(order), order)]
     all_matrices = [[[0 if i != j else 1 for i in range(order)]
@@ -35,14 +43,27 @@ def diagrams_generation(order):
 
 
 def write_diag_exp(latex_file, mbpt_diag):
-    """Write the expression associated to a diagram in the LaTeX file."""
+    """Write the expression associated to a diagram in the LaTeX file.
+
+    Args:
+        latex_file (file): The LaTeX output file to be written in.
+        mbpt_diag (MbptDiagram): The diagram which expression is being written.
+
+    """
     latex_file.write("\\begin{equation}\n")
     latex_file.write(mbpt_diag.expr)
     latex_file.write("\\end{equation}\n")
 
 
 def write_header(tex_file, diags_nbs):
-    """Write tha appropriate header for the LaTeX file for MBPT diagrams."""
+    """Write tha appropriate header for the LaTeX file for MBPT diagrams.
+
+    Args:
+        tex_file (file): The LaTeX ouput file to be written in.
+        diags_nbs (dict): A dict with the number of diagrams per
+            excitation level type.
+
+    """
     tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags']
                    + "Singles: %i\n\n" % diags_nbs['singles']
                    + "Doubles: %i\n\n" % diags_nbs['doubles']
@@ -53,7 +74,15 @@ def write_header(tex_file, diags_nbs):
 
 
 def write_section(result, diag, diags_nbs):
-    """Write sections for MBPT result file."""
+    """Write sections for MBPT result file.
+
+    Args:
+        result (file): The LaTeX output file to be written in.
+        diag (MbptDiagram): The diagram to write the infos of.
+        diags_nbs (dict): A dict with the number of diagrams per
+            excitation level type.
+
+    """
     if diag.tags[0] == 0 and diags_nbs['singles'] != 0:
         result.write("\\section{Singles}\n\n")
     elif diag.tags[0] == diags_nbs['singles']:
@@ -74,7 +103,13 @@ def write_section(result, diag, diags_nbs):
 
 
 def print_cd_output(directory, diagrams):
-    """Print a computer-readable file for C. Drischler's framework."""
+    """Print a computer-readable file for C. Drischler's framework.
+
+    Args:
+        diretory (str): The path to the output directory.
+        diagrams (list): All the MbptDiagrams.
+
+    """
     cd_file = open(directory + '/CD_output.txt', 'w')
     conjug_file = open(directory + '/CD_conjug_pairs.list', 'w')
     for diag in diagrams:
@@ -94,7 +129,17 @@ def print_cd_output(directory, diagrams):
 
 
 def order_diagrams(diagrams):
-    """Order the MBPT diagrams and return the number of diags for each type."""
+    """Order the MBPT diagrams and return the number of diags for each type.
+
+    Args:
+        diagrams (list): The unordered redundent MbptDiagrams.
+
+    Returns:
+        (tuple): First element are the ordered, topologically unique
+            MbptDiagrams. Second element is the number of diagrams for each
+            excitation level type.
+
+    """
     singles = []
     doubles = []
     triples = []
@@ -138,7 +183,14 @@ def order_diagrams(diagrams):
 
 
 def attribute_conjugate(diagrams):
-    """Attribute to each diagram its complex conjugate."""
+    """Attribute to each diagram its complex conjugate.
+
+    The diagrams involved in conjugate pairs receive the tag associated to
+    their partner in the ``complex_conjugate`` attribute.
+
+    Args:
+        diagrams (list): The topologically unique MbptDiagrams.
+    """
     for idx, diag1 in enumerate(diagrams):
         if diag1.complex_conjugate == -1:
             for diag2 in diagrams[idx+1:]:
@@ -150,7 +202,17 @@ def attribute_conjugate(diagrams):
 
 
 def extract_cd_denom(start_graph, subgraph):
-    """Extract the appropriate CD denominator using the subgraph rule."""
+    """Extract the appropriate CD denominator using the subgraph rule.
+
+    Args:
+        start_graph (NetworkX MultiDiGraph): The studied graph.
+        subgraph (NetworkX MultiDiGraph): The subgaph for this particular
+            factor.
+
+    Returns:
+        (str): The denominator factor associated to this subgraph.
+
+    """
     denomin = "{" \
         + "".join("%s, "
                   % propa[3]['qp_state']
@@ -170,7 +232,13 @@ class MbptDiagram(adg.diag.Diagram):
     """Describes a MBPT diagram with its related properties."""
 
     def __init__(self, mbpt_graph, tag_num):
-        """Generate a MBPT diagram using the appropriate NetworkX graph."""
+        """Generate a MBPT diagram using the appropriate NetworkX graph.
+
+        Args:
+            mbpt_graph (NetworkX MultiDiGraph): The actual diagram.
+            tag_num (int): The tag number associated to the graph.
+
+        """
         adg.diag.Diagram.__init__(self, mbpt_graph)
         self.tags = [tag_num]
         # Beware of the sign convention !!!
@@ -199,7 +267,12 @@ class MbptDiagram(adg.diag.Diagram):
                                               self.cd_denominator())
 
     def calc_excitation(self):
-        """Return an integer coding for the excitation level of the diag."""
+        """Return an integer coding for the excitation level of the diag.
+
+        Returns:
+            (int): The singles / doubles / etc. character of the graph.
+
+        """
         max_excited_states = 0
         for row in xrange(1, self.graph.number_of_nodes()):
             nb_excited_states = 0
@@ -214,7 +287,12 @@ class MbptDiagram(adg.diag.Diagram):
         return max_excited_states / 2 if max_excited_states != 0 else 2
 
     def count_hole_lines(self):
-        """Return an integer for the number of hole lines in the graph."""
+        """Return an integer for the number of hole lines in the graph.
+
+        Returns:
+            (int): The number of holes in the diagram.
+
+        """
         nb_holes = 0
         for edge in self.graph.edges():
             if edge[0] > edge[1]:
@@ -222,7 +300,15 @@ class MbptDiagram(adg.diag.Diagram):
         return nb_holes
 
     def is_complex_conjug_of(self, test_diagram):
-        """Return True if self and test_diagram are complex conjugate."""
+        """Return True if self and test_diagram are complex conjugate.
+
+        Args:
+            test_diagram (MbptDiagram): A diagram to compare with.
+
+        Return:
+            (bool): The complex conjugate status of the pair of diagrams.
+
+        """
         is_conjug = True
         # Check the adjacency mat against the anti-transposed one of test_diag
         if not np.array_equal(self.adjacency_mat,
@@ -247,7 +333,12 @@ class MbptDiagram(adg.diag.Diagram):
                 prop[3]['qp_state'] = p_labels.pop(0)
 
     def extract_denominator(self):
-        """Return the denominator for a MBPT graph."""
+        """Return the denominator for a MBPT graph.
+
+        Returns:
+            (str): The denominator of the diagram.
+
+        """
         denominator = ""
         graph = self.graph
         for vertex_i in range(1, len(graph)):
@@ -257,7 +348,12 @@ class MbptDiagram(adg.diag.Diagram):
         return denominator
 
     def cd_denominator(self):
-        """Return the CD-formatted denominator of the graph."""
+        """Return the CD-formatted denominator of the graph.
+
+        Return:
+            (str): The graph denominator tailored for C. Drishcler's framework.
+
+        """
         denominator = ""
         graph = self.graph
         for vertex_i in range(1, len(graph)):
@@ -269,7 +365,12 @@ class MbptDiagram(adg.diag.Diagram):
         return denominator.strip(', ')
 
     def extract_numerator(self):
-        """Return the numerator associated to a MBPT graph."""
+        """Return the numerator associated to a MBPT graph.
+
+        Returns:
+            (str): The numerator of the diagram.
+
+        """
         graph = self.graph
         numerator = ""
         for vertex in graph:
@@ -285,7 +386,12 @@ class MbptDiagram(adg.diag.Diagram):
         return numerator
 
     def cd_numerator(self):
-        """Return the numerator under CD format."""
+        """Return the numerator under CD format.
+
+        Returns:
+            (str): The graph numerator tailored for C. Drishcler's framework.
+
+        """
         graph = self.graph
         numerator = ""
         for vertex in graph:
@@ -304,7 +410,12 @@ class MbptDiagram(adg.diag.Diagram):
         return numerator.strip(', ')
 
     def loops_number(self):
-        """Return the number of loops in the diagram as an integer."""
+        """Return the number of loops in the diagram as an integer.
+
+        Returns:
+            (int): The number of loops in the graph.
+
+        """
         nb_loops = 0
         nb_checked_props = 0
         diag = self.graph
