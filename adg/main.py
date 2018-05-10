@@ -29,13 +29,10 @@ def main():
     diagrams = adg.run.generate_diagrams(run_commands)
 
     # Ordering the diagrams in a convenient way and checking them for doubles
-    if run_commands.theory == "BMBPT":
-        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
+    diagrams, diags_per_type = adg.run.order_diagrams(diagrams,
+                                                      run_commands)
 
-    elif run_commands.theory == "MBPT":
-        diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
-
-    # Treatment of the algebraic expressions
+    # Produce TSD for the expressions of BMBPT diagrams
     if run_commands.theory == "BMBPT" and not run_commands.norm:
 
         diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])

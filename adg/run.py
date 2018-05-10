@@ -163,6 +163,17 @@ def generate_diagrams(commands):
     return diagrams
 
 
+def order_diagrams(diagrams, commands):
+    """Return the ordered unique diagrams with a dict of numbers per type."""
+    if commands.theory == "BMBPT":
+        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
+
+    elif commands.theory == "MBPT":
+        diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
+
+    return diagrams, diags_per_type
+
+
 def print_diags_numbers(commands, diags_nbs):
     """Print the number of diagrams for each major type."""
     print "Number of connected diagrams, ", diags_nbs['nb_diags']
