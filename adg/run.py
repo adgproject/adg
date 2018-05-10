@@ -10,7 +10,12 @@ import adg.diag
 
 
 def parse_command_line():
-    """Return a Namespace with the appropriate commands for the run."""
+    """Return run commands from the Command Line Interface.
+
+    Returns:
+        (Namespace): Appropriate commands to manage the program's run.
+
+    """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="AUTOMATIC DIAGRAM GENERATOR\n\n"
@@ -87,7 +92,15 @@ def parse_command_line():
 
 
 def interactive_interface(commands):
-    """Run the interactive interface mode, return the appropriate commands."""
+    """Run the interactive interface mode, return the appropriate commands.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (Namespace): Flags initialized through keyboard input.
+
+    """
     commands.order = int(raw_input('Order of the diagrams?\n'))
     while commands.order < 2:
         print "Perturbative order too small!"
@@ -115,7 +128,15 @@ def interactive_interface(commands):
 
 
 def attribute_directory(commands):
-    """Create missing directories and return the working directory."""
+    """Create missing directories and return the working directory.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (str): Path to the result folder.
+
+    """
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.with_three_body:
         directory += 'with3N'
@@ -129,7 +150,15 @@ def attribute_directory(commands):
 
 
 def generate_diagrams(commands):
-    """Return a list with diagrams of the appropriate type."""
+    """Return a list with diagrams of the appropriate type.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (list): All the diagrams of the appropriate Class and order.
+
+    """
     if commands.theory == "MBPT":
         diagrams = adg.mbpt.diagrams_generation(commands.order)
     elif commands.theory == "BMBPT":
@@ -164,7 +193,17 @@ def generate_diagrams(commands):
 
 
 def order_diagrams(diagrams, commands):
-    """Return the ordered unique diagrams with a dict of numbers per type."""
+    """Return the ordered unique diagrams with a dict of numbers per type.
+
+    Args:
+        diagrams (list): The diagrams of the appropriate Class.
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (tuple): First element is the list of ordered and unique diagrams.
+        Second element is a dict with the number of diagrams per type.
+
+    """
     if commands.theory == "BMBPT":
         diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
 
@@ -175,7 +214,13 @@ def order_diagrams(diagrams, commands):
 
 
 def print_diags_numbers(commands, diags_nbs):
-    """Print the number of diagrams for each major type."""
+    """Print the number of diagrams for each major type.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+        diags_nbs (dict): The number of diagrams for each major type.
+
+    """
     print "Number of connected diagrams, ", diags_nbs['nb_diags']
 
     if commands.theory == "BMBPT":
@@ -202,7 +247,15 @@ def print_diags_numbers(commands, diags_nbs):
 
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
-    """Write FeynMP files for the different diagrams."""
+    """Write FeynMP files for the different diagrams.
+
+    Args:
+        directory (str): Path to the output folder.
+        commands (Namespace): Flags for the run management.
+        diagrams (list): All the diagrams of interest.
+        diagrams_time (list): All the associated TSDs if appropriate.
+
+    """
     create_feynmanmp_files(diagrams, commands.theory, directory, 'diag')
     if commands.draw_tsds:
         create_feynmanmp_files(diagrams_time, commands.theory,
@@ -210,7 +263,15 @@ def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
 
 
 def create_feynmanmp_files(diagrams, theory, directory, diag_type):
-    """Create and move the appropriate feynmanmp files to the right place."""
+    """Create and move the appropriate feynmanmp files to the right place.
+
+    Args:
+        diagrams (list): The studied diagrams.
+        theory (str): Name of the theory of interest.
+        directory (str): Path to the result folder.
+        diag_type (str): Type of studied diagrams used for drawing.
+
+    """
     for diag in diagrams:
         diag_name = '%s_%i' % (diag_type, diag.tags[0])
         adg.diag.feynmf_generator(diag.graph,
@@ -221,7 +282,14 @@ def create_feynmanmp_files(diagrams, theory, directory, diag_type):
 
 
 def write_file_header(latex_file, commands, diags_nbs):
-    """Write the header of the result tex file."""
+    """Write the header of the result tex file.
+
+    Args:
+        latex_file (file): LaTeX output file of the program.
+        commands (Namespace): Fmags to manage the program's run.
+        diags_nbs (dict): Number of diagrams per major type.
+
+    """
     header = "\\documentclass[10pt,a4paper]{article}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
         + "\\usepackage[T1]{fontenc}\n" \
@@ -250,7 +318,13 @@ def write_file_header(latex_file, commands, diags_nbs):
 
 
 def compile_and_clean(directory, pdiag):
-    """Compile result.pdf and delete useless files."""
+    """Compile result.pdf and delete useless files.
+
+    Args:
+        directory (str): Path to the ouput folder.
+        pdiag (bool): ``True`` if one wants to draw the diagrams.
+
+    """
     os.chdir(directory)
     os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     if pdiag:
