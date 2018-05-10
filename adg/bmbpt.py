@@ -9,7 +9,16 @@ import adg.diag
 
 
 def diagrams_generation(p_order, three_body_use):
-    """Generate diagrams for BMBPT from bottom up."""
+    """Generate diagrams for BMBPT from bottom up.
+
+    Args:
+        p_order (int): The conventional order of the studied diagrams.
+        three_body_use (bool): Flag for the use of three-body operators.
+
+    Returns:
+        (list): NumPy arrays encoding the adjacency matrices of the graphs.
+
+    """
     deg_max = 6 if three_body_use else 4
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
@@ -44,7 +53,15 @@ def diagrams_generation(p_order, three_body_use):
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
-    """Exclude some matrices that would spawn unconnected diagrams."""
+    """Exclude some matrices that would spawn unconnected diagrams.
+
+    Args:
+        matrices (list): The adjacency matrices to be checked.
+        max_filled_vertex (int): The furthest vertex until which the matrices
+            have been filled.
+        length_mat (int): The size of the square matrices.
+
+    """
     empty_block = [0 for _ in range(length_mat - max_filled_vertex - 1)]
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         mat = matrices[ind_mat]
@@ -72,13 +89,26 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
 
 
 def attribute_qp_labels(graph):
-    """Attribute the appropriate qp labels to the graph's propagators."""
+    """Attribute the appropriate qp labels to the graph's propagators.
+
+    Args:
+        graph(NetworkX MultiDiGraph): The graph of interest.
+
+    """
     for idx, prop in enumerate(graph.edges(keys=True, data=True)):
         prop[3]['qp_state'] = "k_{%i}" % (idx+1)
 
 
 def extract_numerator(graph):
-    """Return the numerator associated to a BMBPT graph."""
+    """Return the numerator associated to a BMBPT graph.
+
+    Args:
+        graph(NetworkX MultiDiGraph): The graph of interest.
+
+    Returns:
+        (str): The numerator of the graph.
+
+    """
     numerator = ""
     for vertex in graph:
         # Attribute the correct operator to each vertex
@@ -103,7 +133,17 @@ def extract_numerator(graph):
 
 
 def time_tree_denominator(graph, time_graph):
-    """Return the denominator for a time-tree graph."""
+    """Return the denominator for a time-tree graph.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph of interest.
+        time_graph (NetworkX MultiDiGraph): Its associated time-structure
+            graph.
+
+    Returns:
+        (str): The denominator of the graph.
+
+    """
     denominator = ""
     for vertex_i in range(1, len(time_graph)):
         subgraph_stack = [vertex_j
@@ -115,7 +155,15 @@ def time_tree_denominator(graph, time_graph):
 
 
 def extract_integral(diag):
-    """Return the integral part of the Feynman expression of the diag."""
+    """Return the integral part of the Feynman expression of the diag.
+
+    Args:
+        diag (BmbptFeynmanDiagram): The diagram of interest.
+
+    Returns:
+        (str): The integral part of its Feynman expression.
+
+    """
     graph = diag.graph
     pert_vertex_indices = range(1, len(graph))
     integral = "".join("\\mathrm{d}\\tau_%i" % vertex
@@ -136,6 +184,14 @@ def has_crossing_sign(graph):
 
     Use the fact that all lines propagate upwards and the
     canonical representation of the diagrams and vertices.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph of interest.
+
+    Returns:
+        (bool): Encode for the sign factor associated with crossing
+            propagators.
+
     """
     nb_crossings = 0
     for vertex in graph:
@@ -148,7 +204,15 @@ def has_crossing_sign(graph):
 
 
 def multiplicity_symmetry_factor(graph):
-    """Return the symmetry factor associated with propagators multiplicity."""
+    """Return the symmetry factor associated with propagators multiplicity.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph of interest.
+
+    Returns:
+        (str): The symmetry factor associated with equivalent lines.
+
+    """
     factor = ""
     prop_multiplicity = [0 for _ in xrange(6)]
     for vertex_i in graph:
@@ -166,7 +230,15 @@ def multiplicity_symmetry_factor(graph):
 
 
 def vertex_exchange_sym_factor(diag):
-    """Return the symmetry factor associated with vertex exchange."""
+    """Return the symmetry factor associated with vertex exchange.
+
+    Args:
+        diag (BmbptFeynmanDiagram): The diagram of interest.
+
+    Returns:
+        (str): The symmetry factor for vertex exchange.
+
+    """
     # Starts at -2 as the identity belongs to the set of permutations
     factor = -2
     graph = diag.graph
@@ -185,7 +257,14 @@ def vertex_exchange_sym_factor(diag):
 
 
 def write_header(tex_file, three_body_use, norm, diags_nbs):
-    """Write overall header for BMBPT result file."""
+    """Write overall header for BMBPT result file.
+
+    Args:
+        tex_file (file): The ouput LaTeX file of the program.
+        three_body_use (bool): True if one uses three-body operators.
+        diags_nbs (dict): The number of diagrams per type.
+
+    """
     tex_file.write(
         "Valid diagrams: %i\n\n" % diags_nbs['nb_diags']
         + "2N valid diagrams: %i\n\n" % diags_nbs['nb_2']
@@ -212,7 +291,15 @@ def write_header(tex_file, three_body_use, norm, diags_nbs):
 
 
 def write_section(result, diag, commands, diags_nbs):
-    """Write section and subsections for BMBPT result file."""
+    """Write section and subsections for BMBPT result file.
+
+    Args:
+        result (file): The LaTeX output file of the program.
+        diag (BmbptFeynmanDiagram): The diagram of interest.
+        commands (dict): The flags associated with run management.
+        diags_nbs (dict): The number od diagrams per type.
+
+    """
     if diag.tags[0] == 0:
         result.write("\\section{Two-body diagrams}\n\n"
                      + "\\subsection{Two-body energy canonical diagrams}\n\n")
@@ -239,7 +326,14 @@ def write_section(result, diag, commands, diags_nbs):
 
 
 def write_diag_exps(latex_file, bmbpt_diag, norder):
-    """Write the expressions associated to a diagram in the LaTeX file."""
+    """Write the expressions associated to a diagram in the LaTeX file.
+
+    Args:
+        latex_file (file): The LaTeX outputfile of the program.
+        bmbpt_diag (BmbptFeynmanDiagram): The diagram of interest.
+        norder (int): The order in BMBPT formalism.
+
+    """
     latex_file.write("\\begin{align}\n\\text{PO}%i.%i\n" % (norder,
                                                             (bmbpt_diag.tags[0]
                                                              + 1))
@@ -249,7 +343,16 @@ def write_diag_exps(latex_file, bmbpt_diag, norder):
 
 
 def write_vertices_values(latex_file, diag, mapping):
-    """Write the qp energies associated to each vertex of the diag."""
+    """Write the qp energies associated to each vertex of the diag.
+
+    Args:
+        latex_file (file): The LaTeX output file of the program.
+        diag (BmbptFeynmanDiagram): The diagram of interest.
+        mapping (dict): A mapping between the vertices in the diagram and the
+            vertices in its euivalent TSD, since permutations between vertices
+            are possible.
+
+    """
     latex_file.write("\\begin{align*}\n")
     for ind in range(1, len(diag.vert_exp)):
         latex_file.write("a_%i &= %s" % (ind, diag.vert_exp[mapping[ind]]))
@@ -260,7 +363,13 @@ def write_vertices_values(latex_file, diag, mapping):
 
 
 def produce_expressions(diagrams, diagrams_time):
-    """Produce and store the expressions associated to the BMBPT diagrams."""
+    """Produce and store the expressions associated to the BMBPT diagrams.
+
+    Args:
+        diagrams (list): The list of all BmbptFeynmanDiagrams.
+        diagrams_time (list): Their associates TSDs.
+
+    """
     for diag in diagrams:
         attribute_qp_labels(diag.graph)
         for t_diag in diagrams_time:
@@ -272,7 +381,12 @@ def produce_expressions(diagrams, diagrams_time):
 
 
 def treat_tsds(diagrams_time):
-    """Order TSDs, produce their expressions, return also number of trees."""
+    """Order TSDs, produce their expressions, return also number of trees.
+
+    Args:
+        diagrams_time (list): All the associated TSDs.
+
+    """
     tree_tsds = []
     for i_diag in xrange(len(diagrams_time)-1, -1, -1):
         if diagrams_time[i_diag].is_tree:
@@ -296,7 +410,17 @@ def treat_tsds(diagrams_time):
 
 
 def order_diagrams(diagrams):
-    """Order the BMBPT diagrams and return number of diags for each type."""
+    """Order the BMBPT diagrams and return number of diags for each type.
+
+    Args:
+        diagrams (list): Possibly redundant BmbptFeynmanDiagrams.
+
+    Returns:
+        (tuple): First element is the list of topologically unique, ordered
+            diagrams. Second element is a dict with the number of diagrams
+            for each major type.
+
+    """
     diagrams_2_hf = []
     diagrams_2_ehf = []
     diagrams_2_not_hf = []
@@ -354,7 +478,14 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties."""
 
     def __init__(self, nx_graph, use_norm, tag_num):
-        """Generate a BMBPT diagrams using a NetworkX graph."""
+        """Generate a BMBPT diagrams using a NetworkX graph.
+
+        Args:
+            nx_graph (NetworkX MultiDiGraph): The graph of interest.
+            use_norm (bool): ``True`` if we are sturdying norm diagrams.
+            tag_num (int): The tag number associated to the diagram.
+
+        """
         adg.diag.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
@@ -376,7 +507,12 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                     self.hf_type = "EHF"
 
     def attribute_expressions(self, time_diag):
-        """Attribute the correct Feynman and Goldstone expressions."""
+        """Attribute the correct Feynman and Goldstone expressions.
+
+        Args:
+            time_diag (TimeStructureDiagram): The associated TSD.
+
+        """
         self.vert_exp = [self.vertex_expression(vertex)
                          for vertex in self.graph]
         numerator = extract_numerator(self.graph)
@@ -418,7 +554,12 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             else "%s%s%s\n" % (prefactor, numerator, extra_factor)
 
     def vertex_expression(self, vertex):
-        """Return the expression associated to a given vertex."""
+        """Return the expression associated to a given vertex.
+
+        Args:
+            vertex (int): The vertex of interest in the graph.
+
+        """
         expression = r"\epsilon^{" \
             + "".join("%s"
                       % prop[3]['qp_state']
@@ -433,7 +574,15 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         return expression
 
     def write_graph(self, latex_file, directory, write_time):
-        """Write the BMBPT graph and its associated TSD to the LaTeX file."""
+        """Write the BMBPT graph and its associated TSD to the LaTeX file.
+
+        Args:
+            latex_file (file): The LaTeX output file of the program.
+            directory (str): The path to the result folder.
+            write_time (bool): ``True`` if we want informations on the
+                associated TSDs.
+
+        """
         latex_file.write('\n\\begin{center}\n')
         adg.diag.draw_diagram(directory, latex_file, self.tags[0], 'diag')
         if write_time:
@@ -444,7 +593,13 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         latex_file.write('\n\\end{center}\n\n')
 
     def write_tsd_info(self, diagrams_time, latex_file):
-        """Write info related to the BMBPT associated TSD to the LaTeX file."""
+        """Write info related to the BMBPT associated TSD to the LaTeX file.
+
+        Args:
+            diagrams_time (list): The associated TSDs.
+            latex_file (file): The LaTeX output file of the program.
+
+        """
         for tdiag in diagrams_time:
             if self.time_tag == tdiag.tags[0]:
                 time_diag = tdiag
