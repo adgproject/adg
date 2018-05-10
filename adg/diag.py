@@ -4,7 +4,15 @@ import networkx as nx
 
 
 def no_trace(matrices):
-    """Select matrices with full 0 diagonal."""
+    """Select matrices with full 0 diagonal.
+
+    Args:
+        matrices (list): A list of adjacency matrices.
+
+    Returns:
+        (list): The adjacency matrices without non-zero diagonal elements.
+
+    """
     traceless_matrices = []
     for matrix in matrices:
         test_traceless = True
@@ -18,7 +26,12 @@ def no_trace(matrices):
 
 
 def no_loop(matrices):
-    """Select out matrices with loops between two vertices."""
+    """Select out matrices with loops between two vertices.
+
+    Args:
+        matrices (list): The adjacency matrices.
+
+    """
     for i_mat in xrange(len(matrices)-1, -1, -1):
         test_no_loop = True
         matrix = matrices[i_mat]
@@ -32,7 +45,13 @@ def no_loop(matrices):
 
 
 def check_degree(matrices, three_body_use):
-    """Discard matrices with wrong N-body character."""
+    """Discard matrices with wrong N-body character.
+
+    Args:
+        matrices (list): Adjacency matrices.
+        three_body_use (bool): ``True`` if one uses three-body operators.
+
+    """
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         for ind_i in xrange(len(matrix[0])):
@@ -46,7 +65,14 @@ def check_degree(matrices, three_body_use):
 
 
 def check_vertex_degree(matrices, three_body_use, vertex_id):
-    """Check the degree of a specific vertex in a set of matrices."""
+    """Check the degree of a specific vertex in a set of matrices.
+
+    Args:
+        matrices (list): Adjacency matrices.
+        three_body_use (bool): ``True`` if one uses three-body operators.
+        vertex_id (int): The position of the studied vertex.
+
+    """
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
@@ -57,7 +83,15 @@ def check_vertex_degree(matrices, three_body_use, vertex_id):
 
 
 def topologically_distinct_diagrams(diagrams):
-    """Return a list of diagrams all topologically distinct."""
+    """Return a list of diagrams all topologically distinct.
+
+    Args:
+        diagrams (list): The Diagrams of interest.
+
+    Returns:
+        (list): Topologically unique diagrams.
+
+    """
     import adg.tsd
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
@@ -83,7 +117,14 @@ def topologically_distinct_diagrams(diagrams):
 
 
 def label_vertices(graphs_list, theory_type, study_norm):
-    """Account for different status of vertices in operator diagrams."""
+    """Account for different status of vertices in operator diagrams.
+
+    Args:
+        graphs_list (list): The Diagrams of interest.
+        theory_type (str): The name of the theory of interest.
+        study_norm (bool): ``True`` if one studies norm diagrams.
+
+    """
     for graph in graphs_list:
         for node in graph:
             graph.node[node]['operator'] = False
@@ -92,7 +133,14 @@ def label_vertices(graphs_list, theory_type, study_norm):
 
 
 def feynmf_generator(graph, theory_type, diagram_name):
-    """Generate the feynmanmp instructions corresponding to the diagram."""
+    """Generate the feynmanmp instructions corresponding to the diagram.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph of interest.
+        theory_type (str): The name of the theory of interest.
+        diagram_name (str): The name of the studied diagram.
+
+    """
     p_order = graph.number_of_nodes()
     diag_size = 20*p_order
 
@@ -152,7 +200,15 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
 
 def propagator_style(prop_type):
-    """Return the FeynMF definition for the appropriate propagator type."""
+    """Return the FeynMF definition for the appropriate propagator type.
+
+    Args:
+        prop_type (str): The type of propagators used in the diagram.
+
+    Returns:
+        (str): The FeynMF definition for the propagator style used.
+
+    """
     line_styles = {}
 
     line_styles['prop_pm'] = "\\fmfcmd{style_def prop_pm expr p =\n" \
@@ -170,7 +226,15 @@ def propagator_style(prop_type):
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
-    """Copy the diagram feynmanmp instructions in the result file."""
+    """Copy the diagram feynmanmp instructions in the result file.
+
+    Args:
+        directory (str): The path to the output folder.
+        result_file (file): The LaTeX ouput file of the program.
+        diagram_index (int): The number associated to the diagram.
+        diag_type (str): The type of diagram used here.
+
+    """
     diag_file = open(directory+"/Diagrams/%s_%i.tex" % (diag_type,
                                                         diagram_index))
     result_file.write(diag_file.read())
@@ -178,7 +242,15 @@ def draw_diagram(directory, result_file, diagram_index, diag_type):
 
 
 def to_skeleton(graph):
-    """Return the bare skeleton of a graph, i.e. only non-redundant links."""
+    """Return the bare skeleton of a graph, i.e. only non-redundant links.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph to be turned into a skeleton.
+
+    Returns:
+        (NetworkX MultiDiGraph): The skeleton of the initial graph.
+
+    """
     for vertex_a in graph:
         for vertex_b in graph:
             while graph.number_of_edges(vertex_a, vertex_b) > 1:
@@ -190,7 +262,17 @@ def to_skeleton(graph):
 
 
 def extract_denom(start_graph, subgraph):
-    """Extract the appropriate denominator using the subgraph rule."""
+    """Extract the appropriate denominator using the subgraph rule.
+
+    Args:
+        start_graph (NetworkX MultiDiGraph): The studied graph.
+        subgraph (NetworkX MultiDiGraph): The subgraph used for this particular
+            denominator factor.
+
+    Returns:
+        (str): The denominator factor for this subgraph.
+
+    """
     denomin = r"\epsilon^{" \
         + "".join("%s"
                   % propa[3]['qp_state']
@@ -211,7 +293,12 @@ class Diagram(object):
     """Describes a diagram with its related properties."""
 
     def __init__(self, nx_graph):
-        """Generate a Diagram object starting from the NetworkX graph."""
+        """Generate a Diagram object starting from the NetworkX graph.
+
+        Args:
+            nx_graph (NetworkX MultiDiGraph): The graph of interest.
+
+        """
         self.graph = nx_graph
         self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
@@ -222,7 +309,14 @@ class Diagram(object):
         self.tags = [0]
 
     def write_graph(self, latex_file, directory, write_time):
-        """Write the graph of the diagram to the LaTeX file."""
+        """Write the graph of the diagram to the LaTeX file.
+
+        Args:
+            latex_file (file): The LaTeX ouput file of the program.
+            directory (str): Path to the result folder.
+            write_time (bool): (Here to emulate polymorphism).
+
+        """
         latex_file.write('\n\\begin{center}\n')
         draw_diagram(directory, latex_file, self.tags[0], 'diag')
         latex_file.write('\n\\end{center}\n\n')
