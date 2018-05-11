@@ -36,6 +36,15 @@ setup(
         "numpy",
     ],
     python_requires='>=2.7.1',
+    extras_require=dict(
+        # List additional groups of dependencies here (e.g. development
+        # dependencies). You can install these using the following syntax:
+        # $ pip install -e .[develop]
+        develop=[
+            "sphinx",
+            'sphinx_rtd_theme',
+        ]
+    ),
     classifiers=[
         'Operating System :: MacOS',
         'Operating System :: POSIX',
@@ -56,6 +65,17 @@ setup(
     ],
     packages=[
         "adg",
+    ],
+    data_files=[
+
+        ("share/doc/adg/", [
+            "README.md",
+        ]),
+
+        ("share/man/man1", [
+            "doc/build/man/adg.1",
+        ]),
+
     ],
     entry_points=dict(
         console_scripts=[
