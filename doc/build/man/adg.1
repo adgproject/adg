@@ -145,9 +145,7 @@ adg \-h
 .fi
 .UNINDENT
 .UNINDENT
-.SH ADG REFERENCE
-.SS ADG Reference
-.SS ADG module
+.SH ADG REFERENCE FOR DEVELOPERS
 .SS Main script
 .sp
 Main routine of the Automated Diagram Generator.
@@ -541,7 +539,7 @@ Routines and class for Many\-Body Perturbation Theory diagrams.
 .INDENT 0.0
 .TP
 .B class adg.mbpt.MbptDiagram(mbpt_graph, tag_num)
-Bases: \fI\%adg.diag.Diagram\fP
+Bases: \fBadg.diag.Diagram\fP
 .sp
 Describes a MBPT diagram with its related properties.
 .INDENT 7.0
@@ -822,7 +820,7 @@ Routines and class for Bogoliubov MBPT diagrams.
 .INDENT 0.0
 .TP
 .B class adg.bmbpt.BmbptFeynmanDiagram(nx_graph, use_norm, tag_num)
-Bases: \fI\%adg.diag.Diagram\fP
+Bases: \fBadg.diag.Diagram\fP
 .sp
 Describes a BMBPT Feynman diagram with its related properties.
 .INDENT 7.0
@@ -1163,7 +1161,7 @@ Module with functions relative to time\-stucture diagrams, called by ADG.
 .INDENT 0.0
 .TP
 .B class adg.tsd.TimeStructureDiagram(bmbpt_diag, tag_num)
-Bases: \fI\%adg.diag.Diagram\fP
+Bases: \fBadg.diag.Diagram\fP
 .sp
 Describes a time\-structure diagram with its related properties.
 .INDENT 7.0

@@ -12,7 +12,7 @@ Welcome to ADG - Automated Diagram Generator's documentation!
    project
    install
    use
-   modules
+   adg_ref
    contributors
    citing
    license
