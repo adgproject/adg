@@ -19,13 +19,11 @@ If you want to install ADG in ``develop`` mode, then run
 
 Dependencies
 ------------
-In order to run the code, you will need a Python install >= 2.7.1
+In order to run the code, you will need a Python install >= 2.7.1 and the
+following Python libraries:
 
-  - Python libraries:
-
-  	* networkx >= 2.0
-    
-    * numpy
+  - networkx >= 2.0
+  - numpy
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,

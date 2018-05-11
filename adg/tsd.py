@@ -6,7 +6,15 @@ import adg.diag
 
 
 def time_structure_graph(graph):
-    """Return the time-structure graph associated to the graph."""
+    """Return the time-structure graph associated to the graph.
+
+    Args:
+        graph (NetwrokX MultiDiGraph): The BMBPT graph of interest.
+
+    Returns:
+        (NetworkX MultiDiGraph): The time-structure diagram.
+
+    """
     time_graph = graph.to_directed()
     if time_graph.node[0]['operator']:
         for vertex in xrange(1, len(time_graph)):
@@ -15,7 +23,15 @@ def time_structure_graph(graph):
 
 
 def tree_time_structure_den(time_graph):
-    """Return the denominator associated to a tree time-structure graph."""
+    """Return the denominator associated to a tree time-structure graph.
+
+    Args:
+        time_graph (NetworkX MultiDiGraph): The TSD of interest.
+
+    Returns:
+        (str): The denominator associated to the TSD.
+
+    """
     denominator = ""
     i = 0
     for vertex in time_graph:
@@ -35,7 +51,16 @@ def tree_time_structure_den(time_graph):
 
 
 def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
-    """Return the list of labelled TSDs corresponding to equivalent TSDs."""
+    """Return the list of labelled TSDs corresponding to equivalent TSDs.
+
+    Args:
+        equivalent_trees (list): The equivalent tree TSDs of a non-tree TSD.
+        labelled_tsds (list): The labelled TSDs obtained from BMBPT diagrams.
+
+    Returns:
+        (str): The list of tag numbers of the equivalent TSDs.
+
+    """
     op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
     eq_labelled_tsds = ""
     for eq_tree_graph in equivalent_trees:
@@ -52,7 +77,13 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
 
 
 def draw_equivalent_tree_tsds(time_diagram, latex_file):
-    """Draw the equivalent tree TSDs for a given non-tree TSD."""
+    """Draw the equivalent tree TSDs for a given non-tree TSD.
+
+    Args:
+        time_diagram (TimeStructureDiagram): The TSD of interest.
+        latex_file (file): The output LaTeX file of the priogram.
+
+    """
     for index, graph in enumerate(time_diagram.equivalent_trees):
         adg.diag.feynmf_generator(graph,
                                   'MBPT',
@@ -65,7 +96,16 @@ def draw_equivalent_tree_tsds(time_diagram, latex_file):
 
 
 def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
-    """Write the appropriate section for tsd diagrams in the LaTeX file."""
+    """Write the appropriate section for tsd diagrams in the LaTeX file.
+
+    Args:
+        latex_file (file): The LaTeX output file of the program.
+        directory (str): Path to the output folder.
+        pdiag (bool): ``True`` if diagrams are to be drawn.
+        time_diagrams (list): The ensemble of TSDs.
+        nb_tree_tsds (int): Number of tree TSDs.
+
+    """
     latex_file.write("\\section{Time-structure diagrams}\n\n"
                      + "\\subsection{Tree diagrams}\n\n")
     for tdiag in time_diagrams:
@@ -92,7 +132,15 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
 
 
 def treat_cycles(time_graph):
-    """Find and treat cycles in a TSD diagram."""
+    """Find and treat cycles in a TSD diagram.
+
+    Args:
+        time_graph (NetworkX MultiDiGraph): a time-structure diagram.
+
+    Returns:
+        (list): The unique tree TSDs associated to a non-tree TSD.
+
+    """
     graphs = [time_graph]
     tree_graphs = []
     cycles_left = True
@@ -121,7 +169,17 @@ def treat_cycles(time_graph):
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
-    """Separate a cycle in a sum of tree diagrams."""
+    """Separate a cycle in a sum of tree diagrams.
+
+    Args:
+        time_graph (NetworkXn MultiDiGraph): A time-structure diagram.
+        cycle_nodes (tuple): Integers encoding the positions of the end nodes
+            of the cycle.
+
+    Returns:
+        (list): New graphs produced from treating the cycles in the TSD.
+
+    """
     paths = list(nx.all_simple_paths(time_graph,
                                      cycle_nodes[0],
                                      cycle_nodes[1]))
@@ -141,7 +199,15 @@ def disentangle_cycle(time_graph, cycle_nodes):
 
 
 def find_cycle(graph):
-    """Return start and end nodes for an elementary cycle."""
+    """Return start and end nodes for an elementary cycle.
+
+    Args:
+        graph (NetworkX MultiDiGraph): A TSD with cycle(s) to be treated.
+
+    Returns:
+        (tuple): Positions of the two end nodes of a cycle in the graph.
+
+    """
     cycle_found = False
     for node_a in (node for node in graph if graph.out_degree(node) >= 2):
         for node_b in (node for node in graph if graph.in_degree(node) >= 2):
@@ -163,7 +229,14 @@ class TimeStructureDiagram(adg.diag.Diagram):
     """Describes a time-structure diagram with its related properties."""
 
     def __init__(self, bmbpt_diag, tag_num):
-        """Generate a tsd diagram out of a BMBPT one."""
+        """Generate a tsd diagram out of a BMBPT one.
+
+        Args:
+            bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph used to be
+                turned into a TSD.
+            tag_num (int): The number associated to the TSD.
+
+        """
         adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
         self.tags = [tag_num]
         self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
