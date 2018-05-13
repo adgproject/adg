@@ -154,31 +154,6 @@ def time_tree_denominator(graph, time_graph):
     return denominator
 
 
-def extract_integral(diag):
-    """Return the integral part of the Feynman expression of the diag.
-
-    Args:
-        diag (BmbptFeynmanDiagram): The diagram of interest.
-
-    Returns:
-        (str): The integral part of its Feynman expression.
-
-    """
-    graph = diag.graph
-    pert_vertex_indices = range(1, len(graph))
-    integral = "".join("\\mathrm{d}\\tau_%i" % vertex
-                       for vertex in pert_vertex_indices)
-    if len(graph) > 2:
-        for vertex_i in pert_vertex_indices:
-            integral += "".join("\\theta(\\tau_%i-\\tau_%i) " % (vertex_j,
-                                                                 vertex_i)
-                                for vertex_j in pert_vertex_indices
-                                if graph.has_edge(vertex_i, vertex_j))
-    integral += "".join("e^{-\\tau_%i %s}" % (vertex, diag.vert_exp[vertex])
-                        for vertex in pert_vertex_indices)
-    return integral
-
-
 def has_crossing_sign(graph):
     """Return True if there's a minus sign associated with crossing propagators.
 
@@ -229,33 +204,6 @@ def multiplicity_symmetry_factor(graph):
     return factor
 
 
-def vertex_exchange_sym_factor(diag):
-    """Return the symmetry factor associated with vertex exchange.
-
-    Args:
-        diag (BmbptFeynmanDiagram): The diagram of interest.
-
-    Returns:
-        (str): The symmetry factor for vertex exchange.
-
-    """
-    # Starts at -2 as the identity belongs to the set of permutations
-    factor = -2
-    graph = diag.graph
-    perm_vertices = [vertex for vertex, degrees
-                     in enumerate(diag.unsort_io_degrees)
-                     if graph.node[vertex]['operator'] is False
-                     and diag.unsort_io_degrees.count(degrees) >= 2]
-    for permutation in itertools.permutations(perm_vertices):
-        permuted_graph = nx.relabel_nodes(graph,
-                                          dict(zip(perm_vertices,
-                                                   permutation)),
-                                          copy=True)
-        if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
-            factor += 2
-    return "%i" % factor if factor != 0 else ""
-
-
 def write_header(tex_file, three_body_use, norm, diags_nbs):
     """Write overall header for BMBPT result file.
 
@@ -288,78 +236,6 @@ def write_header(tex_file, three_body_use, norm, diags_nbs):
                 % diags_nbs['nb_3_ehf'])
         tex_file.write(
             "3N non-canonical diagrams: %i\n\n" % diags_nbs['nb_3_not_hf'])
-
-
-def write_section(result, diag, commands, diags_nbs):
-    """Write section and subsections for BMBPT result file.
-
-    Args:
-        result (file): The LaTeX output file of the program.
-        diag (BmbptFeynmanDiagram): The diagram of interest.
-        commands (dict): The flags associated with run management.
-        diags_nbs (dict): The number od diagrams per type.
-
-    """
-    if diag.tags[0] == 0:
-        result.write("\\section{Two-body diagrams}\n\n"
-                     + "\\subsection{Two-body energy canonical diagrams}\n\n")
-    elif (diag.tags[0] == diags_nbs['nb_2_hf']) and (not commands.norm):
-        result.write("\\subsection{Two-body canonical diagrams " +
-                     "for a generic operator only}\n\n")
-    elif diag.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
-        result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
-    if commands.with_three_body:
-        if diag.tags[0] == diags_nbs['nb_2']:
-            result.write(
-                "\\section{Three-body diagrams}\n\n"
-                + "\\subsection{Three-body energy canonical diagrams}\n\n")
-        elif (diag.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']) \
-                and (not commands.norm):
-            result.write("\\subsection{Three-body canonical diagrams " +
-                         "for a generic operator only}\n\n")
-        elif diag.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
-                + diags_nbs['nb_3_ehf']:
-            result.write("\\subsection{Three-body non-canonical diagrams}\n\n")
-    result.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
-    if not commands.norm:
-        write_diag_exps(result, diag, commands.order)
-
-
-def write_diag_exps(latex_file, bmbpt_diag, norder):
-    """Write the expressions associated to a diagram in the LaTeX file.
-
-    Args:
-        latex_file (file): The LaTeX outputfile of the program.
-        bmbpt_diag (BmbptFeynmanDiagram): The diagram of interest.
-        norder (int): The order in BMBPT formalism.
-
-    """
-    latex_file.write("\\begin{align}\n\\text{PO}%i.%i\n" % (norder,
-                                                            (bmbpt_diag.tags[0]
-                                                             + 1))
-                     + "&= %s" % bmbpt_diag.feynman_exp
-                     + r" \nonumber \\" + "\n"
-                     + "&= %s\\end{align}\n" % bmbpt_diag.diag_exp)
-
-
-def write_vertices_values(latex_file, diag, mapping):
-    """Write the qp energies associated to each vertex of the diag.
-
-    Args:
-        latex_file (file): The LaTeX output file of the program.
-        diag (BmbptFeynmanDiagram): The diagram of interest.
-        mapping (dict): A mapping between the vertices in the diagram and the
-            vertices in its euivalent TSD, since permutations between vertices
-            are possible.
-
-    """
-    latex_file.write("\\begin{align*}\n")
-    for ind in range(1, len(diag.vert_exp)):
-        latex_file.write("a_%i &= %s" % (ind, diag.vert_exp[mapping[ind]]))
-        if ind != len(diag.vert_exp)-1:
-            latex_file.write(r"\\")
-        latex_file.write('\n')
-    latex_file.write("\\end{align*}\n")
 
 
 def produce_expressions(diagrams, diagrams_time):
@@ -538,7 +414,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         sym_fact = ""
         for vertex_degrees in self.unsort_io_degrees:
             if self.unsort_io_degrees.count(vertex_degrees) >= 2:
-                sym_fact += vertex_exchange_sym_factor(self)
+                sym_fact += self.vertex_exchange_sym_factor()
                 break
         sym_fact += multiplicity_symmetry_factor(self.graph)
         prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
@@ -546,7 +422,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         # Set the Feynman and Goldstone expressions
         self.feynman_exp = \
             "\\lim\\limits_{\\tau \\to \\infty}%s%s\\int_{0}^{\\tau}%s\n" \
-            % (prefactor, numerator, extract_integral(self))
+            % (prefactor, numerator, self.extract_integral())
         self.diag_exp = \
             "%s\\frac{%s}{%s} %s\n" % (prefactor, numerator,
                                        denominator, extra_factor) \
@@ -607,4 +483,115 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         latex_file.write(
             "\\begin{equation}\n\\text{T}%i = " % (self.time_tag + 1)
             + "%s\\end{equation}\n" % time_diag.expr)
-        write_vertices_values(latex_file, self, time_diag.perms[self.tags[0]])
+        self.write_vertices_values(latex_file, time_diag.perms[self.tags[0]])
+
+    def write_section(self, result, commands, diags_nbs):
+        """Write section and subsections for BMBPT result file.
+
+        Args:
+            result (file): The LaTeX output file of the program.
+            commands (dict): The flags associated with run management.
+            diags_nbs (dict): The number od diagrams per type.
+
+        """
+        if self.tags[0] == 0:
+            result.write(
+                "\\section{Two-body diagrams}\n\n"
+                + "\\subsection{Two-body energy canonical diagrams}\n\n")
+        elif (self.tags[0] == diags_nbs['nb_2_hf']) and (not commands.norm):
+            result.write("\\subsection{Two-body canonical diagrams " +
+                         "for a generic operator only}\n\n")
+        elif self.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
+            result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
+        if commands.with_three_body:
+            if self.tags[0] == diags_nbs['nb_2']:
+                result.write(
+                    "\\section{Three-body diagrams}\n\n"
+                    + "\\subsection{Three-body energy canonical diagrams}\n\n")
+            elif (self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']) \
+                    and (not commands.norm):
+                result.write("\\subsection{Three-body canonical diagrams " +
+                             "for a generic operator only}\n\n")
+            elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
+                    + diags_nbs['nb_3_ehf']:
+                result.write(
+                    "\\subsection{Three-body non-canonical diagrams}\n\n")
+        result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
+        if not commands.norm:
+            self.write_diag_exps(result, commands.order)
+
+    def write_vertices_values(self, latex_file, mapping):
+        """Write the qp energies associated to each vertex of the diag.
+
+        Args:
+            latex_file (file): The LaTeX output file of the program.
+            mapping (dict): A mapping between the vertices in the diagram and
+                the vertices in its euivalent TSD, since permutations between
+                vertices are possible.
+
+        """
+        latex_file.write("\\begin{align*}\n")
+        for ind in range(1, len(self.vert_exp)):
+            latex_file.write("a_%i &= %s" % (ind, self.vert_exp[mapping[ind]]))
+            if ind != len(self.vert_exp)-1:
+                latex_file.write(r"\\")
+            latex_file.write('\n')
+        latex_file.write("\\end{align*}\n")
+
+    def write_diag_exps(self, latex_file, norder):
+        """Write the expressions associated to a diagram in the LaTeX file.
+
+        Args:
+            latex_file (file): The LaTeX outputfile of the program.
+            norder (int): The order in BMBPT formalism.
+
+        """
+        latex_file.write(
+            "\\begin{align}\n\\text{PO}%i.%i\n" % (norder, (self.tags[0] + 1))
+            + "&= %s" % self.feynman_exp
+            + r" \nonumber \\" + "\n"
+            + "&= %s\\end{align}\n" % self.diag_exp)
+
+    def vertex_exchange_sym_factor(self):
+        """Return the symmetry factor associated with vertex exchange.
+
+        Returns:
+            (str): The symmetry factor for vertex exchange.
+
+        """
+        # Starts at -2 as the identity belongs to the set of permutations
+        factor = -2
+        graph = self.graph
+        perm_vertices = [vertex for vertex, degrees
+                         in enumerate(self.unsort_io_degrees)
+                         if graph.node[vertex]['operator'] is False
+                         and self.unsort_io_degrees.count(degrees) >= 2]
+        for permutation in itertools.permutations(perm_vertices):
+            permuted_graph = nx.relabel_nodes(graph,
+                                              dict(zip(perm_vertices,
+                                                       permutation)),
+                                              copy=True)
+            if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
+                factor += 2
+        return "%i" % factor if factor != 0 else ""
+
+    def extract_integral(self):
+        """Return the integral part of the Feynman expression of the diag.
+
+        Returns:
+            (str): The integral part of its Feynman expression.
+
+        """
+        pert_vertex_indices = range(1, len(self.graph))
+        integral = "".join("\\mathrm{d}\\tau_%i" % vertex
+                           for vertex in pert_vertex_indices)
+        if len(pert_vertex_indices) > 1:
+            for vertex_i in pert_vertex_indices:
+                integral += "".join("\\theta(\\tau_%i-\\tau_%i) " % (vertex_j,
+                                                                     vertex_i)
+                                    for vertex_j in pert_vertex_indices
+                                    if self.graph.has_edge(vertex_i, vertex_j))
+        integral += "".join("e^{-\\tau_%i %s}"
+                            % (vertex, self.vert_exp[vertex])
+                            for vertex in pert_vertex_indices)
+        return integral

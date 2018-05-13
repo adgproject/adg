@@ -63,11 +63,7 @@ def main():
         adg.tsd.write_section(latex_file, directory, run_commands.draw_diags,
                               diagrams_time, nb_tree_tsds)
     for diag in diagrams:
-        if run_commands.theory == "BMBPT":
-            adg.bmbpt.write_section(latex_file, diag,
-                                    run_commands, diags_per_type)
-        elif run_commands.theory == "MBPT":
-            adg.mbpt.write_section(latex_file, diag, diags_per_type)
+        diag.write_section(latex_file, run_commands, diags_per_type)
 
         if run_commands.draw_diags:
             diag.write_graph(latex_file, directory, run_commands.draw_tsds)

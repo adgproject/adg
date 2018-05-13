@@ -73,35 +73,6 @@ def write_header(tex_file, diags_nbs):
                    % diags_nbs['quintuples+'])
 
 
-def write_section(result, diag, diags_nbs):
-    """Write sections for MBPT result file.
-
-    Args:
-        result (file): The LaTeX output file to be written in.
-        diag (MbptDiagram): The diagram to write the infos of.
-        diags_nbs (dict): A dict with the number of diagrams per
-            excitation level type.
-
-    """
-    if diag.tags[0] == 0 and diags_nbs['singles'] != 0:
-        result.write("\\section{Singles}\n\n")
-    elif diag.tags[0] == diags_nbs['singles']:
-        result.write("\\section{Doubles}\n\n")
-    elif diag.tags[0] == diags_nbs['singles'] + diags_nbs['doubles']:
-        result.write("\\section{Triples}\n\n")
-    elif diag.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
-                          + diags_nbs['triples']):
-        result.write("\\section{Quadruples}\n\n")
-    elif diag.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
-                          + diags_nbs['triples'] + diags_nbs['quadruples']):
-        result.write("\\section{Quintuples and higher}\n\n")
-    result.write("\\paragraph{Diagram %i:}\n" % (diag.tags[0] + 1))
-    if diag.complex_conjugate >= 0:
-        result.write("Complex conjugate diagram: %i\n"
-                     % (diag.complex_conjugate + 1))
-    write_diag_exp(result, diag)
-
-
 def print_cd_output(directory, diagrams):
     """Print a computer-readable file for C. Drischler's framework.
 
@@ -434,3 +405,32 @@ class MbptDiagram(adg.diag.Diagram):
                                            data=True))[left_right_label]
             nb_loops += 1
         return nb_loops
+
+    def write_section(self, result, commands, diags_nbs):
+        """Write sections for MBPT result file.
+
+        Args:
+            result (file): The LaTeX output file to be written in.
+            commands (dict): The flags associated with run management.
+            diags_nbs (dict): A dict with the number of diagrams per
+                excitation level type.
+
+        """
+        if self.tags[0] == 0 and diags_nbs['singles'] != 0:
+            result.write("\\section{Singles}\n\n")
+        elif self.tags[0] == diags_nbs['singles']:
+            result.write("\\section{Doubles}\n\n")
+        elif self.tags[0] == diags_nbs['singles'] + diags_nbs['doubles']:
+            result.write("\\section{Triples}\n\n")
+        elif self.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
+                              + diags_nbs['triples']):
+            result.write("\\section{Quadruples}\n\n")
+        elif self.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
+                              + diags_nbs['triples']
+                              + diags_nbs['quadruples']):
+            result.write("\\section{Quintuples and higher}\n\n")
+        result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
+        if self.complex_conjugate >= 0:
+            result.write("Complex conjugate diagram: %i\n"
+                         % (self.complex_conjugate + 1))
+        write_diag_exp(result, self)
