@@ -76,25 +76,6 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
-def draw_equivalent_tree_tsds(time_diagram, latex_file):
-    """Draw the equivalent tree TSDs for a given non-tree TSD.
-
-    Args:
-        time_diagram (TimeStructureDiagram): The TSD of interest.
-        latex_file (file): The output LaTeX file of the priogram.
-
-    """
-    for index, graph in enumerate(time_diagram.equivalent_trees):
-        adg.diag.feynmf_generator(graph,
-                                  'MBPT',
-                                  'equivalent%i_%i' % (time_diagram.tags[0],
-                                                       index))
-        diag_file = open("equivalent%i_%i.tex" % (time_diagram.tags[0], index))
-        latex_file.write(diag_file.read())
-        diag_file.close()
-        os.unlink("./equivalent%i_%i.tex" % (time_diagram.tags[0], index))
-
-
 def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
     """Write the appropriate section for tsd diagrams in the LaTeX file.
 
@@ -125,47 +106,10 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
                              % equivalent_labelled_tsds(tdiag.equivalent_trees,
                                                         time_diagrams))
             latex_file.write('\n\\begin{center}\n')
-            draw_equivalent_tree_tsds(tdiag, latex_file)
+            tdiag.draw_equivalent_tree_tsds(latex_file)
             latex_file.write('\n\\end{center}\n\n')
         feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
         latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
-
-
-def treat_cycles(time_graph):
-    """Find and treat cycles in a TSD diagram.
-
-    Args:
-        time_graph (NetworkX MultiDiGraph): a time-structure diagram.
-
-    Returns:
-        (list): The unique tree TSDs associated to a non-tree TSD.
-
-    """
-    graphs = [time_graph]
-    tree_graphs = []
-    cycles_left = True
-    while cycles_left:
-        for gr_index in xrange(len(graphs)-1, -1, -1):
-            graphs += disentangle_cycle(graphs[gr_index],
-                                        find_cycle(graphs[gr_index]))
-            del graphs[gr_index]
-        cycles_left = False
-        for graph_indx in xrange(len(graphs)-1, -1, -1):
-            if nx.is_arborescence(graphs[graph_indx]):
-                tree_graphs.append(graphs[graph_indx])
-                del graphs[graph_indx]
-            else:
-                cycles_left = True
-    tree_graphs_uniq = []
-    for t_graph in tree_graphs:
-        new_graph = True
-        for t_graph_uniq in tree_graphs_uniq:
-            if nx.edges(t_graph) == nx.edges(t_graph_uniq):
-                new_graph = False
-                break
-        if new_graph:
-            tree_graphs_uniq.append(t_graph)
-    return tree_graphs_uniq
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
@@ -225,6 +169,35 @@ def find_cycle(graph):
     return cycle_nodes
 
 
+def treat_tsds(diagrams_time):
+    """Order TSDs, produce their expressions, return also number of trees.
+
+    Args:
+        diagrams_time (list): All the associated TSDs.
+
+    """
+    tree_tsds = []
+    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
+        if diagrams_time[i_diag].is_tree:
+            tree_tsds.append(diagrams_time[i_diag])
+            del diagrams_time[i_diag]
+
+    adg.diag.topologically_distinct_diagrams(tree_tsds)
+    adg.diag.topologically_distinct_diagrams(diagrams_time)
+
+    diagrams_time = tree_tsds + diagrams_time
+
+    for index, t_diag in enumerate(diagrams_time):
+        t_diag.tags.insert(0, index)
+        if not t_diag.is_tree:
+            t_diag.equivalent_trees = t_diag.treat_cycles()
+            t_diag.expr = " + ".join("\\frac{1}{%s}"
+                                     % adg.tsd.tree_time_structure_den(graph)
+                                     for graph
+                                     in t_diag.equivalent_trees)
+    return diagrams_time, len(tree_tsds)
+
+
 class TimeStructureDiagram(adg.diag.Diagram):
     """Describes a time-structure diagram with its related properties."""
 
@@ -247,3 +220,53 @@ class TimeStructureDiagram(adg.diag.Diagram):
         else:
             self.is_tree = False
             self.expr = ""
+
+    def treat_cycles(self):
+        """Find and treat cycles in a TSD diagram.
+
+        Returns:
+            (list): The unique tree TSDs associated to a non-tree TSD.
+
+        """
+        graphs = [self.graph]
+        tree_graphs = []
+        cycles_left = True
+        while cycles_left:
+            for gr_index in xrange(len(graphs)-1, -1, -1):
+                graphs += disentangle_cycle(graphs[gr_index],
+                                            find_cycle(graphs[gr_index]))
+                del graphs[gr_index]
+            cycles_left = False
+            for graph_indx in xrange(len(graphs)-1, -1, -1):
+                if nx.is_arborescence(graphs[graph_indx]):
+                    tree_graphs.append(graphs[graph_indx])
+                    del graphs[graph_indx]
+                else:
+                    cycles_left = True
+        tree_graphs_uniq = []
+        for t_graph in tree_graphs:
+            new_graph = True
+            for t_graph_uniq in tree_graphs_uniq:
+                if nx.edges(t_graph) == nx.edges(t_graph_uniq):
+                    new_graph = False
+                    break
+            if new_graph:
+                tree_graphs_uniq.append(t_graph)
+        return tree_graphs_uniq
+
+    def draw_equivalent_tree_tsds(self, latex_file):
+        """Draw the equivalent tree TSDs for a given non-tree TSD.
+
+        Args:
+            latex_file (file): The output LaTeX file of the priogram.
+
+        """
+        for index, graph in enumerate(self.equivalent_trees):
+            adg.diag.feynmf_generator(graph,
+                                      'MBPT',
+                                      'equivalent%i_%i' % (self.tags[0],
+                                                           index))
+            diag_file = open("equivalent%i_%i.tex" % (self.tags[0], index))
+            latex_file.write(diag_file.read())
+            diag_file.close()
+            os.unlink("./equivalent%i_%i.tex" % (self.tags[0], index))

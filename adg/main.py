@@ -38,7 +38,7 @@ def main():
         diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                          for diagram in diagrams]
 
-        diagrams_time, nb_tree_tsds = adg.bmbpt.treat_tsds(diagrams_time)
+        diagrams_time, nb_tree_tsds = adg.tsd.treat_tsds(diagrams_time)
 
         adg.bmbpt.produce_expressions(diagrams, diagrams_time)
 

@@ -88,122 +88,6 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
                 del matrices[ind_mat]
 
 
-def attribute_qp_labels(graph):
-    """Attribute the appropriate qp labels to the graph's propagators.
-
-    Args:
-        graph(NetworkX MultiDiGraph): The graph of interest.
-
-    """
-    for idx, prop in enumerate(graph.edges(keys=True, data=True)):
-        prop[3]['qp_state'] = "k_{%i}" % (idx+1)
-
-
-def extract_numerator(graph):
-    """Return the numerator associated to a BMBPT graph.
-
-    Args:
-        graph(NetworkX MultiDiGraph): The graph of interest.
-
-    Returns:
-        (str): The numerator of the graph.
-
-    """
-    numerator = ""
-    for vertex in graph:
-        # Attribute the correct operator to each vertex
-        numerator += "O" if graph.node[vertex]['operator'] else "\\Omega"
-        # Attribute the good "type number" to each vertex
-        numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
-                                    graph.in_degree(vertex))
-        # First add the qp states corresponding to propagators going out
-        numerator += "".join(prop[3]['qp_state']
-                             for prop
-                             in graph.out_edges(vertex, keys=True, data=True))
-        # Add the qp states corresponding to propagators coming in
-        previous_vertex = vertex - 1
-        while previous_vertex >= 0:
-            numerator += "".join(
-                prop[3]['qp_state']
-                for prop in graph.in_edges(vertex, keys=True, data=True)
-                if prop[0] == previous_vertex)
-            previous_vertex -= 1
-        numerator += "} "
-    return numerator
-
-
-def time_tree_denominator(graph, time_graph):
-    """Return the denominator for a time-tree graph.
-
-    Args:
-        graph (NetworkX MultiDiGraph): The graph of interest.
-        time_graph (NetworkX MultiDiGraph): Its associated time-structure
-            graph.
-
-    Returns:
-        (str): The denominator of the graph.
-
-    """
-    denominator = ""
-    for vertex_i in range(1, len(time_graph)):
-        subgraph_stack = [vertex_j
-                          for vertex_j in nx.descendants(time_graph, vertex_i)]
-        subgraph_stack.append(vertex_i)
-        subdiag = graph.subgraph(subgraph_stack)
-        denominator += "%s\\ " % adg.diag.extract_denom(graph, subdiag)
-    return denominator
-
-
-def has_crossing_sign(graph):
-    """Return True if there's a minus sign associated with crossing propagators.
-
-    Use the fact that all lines propagate upwards and the
-    canonical representation of the diagrams and vertices.
-
-    Args:
-        graph (NetworkX MultiDiGraph): The graph of interest.
-
-    Returns:
-        (bool): Encode for the sign factor associated with crossing
-            propagators.
-
-    """
-    nb_crossings = 0
-    for vertex in graph:
-        for propagator in graph.out_edges(vertex, keys=True):
-            for vertex_ante in xrange(propagator[0]):
-                for vertex_post in xrange(propagator[0]+1, propagator[1]):
-                    nb_crossings += graph.number_of_edges(vertex_ante,
-                                                          vertex_post)
-    return nb_crossings % 2 == 1
-
-
-def multiplicity_symmetry_factor(graph):
-    """Return the symmetry factor associated with propagators multiplicity.
-
-    Args:
-        graph (NetworkX MultiDiGraph): The graph of interest.
-
-    Returns:
-        (str): The symmetry factor associated with equivalent lines.
-
-    """
-    factor = ""
-    prop_multiplicity = [0 for _ in xrange(6)]
-    for vertex_i in graph:
-        for vertex_j in graph:
-            if graph.number_of_edges(vertex_i, vertex_j) >= 2:
-                prop_multiplicity[graph.number_of_edges(
-                    vertex_i, vertex_j) - 1] += 1
-
-    for prop_id, multiplicity in enumerate(prop_multiplicity):
-        if multiplicity == 1:
-            factor += "(%i!)" % (prop_id+1)
-        elif multiplicity >= 2:
-            factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
-    return factor
-
-
 def write_header(tex_file, three_body_use, norm, diags_nbs):
     """Write overall header for BMBPT result file.
 
@@ -247,42 +131,13 @@ def produce_expressions(diagrams, diagrams_time):
 
     """
     for diag in diagrams:
-        attribute_qp_labels(diag.graph)
+        diag.attribute_qp_labels()
         for t_diag in diagrams_time:
             if diag.tags[0] in t_diag.tags[1:]:
                 diag.time_tag = t_diag.tags[0]
                 diag.tsd_is_tree = t_diag.is_tree
                 break
         diag.attribute_expressions(diagrams_time[diag.time_tag])
-
-
-def treat_tsds(diagrams_time):
-    """Order TSDs, produce their expressions, return also number of trees.
-
-    Args:
-        diagrams_time (list): All the associated TSDs.
-
-    """
-    tree_tsds = []
-    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
-        if diagrams_time[i_diag].is_tree:
-            tree_tsds.append(diagrams_time[i_diag])
-            del diagrams_time[i_diag]
-
-    adg.diag.topologically_distinct_diagrams(tree_tsds)
-    adg.diag.topologically_distinct_diagrams(diagrams_time)
-
-    diagrams_time = tree_tsds + diagrams_time
-
-    for index, t_diag in enumerate(diagrams_time):
-        t_diag.tags.insert(0, index)
-        if not t_diag.is_tree:
-            t_diag.equivalent_trees = adg.tsd.treat_cycles(t_diag.graph)
-            t_diag.expr = " + ".join("\\frac{1}{%s}"
-                                     % adg.tsd.tree_time_structure_den(graph)
-                                     for graph
-                                     in t_diag.equivalent_trees)
-    return diagrams_time, len(tree_tsds)
 
 
 def order_diagrams(diagrams):
@@ -391,34 +246,33 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """
         self.vert_exp = [self.vertex_expression(vertex)
                          for vertex in self.graph]
-        numerator = extract_numerator(self.graph)
-        denominator = time_tree_denominator(
-            self.graph,
-            nx.relabel_nodes(time_diag.graph,
-                             time_diag.perms[self.tags[0]])
+        numerator = self.extract_numerator()
+        denominator = self.time_tree_denominator(
+            nx.relabel_nodes(time_diag.graph, time_diag.perms[self.tags[0]])
         ) if self.tsd_is_tree else ""
+
         extra_factor = "" if self.tsd_is_tree \
             else "\\left[" \
             + " + ".join("\\frac{1}{%s}"
-                         % time_tree_denominator(
-                             self.graph,
-                             nx.relabel_nodes(
-                                 equi_t_graph,
-                                 time_diag.perms[self.tags[0]]))
+                         % self.time_tree_denominator(
+                             nx.relabel_nodes(equi_t_graph,
+                                              time_diag.perms[self.tags[0]]))
                          for equi_t_graph in time_diag.equivalent_trees) \
             + " \\right]"
+
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (len(self.graph) - 1)
-        if has_crossing_sign(self.graph):
+        if self.has_crossing_sign():
             prefactor = "-%s" % prefactor
         sym_fact = ""
         for vertex_degrees in self.unsort_io_degrees:
             if self.unsort_io_degrees.count(vertex_degrees) >= 2:
                 sym_fact += self.vertex_exchange_sym_factor()
                 break
-        sym_fact += multiplicity_symmetry_factor(self.graph)
+        sym_fact += self.multiplicity_symmetry_factor()
         prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
             if sym_fact != "" else "%s\\sum_{k_i}" % prefactor
+
         # Set the Feynman and Goldstone expressions
         self.feynman_exp = \
             "\\lim\\limits_{\\tau \\to \\infty}%s%s\\int_{0}^{\\tau}%s\n" \
@@ -595,3 +449,102 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                             % (vertex, self.vert_exp[vertex])
                             for vertex in pert_vertex_indices)
         return integral
+
+    def attribute_qp_labels(self):
+        """Attribute the appropriate qp labels to the graph's propagators."""
+        for idx, prop in enumerate(self.graph.edges(keys=True, data=True)):
+            prop[3]['qp_state'] = "k_{%i}" % (idx+1)
+
+    def extract_numerator(self):
+        """Return the numerator associated to a BMBPT graph.
+
+        Returns:
+            (str): The numerator of the graph.
+
+        """
+        graph = self.graph
+        numerator = ""
+        for vertex in graph:
+            # Attribute the correct operator to each vertex
+            numerator += "O" if graph.node[vertex]['operator'] else "\\Omega"
+            # Attribute the good "type number" to each vertex
+            numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
+                                        graph.in_degree(vertex))
+            # First add the qp states corresponding to propagators going out
+            numerator += "".join(prop[3]['qp_state']
+                                 for prop
+                                 in graph.out_edges(vertex,
+                                                    keys=True, data=True))
+            # Add the qp states corresponding to propagators coming in
+            previous_vertex = vertex - 1
+            while previous_vertex >= 0:
+                numerator += "".join(
+                    prop[3]['qp_state']
+                    for prop in graph.in_edges(vertex, keys=True, data=True)
+                    if prop[0] == previous_vertex)
+                previous_vertex -= 1
+            numerator += "} "
+        return numerator
+
+    def has_crossing_sign(self):
+        """Return True for a minus sign associated with crossing propagators.
+
+        Use the fact that all lines propagate upwards and the
+        canonical representation of the diagrams and vertices.
+
+        Returns:
+            (bool): Encode for the sign factor associated with crossing
+                propagators.
+
+        """
+        nb_crossings = 0
+        for vertex in self.graph:
+            for propagator in self.graph.out_edges(vertex, keys=True):
+                for vertex_ante in xrange(propagator[0]):
+                    for vertex_post in xrange(propagator[0]+1, propagator[1]):
+                        nb_crossings += self.graph.number_of_edges(vertex_ante,
+                                                                   vertex_post)
+        return nb_crossings % 2 == 1
+
+    def multiplicity_symmetry_factor(self):
+        """Return the symmetry factor associated with propagators multiplicity.
+
+        Returns:
+            (str): The symmetry factor associated with equivalent lines.
+
+        """
+        factor = ""
+        prop_multiplicity = [0 for _ in xrange(6)]
+        for vertex_i in self.graph:
+            for vertex_j in self.graph:
+                if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:
+                    prop_multiplicity[self.graph.number_of_edges(
+                        vertex_i, vertex_j) - 1] += 1
+
+        for prop_id, multiplicity in enumerate(prop_multiplicity):
+            if multiplicity == 1:
+                factor += "(%i!)" % (prop_id+1)
+            elif multiplicity >= 2:
+                factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
+        return factor
+
+    def time_tree_denominator(self, time_graph):
+        """Return the denominator for a time-tree graph.
+
+        Args:
+            time_graph (NetworkX MultiDiGraph): Its associated time-structure
+                graph.
+
+        Returns:
+            (str): The denominator of the graph.
+
+        """
+        denominator = ""
+        for vertex_i in range(1, len(time_graph)):
+            subgraph_stack = [vertex_j for vertex_j
+                              in nx.descendants(time_graph, vertex_i)]
+            subgraph_stack.append(vertex_i)
+            subdiag = self.graph.subgraph(subgraph_stack)
+            denominator += "%s\\ " % adg.diag.extract_denom(self.graph,
+                                                            subdiag)
+        return denominator
