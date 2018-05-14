@@ -27,6 +27,35 @@ Finally, to obtain more information on all the available flags, use
   adg -h
 
 
+CLI options
+-----------
+
+Generic options:
+*****************
+
+-o, --order         order of the diagrams (>=2)
+-t, --theory        theory of interest: MBPT or BMBPT
+-i, --interactive   execute ADG in interactive mode
+
+BMBPT options:
+**************
+
+-n, --norm              study norm BMBPT diagrams instead of operator ones
+-3N, --with_three_body  use two and three-body forces for BMBPT diagrams
+-dt, --draw_tsds        draw Time-Structure Diagrams
+
+MBPT option:
+************
+
+-cd, --cd_output  produce output for C. Drischler's framework
+
+Run management options:
+***********************
+
+-d, --draw_diags  draw the diagrams using FeynMF
+-c, --compile     compile the LaTeX output file with PDFLaTeX
+
+
 Output files
 ------------
 
