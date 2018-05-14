@@ -143,7 +143,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'ADG.tex',
      u'ADG - Automated Diagram Generator Documentation',
-     u'Pierre Arthuis, Raphaël-David Lasseri', 'manual'),
+     u'ADG Developers', 'manual'),
 ]
 
 
