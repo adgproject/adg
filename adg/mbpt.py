@@ -77,7 +77,7 @@ def print_cd_output(directory, diagrams):
     """Print a computer-readable file for C. Drischler's framework.
 
     Args:
-        diretory (str): The path to the output directory.
+        directory (str): The path to the output directory.
         diagrams (list): All the MbptDiagrams.
 
     """
@@ -92,11 +92,6 @@ def print_cd_output(directory, diagrams):
     cd_file.write('\n')
     cd_file.close()
     conjug_file.close()
-    with open(directory+"/CD_adj_matrices.list", "w") as mat_file:
-        for idx, diagram in enumerate(diagrams):
-            mat_file.write("Diagram n: %i\n" % (idx + 1))
-            np.savetxt(mat_file, diagram.adjacency_mat, fmt='%d')
-            mat_file.write("\n")
 
 
 def order_diagrams(diagrams):

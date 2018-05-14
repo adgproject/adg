@@ -1,5 +1,6 @@
 """Routines and class for all types of diagrams, inherited by others."""
 
+import numpy
 import networkx as nx
 
 
@@ -287,6 +288,21 @@ def extract_denom(start_graph, subgraph):
                   if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
         + "}"
     return denomin
+
+
+def print_adj_matrices(directory, diagrams):
+    """Print a computer-readable file with the diagrams' adjacency matrices.
+
+    Args:
+        directory (str): The path to the output directory.
+        diagrams (list): All the diagrams.
+
+    """
+    with open(directory+"/CD_adj_matrices.list", "w") as mat_file:
+        for idx, diagram in enumerate(diagrams):
+            mat_file.write("Diagram n: %i\n" % (idx + 1))
+            numpy.savetxt(mat_file, diagram.adjacency_mat, fmt='%d')
+            mat_file.write("\n")
 
 
 class Diagram(object):

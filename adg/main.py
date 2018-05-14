@@ -74,6 +74,8 @@ def main():
     latex_file.write("\\end{document}")
     latex_file.close()
 
+    adg.diag.print_adj_matrices(directory, diagrams)
+
     # Produce an output adapted to Christian Drischler's format
     if run_commands.cd_output:
         adg.mbpt.print_cd_output(directory, diagrams)
