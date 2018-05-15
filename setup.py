@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""Installation script for the Automated Diagaram Generator.
+
+You can install the program either by running
+    pip install <folder>
+or
+    python setup.py install
+"""
 
 
 import sys
