@@ -323,6 +323,7 @@ class Diagram(object):
         self.io_degrees = sorted(self.unsort_io_degrees)
         self.max_degree = self.degrees[-1]
         self.tags = [0]
+        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the graph of the diagram to the LaTeX file.
