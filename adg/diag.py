@@ -298,7 +298,7 @@ def print_adj_matrices(directory, diagrams):
         diagrams (list): All the diagrams.
 
     """
-    with open(directory+"/CD_adj_matrices.list", "w") as mat_file:
+    with open(directory+"/adjacency_matrices.txt", "w") as mat_file:
         for idx, diagram in enumerate(diagrams):
             mat_file.write("Diagram n: %i\n" % (idx + 1))
             numpy.savetxt(mat_file, diagram.adjacency_mat, fmt='%d')
