@@ -286,7 +286,7 @@ def write_file_header(latex_file, commands, diags_nbs):
 
     Args:
         latex_file (file): LaTeX output file of the program.
-        commands (Namespace): Fmags to manage the program's run.
+        commands (Namespace): Flags to manage the program's run.
         diags_nbs (dict): Number of diagrams per major type.
 
     """
@@ -317,8 +317,8 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("\n\\tableofcontents\n\n")
 
 
-def compile_and_clean(directory, pdiag):
-    """Compile result.pdf and delete useless files.
+def compile_manager(directory, pdiag):
+    """Compile the program's LaTeX ouput file.
 
     Args:
         directory (str): Path to the ouput folder.
@@ -330,9 +330,32 @@ def compile_and_clean(directory, pdiag):
     if pdiag:
         # Second compilation needed
         os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
+    os.chdir("../..")
+    print "Result saved in %s/result.pdf" % directory
+
+
+def clean_folders(directory, commands):
+    """Delete temporary files and folders.
+
+    Args:
+        directory (str): Path to the ouput folder.
+        commands (Namespace): Flags to manage the program's run.
+
+    """
+    os.chdir(directory)
+    if commands.draw_diags:
+        # Remove the temporary Diagrams folder
+        shutil.rmtree('Diagrams')
         # Get rid of undesired feynmp files to keep a clean directory
         for filename in os.listdir('.'):
             if filename.startswith("time") or filename.startswith("diag") \
                     or filename.startswith("equivalent"):
                 os.unlink(filename)
-    print "Result saved in %s/result.pdf" % directory
+
+    if commands.compile:
+        # Remove LaTeX auxiliary files
+        os.unlink("result.aux")
+        os.unlink("result.log")
+        os.unlink("result.out")
+        os.unlink("result.toc")
+    os.chdir("../..")
