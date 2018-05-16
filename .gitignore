@@ -1,4 +1,6 @@
 *
 !*.py
 !.gitignore
-
+!.rst
+!.sh
+!.md

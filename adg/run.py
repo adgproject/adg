@@ -4,13 +4,18 @@ import os
 import argparse
 import shutil
 import networkx as nx
-import mbpt
-import bmbpt
-import generic_diag as gen
+import adg.mbpt
+import adg.bmbpt
+import adg.diag
 
 
 def parse_command_line():
-    """Return a Namespace with the appropriate commands for the run."""
+    """Return run commands from the Command Line Interface.
+
+    Returns:
+        (Namespace): Appropriate commands to manage the program's run.
+
+    """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="AUTOMATIC DIAGRAM GENERATOR\n\n"
@@ -72,7 +77,7 @@ def parse_command_line():
                                    or (args.theory is None)):
         print "\nPlease either run the interactive mode, or the batch mode by"
         print "providing the theory and the order for the desired diagrams.\n"
-        print "Use 'python2 adg.py -h' for help.\n"
+        print "Use 'adg -h' for help.\n"
         exit()
 
     # Avoid conflicting flags
@@ -87,7 +92,15 @@ def parse_command_line():
 
 
 def interactive_interface(commands):
-    """Run the interactive interface mode, return the appropriate commands."""
+    """Run the interactive interface mode, return the appropriate commands.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (Namespace): Flags initialized through keyboard input.
+
+    """
     commands.order = int(raw_input('Order of the diagrams?\n'))
     while commands.order < 2:
         print "Perturbative order too small!"
@@ -115,7 +128,15 @@ def interactive_interface(commands):
 
 
 def attribute_directory(commands):
-    """Create missing directories and return the working directory."""
+    """Create missing directories and return the working directory.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (str): Path to the result folder.
+
+    """
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.with_three_body:
         directory += 'with3N'
@@ -129,42 +150,77 @@ def attribute_directory(commands):
 
 
 def generate_diagrams(commands):
-    """Return a list with diagrams of the appropriate type."""
+    """Return a list with diagrams of the appropriate type.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (list): All the diagrams of the appropriate Class and order.
+
+    """
     if commands.theory == "MBPT":
-        diagrams = mbpt.diagrams_generation(commands.order)
+        diagrams = adg.mbpt.diagrams_generation(commands.order)
     elif commands.theory == "BMBPT":
-        diagrams = bmbpt.diagrams_generation(commands.order,
-                                             commands.with_three_body)
+        diagrams = adg.bmbpt.diagrams_generation(commands.order,
+                                                 commands.with_three_body)
     else:
         print "Invalid theory!"
     print "Number of possible diagrams, ", len(diagrams)
 
-    G = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
-                              parallel_edges=True) for diagram in diagrams]
+    diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
+                                  parallel_edges=True) for diagram in diagrams]
 
-    for i_diag in xrange(len(G)-1, -1, -1):
-        if (nx.number_weakly_connected_components(G[i_diag])) != 1:
-            del G[i_diag]
+    for i_diag in xrange(len(diags)-1, -1, -1):
+        if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
+            del diags[i_diag]
 
     # Specific check for loop diagrams in BMBPT
     if commands.theory == "BMBPT":
-        for i_diag in xrange(len(G)-1, -1, -1):
-            if not nx.is_directed_acyclic_graph(G[i_diag]):
-                del G[i_diag]
+        for i_diag in xrange(len(diags)-1, -1, -1):
+            if not nx.is_directed_acyclic_graph(diags[i_diag]):
+                del diags[i_diag]
 
-    gen.label_vertices(G, commands.theory, commands.norm)
+    adg.diag.label_vertices(diags, commands.theory, commands.norm)
 
     if commands.theory == 'BMBPT':
-        diagrams = [bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
-                    for ind, graph in enumerate(G)]
+        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
+                    for ind, graph in enumerate(diags)]
     elif commands.theory == 'MBPT':
-        diagrams = [mbpt.MbptDiagram(graph, ind)
-                    for ind, graph in enumerate(G)]
+        diagrams = [adg.mbpt.MbptDiagram(graph, ind)
+                    for ind, graph in enumerate(diags)]
     return diagrams
 
 
+def order_diagrams(diagrams, commands):
+    """Return the ordered unique diagrams with a dict of numbers per type.
+
+    Args:
+        diagrams (list): The diagrams of the appropriate Class.
+        commands (Namespace): Flags for the run management.
+
+    Returns:
+        (tuple): First element is the list of ordered and unique diagrams.
+        Second element is a dict with the number of diagrams per type.
+
+    """
+    if commands.theory == "BMBPT":
+        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
+
+    elif commands.theory == "MBPT":
+        diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
+
+    return diagrams, diags_per_type
+
+
 def print_diags_numbers(commands, diags_nbs):
-    """Print the number of diagrams for each major type."""
+    """Print the number of diagrams for each major type.
+
+    Args:
+        commands (Namespace): Flags for the run management.
+        diags_nbs (dict): The number of diagrams for each major type.
+
+    """
     print "Number of connected diagrams, ", diags_nbs['nb_diags']
 
     if commands.theory == "BMBPT":
@@ -191,9 +247,15 @@ def print_diags_numbers(commands, diags_nbs):
 
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
-    """Write FeynMP files for the different diagrams."""
-    shutil.copy('feynmp.mp', directory + '/feynmp.mp')
-    shutil.copy('feynmp.sty', directory + '/feynmp.sty')
+    """Write FeynMP files for the different diagrams.
+
+    Args:
+        directory (str): Path to the output folder.
+        commands (Namespace): Flags for the run management.
+        diagrams (list): All the diagrams of interest.
+        diagrams_time (list): All the associated TSDs if appropriate.
+
+    """
     create_feynmanmp_files(diagrams, commands.theory, directory, 'diag')
     if commands.draw_tsds:
         create_feynmanmp_files(diagrams_time, commands.theory,
@@ -201,18 +263,33 @@ def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
 
 
 def create_feynmanmp_files(diagrams, theory, directory, diag_type):
-    """Create and move the appropriate feynmanmp files to the right place."""
+    """Create and move the appropriate feynmanmp files to the right place.
+
+    Args:
+        diagrams (list): The studied diagrams.
+        theory (str): Name of the theory of interest.
+        directory (str): Path to the result folder.
+        diag_type (str): Type of studied diagrams used for drawing.
+
+    """
     for diag in diagrams:
         diag_name = '%s_%i' % (diag_type, diag.tags[0])
-        gen.feynmf_generator(diag.graph,
-                             'MBPT' if diag_type == 'time' else theory,
-                             diag_name)
+        adg.diag.feynmf_generator(diag.graph,
+                                  'MBPT' if diag_type == 'time' else theory,
+                                  diag_name)
         shutil.move('%s.tex' % diag_name,
                     "%s/Diagrams/%s.tex" % (directory, diag_name))
 
 
 def write_file_header(latex_file, commands, diags_nbs):
-    """Write the header of the result tex file."""
+    """Write the header of the result tex file.
+
+    Args:
+        latex_file (file): LaTeX output file of the program.
+        commands (Namespace): Flags to manage the program's run.
+        diags_nbs (dict): Number of diagrams per major type.
+
+    """
     header = "\\documentclass[10pt,a4paper]{article}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
         + "\\usepackage[T1]{fontenc}\n" \
@@ -232,24 +309,53 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":
-        bmbpt.write_header(latex_file, commands.with_three_body,
-                           commands.norm, diags_nbs)
+        adg.bmbpt.write_header(latex_file, commands.with_three_body,
+                               commands.norm, diags_nbs)
     elif commands.theory == "MBPT":
-        mbpt.write_header(latex_file, diags_nbs)
+        adg.mbpt.write_header(latex_file, diags_nbs)
 
     latex_file.write("\n\\tableofcontents\n\n")
 
 
-def compile_and_clean(directory, pdiag):
-    """Compile result.pdf and delete useless files."""
+def compile_manager(directory, pdiag):
+    """Compile the program's LaTeX ouput file.
+
+    Args:
+        directory (str): Path to the ouput folder.
+        pdiag (bool): ``True`` if one wants to draw the diagrams.
+
+    """
     os.chdir(directory)
     os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     if pdiag:
         # Second compilation needed
         os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
+    os.chdir("../..")
+    print "Result saved in %s/result.pdf" % directory
+
+
+def clean_folders(directory, commands):
+    """Delete temporary files and folders.
+
+    Args:
+        directory (str): Path to the ouput folder.
+        commands (Namespace): Flags to manage the program's run.
+
+    """
+    os.chdir(directory)
+    if commands.draw_diags:
+        # Remove the temporary Diagrams folder
+        shutil.rmtree('Diagrams')
         # Get rid of undesired feynmp files to keep a clean directory
         for filename in os.listdir('.'):
             if filename.startswith("time") or filename.startswith("diag") \
                     or filename.startswith("equivalent"):
                 os.unlink(filename)
-    print "Result saved in %s/result.pdf" % directory
+
+    if commands.compile:
+        # Remove LaTeX auxiliary files
+        os.unlink("result.aux")
+        os.unlink("result.log")
+        os.unlink("result.out")
+        os.unlink("result.toc")
+    os.chdir("../..")
