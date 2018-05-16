@@ -1,0 +1,36 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Time-structure diagrams}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Tree diagrams}{1}{subsection.1.1}
+\contentsline {paragraph}{Time-structure diagram T1:}{1}{section*.2}
+\contentsline {paragraph}{Time-structure diagram T2:}{2}{section*.3}
+\contentsline {section}{\numberline {2}Two-body diagrams}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Two-body energy canonical diagrams}{2}{subsection.2.1}
+\contentsline {paragraph}{Diagram 1:}{2}{section*.4}
+\contentsline {subsection}{\numberline {2.2}Two-body canonical diagrams for a generic operator only}{2}{subsection.2.2}
+\contentsline {paragraph}{Diagram 2:}{2}{section*.5}
+\contentsline {subsection}{\numberline {2.3}Two-body non-canonical diagrams}{3}{subsection.2.3}
+\contentsline {paragraph}{Diagram 3:}{3}{section*.6}
+\contentsline {paragraph}{Diagram 4:}{3}{section*.7}
+\contentsline {paragraph}{Diagram 5:}{4}{section*.8}
+\contentsline {paragraph}{Diagram 6:}{4}{section*.9}
+\contentsline {paragraph}{Diagram 7:}{4}{section*.10}
+\contentsline {paragraph}{Diagram 8:}{5}{section*.11}
+\contentsline {section}{\numberline {3}Three-body diagrams}{5}{section.3}
+\contentsline {subsection}{\numberline {3.1}Three-body energy canonical diagrams}{5}{subsection.3.1}
+\contentsline {paragraph}{Diagram 9:}{5}{section*.12}
+\contentsline {paragraph}{Diagram 10:}{6}{section*.13}
+\contentsline {paragraph}{Diagram 11:}{6}{section*.14}
+\contentsline {paragraph}{Diagram 12:}{7}{section*.15}
+\contentsline {paragraph}{Diagram 13:}{7}{section*.16}
+\contentsline {paragraph}{Diagram 14:}{7}{section*.17}
+\contentsline {paragraph}{Diagram 15:}{8}{section*.18}
+\contentsline {subsection}{\numberline {3.2}Three-body canonical diagrams for a generic operator only}{8}{subsection.3.2}
+\contentsline {paragraph}{Diagram 16:}{8}{section*.19}
+\contentsline {paragraph}{Diagram 17:}{9}{section*.20}
+\contentsline {paragraph}{Diagram 18:}{9}{section*.21}
+\contentsline {subsection}{\numberline {3.3}Three-body non-canonical diagrams}{10}{subsection.3.3}
+\contentsline {paragraph}{Diagram 19:}{10}{section*.22}
+\contentsline {paragraph}{Diagram 20:}{10}{section*.23}
+\contentsline {paragraph}{Diagram 21:}{10}{section*.24}
+\contentsline {paragraph}{Diagram 22:}{11}{section*.25}
+\contentsline {paragraph}{Diagram 23:}{11}{section*.26}

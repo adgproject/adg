@@ -1,0 +1,1461 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hyperindex=true]{hyperref}\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{feynmp-auto}
+\usepackage[landscape]{geometry}
+\title{Diagrams and algebraic expressions at order 4 in MBPT}
+\author{RDL, JR, PA, MD, AT, TD, JPE}
+
+\begin{document}
+
+\maketitle
+
+Valid diagrams: 39
+
+Singles: 4
+
+Doubles: 12
+
+Triples: 16
+
+Quadruples: 7
+
+Quintuples and higher excitation levels: 0
+
+
+\tableofcontents
+
+\section{Singles}
+
+\paragraph{Diagram 1:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{5-3}\sum{\dfrac{v_{abij} v_{ijak} v_{kclm} v_{lmbc} }{\epsilon^{ij}_{ab}\ \epsilon^{k}_{b}\ \epsilon^{lm}_{bc}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_0}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,left=0.5}{v3,v2}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 2:}
+Complex conjugate diagram: 3
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-3}\sum{\dfrac{v_{abij} v_{ijak} v_{cdbl} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{k}_{b}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_1}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,left=0.5}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,left=0.5}{v2,v3}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 3:}
+Complex conjugate diagram: 2
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-3}\sum{\dfrac{v_{abij} v_{icab} v_{jdkl} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{j}_{c}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_2}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.5}{v0,v1}
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,left=0.5}{v3,v2}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 4:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{3-3}\sum{\dfrac{v_{abij} v_{icab} v_{deck} v_{jkde} }{\epsilon^{ij}_{ab}\ \epsilon^{j}_{c}\ \epsilon^{jk}_{de}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_3}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.5}{v0,v1}
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v2,v3}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\section{Doubles}
+
+\paragraph{Diagram 5:}
+\begin{equation}
+\dfrac{1}{16}(-1)^{6-2}\sum{\dfrac{v_{abij} v_{ijkl} v_{klmn} v_{mnab} }{\epsilon^{ij}_{ab}\ \epsilon^{kl}_{ab}\ \epsilon^{mn}_{ab}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_4}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v3}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,left=0.5}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,left=0.5}{v3,v2}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 6:}
+Complex conjugate diagram: 8
+\begin{equation}
+\dfrac{1}{2}(-1)^{5-3}\sum{\dfrac{v_{abij} v_{ijkl} v_{kcam} v_{lmbc} }{\epsilon^{ij}_{ab}\ \epsilon^{kl}_{ab}\ \epsilon^{lm}_{bc}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_5}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 7:}
+Complex conjugate diagram: 14
+\begin{equation}
+\dfrac{1}{16}(-1)^{4-2}\sum{\dfrac{v_{abij} v_{ijkl} v_{cdab} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{kl}_{ab}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_6}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,left=0.5}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,left=0.5}{v2,v3}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,left=0.6}{v3,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 8:}
+Complex conjugate diagram: 6
+\begin{equation}
+\dfrac{1}{2}(-1)^{5-3}\sum{\dfrac{v_{abij} v_{icak} v_{jklm} v_{lmbc} }{\epsilon^{ij}_{ab}\ \epsilon^{jk}_{bc}\ \epsilon^{lm}_{bc}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_7}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,left=0.5}{v3,v2}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 9:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-4}\sum{\dfrac{v_{abik} v_{icaj} v_{jdcl} v_{klbd} }{\epsilon^{ik}_{ab}\ \epsilon^{jk}_{cb}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_8}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 10:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-3}\sum{\dfrac{v_{abij} v_{icak} v_{jdcl} v_{klbd} }{\epsilon^{ij}_{ab}\ \epsilon^{jk}_{cb}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_9}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 11:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-3}\sum{\dfrac{v_{abik} v_{icaj} v_{jdbl} v_{klcd} }{\epsilon^{ik}_{ab}\ \epsilon^{jk}_{bc}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_10}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 12:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-4}\sum{\dfrac{v_{abij} v_{icak} v_{jdbl} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{jk}_{bc}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_11}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 13:}
+Complex conjugate diagram: 15
+\begin{equation}
+\dfrac{1}{2}(-1)^{3-3}\sum{\dfrac{v_{abij} v_{icak} v_{debc} v_{jkde} }{\epsilon^{ij}_{ab}\ \epsilon^{jk}_{bc}\ \epsilon^{jk}_{de}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_12}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.5}{v1,v0}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v2,v3}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 14:}
+Complex conjugate diagram: 7
+\begin{equation}
+\dfrac{1}{16}(-1)^{4-2}\sum{\dfrac{v_{abij} v_{cdab} v_{ijkl} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{ij}_{cd}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_13}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.5}{v0,v1}
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,left=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,left=0.6}{v2,v0}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,left=0.5}{v3,v2}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 15:}
+Complex conjugate diagram: 13
+\begin{equation}
+\dfrac{1}{2}(-1)^{3-3}\sum{\dfrac{v_{abij} v_{cdab} v_{ieck} v_{jkde} }{\epsilon^{ij}_{ab}\ \epsilon^{ij}_{cd}\ \epsilon^{jk}_{de}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_14}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.5}{v0,v1}
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.5}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 16:}
+\begin{equation}
+\dfrac{1}{16}(-1)^{2-2}\sum{\dfrac{v_{abij} v_{cdab} v_{efcd} v_{ijef} }{\epsilon^{ij}_{ab}\ \epsilon^{ij}_{cd}\ \epsilon^{ij}_{ef}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_15}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.5}{v0,v1}
+\fmf{half_prop,right=0.5}{v0,v1}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v2,v3}
+\fmf{half_prop,right=0.5}{v2,v3}
+\fmf{half_prop,left=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v0}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\section{Triples}
+
+\paragraph{Diagram 17:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{5-1}\sum{\dfrac{v_{abil} v_{icjk} v_{jkcm} v_{lmab} }{\epsilon^{il}_{ab}\ \epsilon^{jkl}_{cab}\ \epsilon^{lm}_{ab}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_16}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v3}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,right=0.75}{v3,v0}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 18:}
+\begin{equation}
+\dfrac{1}{2}(-1)^{5-1}\sum{\dfrac{v_{abij} v_{ickl} v_{jkcm} v_{lmab} }{\epsilon^{ij}_{ab}\ \epsilon^{jkl}_{cab}\ \epsilon^{lm}_{ab}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_17}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v3}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 19:}
+\begin{equation}
+\dfrac{1}{2}(-1)^{5-3}\sum{\dfrac{v_{abil} v_{icjk} v_{jkam} v_{lmbc} }{\epsilon^{il}_{ab}\ \epsilon^{jkl}_{abc}\ \epsilon^{lm}_{bc}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_18}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,left=0.5}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 20:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{5-1}\sum{\dfrac{v_{abij} v_{ickl} v_{jkam} v_{lmbc} }{\epsilon^{ij}_{ab}\ \epsilon^{jkl}_{abc}\ \epsilon^{lm}_{bc}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_19}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 21:}
+Complex conjugate diagram: 25
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-3}\sum{\dfrac{v_{abik} v_{icjl} v_{jdac} v_{klbd} }{\epsilon^{ik}_{ab}\ \epsilon^{jkl}_{acb}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_20}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 22:}
+Complex conjugate diagram: 26
+\begin{equation}
+\dfrac{1}{2}(-1)^{4-2}\sum{\dfrac{v_{abij} v_{ickl} v_{jdac} v_{klbd} }{\epsilon^{ij}_{ab}\ \epsilon^{jkl}_{acb}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_21}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,left=0.6}{v3,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 23:}
+Complex conjugate diagram: 29
+\begin{equation}
+\dfrac{1}{2}(-1)^{4-2}\sum{\dfrac{v_{abik} v_{icjl} v_{jdab} v_{klcd} }{\epsilon^{ik}_{ab}\ \epsilon^{jkl}_{abc}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_22}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 24:}
+Complex conjugate diagram: 30
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-1}\sum{\dfrac{v_{abij} v_{ickl} v_{jdab} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{jkl}_{abc}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_23}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop}{v1,v0}
+\fmf{half_prop,right=0.75}{v1,v3}
+\fmf{half_prop,right=0.75}{v2,v0}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,left=0.6}{v3,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 25:}
+Complex conjugate diagram: 21
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-3}\sum{\dfrac{v_{abik} v_{cdaj} v_{ijcl} v_{klbd} }{\epsilon^{ik}_{ab}\ \epsilon^{ijk}_{cbd}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_24}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 26:}
+Complex conjugate diagram: 22
+\begin{equation}
+\dfrac{1}{2}(-1)^{4-2}\sum{\dfrac{v_{abij} v_{cdak} v_{ijcl} v_{klbd} }{\epsilon^{ij}_{ab}\ \epsilon^{ijk}_{cbd}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_25}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,left=0.6}{v2,v0}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 27:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{3-1}\sum{\dfrac{v_{abjk} v_{cdai} v_{iecd} v_{jkbe} }{\epsilon^{jk}_{ab}\ \epsilon^{ijk}_{cdb}\ \epsilon^{jk}_{be}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_26}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.75}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,left=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v0}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 28:}
+\begin{equation}
+\dfrac{1}{2}(-1)^{3-3}\sum{\dfrac{v_{abij} v_{cdak} v_{iecd} v_{jkbe} }{\epsilon^{ij}_{ab}\ \epsilon^{ijk}_{cdb}\ \epsilon^{jk}_{be}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_27}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 29:}
+Complex conjugate diagram: 23
+\begin{equation}
+\dfrac{1}{2}(-1)^{4-2}\sum{\dfrac{v_{abik} v_{cdaj} v_{ijbl} v_{klcd} }{\epsilon^{ik}_{ab}\ \epsilon^{ijk}_{bcd}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_28}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,left=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 30:}
+Complex conjugate diagram: 24
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-1}\sum{\dfrac{v_{abij} v_{cdak} v_{ijbl} v_{klcd} }{\epsilon^{ij}_{ab}\ \epsilon^{ijk}_{bcd}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_29}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.75}{v0,v2}
+\fmf{half_prop,left=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,left=0.6}{v2,v0}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.75}{v3,v1}
+\fmf{half_prop}{v3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 31:}
+\begin{equation}
+\dfrac{1}{2}(-1)^{3-1}\sum{\dfrac{v_{abjk} v_{cdai} v_{iebc} v_{jkde} }{\epsilon^{jk}_{ab}\ \epsilon^{ijk}_{bcd}\ \epsilon^{jk}_{de}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_30}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,left=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v0}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 32:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{3-1}\sum{\dfrac{v_{abij} v_{cdak} v_{iebc} v_{jkde} }{\epsilon^{ij}_{ab}\ \epsilon^{ijk}_{bcd}\ \epsilon^{jk}_{de}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_31}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v3}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\section{Quadruples}
+
+\paragraph{Diagram 33:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-1}\sum{\dfrac{v_{abik} v_{cdjl} v_{ijcd} v_{klab} }{\epsilon^{ik}_{ab}\ \epsilon^{ijkl}_{cdab}\ \epsilon^{kl}_{ab}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_32}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v3}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,right=0.75}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 34:}
+\begin{equation}
+\dfrac{1}{16}(-1)^{4-2}\sum{\dfrac{v_{abij} v_{cdkl} v_{ijcd} v_{klab} }{\epsilon^{ij}_{ab}\ \epsilon^{ijkl}_{cdab}\ \epsilon^{kl}_{ab}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_33}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v3}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.6}{v2,v0}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,left=0.6}{v3,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 35:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-1}\sum{\dfrac{v_{abkl} v_{cdij} v_{ijac} v_{klbd} }{\epsilon^{kl}_{ab}\ \epsilon^{ijkl}_{acbd}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_34}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.75}{v0,v3}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,left=0.5}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,left=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v0}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 36:}
+\begin{equation}
+\dfrac{1}{1}(-1)^{4-4}\sum{\dfrac{v_{abik} v_{cdjl} v_{ijac} v_{klbd} }{\epsilon^{ik}_{ab}\ \epsilon^{ijkl}_{acbd}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_35}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 37:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-3}\sum{\dfrac{v_{abij} v_{cdkl} v_{ijac} v_{klbd} }{\epsilon^{ij}_{ab}\ \epsilon^{ijkl}_{acbd}\ \epsilon^{kl}_{bd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_36}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,right=0.75}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v3}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.75}{v1,v3}
+\fmf{half_prop,left=0.6}{v2,v0}
+\fmf{half_prop,right=0.6}{v2,v0}
+\fmf{half_prop,left=0.6}{v3,v1}
+\fmf{half_prop,right=0.6}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 38:}
+\begin{equation}
+\dfrac{1}{16}(-1)^{4-2}\sum{\dfrac{v_{abkl} v_{cdij} v_{ijab} v_{klcd} }{\epsilon^{kl}_{ab}\ \epsilon^{ijkl}_{abcd}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_37}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,left=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,left=0.5}{v2,v1}
+\fmf{half_prop,right=0.5}{v2,v1}
+\fmf{half_prop,left=0.6}{v3,v0}
+\fmf{half_prop,right=0.6}{v3,v0}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 39:}
+\begin{equation}
+\dfrac{1}{4}(-1)^{4-3}\sum{\dfrac{v_{abik} v_{cdjl} v_{ijab} v_{klcd} }{\epsilon^{ik}_{ab}\ \epsilon^{ijkl}_{abcd}\ \epsilon^{kl}_{cd}\ }}
+\end{equation}
+
+\begin{center}
+\parbox{80pt}{\begin{fmffile}{diag_38}
+\begin{fmfgraph*}(80,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v3}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmf{phantom}{v2,v3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v3}
+\fmffreeze
+\fmf{half_prop,left=0.6}{v0,v2}
+\fmf{half_prop,right=0.6}{v0,v2}
+\fmf{half_prop,left=0.6}{v1,v3}
+\fmf{half_prop,right=0.6}{v1,v3}
+\fmf{half_prop,right=0.75}{v2,v0}
+\fmf{half_prop}{v2,v1}
+\fmf{half_prop,right=0.6}{v3,v0}
+\fmf{half_prop,right=0.75}{v3,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\end{document}

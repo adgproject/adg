@@ -1,0 +1,19 @@
+\parbox{60pt}{\begin{fmffile}{time_0}
+\begin{fmfgraph*}(60,60)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmftop{v2}\fmfbottom{v0}
+\fmf{phantom}{v0,v1}
+\fmfv{d.shape=square,d.filled=full,d.size=3thick}{v0}
+\fmf{phantom}{v1,v2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v0,v1}
+\fmf{half_prop}{v1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
