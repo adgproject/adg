@@ -61,6 +61,33 @@ Finally, to obtain more information on all the available flags, use
 adg -h
 ```
 
+## Package structure
+
+The main folder contains the README file of the package and the setup.py filed
+used for installing the package.
+
+### adg folder
+
+This folder contains the various Python files with the functions used by ADG.
+
+### doc folder
+
+This folder contains the documentation of the package in reStructuredText,
+as well as the Makefile and the conf.py files used by Sphinx for an automatic
+generation of the documentation. Part of the documentation is stored in the adg
+subfolder.
+
+The compiled documentation is stored in the build subfolder, in a folder named
+after the type of documentation. Especially, the manpages of ADG distributed
+with the package are stored in the subfolder /build/man.
+
+### examples folder
+
+This folder contains very simple scripts that can be used to launch test
+calculations automatically. The precompiled output corresponding to the tests is
+available in the sample_output subfolder, then organized in the same way an
+actual calculation output would be stored.
+
 ## Citing
 If you use ADG in your research work, we kindly ask you to cite the following
 paper: []
