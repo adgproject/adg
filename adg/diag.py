@@ -306,7 +306,19 @@ def print_adj_matrices(directory, diagrams):
 
 
 class Diagram(object):
-    """Describes a diagram with its related properties."""
+    """Describes a diagram with its related properties.
+
+    Attributes:
+        graph (NetworkX MultiDiGraph): The actual graph.
+        degrees (tuple): The ascendingly sorted degrees of the graph vertices.
+        unsort_io_degrees (tuple): The list of in- and out-degrees for each
+            vertex of the graph, stored in a (in, out) tuple.
+        io_degrees (tuple): The sorted version of unsort_io_degrees.
+        max_degree (int): The maximal degree of a vertex in the graph.
+        tags (list): The tag numbers associated to a diagram.
+        adjacency_mat (NumPy array): The adjacency matrix of the graph.
+
+    """
 
     def __init__(self, nx_graph):
         """Generate a Diagram object starting from the NetworkX graph.

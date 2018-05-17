@@ -199,7 +199,17 @@ def treat_tsds(diagrams_time):
 
 
 class TimeStructureDiagram(adg.diag.Diagram):
-    """Describes a time-structure diagram with its related properties."""
+    """Describes a time-structure diagram with its related properties.
+
+    Attributes:
+        perms (dict): The permutations on the vertices for all the BMBPT
+            diagrams associated to this TSD.
+        equivalent_trees (list): The tag numbers of the equivalent tree TSDs
+            associated to a non-tree TSD.
+        is_tree (bool): The tree or non-tree character of a TSD.
+        expr (str): The Goldstone denominator associated to the TSD.
+
+    """
 
     def __init__(self, bmbpt_diag, tag_num):
         """Generate a tsd diagram out of a BMBPT one.

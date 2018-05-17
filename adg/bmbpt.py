@@ -206,7 +206,21 @@ def order_diagrams(diagrams):
 
 
 class BmbptFeynmanDiagram(adg.diag.Diagram):
-    """Describes a BMBPT Feynman diagram with its related properties."""
+    """Describes a BMBPT Feynman diagram with its related properties.
+
+    Attributes:
+        two_or_three_body (int): The 2 or 3-body characted of the vertices.
+        time_tag (int): The tag number associated to the diagram's
+            associated TSD.
+        tsd_is_tree (bool): The tree or non-tree character of the
+            associated TSD.
+        feynman_exp (str): The Feynman expression associated to the diagram.
+        diag_exp (str): The Goldstone expression associated to the diagram.
+        vert_exp (list): The expression associated to the vertices.
+        hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
+            the energy operator only character of the graph.
+
+        """
 
     def __init__(self, nx_graph, use_norm, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.

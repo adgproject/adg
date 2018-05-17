@@ -195,7 +195,18 @@ def extract_cd_denom(start_graph, subgraph):
 
 
 class MbptDiagram(adg.diag.Diagram):
-    """Describes a MBPT diagram with its related properties."""
+    """Describes a MBPT diagram with its related properties.
+
+    Attributes:
+        incidence (NumPy array): The incidence matrix of the graph.
+        excitation_level (int): The single, double, etc., excitation character.
+        complex_conjugate (int): The tag number of the diagram's complex
+            conjugate. -1 is the graph has none.
+        expr (str): The MBPT expression associated to the diagram.
+        cd_expr (str): The expression associated to the diagram in a
+            computer-readable format.
+
+    """
 
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph.
