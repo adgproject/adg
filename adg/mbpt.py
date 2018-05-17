@@ -269,11 +269,7 @@ class MbptDiagram(adg.diag.Diagram):
             (int): The number of holes in the diagram.
 
         """
-        nb_holes = 0
-        for edge in self.graph.edges():
-            if edge[0] > edge[1]:
-                nb_holes += 1
-        return nb_holes
+        return sum(1 for edge in self.graph.edges() if edge[0] > edge[1])
 
     def is_complex_conjug_of(self, test_diagram):
         """Return True if self and test_diagram are complex conjugate.
@@ -285,12 +281,9 @@ class MbptDiagram(adg.diag.Diagram):
             (bool): The complex conjugate status of the pair of diagrams.
 
         """
-        is_conjug = True
         # Check the adjacency mat against the anti-transposed one of test_diag
-        if not np.array_equal(self.adjacency_mat,
-                              test_diagram.adjacency_mat[::-1, ::-1].T):
-            is_conjug = False
-        return is_conjug
+        return np.array_equal(self.adjacency_mat,
+                              test_diagram.adjacency_mat[::-1, ::-1].T)
 
     def attribute_ph_labels(self):
         """Attribute the appropriate qp labels to the graph's propagators."""
@@ -317,10 +310,11 @@ class MbptDiagram(adg.diag.Diagram):
         """
         denominator = ""
         graph = self.graph
-        for vertex_i in range(1, len(graph)):
-            stack = [vertex_j for vertex_j in graph if vertex_j >= vertex_i]
+        vertices = list(range(1, len(graph)))
+        while len(vertices) >= 1:
             denominator += "%s\\ " % adg.diag.extract_denom(
-                graph, graph.subgraph(stack))
+                graph, graph.subgraph(vertices))
+            del vertices[0]
         return denominator
 
     def cd_denominator(self):
@@ -332,12 +326,11 @@ class MbptDiagram(adg.diag.Diagram):
         """
         denominator = ""
         graph = self.graph
-        for vertex_i in range(1, len(graph)):
-            substack = [vertex_j
-                        for vertex_j in graph
-                        if vertex_j >= vertex_i]
+        vertices = list(range(1, len(graph)))
+        while len(vertices) >= 1:
             denominator += "%s, " % extract_cd_denom(graph,
-                                                     graph.subgraph(substack))
+                                                     graph.subgraph(vertices))
+            del vertices[0]
         return denominator.strip(', ')
 
     def extract_numerator(self):
