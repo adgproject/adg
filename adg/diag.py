@@ -310,6 +310,7 @@ class Diagram(object):
 
     Attributes:
         graph (NetworkX MultiDiGraph): The actual graph.
+        unsorted_degrees (tuple): The degrees of the graph vertices
         degrees (tuple): The ascendingly sorted degrees of the graph vertices.
         unsort_io_degrees (tuple): The list of in- and out-degrees for each
             vertex of the graph, stored in a (in, out) tuple.
@@ -328,7 +329,8 @@ class Diagram(object):
 
         """
         self.graph = nx_graph
-        self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])
+        self.unsort_degrees = tuple(nx_graph.degree(node) for node in nx_graph)
+        self.degrees = sorted(self.unsort_degrees)
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
                                         nx_graph.out_degree(node))
                                        for node in nx_graph)

@@ -241,15 +241,10 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         self.vert_exp = []
         if 2 not in self.degrees:
             self.hf_type = "HF"
-        elif use_norm:
-            self.hf_type = "noHF"
+        elif not use_norm and 2 not in self.unsort_degrees[1:]:
+            self.hf_type = "EHF"
         else:
-            for node in xrange(1, len(self.graph)):
-                if self.graph.degree(node) == 2:
-                    self.hf_type = "noHF"
-                    break
-                if self.graph.degree(len(self.graph)-1) != 2:
-                    self.hf_type = "EHF"
+            self.hf_type = "noHF"
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -359,7 +354,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         Args:
             result (file): The LaTeX output file of the program.
             commands (dict): The flags associated with run management.
-            diags_nbs (dict): The number od diagrams per type.
+            diags_nbs (dict): The number of diagrams per type.
 
         """
         if self.tags[0] == 0:
@@ -482,8 +477,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             # Attribute the correct operator to each vertex
             numerator += "O" if graph.node[vertex]['operator'] else "\\Omega"
             # Attribute the good "type number" to each vertex
-            numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
-                                        graph.in_degree(vertex))
+            numerator += "^{%i%i}_{" % (self.unsort_io_degrees[vertex][1],
+                                        self.unsort_io_degrees[vertex][0])
             # First add the qp states corresponding to propagators going out
             numerator += "".join(prop[3]['qp_state']
                                  for prop
@@ -528,6 +523,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         """
         factor = ""
+        # Account for up to three-body operators
         prop_multiplicity = [0 for _ in xrange(6)]
         for vertex_i in self.graph:
             for vertex_j in self.graph:
