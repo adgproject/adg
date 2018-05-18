@@ -42,8 +42,6 @@ def diagrams_generation(p_order, three_body_use):
             check_unconnected_spawn(matrices, vertex, p_order)
 
     # Checks to exclude non-conform matrices
-    adg.diag.check_degree(matrices, three_body_use)
-    adg.diag.no_loop(matrices)
     matrices_uniq = []
     for mat in matrices:
         if mat not in matrices_uniq:
