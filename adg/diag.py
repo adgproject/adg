@@ -26,45 +26,6 @@ def no_trace(matrices):
     return traceless_matrices
 
 
-def no_loop(matrices):
-    """Select out matrices with loops between two vertices.
-
-    Args:
-        matrices (list): The adjacency matrices.
-
-    """
-    for i_mat in xrange(len(matrices)-1, -1, -1):
-        test_no_loop = True
-        matrix = matrices[i_mat]
-        for ind_i in xrange(len(matrix[0])):
-            for ind_j in xrange(ind_i+1):
-                if (matrix[ind_i][ind_j] != 0) and (matrix[ind_j][ind_i] != 0):
-                    test_no_loop = False
-                    break
-        if not test_no_loop:
-            del matrices[i_mat]
-
-
-def check_degree(matrices, three_body_use):
-    """Discard matrices with wrong N-body character.
-
-    Args:
-        matrices (list): Adjacency matrices.
-        three_body_use (bool): ``True`` if one uses three-body operators.
-
-    """
-    for i_mat in xrange(len(matrices)-1, -1, -1):
-        matrix = matrices[i_mat]
-        for ind_i in xrange(len(matrix[0])):
-            degree = sum(matrix[ind_i][ind_j]
-                         + matrix[ind_j][ind_i]
-                         for ind_j in xrange(len(matrix[0])))
-            if (degree != 2) and (degree != 4):
-                if (not three_body_use) or (degree != 6):
-                    del matrices[i_mat]
-                    break
-
-
 def check_vertex_degree(matrices, three_body_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices.
 

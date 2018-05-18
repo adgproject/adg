@@ -41,7 +41,7 @@ def diagrams_generation(p_order, three_body_use):
         if 0 < vertex < p_order-1:
             check_unconnected_spawn(matrices, vertex, p_order)
 
-    # Checks to exclude non-conform matrices
+    # Checks to exclude redundant matrices
     matrices_uniq = []
     for mat in matrices:
         if mat not in matrices_uniq:
