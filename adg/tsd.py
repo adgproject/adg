@@ -108,6 +108,8 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
             latex_file.write('\n\\begin{center}\n')
             tdiag.draw_equivalent_tree_tsds(latex_file)
             latex_file.write('\n\\end{center}\n\n')
+        latex_file.write("Number of related Feynman diagrams: %i.\n\n"
+                         % (len(tdiag.tags)-1))
         feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
         latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
 
