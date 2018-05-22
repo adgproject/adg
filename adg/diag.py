@@ -78,19 +78,18 @@ def topologically_distinct_diagrams(diagrams):
     return diagrams
 
 
-def label_vertices(graphs_list, theory_type, study_norm):
+def label_vertices(graphs_list, theory_type):
     """Account for different status of vertices in operator diagrams.
 
     Args:
         graphs_list (list): The Diagrams of interest.
         theory_type (str): The name of the theory of interest.
-        study_norm (bool): ``True`` if one studies norm diagrams.
 
     """
     for graph in graphs_list:
         for node in graph:
             graph.node[node]['operator'] = False
-        if (theory_type == "BMBPT") and not study_norm:
+        if theory_type == "BMBPT":
             graph.node[0]['operator'] = True
 
 
@@ -106,8 +105,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
     p_order = graph.number_of_nodes()
     diag_size = 20*p_order
 
-    theories = ["MBPT", "BMBPT", "SCGF"]
-    prop_types = ["half_prop", "prop_pm", "double_arrow"]
+    theories = ["MBPT", "BMBPT"]
+    prop_types = ["half_prop", "prop_pm"]
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')

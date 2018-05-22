@@ -51,9 +51,6 @@ def parse_command_line():
         help="execute ADG in interactive mode")
 
     bmbpt_args.add_argument(
-        "-n", "--norm", action="store_true",
-        help="study norm BMBPT diagrams instead of operator ones")
-    bmbpt_args.add_argument(
         "-3N", "--with_three_body", action="store_true",
         help="use two and three-body forces for BMBPT diagrams")
     bmbpt_args.add_argument(
@@ -83,7 +80,6 @@ def parse_command_line():
     # Avoid conflicting flags
     if args.theory != 'BMBPT' and not args.interactive:
         args.with_three_body = None
-        args.norm = None
         args.draw_tsds = None
     if args.theory != 'MBPT' and not args.interactive:
         args.cd_output = None
@@ -110,8 +106,6 @@ def interactive_interface(commands):
     if commands.theory == "BMBPT":
         commands.with_three_body = raw_input(
             "Include three-body forces? (y/N)").lower() == 'y'
-        commands.norm = raw_input(
-            "Compute norm diagrams, not operator ones? (y/N)").lower() == 'y'
         commands.draw_tsds = raw_input(
             "Draw time-structure diagrams? (y/N)").lower() == 'y'
 
@@ -140,8 +134,6 @@ def attribute_directory(commands):
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.with_three_body:
         directory += 'with3N'
-    if commands.norm:
-        directory += '_run_commands.norm'
     if not os.path.exists(directory):
         os.makedirs(directory)
     if not os.path.exists(directory+"/Diagrams"):
@@ -181,10 +173,10 @@ def generate_diagrams(commands):
             if not nx.is_directed_acyclic_graph(diags[i_diag]):
                 del diags[i_diag]
 
-    adg.diag.label_vertices(diags, commands.theory, commands.norm)
+    adg.diag.label_vertices(diags, commands.theory)
 
     if commands.theory == 'BMBPT':
-        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, commands.norm, ind)
+        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, ind)
                     for ind, graph in enumerate(diags)]
     elif commands.theory == 'MBPT':
         diagrams = [adg.mbpt.MbptDiagram(graph, ind)
@@ -226,16 +218,14 @@ def print_diags_numbers(commands, diags_nbs):
     if commands.theory == "BMBPT":
         print "\n2N valid diagrams: %i" % diags_nbs['nb_2']
         print "2N energy canonical diagrams: %i" % diags_nbs['nb_2_hf']
-        if not commands.norm:
-            print "2N canonical diagrams for a generic operator only: %i" \
-                % diags_nbs['nb_2_ehf']
+        print "2N canonical diagrams for a generic operator only: %i" \
+            % diags_nbs['nb_2_ehf']
         print "2N non-canonical diagrams: %i\n" % diags_nbs['nb_2_not_hf']
         if commands.with_three_body:
             print "3N valid diagrams: %i" % diags_nbs['nb_3']
             print "3N energy canonical diagrams: %i" % diags_nbs['nb_3_hf']
-            if not commands.norm:
-                print "3N canonical diagrams for a generic operator only: %i" \
-                    % diags_nbs['nb_3_ehf']
+            print "3N canonical diagrams for a generic operator only: %i" \
+                % diags_nbs['nb_3_ehf']
             print "3N non-canonical diagrams: %i" % diags_nbs['nb_3_not_hf']
     elif commands.theory == "MBPT":
         print "\nValid diagrams: %i\n" % diags_nbs['nb_diags']
@@ -309,8 +299,7 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":
-        adg.bmbpt.write_header(latex_file, commands.with_three_body,
-                               commands.norm, diags_nbs)
+        adg.bmbpt.write_header(latex_file, commands.with_three_body, diags_nbs)
     elif commands.theory == "MBPT":
         adg.mbpt.write_header(latex_file, diags_nbs)
 
