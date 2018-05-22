@@ -53,10 +53,18 @@ setup(
         ]
     ),
     classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: End Users/Desktop',
+        'Intended Audience :: Science/Research',
+        'Natural Language :: English',
         'Operating System :: MacOS',
         'Operating System :: POSIX',
         'Operating System :: Unix',
         'Programming Language :: Python :: 2.7',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Chemistry',
+        'Topic :: Scientific/Engineering :: Physics',
     ],
     description='A powerful diagram generator and evaluator for many-body '
                 'formalisms in physics and chemistry',
