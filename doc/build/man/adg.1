@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "May 17, 2018" "0.0.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "May 22, 2018" "0.0.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -417,6 +417,11 @@ Describes a diagram with its related properties.
 .UNINDENT
 .INDENT 7.0
 .TP
+.B unsorted_degrees
+\fItuple\fP \-\- The degrees of the graph vertices
+.UNINDENT
+.INDENT 7.0
+.TP
 .B degrees
 \fItuple\fP \-\- The ascendingly sorted degrees of the graph vertices.
 .UNINDENT
@@ -461,21 +466,6 @@ Write the graph of the diagram to the LaTeX file.
 .IP \(bu 2
 \fBwrite_time\fP (\fIbool\fP) \-\- (Here to emulate polymorphism).
 .UNINDENT
-.UNINDENT
-.UNINDENT
-.UNINDENT
-.INDENT 0.0
-.TP
-.B adg.diag.check_degree(matrices, three_body_use)
-Discard matrices with wrong N\-body character.
-.INDENT 7.0
-.TP
-.B Parameters
-.INDENT 7.0
-.IP \(bu 2
-\fBmatrices\fP (\fIlist\fP) \-\- Adjacency matrices.
-.IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- \fBTrue\fP if one uses three\-body operators.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -556,7 +546,7 @@ Generate the feynmanmp instructions corresponding to the diagram.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.diag.label_vertices(graphs_list, theory_type, study_norm)
+.B adg.diag.label_vertices(graphs_list, theory_type)
 Account for different status of vertices in operator diagrams.
 .INDENT 7.0
 .TP
@@ -566,19 +556,7 @@ Account for different status of vertices in operator diagrams.
 \fBgraphs_list\fP (\fIlist\fP) \-\- The Diagrams of interest.
 .IP \(bu 2
 \fBtheory_type\fP (\fIstr\fP) \-\- The name of the theory of interest.
-.IP \(bu 2
-\fBstudy_norm\fP (\fIbool\fP) \-\- \fBTrue\fP if one studies norm diagrams.
 .UNINDENT
-.UNINDENT
-.UNINDENT
-.INDENT 0.0
-.TP
-.B adg.diag.no_loop(matrices)
-Select out matrices with loops between two vertices.
-.INDENT 7.0
-.TP
-.B Parameters
-\fBmatrices\fP (\fIlist\fP) \-\- The adjacency matrices.
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -973,7 +951,7 @@ excitation level type.
 Routines and class for Bogoliubov MBPT diagrams.
 .INDENT 0.0
 .TP
-.B class adg.bmbpt.BmbptFeynmanDiagram(nx_graph, use_norm, tag_num)
+.B class adg.bmbpt.BmbptFeynmanDiagram(nx_graph, tag_num)
 Bases: \fBadg.diag.Diagram\fP
 .sp
 Describes a BMBPT Feynman diagram with its related properties.
@@ -1176,7 +1154,7 @@ Write section and subsections for BMBPT result file.
 .IP \(bu 2
 \fBcommands\fP (\fIdict\fP) \-\- The flags associated with run management.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- The number od diagrams per type.
+\fBdiags_nbs\fP (\fIdict\fP) \-\- The number of diagrams per type.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1291,7 +1269,7 @@ Produce and store the expressions associated to the BMBPT diagrams.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.bmbpt.write_header(tex_file, three_body_use, norm, diags_nbs)
+.B adg.bmbpt.write_header(tex_file, three_body_use, diags_nbs)
 Write overall header for BMBPT result file.
 .INDENT 7.0
 .TP
