@@ -229,13 +229,14 @@ class MbptDiagram(adg.diag.Diagram):
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
-        phases = '(-1)^{%i-%i}' % (self.count_hole_lines(),
-                                   self.loops_number())
+        sign = "-" if (self.count_hole_lines()
+                       - self.loops_number()) % 2 == 1 else ""
         eq_lines = np.array(self.incidence.transpose())
         neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         nedges_eq = 2**(len(eq_lines)-len(neq_lines))
 
-        self.expr = "\\dfrac{1}{%i}%s" % (nedges_eq, phases) \
+        self.expr = sign \
+            + ("\\dfrac{1}{%i}" % nedges_eq if nedges_eq != 1 else "") \
             + "\\sum{\\dfrac{%s}{%s}}\n" % (self.extract_numerator(),
                                             self.extract_denominator())
         self.cd_expr = "{%i, {%s}, {%s}};" % (nedges_eq,
