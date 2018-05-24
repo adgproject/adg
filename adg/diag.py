@@ -26,45 +26,6 @@ def no_trace(matrices):
     return traceless_matrices
 
 
-def no_loop(matrices):
-    """Select out matrices with loops between two vertices.
-
-    Args:
-        matrices (list): The adjacency matrices.
-
-    """
-    for i_mat in xrange(len(matrices)-1, -1, -1):
-        test_no_loop = True
-        matrix = matrices[i_mat]
-        for ind_i in xrange(len(matrix[0])):
-            for ind_j in xrange(ind_i+1):
-                if (matrix[ind_i][ind_j] != 0) and (matrix[ind_j][ind_i] != 0):
-                    test_no_loop = False
-                    break
-        if not test_no_loop:
-            del matrices[i_mat]
-
-
-def check_degree(matrices, three_body_use):
-    """Discard matrices with wrong N-body character.
-
-    Args:
-        matrices (list): Adjacency matrices.
-        three_body_use (bool): ``True`` if one uses three-body operators.
-
-    """
-    for i_mat in xrange(len(matrices)-1, -1, -1):
-        matrix = matrices[i_mat]
-        for ind_i in xrange(len(matrix[0])):
-            degree = sum(matrix[ind_i][ind_j]
-                         + matrix[ind_j][ind_i]
-                         for ind_j in xrange(len(matrix[0])))
-            if (degree != 2) and (degree != 4):
-                if (not three_body_use) or (degree != 6):
-                    del matrices[i_mat]
-                    break
-
-
 def check_vertex_degree(matrices, three_body_use, vertex_id):
     """Check the degree of a specific vertex in a set of matrices.
 
@@ -117,19 +78,18 @@ def topologically_distinct_diagrams(diagrams):
     return diagrams
 
 
-def label_vertices(graphs_list, theory_type, study_norm):
+def label_vertices(graphs_list, theory_type):
     """Account for different status of vertices in operator diagrams.
 
     Args:
         graphs_list (list): The Diagrams of interest.
         theory_type (str): The name of the theory of interest.
-        study_norm (bool): ``True`` if one studies norm diagrams.
 
     """
     for graph in graphs_list:
         for node in graph:
             graph.node[node]['operator'] = False
-        if (theory_type == "BMBPT") and not study_norm:
+        if theory_type == "BMBPT":
             graph.node[0]['operator'] = True
 
 
@@ -145,8 +105,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
     p_order = graph.number_of_nodes()
     diag_size = 20*p_order
 
-    theories = ["MBPT", "BMBPT", "SCGF"]
-    prop_types = ["half_prop", "prop_pm", "double_arrow"]
+    theories = ["MBPT", "BMBPT"]
+    prop_types = ["half_prop", "prop_pm"]
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
@@ -306,7 +266,20 @@ def print_adj_matrices(directory, diagrams):
 
 
 class Diagram(object):
-    """Describes a diagram with its related properties."""
+    """Describes a diagram with its related properties.
+
+    Attributes:
+        graph (NetworkX MultiDiGraph): The actual graph.
+        unsorted_degrees (tuple): The degrees of the graph vertices
+        degrees (tuple): The ascendingly sorted degrees of the graph vertices.
+        unsort_io_degrees (tuple): The list of in- and out-degrees for each
+            vertex of the graph, stored in a (in, out) tuple.
+        io_degrees (tuple): The sorted version of unsort_io_degrees.
+        max_degree (int): The maximal degree of a vertex in the graph.
+        tags (list): The tag numbers associated to a diagram.
+        adjacency_mat (NumPy array): The adjacency matrix of the graph.
+
+    """
 
     def __init__(self, nx_graph):
         """Generate a Diagram object starting from the NetworkX graph.
@@ -316,7 +289,8 @@ class Diagram(object):
 
         """
         self.graph = nx_graph
-        self.degrees = sorted([nx_graph.degree(node) for node in nx_graph])
+        self.unsort_degrees = tuple(nx_graph.degree(node) for node in nx_graph)
+        self.degrees = sorted(self.unsort_degrees)
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
                                         nx_graph.out_degree(node))
                                        for node in nx_graph)

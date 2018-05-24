@@ -195,7 +195,18 @@ def extract_cd_denom(start_graph, subgraph):
 
 
 class MbptDiagram(adg.diag.Diagram):
-    """Describes a MBPT diagram with its related properties."""
+    """Describes a MBPT diagram with its related properties.
+
+    Attributes:
+        incidence (NumPy array): The incidence matrix of the graph.
+        excitation_level (int): The single, double, etc., excitation character.
+        complex_conjugate (int): The tag number of the diagram's complex
+            conjugate. -1 is the graph has none.
+        expr (str): The MBPT expression associated to the diagram.
+        cd_expr (str): The expression associated to the diagram in a
+            computer-readable format.
+
+    """
 
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph.
@@ -218,13 +229,14 @@ class MbptDiagram(adg.diag.Diagram):
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
-        phases = '(-1)^{%i-%i}' % (self.count_hole_lines(),
-                                   self.loops_number())
+        sign = "-" if (self.count_hole_lines()
+                       - self.loops_number()) % 2 == 1 else ""
         eq_lines = np.array(self.incidence.transpose())
         neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
         nedges_eq = 2**(len(eq_lines)-len(neq_lines))
 
-        self.expr = "\\dfrac{1}{%i}%s" % (nedges_eq, phases) \
+        self.expr = sign \
+            + ("\\dfrac{1}{%i}" % nedges_eq if nedges_eq != 1 else "") \
             + "\\sum{\\dfrac{%s}{%s}}\n" % (self.extract_numerator(),
                                             self.extract_denominator())
         self.cd_expr = "{%i, {%s}, {%s}};" % (nedges_eq,
@@ -258,11 +270,7 @@ class MbptDiagram(adg.diag.Diagram):
             (int): The number of holes in the diagram.
 
         """
-        nb_holes = 0
-        for edge in self.graph.edges():
-            if edge[0] > edge[1]:
-                nb_holes += 1
-        return nb_holes
+        return sum(1 for edge in self.graph.edges() if edge[0] > edge[1])
 
     def is_complex_conjug_of(self, test_diagram):
         """Return True if self and test_diagram are complex conjugate.
@@ -274,12 +282,9 @@ class MbptDiagram(adg.diag.Diagram):
             (bool): The complex conjugate status of the pair of diagrams.
 
         """
-        is_conjug = True
         # Check the adjacency mat against the anti-transposed one of test_diag
-        if not np.array_equal(self.adjacency_mat,
-                              test_diagram.adjacency_mat[::-1, ::-1].T):
-            is_conjug = False
-        return is_conjug
+        return np.array_equal(self.adjacency_mat,
+                              test_diagram.adjacency_mat[::-1, ::-1].T)
 
     def attribute_ph_labels(self):
         """Attribute the appropriate qp labels to the graph's propagators."""
@@ -306,10 +311,11 @@ class MbptDiagram(adg.diag.Diagram):
         """
         denominator = ""
         graph = self.graph
-        for vertex_i in range(1, len(graph)):
-            stack = [vertex_j for vertex_j in graph if vertex_j >= vertex_i]
+        vertices = list(range(1, len(graph)))
+        while len(vertices) >= 1:
             denominator += "%s\\ " % adg.diag.extract_denom(
-                graph, graph.subgraph(stack))
+                graph, graph.subgraph(vertices))
+            del vertices[0]
         return denominator
 
     def cd_denominator(self):
@@ -321,12 +327,11 @@ class MbptDiagram(adg.diag.Diagram):
         """
         denominator = ""
         graph = self.graph
-        for vertex_i in range(1, len(graph)):
-            substack = [vertex_j
-                        for vertex_j in graph
-                        if vertex_j >= vertex_i]
+        vertices = list(range(1, len(graph)))
+        while len(vertices) >= 1:
             denominator += "%s, " % extract_cd_denom(graph,
-                                                     graph.subgraph(substack))
+                                                     graph.subgraph(vertices))
+            del vertices[0]
         return denominator.strip(', ')
 
     def extract_numerator(self):

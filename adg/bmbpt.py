@@ -41,9 +41,7 @@ def diagrams_generation(p_order, three_body_use):
         if 0 < vertex < p_order-1:
             check_unconnected_spawn(matrices, vertex, p_order)
 
-    # Checks to exclude non-conform matrices
-    adg.diag.check_degree(matrices, three_body_use)
-    adg.diag.no_loop(matrices)
+    # Checks to exclude redundant matrices
     matrices_uniq = []
     for mat in matrices:
         if mat not in matrices_uniq:
@@ -88,7 +86,7 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
                 del matrices[ind_mat]
 
 
-def write_header(tex_file, three_body_use, norm, diags_nbs):
+def write_header(tex_file, three_body_use, diags_nbs):
     """Write overall header for BMBPT result file.
 
     Args:
@@ -102,10 +100,9 @@ def write_header(tex_file, three_body_use, norm, diags_nbs):
         + "2N valid diagrams: %i\n\n" % diags_nbs['nb_2']
         + "2N canonical diagrams for the energy: %i\n\n"
         % diags_nbs['nb_2_hf'])
-    if not norm:
-        tex_file.write(
-            "2N canonical diagrams for a generic operator only: %i\n\n"
-            % diags_nbs['nb_2_ehf'])
+    tex_file.write(
+        "2N canonical diagrams for a generic operator only: %i\n\n"
+        % diags_nbs['nb_2_ehf'])
     tex_file.write(
         "2N non-canonical diagrams: %i\n\n" % diags_nbs['nb_2_not_hf'])
     if three_body_use:
@@ -114,10 +111,9 @@ def write_header(tex_file, three_body_use, norm, diags_nbs):
         tex_file.write(
             "3N canonical diagrams for the energy: %i\n\n"
             % diags_nbs['nb_3_hf'])
-        if not norm:
-            tex_file.write(
-                "3N canonical diagrams for a generic operator only: %i\n\n"
-                % diags_nbs['nb_3_ehf'])
+        tex_file.write(
+            "3N canonical diagrams for a generic operator only: %i\n\n"
+            % diags_nbs['nb_3_ehf'])
         tex_file.write(
             "3N non-canonical diagrams: %i\n\n" % diags_nbs['nb_3_not_hf'])
 
@@ -206,14 +202,27 @@ def order_diagrams(diagrams):
 
 
 class BmbptFeynmanDiagram(adg.diag.Diagram):
-    """Describes a BMBPT Feynman diagram with its related properties."""
+    """Describes a BMBPT Feynman diagram with its related properties.
 
-    def __init__(self, nx_graph, use_norm, tag_num):
+    Attributes:
+        two_or_three_body (int): The 2 or 3-body characted of the vertices.
+        time_tag (int): The tag number associated to the diagram's
+            associated TSD.
+        tsd_is_tree (bool): The tree or non-tree character of the
+            associated TSD.
+        feynman_exp (str): The Feynman expression associated to the diagram.
+        diag_exp (str): The Goldstone expression associated to the diagram.
+        vert_exp (list): The expression associated to the vertices.
+        hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
+            the energy operator only character of the graph.
+
+        """
+
+    def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
 
         Args:
             nx_graph (NetworkX MultiDiGraph): The graph of interest.
-            use_norm (bool): ``True`` if we are sturdying norm diagrams.
             tag_num (int): The tag number associated to the diagram.
 
         """
@@ -227,15 +236,10 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         self.vert_exp = []
         if 2 not in self.degrees:
             self.hf_type = "HF"
-        elif use_norm:
-            self.hf_type = "noHF"
+        elif 2 not in self.unsort_degrees[1:]:
+            self.hf_type = "EHF"
         else:
-            for node in xrange(1, len(self.graph)):
-                if self.graph.degree(node) == 2:
-                    self.hf_type = "noHF"
-                    break
-                if self.graph.degree(len(self.graph)-1) != 2:
-                    self.hf_type = "EHF"
+            self.hf_type = "noHF"
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -345,14 +349,14 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         Args:
             result (file): The LaTeX output file of the program.
             commands (dict): The flags associated with run management.
-            diags_nbs (dict): The number od diagrams per type.
+            diags_nbs (dict): The number of diagrams per type.
 
         """
         if self.tags[0] == 0:
             result.write(
                 "\\section{Two-body diagrams}\n\n"
                 + "\\subsection{Two-body energy canonical diagrams}\n\n")
-        elif (self.tags[0] == diags_nbs['nb_2_hf']) and (not commands.norm):
+        elif self.tags[0] == diags_nbs['nb_2_hf']:
             result.write("\\subsection{Two-body canonical diagrams " +
                          "for a generic operator only}\n\n")
         elif self.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
@@ -362,8 +366,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 result.write(
                     "\\section{Three-body diagrams}\n\n"
                     + "\\subsection{Three-body energy canonical diagrams}\n\n")
-            elif (self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']) \
-                    and (not commands.norm):
+            elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']:
                 result.write("\\subsection{Three-body canonical diagrams " +
                              "for a generic operator only}\n\n")
             elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
@@ -371,8 +374,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 result.write(
                     "\\subsection{Three-body non-canonical diagrams}\n\n")
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
-        if not commands.norm:
-            self.write_diag_exps(result, commands.order)
+        self.write_diag_exps(result, commands.order)
 
     def write_vertices_values(self, latex_file, mapping):
         """Write the qp energies associated to each vertex of the diag.
@@ -468,8 +470,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             # Attribute the correct operator to each vertex
             numerator += "O" if graph.node[vertex]['operator'] else "\\Omega"
             # Attribute the good "type number" to each vertex
-            numerator += "^{%i%i}_{" % (graph.out_degree(vertex),
-                                        graph.in_degree(vertex))
+            numerator += "^{%i%i}_{" % (self.unsort_io_degrees[vertex][1],
+                                        self.unsort_io_degrees[vertex][0])
             # First add the qp states corresponding to propagators going out
             numerator += "".join(prop[3]['qp_state']
                                  for prop
@@ -514,6 +516,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         """
         factor = ""
+        # Account for up to three-body operators
         prop_multiplicity = [0 for _ in xrange(6)]
         for vertex_i in self.graph:
             for vertex_j in self.graph:
