@@ -130,6 +130,23 @@ def attribute_directory(commands):
     Returns:
         (str): Path to the result folder.
 
+    >>> com = argparse.Namespace()
+    >>>
+    >>> com.theory, com.order, com.with_three_body = 'BMBPT', 4, False
+    >>>
+    >>> attribute_directory(com)
+    'BMBPT/Order-4'
+    >>>
+    >>> com.theory, com.order, com.with_three_body = 'BMBPT', 5, True
+    >>>
+    >>> attribute_directory(com)
+    'BMBPT/Order-5with3N'
+    >>>
+    >>> com.theory, com.order, com.with_three_body = 'MBPT', 3, False
+    >>>
+    >>> attribute_directory(com)
+    'MBPT/Order-3'
+
     """
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.with_three_body:
@@ -348,3 +365,6 @@ def clean_folders(directory, commands):
         os.unlink("result.out")
         os.unlink("result.toc")
     os.chdir("../..")
+
+import doctest
+doctest.testmod()

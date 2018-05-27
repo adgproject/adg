@@ -13,6 +13,19 @@ def no_trace(matrices):
     Returns:
         (list): The adjacency matrices without non-zero diagonal elements.
 
+    >>> test_matrices = [[[0, 1, 2], [2, 0, 1], [5, 2, 0]], \
+    [[2, 2, 2], [1, 2, 3], [0, 0, 0]], \
+    [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+    >>> no_trace(test_matrices)
+    [[[0, 1, 2], [2, 0, 1], [5, 2, 0]], [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+    >>> no_trace()
+    Traceback (most recent call last):
+      File "/usr/lib/python2.7/doctest.py", line 1315, in __run
+        compileflags, 1) in test.globs
+      File "<doctest __main__.no_trace[4]>", line 1, in <module>
+        no_trace()
+    TypeError: no_trace() takes exactly 1 argument (0 given)
+
     """
     traceless_matrices = []
     for matrix in matrices:
@@ -34,11 +47,23 @@ def check_vertex_degree(matrices, three_body_use, vertex_id):
         three_body_use (bool): ``True`` if one uses three-body operators.
         vertex_id (int): The position of the studied vertex.
 
+    >>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], \
+        [[2, 0, 2], [1, 2, 3], [1, 0, 0]], \
+        [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+    >>> check_vertex_degree(test_matrices, True, 0)
+    >>> test_matrices
+    [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
+    >>> check_vertex_degree(test_matrices, False, 0)
+    >>> test_matrices
+    [[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
+
     """
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
                             for index in xrange(len(matrix[0])))
+        # Avoid double-counting for matrices with diagonal elements
+        vertex_degree -= matrix[vertex_id][vertex_id]
         if (vertex_degree != 2) and (vertex_degree != 4):
             if (not three_body_use) or (vertex_degree != 6):
                 del matrices[i_mat]
@@ -311,3 +336,7 @@ class Diagram(object):
         latex_file.write('\n\\begin{center}\n')
         draw_diagram(directory, latex_file, self.tags[0], 'diag')
         latex_file.write('\n\\end{center}\n\n')
+
+
+import doctest
+doctest.testmod()

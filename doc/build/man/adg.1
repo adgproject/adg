@@ -482,6 +482,38 @@ Check the degree of a specific vertex in a set of matrices.
 \fBvertex_id\fP (\fIint\fP) \-\- The position of the studied vertex.
 .UNINDENT
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]],         [[2, 0, 2], [1, 2, 3], [1, 0, 0]],         [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+.ft P
+.fi
+.sp
+.nf
+.ft C
+>>> check_vertex_degree(test_matrices, True, 0)
+.ft P
+.fi
+.sp
+.nf
+.ft C
+>>> test_matrices
+[[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
+.ft P
+.fi
+.sp
+.nf
+.ft C
+>>> check_vertex_degree(test_matrices, False, 0)
+.ft P
+.fi
+.sp
+.nf
+.ft C
+>>> test_matrices
+[[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -571,6 +603,31 @@ The adjacency matrices without non\-zero diagonal elements.
 .B Return type
 (list)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> test_matrices = [[[0, 1, 2], [2, 0, 1], [5, 2, 0]],     [[2, 2, 2], [1, 2, 3], [0, 0, 0]],     [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+.ft P
+.fi
+.sp
+.nf
+.ft C
+>>> no_trace(test_matrices)
+[[[0, 1, 2], [2, 0, 1], [5, 2, 0]], [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+.ft P
+.fi
+.sp
+.nf
+.ft C
+>>> no_trace()
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/doctest.py", line 1315, in __run
+    compileflags, 1) in test.globs
+  File "<doctest __main__.no_trace[4]>", line 1, in <module>
+    no_trace()
+TypeError: no_trace() takes exactly 1 argument (0 given)
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
