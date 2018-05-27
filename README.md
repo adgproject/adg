@@ -13,13 +13,13 @@ Theory (BMBPT).
   - For MBPT, the code generates all canonical (i.e. HF) diagrams at any given
     order along with their expression and additional information
     (conjugate diagram, excitation level...).
-  - For BMBPT, the code generates all diagrams for norm or operator kernels,
-    and the time-dependent and time-integrated expressions for all operator
-    diagrams.
+  - For BMBPT, the code generates all diagrams along with their time-dependent
+    and time-integrated expressions.
 
 ## Future developments
-Extensions under discussions are norm diagrams for BMBPT as well as diagrams
-and expressions generation for Gorkov Self-Consistent Green's Functions (GSCGF).
+Extensions under discussions are diagrams and expressions for Particle-Number
+Restored BMBPT as well as diagrams and expressions generation for Gorkov
+Self-Consistent Green's Functions (GSCGF).
 
 ## Install
 To install ADG starting, download the source files and run
