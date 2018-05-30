@@ -97,11 +97,21 @@ def interactive_interface(commands):
         (Namespace): Flags initialized through keyboard input.
 
     """
-    commands.order = int(raw_input('Order of the diagrams?\n'))
-    while commands.order < 2:
-        print "Perturbative order too small!"
-        commands.order = int(raw_input('Order of the diagrams?\n'))
+    try:
+        commands.order = int(raw_input('Order of the diagrams? [2-10]\n'))
+    except ValueError:
+        print "Please enter an integer value! Program exiting."
+        exit()
+    while commands.order < 2 or commands.order > 10:
+        print "Perturbative order too small or too high!"
+        commands.order = int(raw_input('Order of the diagrams? [2-10]\n'))
+
+    theories = ["BMBPT", "MBPT"]
+
     commands.theory = raw_input('MBPT or BMBPT?\n').upper()
+    while commands.theory not in theories:
+        print "Invalid theory!"
+        commands.theory = raw_input('MBPT or BMBPT?\n').upper()
 
     if commands.theory == "BMBPT":
         commands.with_three_body = raw_input(
@@ -157,7 +167,8 @@ def generate_diagrams(commands):
         diagrams = adg.bmbpt.diagrams_generation(commands.order,
                                                  commands.with_three_body)
     else:
-        print "Invalid theory!"
+        print "Invalid theory! Exiting program."
+        exit()
     print "Number of possible diagrams, ", len(diagrams)
 
     diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
