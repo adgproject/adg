@@ -17,6 +17,15 @@ def diagrams_generation(order):
     Returns:
         (list): A list of NumPy arrays with the diagrams adjacency matrices.
 
+    >>> diagrams_generation(2) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2], [2, 0]])]
+    >>> diagrams_generation(3) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 0], [0, 0, 2], [2, 0, 0]]),
+     array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+     array([[0, 0, 2], [2, 0, 0], [0, 2, 0]])]
+    >>> diagrams_generation(1)
+    []
+
     """
     # Generate all 1-magic square of dimension order
     seeds = [k for k in itertools.permutations(range(order), order)]
