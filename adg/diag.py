@@ -336,7 +336,3 @@ class Diagram(object):
         latex_file.write('\n\\begin{center}\n')
         draw_diagram(directory, latex_file, self.tags[0], 'diag')
         latex_file.write('\n\\end{center}\n\n')
-
-
-import doctest
-doctest.testmod()

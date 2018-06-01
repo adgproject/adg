@@ -49,6 +49,7 @@ setup(
         # $ pip install -e .[develop]
         develop=[
             'pytest',
+            'pytest-cov',
             'sphinx',
             'sphinx_rtd_theme',
         ]

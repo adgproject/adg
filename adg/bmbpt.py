@@ -563,6 +563,3 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             denominator += "%s\\ " % adg.diag.extract_denom(self.graph,
                                                             subdiag)
         return denominator
-
-import doctest
-doctest.testmod()
