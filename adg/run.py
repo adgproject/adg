@@ -371,5 +371,6 @@ def clean_folders(directory, commands):
         os.unlink("result.toc")
     os.chdir("../..")
 
+
 import doctest
 doctest.testmod()
