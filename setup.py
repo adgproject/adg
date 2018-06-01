@@ -48,7 +48,8 @@ setup(
         # dependencies). You can install these using the following syntax:
         # $ pip install -e .[develop]
         develop=[
-            "sphinx",
+            'pytest',
+            'sphinx',
             'sphinx_rtd_theme',
         ]
     ),

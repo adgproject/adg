@@ -18,15 +18,10 @@ def diagrams_generation(p_order, three_body_use):
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
-    >>> diagrams_generation(2, False)
-    [array([[0, 4],
-           [0, 0]]), array([[0, 2],
-           [0, 0]])]
-    >>> diagrams_generation(2, True)
-    [array([[0, 6],
-           [0, 0]]), array([[0, 4],
-           [0, 0]]), array([[0, 2],
-           [0, 0]])]
+    >>> diagrams_generation(2, False)  # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+    >>> diagrams_generation(2, True)  # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
 
     """
     deg_max = 6 if three_body_use else 4
@@ -70,7 +65,7 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
         length_mat (int): The size of the square matrices.
 
     >>> mats = [[[0, 2, 0], [2, 0, 0], [0, 0, 0]], \
-    [[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+                [[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
     >>>
     >>> check_unconnected_spawn(mats, 1, 3)
     >>> mats
