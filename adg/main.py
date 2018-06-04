@@ -84,6 +84,8 @@ def main():
 
     adg.run.clean_folders(directory, run_commands)
 
+    print "\nADG ended succesfully!\n"
+
 
 if __name__ == "__main__":
     main()
