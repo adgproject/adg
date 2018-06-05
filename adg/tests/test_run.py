@@ -26,7 +26,7 @@ def test_generate_diagrams():
         adg.run.generate_diagrams()
 
     com.theory, com.order, com.with_three_body = 'SCGF', 2, True
-    with pytest.raises(UnboundLocalError):
+    with pytest.raises(SystemExit):
         adg.run.generate_diagrams(com)
 
 
