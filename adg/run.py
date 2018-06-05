@@ -178,12 +178,6 @@ def generate_diagrams(commands):
         if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
             del diags[i_diag]
 
-    # Specific check for loop diagrams in BMBPT
-    if commands.theory == "BMBPT":
-        for i_diag in xrange(len(diags)-1, -1, -1):
-            if not nx.is_directed_acyclic_graph(diags[i_diag]):
-                del diags[i_diag]
-
     adg.diag.label_vertices(diags, commands.theory)
 
     if commands.theory == 'BMBPT':
