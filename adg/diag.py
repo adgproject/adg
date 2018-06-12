@@ -26,22 +26,29 @@ def no_trace(matrices):
     return traceless_matrices
 
 
-def check_vertex_degree(matrices, three_body_use, vertex_id):
+def check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id):
     """Check the degree of a specific vertex in a set of matrices.
 
     Args:
         matrices (list): Adjacency matrices.
         three_body_use (bool): ``True`` if one uses three-body operators.
+        canonical_only (bool): ``True`` if one draws only canonical diagrams.
         vertex_id (int): The position of the studied vertex.
 
     """
+    authorized_deg = [4]
+    if three_body_use:
+        authorized_deg.append(6)
+    if not canonical_only or vertex_id == 0:
+        authorized_deg.append(2)
+    authorized_deg = tuple(authorized_deg)
+
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
                             for index in xrange(len(matrix[0])))
-        if (vertex_degree != 2) and (vertex_degree != 4):
-            if (not three_body_use) or (vertex_degree != 6):
-                del matrices[i_mat]
+        if vertex_degree not in authorized_deg:
+            del matrices[i_mat]
 
 
 def topologically_distinct_diagrams(diagrams):

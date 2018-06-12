@@ -51,6 +51,9 @@ def parse_command_line():
         help="execute ADG in interactive mode")
 
     bmbpt_args.add_argument(
+        "-can", "--canonical", action="store_true",
+        help="consider only canonical diagrams")
+    bmbpt_args.add_argument(
         "-3N", "--with_three_body", action="store_true",
         help="use two and three-body forces for BMBPT diagrams")
     bmbpt_args.add_argument(
@@ -79,6 +82,7 @@ def parse_command_line():
 
     # Avoid conflicting flags
     if args.theory != 'BMBPT' and not args.interactive:
+        args.canonical = None
         args.with_three_body = None
         args.draw_tsds = None
     if args.theory != 'MBPT' and not args.interactive:
@@ -114,6 +118,8 @@ def interactive_interface(commands):
         commands.theory = raw_input('MBPT or BMBPT?\n').upper()
 
     if commands.theory == "BMBPT":
+        commands.canonical = raw_input(
+            "Consider only canonical diagrams? (y/N)").lower() == 'y'
         commands.with_three_body = raw_input(
             "Include three-body forces? (y/N)").lower() == 'y'
         commands.draw_tsds = raw_input(
@@ -142,8 +148,10 @@ def attribute_directory(commands):
 
     """
     directory = '%s/Order-%i' % (commands.theory, commands.order)
+    if commands.canonical:
+        directory += '_canonical'
     if commands.with_three_body:
-        directory += 'with3N'
+        directory += '_with3N'
     if not os.path.exists(directory):
         os.makedirs(directory)
     if not os.path.exists(directory+"/Diagrams"):
@@ -165,7 +173,8 @@ def generate_diagrams(commands):
         diagrams = adg.mbpt.diagrams_generation(commands.order)
     elif commands.theory == "BMBPT":
         diagrams = adg.bmbpt.diagrams_generation(commands.order,
-                                                 commands.with_three_body)
+                                                 commands.with_three_body,
+                                                 commands.canonical)
     else:
         print "Invalid theory! Exiting program."
         exit()
@@ -221,24 +230,36 @@ def print_diags_numbers(commands, diags_nbs):
     print "Number of connected diagrams, ", diags_nbs['nb_diags']
 
     if commands.theory == "BMBPT":
-        print "\n2N valid diagrams: %i" % diags_nbs['nb_2']
-        print "2N energy canonical diagrams: %i" % diags_nbs['nb_2_hf']
-        print "2N canonical diagrams for a generic operator only: %i" \
+        print(
+            "\n2N valid diagrams: %i\n" % diags_nbs['nb_2']
+            + "2N energy canonical diagrams: %i\n" % diags_nbs['nb_2_hf']
+            + "2N canonical diagrams for a generic operator only: %i\n"
             % diags_nbs['nb_2_ehf']
-        print "2N non-canonical diagrams: %i\n" % diags_nbs['nb_2_not_hf']
+        )
+        if not commands.canonical:
+            print(
+                "2N non-canonical diagrams: %i\n" % diags_nbs['nb_2_not_hf']
+            )
         if commands.with_three_body:
-            print "3N valid diagrams: %i" % diags_nbs['nb_3']
-            print "3N energy canonical diagrams: %i" % diags_nbs['nb_3_hf']
-            print "3N canonical diagrams for a generic operator only: %i" \
+            print(
+                "3N valid diagrams: %i\n" % diags_nbs['nb_3']
+                + "3N energy canonical diagrams: %i\n" % diags_nbs['nb_3_hf']
+                + "3N canonical diagrams for a generic operator only: %i"
                 % diags_nbs['nb_3_ehf']
-            print "3N non-canonical diagrams: %i" % diags_nbs['nb_3_not_hf']
+            )
+            if not commands.canonical:
+                print(
+                    "3N non-canonical diagrams: %i" % diags_nbs['nb_3_not_hf']
+                )
     elif commands.theory == "MBPT":
-        print "\nValid diagrams: %i\n" % diags_nbs['nb_diags']
-        print "Singles: %i" % diags_nbs['singles']
-        print "Doubles: %i" % diags_nbs['doubles']
-        print "Triples: %i" % diags_nbs['triples']
-        print "Quadruples: %i" % diags_nbs['quadruples']
-        print "Quintuples and higher: %i" % diags_nbs['quintuples+']
+        print(
+            "\nValid diagrams: %i\n\n" % diags_nbs['nb_diags']
+            + "Singles: %i\n" % diags_nbs['singles']
+            + "Doubles: %i\n" % diags_nbs['doubles']
+            + "Triples: %i\n" % diags_nbs['triples']
+            + "Quadruples: %i\n" % diags_nbs['quadruples']
+            + "Quintuples and higher: %i\n" % diags_nbs['quintuples+']
+        )
 
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
@@ -304,7 +325,7 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":
-        adg.bmbpt.write_header(latex_file, commands.with_three_body, diags_nbs)
+        adg.bmbpt.write_header(latex_file, commands, diags_nbs)
     elif commands.theory == "MBPT":
         adg.mbpt.write_header(latex_file, diags_nbs)
 
