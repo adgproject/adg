@@ -40,6 +40,7 @@ Generic options:
 BMBPT options:
 **************
 
+-can, --canonnical      consider only canonical diagrams
 -3N, --with_three_body  use two and three-body forces for BMBPT diagrams
 -dt, --draw_tsds        draw Time-Structure Diagrams
 

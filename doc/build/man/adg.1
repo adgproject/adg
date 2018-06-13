@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "May 27, 2018" "0.0.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Jun 13, 2018" "0.0.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -162,6 +162,9 @@ execute ADG in interactive mode
 .SS BMBPT options:
 .INDENT 0.0
 .TP
+.BI \-c\fB an\fP,\fB \ \-\-canonnical
+consider only canonical diagrams
+.TP
 .BI \-3\fB N\fP,\fB \ \-\-with_three_body
 use two and three\-body forces for BMBPT diagrams
 .TP
@@ -172,7 +175,7 @@ draw Time\-Structure Diagrams
 .INDENT 0.0
 .TP
 .BI \-c\fB d\fP,\fB \ \-\-cd_output
-produce output for C. Drischler\(aqs framework
+produce output for C. Drischler’s framework
 .UNINDENT
 .SS Run management options:
 .INDENT 0.0
@@ -201,7 +204,7 @@ separately in the \fBadj_matrices.list\fP file to allow for an easy use with
 another many\-body diagrams code.
 .sp
 In the case of a MBPT calculations, it is possible to produce output
-specifically tailored for C. Drischler\(aqs automated calculations framework by
+specifically tailored for C. Drischler’s automated calculations framework by
 using the \fB\-cd\fP flag. The associated output files use \fBCD_\fP as a prefix.
 .SH ADG REFERENCE FOR DEVELOPERS
 .SS Main script
@@ -468,7 +471,7 @@ Write the graph of the diagram to the LaTeX file.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.diag.check_vertex_degree(matrices, three_body_use, vertex_id)
+.B adg.diag.check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id)
 Check the degree of a specific vertex in a set of matrices.
 .INDENT 7.0
 .TP
@@ -478,6 +481,8 @@ Check the degree of a specific vertex in a set of matrices.
 \fBmatrices\fP (\fIlist\fP) \-\- Adjacency matrices.
 .IP \(bu 2
 \fBthree_body_use\fP (\fIbool\fP) \-\- \fBTrue\fP if one uses three\-body operators.
+.IP \(bu 2
+\fBcanonical_only\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
 .IP \(bu 2
 \fBvertex_id\fP (\fIint\fP) \-\- The position of the studied vertex.
 .UNINDENT
@@ -1208,7 +1213,7 @@ have been filled.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.bmbpt.diagrams_generation(p_order, three_body_use)
+.B adg.bmbpt.diagrams_generation(p_order, three_body_use, canonical)
 Generate diagrams for BMBPT from bottom up.
 .INDENT 7.0
 .TP
@@ -1218,6 +1223,8 @@ Generate diagrams for BMBPT from bottom up.
 \fBp_order\fP (\fIint\fP) \-\- The conventional order of the studied diagrams.
 .IP \(bu 2
 \fBthree_body_use\fP (\fIbool\fP) \-\- Flag for the use of three\-body operators.
+.IP \(bu 2
+\fBcanonical\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
 .UNINDENT
 .TP
 .B Returns
@@ -1266,7 +1273,7 @@ Produce and store the expressions associated to the BMBPT diagrams.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.bmbpt.write_header(tex_file, three_body_use, diags_nbs)
+.B adg.bmbpt.write_header(tex_file, commands, diags_nbs)
 Write overall header for BMBPT result file.
 .INDENT 7.0
 .TP
@@ -1275,7 +1282,7 @@ Write overall header for BMBPT result file.
 .IP \(bu 2
 \fBtex_file\fP (\fIfile\fP) \-\- The ouput LaTeX file of the program.
 .IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- True if one uses three\-body operators.
+\fBcommands\fP (\fINamespace\fP) \-\- Flags for the program run.
 .IP \(bu 2
 \fBdiags_nbs\fP (\fIdict\fP) \-\- The number of diagrams per type.
 .UNINDENT
