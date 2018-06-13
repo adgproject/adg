@@ -233,16 +233,16 @@ def print_diags_numbers(commands, diags_nbs):
         print(
             "\n2N valid diagrams: %i\n" % diags_nbs['nb_2']
             + "2N energy canonical diagrams: %i\n" % diags_nbs['nb_2_hf']
-            + "2N canonical diagrams for a generic operator only: %i\n"
+            + "2N canonical diagrams for a generic operator only: %i"
             % diags_nbs['nb_2_ehf']
         )
         if not commands.canonical:
             print(
-                "2N non-canonical diagrams: %i\n" % diags_nbs['nb_2_not_hf']
+                "2N non-canonical diagrams: %i" % diags_nbs['nb_2_not_hf']
             )
         if commands.with_three_body:
             print(
-                "3N valid diagrams: %i\n" % diags_nbs['nb_3']
+                "\n3N valid diagrams: %i\n" % diags_nbs['nb_3']
                 + "3N energy canonical diagrams: %i\n" % diags_nbs['nb_3_hf']
                 + "3N canonical diagrams for a generic operator only: %i"
                 % diags_nbs['nb_3_ehf']

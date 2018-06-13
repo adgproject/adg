@@ -44,13 +44,8 @@ def diagrams_generation(p_order, three_body_use, canonical):
         if 0 < vertex < p_order-1:
             check_unconnected_spawn(matrices, vertex, p_order)
 
-    # Checks to exclude redundant matrices
-    matrices_uniq = []
-    for mat in matrices:
-        if mat not in matrices_uniq:
-            matrices_uniq.append(mat)
-    matrices_uniq.sort(reverse=True)
-    return [np.array(mat) for mat in matrices_uniq]
+    matrices.sort(reverse=True)
+    return [np.array(matrix) for matrix in matrices]
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
@@ -201,7 +196,7 @@ def order_diagrams(diagrams):
                  + len(diagrams_2_not_hf)),
         'nb_3': (len(diagrams_3_hf) + len(diagrams_3_ehf)
                  + len(diagrams_3_not_hf))
-        }
+    }
 
     return diagrams, diags_nb_per_type
 
