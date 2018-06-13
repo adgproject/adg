@@ -41,8 +41,8 @@ def parse_command_line():
         description="Arguments available only for BMBPT calculations.\n")
 
     basic_args.add_argument(
-        "-o", "--order", type=int, choices=range(2, 10),
-        help="order of the diagrams (>=2)")
+        "-o", "--order", type=int, choices=range(1, 10),
+        help="order of the diagrams (>=1)")
     basic_args.add_argument(
         "-t", "--theory", type=str, choices=['MBPT', 'BMBPT'],
         help="theory of interest: MBPT or BMBPT")
@@ -102,13 +102,13 @@ def interactive_interface(commands):
 
     """
     try:
-        commands.order = int(raw_input('Order of the diagrams? [2-10]\n'))
+        commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
     except ValueError:
         print "Please enter an integer value! Program exiting."
         exit()
-    while commands.order < 2 or commands.order > 10:
+    while commands.order < 1 or commands.order > 9:
         print "Perturbative order too small or too high!"
-        commands.order = int(raw_input('Order of the diagrams? [2-10]\n'))
+        commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
 
     theories = ["BMBPT", "MBPT"]
 
@@ -315,7 +315,7 @@ def write_file_header(latex_file, commands, diags_nbs):
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
     if commands.draw_diags:
         header = "%s\\usepackage{feynmp-auto}\n" % header
-    if commands.order > 3:
+    if commands.theory == 'BMBPT' and commands.order >= 3:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
     header = header \

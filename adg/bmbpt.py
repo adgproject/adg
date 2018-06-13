@@ -12,7 +12,7 @@ def diagrams_generation(p_order, three_body_use, canonical):
     """Generate diagrams for BMBPT from bottom up.
 
     Args:
-        p_order (int): The conventional order of the studied diagrams.
+        p_order (int): The BMBPT perturbative order of the studied diagrams.
         three_body_use (bool): Flag for the use of three-body operators.
         canonical (bool): ``True`` if one draws only canonical diagrams.
 
@@ -22,14 +22,17 @@ def diagrams_generation(p_order, three_body_use, canonical):
     """
     deg_max = 6 if three_body_use else 4
 
+    # Matrices contain operator vertex + p_order perturbative vertices
+    order = p_order + 1
+
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    matrices = [[[0 for _ in range(p_order)] for _ in range(p_order)]]
+    matrices = [[[0 for _ in range(order)] for _ in range(order)]]
 
     # Generate oriented adjacency matrices going vertex-wise
-    vertices = range(p_order)
+    vertices = range(order)
     add = matrices.append
     for vertex in vertices:
-        for sum_index in xrange(vertex+1, p_order):
+        for sum_index in xrange(vertex+1, order):
             for mat_indx in xrange(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
                 elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
@@ -41,8 +44,8 @@ def diagrams_generation(p_order, three_body_use, canonical):
         adg.diag.check_vertex_degree(
             matrices, three_body_use, canonical, vertex
         )
-        if 0 < vertex < p_order-1:
-            check_unconnected_spawn(matrices, vertex, p_order)
+        if 0 < vertex < order-1:
+            check_unconnected_spawn(matrices, vertex, order)
 
     matrices.sort(reverse=True)
     return [np.array(matrix) for matrix in matrices]
