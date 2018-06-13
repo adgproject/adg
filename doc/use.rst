@@ -33,14 +33,14 @@ CLI options
 Generic options:
 *****************
 
--o, --order         order of the diagrams (>=2)
+-o, --order         order of the diagrams [1-9]
 -t, --theory        theory of interest: MBPT or BMBPT
 -i, --interactive   execute ADG in interactive mode
 
 BMBPT options:
 **************
 
--can, --canonnical      consider only canonical diagrams
+-can, --canonical      consider only canonical diagrams
 -3N, --with_three_body  use two and three-body forces for BMBPT diagrams
 -dt, --draw_tsds        draw Time-Structure Diagrams
 

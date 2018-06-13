@@ -151,7 +151,7 @@ adg \-h
 .INDENT 0.0
 .TP
 .B \-o\fP,\fB  \-\-order
-order of the diagrams (>=2)
+order of the diagrams [1\-9]
 .TP
 .B \-t\fP,\fB  \-\-theory
 theory of interest: MBPT or BMBPT
@@ -162,7 +162,7 @@ execute ADG in interactive mode
 .SS BMBPT options:
 .INDENT 0.0
 .TP
-.BI \-c\fB an\fP,\fB \ \-\-canonnical
+.BI \-c\fB an\fP,\fB \ \-\-canonical
 consider only canonical diagrams
 .TP
 .BI \-3\fB N\fP,\fB \ \-\-with_three_body
@@ -175,7 +175,7 @@ draw Time\-Structure Diagrams
 .INDENT 0.0
 .TP
 .BI \-c\fB d\fP,\fB \ \-\-cd_output
-produce output for C. Drischler’s framework
+produce output for C. Drischler\(aqs framework
 .UNINDENT
 .SS Run management options:
 .INDENT 0.0
@@ -204,7 +204,7 @@ separately in the \fBadj_matrices.list\fP file to allow for an easy use with
 another many\-body diagrams code.
 .sp
 In the case of a MBPT calculations, it is possible to produce output
-specifically tailored for C. Drischler’s automated calculations framework by
+specifically tailored for C. Drischler\(aqs automated calculations framework by
 using the \fB\-cd\fP flag. The associated output files use \fBCD_\fP as a prefix.
 .SH ADG REFERENCE FOR DEVELOPERS
 .SS Main script
@@ -1220,7 +1220,7 @@ Generate diagrams for BMBPT from bottom up.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBp_order\fP (\fIint\fP) \-\- The conventional order of the studied diagrams.
+\fBp_order\fP (\fIint\fP) \-\- The BMBPT perturbative order of the studied diagrams.
 .IP \(bu 2
 \fBthree_body_use\fP (\fIbool\fP) \-\- Flag for the use of three\-body operators.
 .IP \(bu 2
