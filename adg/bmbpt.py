@@ -8,12 +8,13 @@ import adg.tsd
 import adg.diag
 
 
-def diagrams_generation(p_order, three_body_use):
+def diagrams_generation(p_order, three_body_use, canonical):
     """Generate diagrams for BMBPT from bottom up.
 
     Args:
-        p_order (int): The conventional order of the studied diagrams.
+        p_order (int): The BMBPT perturbative order of the studied diagrams.
         three_body_use (bool): Flag for the use of three-body operators.
+        canonical (bool): ``True`` if one draws only canonical diagrams.
 
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
@@ -21,14 +22,17 @@ def diagrams_generation(p_order, three_body_use):
     """
     deg_max = 6 if three_body_use else 4
 
+    # Matrices contain operator vertex + p_order perturbative vertices
+    order = p_order + 1
+
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    matrices = [[[0 for _ in range(p_order)] for _ in range(p_order)]]
+    matrices = [[[0 for _ in range(order)] for _ in range(order)]]
 
     # Generate oriented adjacency matrices going vertex-wise
-    vertices = range(p_order)
+    vertices = range(order)
     add = matrices.append
     for vertex in vertices:
-        for sum_index in xrange(vertex+1, p_order):
+        for sum_index in xrange(vertex+1, order):
             for mat_indx in xrange(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
                 elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
@@ -37,17 +41,14 @@ def diagrams_generation(p_order, three_body_use):
                     temp_mat = copy.deepcopy(mat)
                     temp_mat[vertex][sum_index] = elem
                     add(temp_mat)
-        adg.diag.check_vertex_degree(matrices, three_body_use, vertex)
-        if 0 < vertex < p_order-1:
-            check_unconnected_spawn(matrices, vertex, p_order)
+        adg.diag.check_vertex_degree(
+            matrices, three_body_use, canonical, vertex
+        )
+        if 0 < vertex < order-1:
+            check_unconnected_spawn(matrices, vertex, order)
 
-    # Checks to exclude redundant matrices
-    matrices_uniq = []
-    for mat in matrices:
-        if mat not in matrices_uniq:
-            matrices_uniq.append(mat)
-    matrices_uniq.sort(reverse=True)
-    return [np.array(mat) for mat in matrices_uniq]
+    matrices.sort(reverse=True)
+    return [np.array(matrix) for matrix in matrices]
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
@@ -86,36 +87,38 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
                 del matrices[ind_mat]
 
 
-def write_header(tex_file, three_body_use, diags_nbs):
+def write_header(tex_file, commands, diags_nbs):
     """Write overall header for BMBPT result file.
 
     Args:
         tex_file (file): The ouput LaTeX file of the program.
-        three_body_use (bool): True if one uses three-body operators.
+        commands (Namespace): Flags for the program run.
         diags_nbs (dict): The number of diagrams per type.
 
     """
     tex_file.write(
         "Valid diagrams: %i\n\n" % diags_nbs['nb_diags']
         + "2N valid diagrams: %i\n\n" % diags_nbs['nb_2']
-        + "2N canonical diagrams for the energy: %i\n\n"
-        % diags_nbs['nb_2_hf'])
-    tex_file.write(
-        "2N canonical diagrams for a generic operator only: %i\n\n"
-        % diags_nbs['nb_2_ehf'])
-    tex_file.write(
-        "2N non-canonical diagrams: %i\n\n" % diags_nbs['nb_2_not_hf'])
-    if three_body_use:
+        + "2N canonical diagrams for the energy: %i\n\n" % diags_nbs['nb_2_hf']
+        + "2N canonical diagrams for a generic operator only: %i\n\n"
+        % diags_nbs['nb_2_ehf']
+    )
+    if not commands.canonical:
         tex_file.write(
-            "3N valid diagrams: %i\n\n" % diags_nbs['nb_3_hf'])
+            "2N non-canonical diagrams: %i\n\n" % diags_nbs['nb_2_not_hf']
+        )
+    if commands.with_three_body:
         tex_file.write(
-            "3N canonical diagrams for the energy: %i\n\n"
-            % diags_nbs['nb_3_hf'])
-        tex_file.write(
-            "3N canonical diagrams for a generic operator only: %i\n\n"
-            % diags_nbs['nb_3_ehf'])
-        tex_file.write(
-            "3N non-canonical diagrams: %i\n\n" % diags_nbs['nb_3_not_hf'])
+            "3N valid diagrams: %i\n\n" % diags_nbs['nb_3_hf']
+            + "3N canonical diagrams for the energy: %i\n\n"
+            % diags_nbs['nb_3_hf']
+            + "3N canonical diagrams for a generic operator only: %i\n\n"
+            % diags_nbs['nb_3_ehf']
+        )
+        if not commands.canonical:
+            tex_file.write(
+                "3N non-canonical diagrams: %i\n\n" % diags_nbs['nb_3_not_hf']
+            )
 
 
 def produce_expressions(diagrams, diagrams_time):
@@ -196,7 +199,7 @@ def order_diagrams(diagrams):
                  + len(diagrams_2_not_hf)),
         'nb_3': (len(diagrams_3_hf) + len(diagrams_3_ehf)
                  + len(diagrams_3_not_hf))
-        }
+    }
 
     return diagrams, diags_nb_per_type
 

@@ -33,14 +33,14 @@ CLI options
 Generic options:
 *****************
 
--o, --order         order of the diagrams (>=2)
+-o, --order         order of the diagrams [1-9]
 -t, --theory        theory of interest: MBPT or BMBPT
 -i, --interactive   execute ADG in interactive mode
 
 BMBPT options:
 **************
 
--n, --norm              study norm BMBPT diagrams instead of operator ones
+-can, --canonical      consider only canonical diagrams
 -3N, --with_three_body  use two and three-body forces for BMBPT diagrams
 -dt, --draw_tsds        draw Time-Structure Diagrams
 
@@ -62,7 +62,7 @@ Output files
 The output of the program is stored in a folder named after the theory, and a
 subfolder named after the order, i.e. for our previous example, results would
 be stored under ``/BMBPT/Order-4``. In the case of BMBPT, suffixes are added
-for diagrams computed using three-body forces, and/or norm diagrams.
+for diagrams computed using three-body forces.
 
 The main output file of the program, called ``result.tex``, is a LaTeX file
 containing the expressions of the diagrams along other basic infos on their
