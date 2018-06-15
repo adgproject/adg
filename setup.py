@@ -50,6 +50,7 @@ setup(
         develop=[
             'pytest',
             'pytest-cov',
+            'roman',
             'sphinx',
             'sphinx_rtd_theme',
         ]

@@ -1,6 +1,7 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
 import os
+import math
 import networkx as nx
 import adg.diag
 
@@ -99,9 +100,12 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
                              + "/Diagrams/time_%i.tex" % tdiag.tags[0])
             latex_file.write('\n\\begin{center}\n%s\n\\end{center}\n\n'
                              % time_file.read())
-        latex_file.write("\\begin{equation}\n\\text{T%i} = %s\\end{equation}\n"
+        latex_file.write("\\begin{equation}\n\\text{T%i} = "
+                         "%s\\end{equation}\n\n"
                          % (tdiag.tags[0]+1, tdiag.expr))
-        if not tdiag.is_tree:
+        if tdiag.is_tree:
+            latex_file.write("Resummation power: %i\n\n" % tdiag.resum)
+        else:
             latex_file.write("Equivalent tree diagrams: %s\n\n"
                              % equivalent_labelled_tsds(tdiag.equivalent_trees,
                                                         time_diagrams))
@@ -229,9 +233,11 @@ class TimeStructureDiagram(adg.diag.Diagram):
         if nx.is_arborescence(self.graph):
             self.is_tree = True
             self.expr = "\\frac{1}{%s}" % tree_time_structure_den(self.graph)
+            self.resum = self.resummation_power()
         else:
             self.is_tree = False
             self.expr = ""
+            self.resum = 0
 
     def treat_cycles(self):
         """Find and treat cycles in a TSD diagram.
@@ -282,3 +288,17 @@ class TimeStructureDiagram(adg.diag.Diagram):
             latex_file.write(diag_file.read())
             diag_file.close()
             os.unlink("./equivalent%i_%i.tex" % (self.tags[0], index))
+
+    def resummation_power(self):
+        """Calculate the resummation power of the tree TSD.
+
+        Returns:
+            (int): The resummation power associated to the TSD.abs
+
+        """
+        power = math.factorial(len(self.graph) - 1)
+
+        for node in range(1, len(self.graph)):
+            power /= 1 + len(nx.descendants(self.graph, node))
+
+        return power

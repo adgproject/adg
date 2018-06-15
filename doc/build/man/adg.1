@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "May 27, 2018" "0.0.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Jun 15, 2018" "0.1.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -151,7 +151,7 @@ adg \-h
 .INDENT 0.0
 .TP
 .B \-o\fP,\fB  \-\-order
-order of the diagrams (>=2)
+order of the diagrams [1\-9]
 .TP
 .B \-t\fP,\fB  \-\-theory
 theory of interest: MBPT or BMBPT
@@ -161,6 +161,9 @@ execute ADG in interactive mode
 .UNINDENT
 .SS BMBPT options:
 .INDENT 0.0
+.TP
+.BI \-c\fB an\fP,\fB \ \-\-canonical
+consider only canonical diagrams
 .TP
 .BI \-3\fB N\fP,\fB \ \-\-with_three_body
 use two and three\-body forces for BMBPT diagrams
@@ -468,7 +471,7 @@ Write the graph of the diagram to the LaTeX file.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.diag.check_vertex_degree(matrices, three_body_use, vertex_id)
+.B adg.diag.check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id)
 Check the degree of a specific vertex in a set of matrices.
 .INDENT 7.0
 .TP
@@ -478,6 +481,8 @@ Check the degree of a specific vertex in a set of matrices.
 \fBmatrices\fP (\fIlist\fP) \-\- Adjacency matrices.
 .IP \(bu 2
 \fBthree_body_use\fP (\fIbool\fP) \-\- \fBTrue\fP if one uses three\-body operators.
+.IP \(bu 2
+\fBcanonical_only\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
 .IP \(bu 2
 \fBvertex_id\fP (\fIint\fP) \-\- The position of the studied vertex.
 .UNINDENT
@@ -1265,16 +1270,18 @@ have been filled.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.bmbpt.diagrams_generation(p_order, three_body_use)
+.B adg.bmbpt.diagrams_generation(p_order, three_body_use, canonical)
 Generate diagrams for BMBPT from bottom up.
 .INDENT 7.0
 .TP
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBp_order\fP (\fIint\fP) \-\- The conventional order of the studied diagrams.
+\fBp_order\fP (\fIint\fP) \-\- The BMBPT perturbative order of the studied diagrams.
 .IP \(bu 2
 \fBthree_body_use\fP (\fIbool\fP) \-\- Flag for the use of three\-body operators.
+.IP \(bu 2
+\fBcanonical\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
 .UNINDENT
 .TP
 .B Returns
@@ -1323,7 +1330,7 @@ Produce and store the expressions associated to the BMBPT diagrams.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.bmbpt.write_header(tex_file, three_body_use, diags_nbs)
+.B adg.bmbpt.write_header(tex_file, commands, diags_nbs)
 Write overall header for BMBPT result file.
 .INDENT 7.0
 .TP
@@ -1332,7 +1339,7 @@ Write overall header for BMBPT result file.
 .IP \(bu 2
 \fBtex_file\fP (\fIfile\fP) \-\- The ouput LaTeX file of the program.
 .IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- True if one uses three\-body operators.
+\fBcommands\fP (\fINamespace\fP) \-\- Flags for the program run.
 .IP \(bu 2
 \fBdiags_nbs\fP (\fIdict\fP) \-\- The number of diagrams per type.
 .UNINDENT
@@ -1377,6 +1384,19 @@ Draw the equivalent tree TSDs for a given non\-tree TSD.
 .TP
 .B Parameters
 \fBlatex_file\fP (\fIfile\fP) \-\- The output LaTeX file of the priogram.
+.UNINDENT
+.UNINDENT
+.INDENT 7.0
+.TP
+.B resummation_power()
+Calculate the resummation power of the tree TSD.
+.INDENT 7.0
+.TP
+.B Returns
+The resummation power associated to the TSD.abs
+.TP
+.B Return type
+(int)
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
