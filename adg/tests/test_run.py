@@ -11,13 +11,16 @@ def test_generate_diagrams():
 
     # Tests for the number of diagrams produced for simple known cases
 
-    com.theory, com.order, com.with_three_body = 'BMBPT', 2, False
+    com.theory, com.order, com.with_three_body = 'BMBPT', 1, False
+    com.canonical = False
     assert len(adg.run.generate_diagrams(com)) == 2
 
     com.theory, com.order, com.with_three_body = 'MBPT', 2, False
+    com.canonical = False
     assert len(adg.run.generate_diagrams(com)) == 1
 
-    com.theory, com.order, com.with_three_body = 'BMBPT', 2, True
+    com.theory, com.order, com.with_three_body = 'BMBPT', 1, True
+    com.canonical = False
     assert len(adg.run.generate_diagrams(com)) == 3
 
     # Test for anomalous cases
@@ -26,6 +29,7 @@ def test_generate_diagrams():
         adg.run.generate_diagrams()
 
     com.theory, com.order, com.with_three_body = 'SCGF', 2, True
+    com.canonical = False
     with pytest.raises(SystemExit):
         adg.run.generate_diagrams(com)
 
@@ -36,7 +40,8 @@ def test_order_diagrams():
 
     # Tests for the number of diagrams produced for simple known cases
 
-    com.theory, com.order, com.with_three_body = 'BMBPT', 2, False
+    com.theory, com.order, com.with_three_body = 'BMBPT', 1, False
+    com.canonical = False
 
     # Use generate_diagrams as a seed
     diagrams = adg.run.generate_diagrams(com)
@@ -52,7 +57,8 @@ def test_order_diagrams():
 
     # Test for the ordering with simple three-body case
     com = argparse.Namespace()
-    com.theory, com.order, com.with_three_body = 'BMBPT', 2, True
+    com.theory, com.order, com.with_three_body = 'BMBPT', 1, True
+    com.canonical = False
     diagrams = adg.run.generate_diagrams(com)
     assert len(diagrams) == 3
     diagrams, diag_nbs = adg.run.order_diagrams(diagrams, com)
@@ -105,10 +111,10 @@ def test_print_diags_numbers(capsys):
         "Doubles: 2\n"
         "Triples: 3\n"
         "Quadruples: 4\n"
-        "Quintuples and higher: 5\n"
+        "Quintuples and higher: 5\n\n"
     )
 
-    com.theory, com.with_three_body = 'BMBPT', False
+    com.theory, com.with_three_body, com.canonical = 'BMBPT', False, False
 
     diags_nb_per_type = {
         'nb_2_hf': 0,
@@ -129,10 +135,10 @@ def test_print_diags_numbers(capsys):
         "2N valid diagrams: 6\n"
         "2N energy canonical diagrams: 0\n"
         "2N canonical diagrams for a generic operator only: 1\n"
-        "2N non-canonical diagrams: 2\n\n"
+        "2N non-canonical diagrams: 2\n"
     )
 
-    com.theory, com.with_three_body = 'BMBPT', True
+    com.theory, com.with_three_body, com.canonical = 'BMBPT', True, False
 
     adg.run.print_diags_numbers(com, diags_nb_per_type)
     output = capsys.readouterr()

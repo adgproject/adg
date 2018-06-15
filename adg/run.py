@@ -148,17 +148,20 @@ def attribute_directory(commands):
 
     >>> com = argparse.Namespace()
     >>>
-    >>> com.theory, com.order, com.with_three_body = 'BMBPT', 4, False
+    >>> com.theory, com.order = 'BMBPT', 4
+    >>> com.with_three_body, com.canonical = False, False
     >>>
     >>> attribute_directory(com)
     'BMBPT/Order-4'
     >>>
-    >>> com.theory, com.order, com.with_three_body = 'BMBPT', 5, True
+    >>> com.theory, com.order = 'BMBPT', 5
+    >>> com.with_three_body, com.canonical = True, False
     >>>
     >>> attribute_directory(com)
-    'BMBPT/Order-5with3N'
+    'BMBPT/Order-5_with3N'
     >>>
-    >>> com.theory, com.order, com.with_three_body = 'MBPT', 3, False
+    >>> com.theory, com.order = 'MBPT', 3
+    >>> com.with_three_body, com.canonical = False, False
     >>>
     >>> attribute_directory(com)
     'MBPT/Order-3'

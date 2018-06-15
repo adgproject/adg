@@ -51,10 +51,10 @@ def check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id):
     >>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], \
         [[2, 0, 2], [1, 2, 3], [1, 0, 0]], \
         [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
-    >>> check_vertex_degree(test_matrices, True, 0)
+    >>> check_vertex_degree(test_matrices, True, False, 0)
     >>> test_matrices
     [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
-    >>> check_vertex_degree(test_matrices, False, 0)
+    >>> check_vertex_degree(test_matrices, False, False, 0)
     >>> test_matrices
     [[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
 

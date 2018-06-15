@@ -233,6 +233,27 @@ Path to the result folder.
 .B Return type
 (str)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> com = argparse.Namespace()
+>>>
+>>> com.theory, com.order, com.with_three_body = \(aqBMBPT\(aq, 4, False
+>>>
+>>> attribute_directory(com)
+\(aqBMBPT/Order\-4\(aq
+>>>
+>>> com.theory, com.order, com.with_three_body = \(aqBMBPT\(aq, 5, True
+>>>
+>>> attribute_directory(com)
+\(aqBMBPT/Order\-5with3N\(aq
+>>>
+>>> com.theory, com.order, com.with_three_body = \(aqMBPT\(aq, 3, False
+>>>
+>>> attribute_directory(com)
+\(aqMBPT/Order\-3\(aq
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -491,30 +512,10 @@ Check the degree of a specific vertex in a set of matrices.
 .nf
 .ft C
 >>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]],         [[2, 0, 2], [1, 2, 3], [1, 0, 0]],         [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
-.ft P
-.fi
-.sp
-.nf
-.ft C
 >>> check_vertex_degree(test_matrices, True, 0)
-.ft P
-.fi
-.sp
-.nf
-.ft C
 >>> test_matrices
 [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
-.ft P
-.fi
-.sp
-.nf
-.ft C
 >>> check_vertex_degree(test_matrices, False, 0)
-.ft P
-.fi
-.sp
-.nf
-.ft C
 >>> test_matrices
 [[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
 .ft P
@@ -612,18 +613,8 @@ The adjacency matrices without non\-zero diagonal elements.
 .nf
 .ft C
 >>> test_matrices = [[[0, 1, 2], [2, 0, 1], [5, 2, 0]],     [[2, 2, 2], [1, 2, 3], [0, 0, 0]],     [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
-.ft P
-.fi
-.sp
-.nf
-.ft C
 >>> no_trace(test_matrices)
 [[[0, 1, 2], [2, 0, 1], [5, 2, 0]], [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
-.ft P
-.fi
-.sp
-.nf
-.ft C
 >>> no_trace()
 Traceback (most recent call last):
   File "/usr/lib/python2.7/doctest.py", line 1315, in __run
@@ -914,6 +905,19 @@ A list of NumPy arrays with the diagrams adjacency matrices.
 .B Return type
 (list)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> diagrams_generation(2) # doctest: +NORMALIZE_WHITESPACE
+[array([[0, 2], [2, 0]])]
+>>> diagrams_generation(3) # doctest: +NORMALIZE_WHITESPACE
+[array([[0, 2, 0], [0, 0, 2], [2, 0, 0]]),
+ array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+ array([[0, 0, 2], [2, 0, 0], [0, 2, 0]])]
+>>> diagrams_generation(1)
+[]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -944,16 +948,11 @@ Order the MBPT diagrams and return the number of diags for each type.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams\fP (\fIlist\fP) \-\- The unordered redundent MbptDiagrams.
+\fBdiagrams\fP (\fIlist\fP) \-\- The unordered MbptDiagrams.
 .TP
 .B Returns
-.INDENT 7.0
-.TP
-.B First element are the ordered, topologically unique
-MbptDiagrams. Second element is the number of diagrams for each
-excitation level type.
-.UNINDENT
-
+First element are the ordered MbptDiagrams. Second element is
+the number of diagrams for each excitation level type.
 .TP
 .B Return type
 (tuple)
@@ -1267,6 +1266,16 @@ have been filled.
 \fBlength_mat\fP (\fIint\fP) \-\- The size of the square matrices.
 .UNINDENT
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> mats = [[[0, 2, 0], [2, 0, 0], [0, 0, 0]],                 [[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+>>>
+>>> check_unconnected_spawn(mats, 1, 3)
+>>> mats
+[[[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1290,6 +1299,15 @@ NumPy arrays encoding the adjacency matrices of the graphs.
 .B Return type
 (list)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> diagrams_generation(2, False)  # doctest: +NORMALIZE_WHITESPACE
+[array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+>>> diagrams_generation(2, True)  # doctest: +NORMALIZE_WHITESPACE
+[array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
