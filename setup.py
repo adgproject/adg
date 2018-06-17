@@ -41,6 +41,7 @@ setup(
     install_requires=[
         "networkx>=2.0",
         "numpy",
+        "scipy",
     ],
     python_requires='>=2.7.1',
     extras_require=dict(

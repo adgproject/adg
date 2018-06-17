@@ -178,7 +178,7 @@ def generate_diagrams(commands):
     else:
         print "Invalid theory! Exiting program."
         exit()
-    print "Number of possible diagrams, ", len(diagrams)
+    print "Number of matrices produced: ", len(diagrams)
 
     diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
                                   parallel_edges=True) for diagram in diagrams]
@@ -227,7 +227,7 @@ def print_diags_numbers(commands, diags_nbs):
         diags_nbs (dict): The number of diagrams for each major type.
 
     """
-    print "Number of connected diagrams, ", diags_nbs['nb_diags']
+    print "Number of connected diagrams: ", diags_nbs['nb_diags']
 
     if commands.theory == "BMBPT":
         print(
@@ -258,8 +258,9 @@ def print_diags_numbers(commands, diags_nbs):
             + "Doubles: %i\n" % diags_nbs['doubles']
             + "Triples: %i\n" % diags_nbs['triples']
             + "Quadruples: %i\n" % diags_nbs['quadruples']
-            + "Quintuples and higher: %i\n" % diags_nbs['quintuples+']
+            + "Quintuples and higher: %i" % diags_nbs['quintuples+']
         )
+    print
 
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):

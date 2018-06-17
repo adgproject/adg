@@ -11,11 +11,15 @@ def main():
     """Launch the ADG program."""
     run_commands = adg.run.parse_command_line()
 
-    print "#####################"
-    print "# Automatic Diagram #"
-    print "#     Generator     #"
-    print "#    RDL,JR,PA,MD   #"
-    print "#####################"
+    print(
+        "#####################\n"
+        + "# Automatic Diagram #\n"
+        + "#     Generator     #\n"
+        + "#      v%s       #\n" % adg.__version__
+        + "#                   #\n"
+        + "#  by ADG Dev Team  #\n"
+        + "#####################\n"
+    )
 
     if run_commands.interactive:
         run_commands = adg.run.interactive_interface(run_commands)
