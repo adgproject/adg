@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "Jun 15, 2018" "0.1.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Jun 19, 2018" "0.1.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -48,7 +48,7 @@ Theory (BMBPT).
 .IP \(bu 2
 For MBPT, the code generates all canonical (i.e. HF) diagrams at any given
 order along with their expression and additional information
-(conjugate diagram, excitation level...).
+(conjugate diagram, excitation level…).
 .IP \(bu 2
 For BMBPT, the code generates all diagrams along with their time\-dependent
 and time\-integrated expressions for all operator diagrams.
@@ -59,7 +59,7 @@ and time\-integrated expressions for all operator diagrams.
 .sp
 Extensions under discussions are diagrams and expressions for Particle\-Number
 Restored BMBPT as well as diagrams and expressions generation for Gorkov
-Self\-Consistent Green\(aqs Functions (GSCGF).
+Self\-Consistent Green’s Functions (GSCGF).
 .SH INSTALL ADG ON YOUR COMPUTER
 .SS Install
 .sp
@@ -175,7 +175,7 @@ draw Time\-Structure Diagrams
 .INDENT 0.0
 .TP
 .BI \-c\fB d\fP,\fB \ \-\-cd_output
-produce output for C. Drischler\(aqs framework
+produce output for C. Drischler’s framework
 .UNINDENT
 .SS Run management options:
 .INDENT 0.0
@@ -204,7 +204,7 @@ separately in the \fBadj_matrices.list\fP file to allow for an easy use with
 another many\-body diagrams code.
 .sp
 In the case of a MBPT calculations, it is possible to produce output
-specifically tailored for C. Drischler\(aqs automated calculations framework by
+specifically tailored for C. Drischler’s automated calculations framework by
 using the \fB\-cd\fP flag. The associated output files use \fBCD_\fP as a prefix.
 .SH ADG REFERENCE FOR DEVELOPERS
 .SS Main script
@@ -225,7 +225,7 @@ Create missing directories and return the working directory.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
+\fBcommands\fP (\fINamespace\fP) – Flags for the run management.
 .TP
 .B Returns
 Path to the result folder.
@@ -243,24 +243,24 @@ Delete temporary files and folders.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the ouput folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the ouput folder.
 .IP \(bu 2
-\fBcommands\fP (\fINamespace\fP) \-\- Flags to manage the program\(aqs run.
+\fBcommands\fP (\fINamespace\fP) – Flags to manage the program’s run.
 .UNINDENT
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B adg.run.compile_manager(directory, pdiag)
-Compile the program\(aqs LaTeX ouput file.
+Compile the program’s LaTeX ouput file.
 .INDENT 7.0
 .TP
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the ouput folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the ouput folder.
 .IP \(bu 2
-\fBpdiag\fP (\fIbool\fP) \-\- \fBTrue\fP if one wants to draw the diagrams.
+\fBpdiag\fP (\fIbool\fP) – \fBTrue\fP if one wants to draw the diagrams.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -273,13 +273,13 @@ Create and move the appropriate feynmanmp files to the right place.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdiagrams\fP (\fIlist\fP) \-\- The studied diagrams.
+\fBdiagrams\fP (\fIlist\fP) – The studied diagrams.
 .IP \(bu 2
-\fBtheory\fP (\fIstr\fP) \-\- Name of the theory of interest.
+\fBtheory\fP (\fIstr\fP) – Name of the theory of interest.
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the result folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the result folder.
 .IP \(bu 2
-\fBdiag_type\fP (\fIstr\fP) \-\- Type of studied diagrams used for drawing.
+\fBdiag_type\fP (\fIstr\fP) – Type of studied diagrams used for drawing.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -290,7 +290,7 @@ Return a list with diagrams of the appropriate type.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
+\fBcommands\fP (\fINamespace\fP) – Flags for the run management.
 .TP
 .B Returns
 All the diagrams of the appropriate Class and order.
@@ -306,7 +306,7 @@ Run the interactive interface mode, return the appropriate commands.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
+\fBcommands\fP (\fINamespace\fP) – Flags for the run management.
 .TP
 .B Returns
 Flags initialized through keyboard input.
@@ -324,9 +324,9 @@ Return the ordered unique diagrams with a dict of numbers per type.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdiagrams\fP (\fIlist\fP) \-\- The diagrams of the appropriate Class.
+\fBdiagrams\fP (\fIlist\fP) – The diagrams of the appropriate Class.
 .IP \(bu 2
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
+\fBcommands\fP (\fINamespace\fP) – Flags for the run management.
 .UNINDENT
 .TP
 .B Returns
@@ -344,7 +344,7 @@ Return run commands from the Command Line Interface.
 .INDENT 7.0
 .TP
 .B Returns
-Appropriate commands to manage the program\(aqs run.
+Appropriate commands to manage the program’s run.
 .TP
 .B Return type
 (Namespace)
@@ -359,13 +359,13 @@ Write FeynMP files for the different diagrams.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the output folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the output folder.
 .IP \(bu 2
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
+\fBcommands\fP (\fINamespace\fP) – Flags for the run management.
 .IP \(bu 2
-\fBdiagrams\fP (\fIlist\fP) \-\- All the diagrams of interest.
+\fBdiagrams\fP (\fIlist\fP) – All the diagrams of interest.
 .IP \(bu 2
-\fBdiagrams_time\fP (\fIlist\fP) \-\- All the associated TSDs if appropriate.
+\fBdiagrams_time\fP (\fIlist\fP) – All the associated TSDs if appropriate.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -378,9 +378,9 @@ Print the number of diagrams for each major type.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
+\fBcommands\fP (\fINamespace\fP) – Flags for the run management.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- The number of diagrams for each major type.
+\fBdiags_nbs\fP (\fIdict\fP) – The number of diagrams for each major type.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -393,11 +393,11 @@ Write the header of the result tex file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- LaTeX output file of the program.
+\fBlatex_file\fP (\fIfile\fP) – LaTeX output file of the program.
 .IP \(bu 2
-\fBcommands\fP (\fINamespace\fP) \-\- Flags to manage the program\(aqs run.
+\fBcommands\fP (\fINamespace\fP) – Flags to manage the program’s run.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- Number of diagrams per major type.
+\fBdiags_nbs\fP (\fIdict\fP) – Number of diagrams per major type.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -413,43 +413,43 @@ Describes a diagram with its related properties.
 .INDENT 7.0
 .TP
 .B graph
-\fINetworkX MultiDiGraph\fP \-\- The actual graph.
+\fINetworkX MultiDiGraph\fP – The actual graph.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B unsorted_degrees
-\fItuple\fP \-\- The degrees of the graph vertices
+\fItuple\fP – The degrees of the graph vertices
 .UNINDENT
 .INDENT 7.0
 .TP
 .B degrees
-\fItuple\fP \-\- The ascendingly sorted degrees of the graph vertices.
+\fItuple\fP – The ascendingly sorted degrees of the graph vertices.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B unsort_io_degrees
-\fItuple\fP \-\- The list of in\- and out\-degrees for each
+\fItuple\fP – The list of in\- and out\-degrees for each
 vertex of the graph, stored in a (in, out) tuple.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B io_degrees
-\fItuple\fP \-\- The sorted version of unsort_io_degrees.
+\fItuple\fP – The sorted version of unsort_io_degrees.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B max_degree
-\fIint\fP \-\- The maximal degree of a vertex in the graph.
+\fIint\fP – The maximal degree of a vertex in the graph.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B tags
-\fIlist\fP \-\- The tag numbers associated to a diagram.
+\fIlist\fP – The tag numbers associated to a diagram.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B adjacency_mat
-\fINumPy array\fP \-\- The adjacency matrix of the graph.
+\fINumPy array\fP – The adjacency matrix of the graph.
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -460,11 +460,11 @@ Write the graph of the diagram to the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX ouput file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX ouput file of the program.
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the result folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the result folder.
 .IP \(bu 2
-\fBwrite_time\fP (\fIbool\fP) \-\- (Here to emulate polymorphism).
+\fBwrite_time\fP (\fIbool\fP) – (Here to emulate polymorphism).
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -478,13 +478,13 @@ Check the degree of a specific vertex in a set of matrices.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBmatrices\fP (\fIlist\fP) \-\- Adjacency matrices.
+\fBmatrices\fP (\fIlist\fP) – Adjacency matrices.
 .IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- \fBTrue\fP if one uses three\-body operators.
+\fBthree_body_use\fP (\fIbool\fP) – \fBTrue\fP if one uses three\-body operators.
 .IP \(bu 2
-\fBcanonical_only\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
+\fBcanonical_only\fP (\fIbool\fP) – \fBTrue\fP if one draws only canonical diagrams.
 .IP \(bu 2
-\fBvertex_id\fP (\fIint\fP) \-\- The position of the studied vertex.
+\fBvertex_id\fP (\fIint\fP) – The position of the studied vertex.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -497,13 +497,13 @@ Copy the diagram feynmanmp instructions in the result file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- The path to the output folder.
+\fBdirectory\fP (\fIstr\fP) – The path to the output folder.
 .IP \(bu 2
-\fBresult_file\fP (\fIfile\fP) \-\- The LaTeX ouput file of the program.
+\fBresult_file\fP (\fIfile\fP) – The LaTeX ouput file of the program.
 .IP \(bu 2
-\fBdiagram_index\fP (\fIint\fP) \-\- The number associated to the diagram.
+\fBdiagram_index\fP (\fIint\fP) – The number associated to the diagram.
 .IP \(bu 2
-\fBdiag_type\fP (\fIstr\fP) \-\- The type of diagram used here.
+\fBdiag_type\fP (\fIstr\fP) – The type of diagram used here.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -516,9 +516,9 @@ Extract the appropriate denominator using the subgraph rule.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBstart_graph\fP (\fINetworkX MultiDiGraph\fP) \-\- The studied graph.
+\fBstart_graph\fP (\fINetworkX MultiDiGraph\fP) – The studied graph.
 .IP \(bu 2
-\fBsubgraph\fP (\fINetworkX MultiDiGraph\fP) \-\- The subgraph used for this particular
+\fBsubgraph\fP (\fINetworkX MultiDiGraph\fP) – The subgraph used for this particular
 denominator factor.
 .UNINDENT
 .TP
@@ -538,11 +538,11 @@ Generate the feynmanmp instructions corresponding to the diagram.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBgraph\fP (\fINetworkX MultiDiGraph\fP) \-\- The graph of interest.
+\fBgraph\fP (\fINetworkX MultiDiGraph\fP) – The graph of interest.
 .IP \(bu 2
-\fBtheory_type\fP (\fIstr\fP) \-\- The name of the theory of interest.
+\fBtheory_type\fP (\fIstr\fP) – The name of the theory of interest.
 .IP \(bu 2
-\fBdiagram_name\fP (\fIstr\fP) \-\- The name of the studied diagram.
+\fBdiagram_name\fP (\fIstr\fP) – The name of the studied diagram.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -555,9 +555,9 @@ Account for different status of vertices in operator diagrams.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBgraphs_list\fP (\fIlist\fP) \-\- The Diagrams of interest.
+\fBgraphs_list\fP (\fIlist\fP) – The Diagrams of interest.
 .IP \(bu 2
-\fBtheory_type\fP (\fIstr\fP) \-\- The name of the theory of interest.
+\fBtheory_type\fP (\fIstr\fP) – The name of the theory of interest.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -568,7 +568,7 @@ Select matrices with full 0 diagonal.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBmatrices\fP (\fIlist\fP) \-\- A list of adjacency matrices.
+\fBmatrices\fP (\fIlist\fP) – A list of adjacency matrices.
 .TP
 .B Returns
 The adjacency matrices without non\-zero diagonal elements.
@@ -580,15 +580,15 @@ The adjacency matrices without non\-zero diagonal elements.
 .INDENT 0.0
 .TP
 .B adg.diag.print_adj_matrices(directory, diagrams)
-Print a computer\-readable file with the diagrams\(aq adjacency matrices.
+Print a computer\-readable file with the diagrams’ adjacency matrices.
 .INDENT 7.0
 .TP
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- The path to the output directory.
+\fBdirectory\fP (\fIstr\fP) – The path to the output directory.
 .IP \(bu 2
-\fBdiagrams\fP (\fIlist\fP) \-\- All the diagrams.
+\fBdiagrams\fP (\fIlist\fP) – All the diagrams.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -599,7 +599,7 @@ Return the FeynMF definition for the appropriate propagator type.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBprop_type\fP (\fIstr\fP) \-\- The type of propagators used in the diagram.
+\fBprop_type\fP (\fIstr\fP) – The type of propagators used in the diagram.
 .TP
 .B Returns
 The FeynMF definition for the propagator style used.
@@ -615,7 +615,7 @@ Return the bare skeleton of a graph, i.e. only non\-redundant links.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBgraph\fP (\fINetworkX MultiDiGraph\fP) \-\- The graph to be turned into a skeleton.
+\fBgraph\fP (\fINetworkX MultiDiGraph\fP) – The graph to be turned into a skeleton.
 .TP
 .B Returns
 The skeleton of the initial graph.
@@ -631,7 +631,7 @@ Return a list of diagrams all topologically distinct.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams\fP (\fIlist\fP) \-\- The Diagrams of interest.
+\fBdiagrams\fP (\fIlist\fP) – The Diagrams of interest.
 .TP
 .B Returns
 Topologically unique diagrams.
@@ -652,28 +652,28 @@ Describes a MBPT diagram with its related properties.
 .INDENT 7.0
 .TP
 .B incidence
-\fINumPy array\fP \-\- The incidence matrix of the graph.
+\fINumPy array\fP – The incidence matrix of the graph.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B excitation_level
-\fIint\fP \-\- The single, double, etc., excitation character.
+\fIint\fP – The single, double, etc., excitation character.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B complex_conjugate
-\fIint\fP \-\- The tag number of the diagram\(aqs complex
+\fIint\fP – The tag number of the diagram’s complex
 conjugate. \-1 is the graph has none.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B expr
-\fIstr\fP \-\- The MBPT expression associated to the diagram.
+\fIstr\fP – The MBPT expression associated to the diagram.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B cd_expr
-\fIstr\fP \-\- The expression associated to the diagram in a
+\fIstr\fP – The expression associated to the diagram in a
 computer\-readable format.
 .UNINDENT
 .INDENT 7.0
@@ -684,7 +684,7 @@ Initialize the expression associated to the diagram.
 .INDENT 7.0
 .TP
 .B attribute_ph_labels()
-Attribute the appropriate qp labels to the graph\(aqs propagators.
+Attribute the appropriate qp labels to the graph’s propagators.
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -706,7 +706,7 @@ Return the CD\-formatted denominator of the graph.
 .INDENT 7.0
 .TP
 .B Returns
-The graph denominator tailored for C. Drishcler\(aqs framework.
+The graph denominator tailored for C. Drishcler’s framework.
 .TP
 .B Return type
 (str)
@@ -719,7 +719,7 @@ Return the numerator under CD format.
 .INDENT 7.0
 .TP
 .B Returns
-The graph numerator tailored for C. Drishcler\(aqs framework.
+The graph numerator tailored for C. Drishcler’s framework.
 .TP
 .B Return type
 (str)
@@ -771,7 +771,7 @@ Return True if self and test_diagram are complex conjugate.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtest_diagram\fP (\fIMbptDiagram\fP) \-\- A diagram to compare with.
+\fBtest_diagram\fP (\fIMbptDiagram\fP) – A diagram to compare with.
 .TP
 .B Returns
 The complex conjugate status of the pair of diagrams.
@@ -802,11 +802,11 @@ Write the graph of the diagram to the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX ouput file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX ouput file of the program.
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the result folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the result folder.
 .IP \(bu 2
-\fBwrite_time\fP (\fIbool\fP) \-\- (Here to emulate polymorphism).
+\fBwrite_time\fP (\fIbool\fP) – (Here to emulate polymorphism).
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -819,11 +819,11 @@ Write sections for MBPT result file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBresult\fP (\fIfile\fP) \-\- The LaTeX output file to be written in.
+\fBresult\fP (\fIfile\fP) – The LaTeX output file to be written in.
 .IP \(bu 2
-\fBcommands\fP (\fIdict\fP) \-\- The flags associated with run management.
+\fBcommands\fP (\fIdict\fP) – The flags associated with run management.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- A dict with the number of diagrams per
+\fBdiags_nbs\fP (\fIdict\fP) – A dict with the number of diagrams per
 excitation level type.
 .UNINDENT
 .UNINDENT
@@ -839,7 +839,7 @@ their partner in the \fBcomplex_conjugate\fP attribute.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams\fP (\fIlist\fP) \-\- The topologically unique MbptDiagrams.
+\fBdiagrams\fP (\fIlist\fP) – The topologically unique MbptDiagrams.
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -849,7 +849,7 @@ Generate the diagrams for the MBPT case.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBorder\fP (\fIint\fP) \-\- The perturbative order of interest.
+\fBorder\fP (\fIint\fP) – The perturbative order of interest.
 .TP
 .B Returns
 A list of NumPy arrays with the diagrams adjacency matrices.
@@ -867,9 +867,9 @@ Extract the appropriate CD denominator using the subgraph rule.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBstart_graph\fP (\fINetworkX MultiDiGraph\fP) \-\- The studied graph.
+\fBstart_graph\fP (\fINetworkX MultiDiGraph\fP) – The studied graph.
 .IP \(bu 2
-\fBsubgraph\fP (\fINetworkX MultiDiGraph\fP) \-\- The subgaph for this particular
+\fBsubgraph\fP (\fINetworkX MultiDiGraph\fP) – The subgaph for this particular
 factor.
 .UNINDENT
 .TP
@@ -887,7 +887,7 @@ Order the MBPT diagrams and return the number of diags for each type.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams\fP (\fIlist\fP) \-\- The unordered redundent MbptDiagrams.
+\fBdiagrams\fP (\fIlist\fP) – The unordered redundent MbptDiagrams.
 .TP
 .B Returns
 .INDENT 7.0
@@ -905,15 +905,15 @@ excitation level type.
 .INDENT 0.0
 .TP
 .B adg.mbpt.print_cd_output(directory, diagrams)
-Print a computer\-readable file for C. Drischler\(aqs framework.
+Print a computer\-readable file for C. Drischler’s framework.
 .INDENT 7.0
 .TP
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- The path to the output directory.
+\fBdirectory\fP (\fIstr\fP) – The path to the output directory.
 .IP \(bu 2
-\fBdiagrams\fP (\fIlist\fP) \-\- All the MbptDiagrams.
+\fBdiagrams\fP (\fIlist\fP) – All the MbptDiagrams.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -926,9 +926,9 @@ Write the expression associated to a diagram in the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX output file to be written in.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX output file to be written in.
 .IP \(bu 2
-\fBmbpt_diag\fP (\fIMbptDiagram\fP) \-\- The diagram which expression is being written.
+\fBmbpt_diag\fP (\fIMbptDiagram\fP) – The diagram which expression is being written.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -941,9 +941,9 @@ Write tha appropriate header for the LaTeX file for MBPT diagrams.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBtex_file\fP (\fIfile\fP) \-\- The LaTeX ouput file to be written in.
+\fBtex_file\fP (\fIfile\fP) – The LaTeX ouput file to be written in.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- A dict with the number of diagrams per
+\fBdiags_nbs\fP (\fIdict\fP) – A dict with the number of diagrams per
 excitation level type.
 .UNINDENT
 .UNINDENT
@@ -960,39 +960,39 @@ Describes a BMBPT Feynman diagram with its related properties.
 .INDENT 7.0
 .TP
 .B two_or_three_body
-\fIint\fP \-\- The 2 or 3\-body characted of the vertices.
+\fIint\fP – The 2 or 3\-body characted of the vertices.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B time_tag
-\fIint\fP \-\- The tag number associated to the diagram\(aqs
+\fIint\fP – The tag number associated to the diagram’s
 associated TSD.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B tsd_is_tree
-\fIbool\fP \-\- The tree or non\-tree character of the
+\fIbool\fP – The tree or non\-tree character of the
 associated TSD.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B feynman_exp
-\fIstr\fP \-\- The Feynman expression associated to the diagram.
+\fIstr\fP – The Feynman expression associated to the diagram.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B diag_exp
-\fIstr\fP \-\- The Goldstone expression associated to the diagram.
+\fIstr\fP – The Goldstone expression associated to the diagram.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B vert_exp
-\fIlist\fP \-\- The expression associated to the vertices.
+\fIlist\fP – The expression associated to the vertices.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B hf_type
-\fIstr\fP \-\- The Hartree\-Fock, non\-Hartree\-Fock or Hartree\-Fock for
+\fIstr\fP – The Hartree\-Fock, non\-Hartree\-Fock or Hartree\-Fock for
 the energy operator only character of the graph.
 .UNINDENT
 .INDENT 7.0
@@ -1002,13 +1002,13 @@ Attribute the correct Feynman and Goldstone expressions.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtime_diag\fP (\fITimeStructureDiagram\fP) \-\- The associated TSD.
+\fBtime_diag\fP (\fITimeStructureDiagram\fP) – The associated TSD.
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B attribute_qp_labels()
-Attribute the appropriate qp labels to the graph\(aqs propagators.
+Attribute the appropriate qp labels to the graph’s propagators.
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -1077,7 +1077,7 @@ Return the denominator for a time\-tree graph.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtime_graph\fP (\fINetworkX MultiDiGraph\fP) \-\- Its associated time\-structure
+\fBtime_graph\fP (\fINetworkX MultiDiGraph\fP) – Its associated time\-structure
 graph.
 .TP
 .B Returns
@@ -1107,7 +1107,7 @@ Return the expression associated to a given vertex.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBvertex\fP (\fIint\fP) \-\- The vertex of interest in the graph.
+\fBvertex\fP (\fIint\fP) – The vertex of interest in the graph.
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -1119,9 +1119,9 @@ Write the expressions associated to a diagram in the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX outputfile of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX outputfile of the program.
 .IP \(bu 2
-\fBnorder\fP (\fIint\fP) \-\- The order in BMBPT formalism.
+\fBnorder\fP (\fIint\fP) – The order in BMBPT formalism.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1134,11 +1134,11 @@ Write the BMBPT graph and its associated TSD to the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX output file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX output file of the program.
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- The path to the result folder.
+\fBdirectory\fP (\fIstr\fP) – The path to the result folder.
 .IP \(bu 2
-\fBwrite_time\fP (\fIbool\fP) \-\- \fBTrue\fP if we want informations on the
+\fBwrite_time\fP (\fIbool\fP) – \fBTrue\fP if we want informations on the
 associated TSDs.
 .UNINDENT
 .UNINDENT
@@ -1152,11 +1152,11 @@ Write section and subsections for BMBPT result file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBresult\fP (\fIfile\fP) \-\- The LaTeX output file of the program.
+\fBresult\fP (\fIfile\fP) – The LaTeX output file of the program.
 .IP \(bu 2
-\fBcommands\fP (\fIdict\fP) \-\- The flags associated with run management.
+\fBcommands\fP (\fIdict\fP) – The flags associated with run management.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- The number of diagrams per type.
+\fBdiags_nbs\fP (\fIdict\fP) – The number of diagrams per type.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1169,9 +1169,9 @@ Write info related to the BMBPT associated TSD to the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdiagrams_time\fP (\fIlist\fP) \-\- The associated TSDs.
+\fBdiagrams_time\fP (\fIlist\fP) – The associated TSDs.
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX output file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX output file of the program.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1184,9 +1184,9 @@ Write the qp energies associated to each vertex of the diag.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX output file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX output file of the program.
 .IP \(bu 2
-\fBmapping\fP (\fIdict\fP) \-\- A mapping between the vertices in the diagram and
+\fBmapping\fP (\fIdict\fP) – A mapping between the vertices in the diagram and
 the vertices in its euivalent TSD, since permutations between
 vertices are possible.
 .UNINDENT
@@ -1202,12 +1202,12 @@ Exclude some matrices that would spawn unconnected diagrams.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBmatrices\fP (\fIlist\fP) \-\- The adjacency matrices to be checked.
+\fBmatrices\fP (\fIlist\fP) – The adjacency matrices to be checked.
 .IP \(bu 2
-\fBmax_filled_vertex\fP (\fIint\fP) \-\- The furthest vertex until which the matrices
+\fBmax_filled_vertex\fP (\fIint\fP) – The furthest vertex until which the matrices
 have been filled.
 .IP \(bu 2
-\fBlength_mat\fP (\fIint\fP) \-\- The size of the square matrices.
+\fBlength_mat\fP (\fIint\fP) – The size of the square matrices.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1220,11 +1220,11 @@ Generate diagrams for BMBPT from bottom up.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBp_order\fP (\fIint\fP) \-\- The BMBPT perturbative order of the studied diagrams.
+\fBp_order\fP (\fIint\fP) – The BMBPT perturbative order of the studied diagrams.
 .IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- Flag for the use of three\-body operators.
+\fBthree_body_use\fP (\fIbool\fP) – Flag for the use of three\-body operators.
 .IP \(bu 2
-\fBcanonical\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
+\fBcanonical\fP (\fIbool\fP) – \fBTrue\fP if one draws only canonical diagrams.
 .UNINDENT
 .TP
 .B Returns
@@ -1241,7 +1241,7 @@ Order the BMBPT diagrams and return number of diags for each type.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams\fP (\fIlist\fP) \-\- Possibly redundant BmbptFeynmanDiagrams.
+\fBdiagrams\fP (\fIlist\fP) – Possibly redundant BmbptFeynmanDiagrams.
 .TP
 .B Returns
 .INDENT 7.0
@@ -1265,9 +1265,9 @@ Produce and store the expressions associated to the BMBPT diagrams.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdiagrams\fP (\fIlist\fP) \-\- The list of all BmbptFeynmanDiagrams.
+\fBdiagrams\fP (\fIlist\fP) – The list of all BmbptFeynmanDiagrams.
 .IP \(bu 2
-\fBdiagrams_time\fP (\fIlist\fP) \-\- Their associates TSDs.
+\fBdiagrams_time\fP (\fIlist\fP) – Their associates TSDs.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1280,11 +1280,11 @@ Write overall header for BMBPT result file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBtex_file\fP (\fIfile\fP) \-\- The ouput LaTeX file of the program.
+\fBtex_file\fP (\fIfile\fP) – The ouput LaTeX file of the program.
 .IP \(bu 2
-\fBcommands\fP (\fINamespace\fP) \-\- Flags for the program run.
+\fBcommands\fP (\fINamespace\fP) – Flags for the program run.
 .IP \(bu 2
-\fBdiags_nbs\fP (\fIdict\fP) \-\- The number of diagrams per type.
+\fBdiags_nbs\fP (\fIdict\fP) – The number of diagrams per type.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1300,24 +1300,24 @@ Describes a time\-structure diagram with its related properties.
 .INDENT 7.0
 .TP
 .B perms
-\fIdict\fP \-\- The permutations on the vertices for all the BMBPT
+\fIdict\fP – The permutations on the vertices for all the BMBPT
 diagrams associated to this TSD.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B equivalent_trees
-\fIlist\fP \-\- The tag numbers of the equivalent tree TSDs
+\fIlist\fP – The tag numbers of the equivalent tree TSDs
 associated to a non\-tree TSD.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B is_tree
-\fIbool\fP \-\- The tree or non\-tree character of a TSD.
+\fIbool\fP – The tree or non\-tree character of a TSD.
 .UNINDENT
 .INDENT 7.0
 .TP
 .B expr
-\fIstr\fP \-\- The Goldstone denominator associated to the TSD.
+\fIstr\fP – The Goldstone denominator associated to the TSD.
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -1326,7 +1326,7 @@ Draw the equivalent tree TSDs for a given non\-tree TSD.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBlatex_file\fP (\fIfile\fP) \-\- The output LaTeX file of the priogram.
+\fBlatex_file\fP (\fIfile\fP) – The output LaTeX file of the priogram.
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -1364,11 +1364,11 @@ Write the graph of the diagram to the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX ouput file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX ouput file of the program.
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the result folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the result folder.
 .IP \(bu 2
-\fBwrite_time\fP (\fIbool\fP) \-\- (Here to emulate polymorphism).
+\fBwrite_time\fP (\fIbool\fP) – (Here to emulate polymorphism).
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1382,9 +1382,9 @@ Separate a cycle in a sum of tree diagrams.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBtime_graph\fP (\fINetworkXn MultiDiGraph\fP) \-\- A time\-structure diagram.
+\fBtime_graph\fP (\fINetworkXn MultiDiGraph\fP) – A time\-structure diagram.
 .IP \(bu 2
-\fBcycle_nodes\fP (\fItuple\fP) \-\- Integers encoding the positions of the end nodes
+\fBcycle_nodes\fP (\fItuple\fP) – Integers encoding the positions of the end nodes
 of the cycle.
 .UNINDENT
 .TP
@@ -1404,9 +1404,9 @@ Return the list of labelled TSDs corresponding to equivalent TSDs.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBequivalent_trees\fP (\fIlist\fP) \-\- The equivalent tree TSDs of a non\-tree TSD.
+\fBequivalent_trees\fP (\fIlist\fP) – The equivalent tree TSDs of a non\-tree TSD.
 .IP \(bu 2
-\fBlabelled_tsds\fP (\fIlist\fP) \-\- The labelled TSDs obtained from BMBPT diagrams.
+\fBlabelled_tsds\fP (\fIlist\fP) – The labelled TSDs obtained from BMBPT diagrams.
 .UNINDENT
 .TP
 .B Returns
@@ -1423,7 +1423,7 @@ Return start and end nodes for an elementary cycle.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBgraph\fP (\fINetworkX MultiDiGraph\fP) \-\- A TSD with cycle(s) to be treated.
+\fBgraph\fP (\fINetworkX MultiDiGraph\fP) – A TSD with cycle(s) to be treated.
 .TP
 .B Returns
 Positions of the two end nodes of a cycle in the graph.
@@ -1439,7 +1439,7 @@ Return the time\-structure graph associated to the graph.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBgraph\fP (\fINetwrokX MultiDiGraph\fP) \-\- The BMBPT graph of interest.
+\fBgraph\fP (\fINetwrokX MultiDiGraph\fP) – The BMBPT graph of interest.
 .TP
 .B Returns
 The time\-structure diagram.
@@ -1455,7 +1455,7 @@ Order TSDs, produce their expressions, return also number of trees.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams_time\fP (\fIlist\fP) \-\- All the associated TSDs.
+\fBdiagrams_time\fP (\fIlist\fP) – All the associated TSDs.
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -1465,7 +1465,7 @@ Return the denominator associated to a tree time\-structure graph.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtime_graph\fP (\fINetworkX MultiDiGraph\fP) \-\- The TSD of interest.
+\fBtime_graph\fP (\fINetworkX MultiDiGraph\fP) – The TSD of interest.
 .TP
 .B Returns
 The denominator associated to the TSD.
@@ -1483,15 +1483,15 @@ Write the appropriate section for tsd diagrams in the LaTeX file.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX output file of the program.
+\fBlatex_file\fP (\fIfile\fP) – The LaTeX output file of the program.
 .IP \(bu 2
-\fBdirectory\fP (\fIstr\fP) \-\- Path to the output folder.
+\fBdirectory\fP (\fIstr\fP) – Path to the output folder.
 .IP \(bu 2
-\fBpdiag\fP (\fIbool\fP) \-\- \fBTrue\fP if diagrams are to be drawn.
+\fBpdiag\fP (\fIbool\fP) – \fBTrue\fP if diagrams are to be drawn.
 .IP \(bu 2
-\fBtime_diagrams\fP (\fIlist\fP) \-\- The ensemble of TSDs.
+\fBtime_diagrams\fP (\fIlist\fP) – The ensemble of TSDs.
 .IP \(bu 2
-\fBnb_tree_tsds\fP (\fIint\fP) \-\- Number of tree TSDs.
+\fBnb_tree_tsds\fP (\fIint\fP) – Number of tree TSDs.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1520,7 +1520,23 @@ If you use ADG in your research work, we kindly ask you to cite the following
 paper: []
 .SH LICENSE
 .sp
-ADG is licensed under
+ADG is licensed under under GNU General Public License version 3
+(see LICENSE.txt for the full GPLv3 License).
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Copyright (C) 2018 ADG Dev Team
+Pierre Arthuis
+Thomas Duguet
+Jean\-Paul Ebran
+Raphaël\-David Lasseri
+Alexander Tichai
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
 .INDENT 0.0
 .IP \(bu 2
 genindex

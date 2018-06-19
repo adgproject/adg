@@ -93,4 +93,12 @@ If you use ADG in your research work, we kindly ask you to cite the following
 paper: []
 
 ## License
-ADG is licensed under
+ADG is licensed under GNU General Public License version 3 (see LICENSE.txt)
+```
+Copyright (C) 2018 ADG Dev Team
+Pierre Arthuis
+Thomas Duguet
+Jean-Paul Ebran
+Raphaël-David Lasseri
+Alexander Tichai
+```

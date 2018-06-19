@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.abspath('..'))
 import adg
 
 project = u'ADG - Automated Diagram Generator'
-copyright = u'2018, ADG Developers'
-author = u'ADG Developers'
+copyright = u'2018, ADG Dev Team'
+author = u'ADG Dev Team'
 
 # The short X.Y version
 version = adg.__version__
@@ -142,7 +142,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'ADG.tex',
      u'ADG - Automated Diagram Generator Documentation',
-     u'ADG Developers', 'manual'),
+     u'ADG Dev Team', 'manual'),
 ]
 
 
