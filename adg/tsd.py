@@ -183,6 +183,9 @@ def treat_tsds(diagrams_time):
     Args:
         diagrams_time (list): All the associated TSDs.
 
+    Returns:
+        (tuple): List of TSDs, number of tree TSDs
+
     """
     tree_tsds = []
     for i_diag in xrange(len(diagrams_time)-1, -1, -1):
