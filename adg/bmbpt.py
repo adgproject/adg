@@ -23,6 +23,9 @@ def diagrams_generation(p_order, three_body_use, canonical):
     [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
     >>> diagrams_generation(1, True, False)  # doctest: +NORMALIZE_WHITESPACE
     [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+    >>> diagrams_generation(2, False, True)  # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
+     array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
 
     """
     deg_max = 6 if three_body_use else 4
