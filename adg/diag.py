@@ -39,22 +39,24 @@ def no_trace(matrices):
     return traceless_matrices
 
 
-def check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id):
+def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
+                        canonical_only, vertex_id):
     """Check the degree of a specific vertex in a set of matrices.
 
     Args:
         matrices (list): Adjacency matrices.
-        three_body_use (bool): ``True`` if one uses three-body operators.
+        three_body_use (bool): ``True`` if one uses three-body forces.
+        nbody_max_observable (int): Maximum body number for the observable.
         canonical_only (bool): ``True`` if one draws only canonical diagrams.
         vertex_id (int): The position of the studied vertex.
 
     >>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], \
         [[2, 0, 2], [1, 2, 3], [1, 0, 0]], \
         [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
-    >>> check_vertex_degree(test_matrices, True, False, 0)
+    >>> check_vertex_degree(test_matrices, True, 3, False, 0)
     >>> test_matrices
     [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
-    >>> check_vertex_degree(test_matrices, False, False, 0)
+    >>> check_vertex_degree(test_matrices, False, 2, False, 0)
     >>> test_matrices
     [[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
 
@@ -72,7 +74,8 @@ def check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id):
                             for index in xrange(len(matrix[0])))
         vertex_degree -= matrix[vertex_id][vertex_id]
 
-        if vertex_degree not in authorized_deg:
+        if (vertex_id != 0 and vertex_degree not in authorized_deg) \
+                or (vertex_id == 0 and vertex_degree > 2*nbody_max_observable):
             del matrices[i_mat]
 
 

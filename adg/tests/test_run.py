@@ -11,16 +11,16 @@ def test_generate_diagrams():
 
     # Tests for the number of diagrams produced for simple known cases
 
-    com.theory, com.order, com.with_three_body = 'BMBPT', 1, False
-    com.canonical = False
+    com.theory, com.order, com.with_3NF = 'BMBPT', 1, False
+    com.nbody_observable, com.canonical = 2, False
     assert len(adg.run.generate_diagrams(com)) == 2
 
-    com.theory, com.order, com.with_three_body = 'MBPT', 2, False
-    com.canonical = False
+    com.theory, com.order, com.with_3NF = 'MBPT', 2, False
+    com.nbody_observable, com.canonical = 2, False
     assert len(adg.run.generate_diagrams(com)) == 1
 
-    com.theory, com.order, com.with_three_body = 'BMBPT', 1, True
-    com.canonical = False
+    com.theory, com.order, com.with_3NF = 'BMBPT', 1, True
+    com.nbody_observable, com.canonical = 3, False
     assert len(adg.run.generate_diagrams(com)) == 3
 
     # Test for anomalous cases
@@ -29,7 +29,7 @@ def test_generate_diagrams():
         adg.run.generate_diagrams()
 
     com.theory, com.order, com.with_three_body = 'SCGF', 2, True
-    com.canonical = False
+    com.nbody_observable, com.canonical = 2, False
     with pytest.raises(SystemExit):
         adg.run.generate_diagrams(com)
 
@@ -40,8 +40,8 @@ def test_order_diagrams():
 
     # Tests for the number of diagrams produced for simple known cases
 
-    com.theory, com.order, com.with_three_body = 'BMBPT', 1, False
-    com.canonical = False
+    com.theory, com.order, com.with_3NF = 'BMBPT', 1, False
+    com.nbody_observable, com.canonical = 2, False
 
     # Use generate_diagrams as a seed
     diagrams = adg.run.generate_diagrams(com)
@@ -57,8 +57,8 @@ def test_order_diagrams():
 
     # Test for the ordering with simple three-body case
     com = argparse.Namespace()
-    com.theory, com.order, com.with_three_body = 'BMBPT', 1, True
-    com.canonical = False
+    com.theory, com.order, com.with_3NF = 'BMBPT', 1, True
+    com.nbody_observable, com.canonical = 3, False
     diagrams = adg.run.generate_diagrams(com)
     assert len(diagrams) == 3
     diagrams, diag_nbs = adg.run.order_diagrams(diagrams, com)
@@ -114,7 +114,8 @@ def test_print_diags_numbers(capsys):
         "Quintuples and higher: 5\n\n"
     )
 
-    com.theory, com.with_three_body, com.canonical = 'BMBPT', False, False
+    com.theory, com.with_3NF, com.canonical = 'BMBPT', False, False
+    com.nbody_observable = 2
 
     diags_nb_per_type = {
         'nb_2_hf': 0,
@@ -138,7 +139,8 @@ def test_print_diags_numbers(capsys):
         "2N non-canonical diagrams: 2\n"
     )
 
-    com.theory, com.with_three_body, com.canonical = 'BMBPT', True, False
+    com.theory, com.with_3NF, com.canonical = 'BMBPT', True, False
+    com.nbody_observable = 3
 
     adg.run.print_diags_numbers(com, diags_nb_per_type)
     output = capsys.readouterr()

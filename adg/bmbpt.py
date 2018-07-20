@@ -8,28 +8,27 @@ import adg.tsd
 import adg.diag
 
 
-def diagrams_generation(p_order, three_body_use, canonical):
+def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
     """Generate diagrams for BMBPT from bottom up.
 
     Args:
         p_order (int): The BMBPT perturbative order of the studied diagrams.
-        three_body_use (bool): Flag for the use of three-body operators.
+        three_body_use (bool): Flag for the use of three-body forces.
+        nbody_obs (int): N-body character of the obervable of interest.
         canonical (bool): ``True`` if one draws only canonical diagrams.
 
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
-    >>> diagrams_generation(1, False, False)  # doctest: +NORMALIZE_WHITESPACE
+    >>> diagrams_generation(1, False, 2, False) #doctest: +NORMALIZE_WHITESPACE
     [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
-    >>> diagrams_generation(1, True, False)  # doctest: +NORMALIZE_WHITESPACE
+    >>> diagrams_generation(1, True, 3, False)  #doctest: +NORMALIZE_WHITESPACE
     [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
-    >>> diagrams_generation(2, False, True)  # doctest: +NORMALIZE_WHITESPACE
+    >>> diagrams_generation(2, False, 2, True)  #doctest: +NORMALIZE_WHITESPACE
     [array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
      array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
 
     """
-    deg_max = 6 if three_body_use else 4
-
     # Matrices contain operator vertex + p_order perturbative vertices
     order = p_order + 1
 
@@ -40,6 +39,10 @@ def diagrams_generation(p_order, three_body_use, canonical):
     vertices = range(order)
     add = matrices.append
     for vertex in vertices:
+        if vertex == 0:
+            deg_max = 2*nbody_obs
+        else:
+            deg_max = 6 if three_body_use else 4
         for sum_index in xrange(vertex+1, order):
             for mat_indx in xrange(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
@@ -50,7 +53,7 @@ def diagrams_generation(p_order, three_body_use, canonical):
                     temp_mat[vertex][sum_index] = elem
                     add(temp_mat)
         adg.diag.check_vertex_degree(
-            matrices, three_body_use, canonical, vertex
+            matrices, three_body_use, nbody_obs, canonical, vertex
         )
         if 0 < vertex < order-1:
             check_unconnected_spawn(matrices, vertex, order)
@@ -122,7 +125,7 @@ def write_header(tex_file, commands, diags_nbs):
         tex_file.write(
             "2N non-canonical diagrams: %i\n\n" % diags_nbs['nb_2_not_hf']
         )
-    if commands.with_three_body:
+    if commands.with_3NF:
         tex_file.write(
             "3N valid diagrams: %i\n\n" % diags_nbs['nb_3_hf']
             + "3N canonical diagrams for the energy: %i\n\n"
@@ -379,7 +382,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                          "for a generic operator only}\n\n")
         elif self.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
             result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
-        if commands.with_three_body:
+        if commands.with_3NF:
             if self.tags[0] == diags_nbs['nb_2']:
                 result.write(
                     "\\section{Three-body diagrams}\n\n"
