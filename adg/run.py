@@ -72,7 +72,7 @@ def parse_command_line():
 
     mbpt_args.add_argument(
         "-cd", "--cd_output", action="store_true",
-        help="produce output for C. Drischler's framework (MBPT)")
+        help="produce computer-readable output for automated framework (MBPT)")
 
     args = parser.parse_args()
 

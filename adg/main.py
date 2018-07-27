@@ -48,7 +48,7 @@ def main():
     else:
         diagrams_time = []
 
-    print "Time ellapsed: ", datetime.now() - start_time
+    print "Time elapsed: ", datetime.now() - start_time
 
     adg.run.print_diags_numbers(run_commands, diags_per_type)
 
@@ -88,7 +88,7 @@ def main():
 
     adg.run.clean_folders(directory, run_commands)
 
-    print "\nADG ended succesfully!\n"
+    print "\nADG ended successfully!\n"
 
 
 if __name__ == "__main__":

@@ -3,18 +3,24 @@ Install ADG on your computer
 
 Install
 --------
-To install ADG starting, download the source files and run
+To install ADG, download the source files and run
 
 .. code:: bash
 
-  pip install <project_folder>
+  pip2 install <project_folder>
+
+or alternatively
+
+.. code:: bash
+
+  python2 setup.py install
 
 
 If you want to install ADG in ``develop`` mode, then run
 
 .. code:: bash
 
-  pip install -e <project_folder>
+  pip2 install -e <project_folder>
 
 
 Dependencies
@@ -24,6 +30,7 @@ following Python libraries:
 
   - networkx >= 2.0
   - numpy
+  - scipy
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,

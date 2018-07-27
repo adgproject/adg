@@ -2,9 +2,9 @@
 """Installation script for the Automated Diagaram Generator.
 
 You can install the program either by running
-    pip install <folder>
+    pip2 install <folder>
 or
-    python setup.py install
+    python2 setup.py install
 """
 
 
@@ -24,7 +24,7 @@ for dep in main_dependencies:
             "Error: You do not have %s installed, please\n"
             "       install it. For example doing\n"
             "\n"
-            "       pip install %s\n" % (dep, dep)
+            "       pip2 install %s\n" % (dep, dep)
         )
         sys.exit(1)
 
@@ -33,7 +33,7 @@ setup(
     name='adg',
     version=adg.__version__,
     maintainer='Pierre Arthuis',
-    maintainer_email='pierre.arthuis@pm.me',
+    maintainer_email='pierre.arthuis@protonmail.com',
     author=adg.__author__,
     author_email=adg.__email__,
     license=adg.__license__,
@@ -47,7 +47,7 @@ setup(
     extras_require=dict(
         # List additional groups of dependencies here (e.g. development
         # dependencies). You can install these using the following syntax:
-        # $ pip install -e .[develop]
+        # $ pip2 install -e .[develop]
         develop=[
             'pytest',
             'pytest-cov',

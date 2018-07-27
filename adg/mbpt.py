@@ -83,7 +83,7 @@ def write_header(tex_file, diags_nbs):
 
 
 def print_cd_output(directory, diagrams):
-    """Print a computer-readable file for C. Drischler's framework.
+    """Print a computer-readable file for automated frameworks.
 
     Args:
         directory (str): The path to the output directory.
@@ -176,7 +176,7 @@ def attribute_conjugate(diagrams):
 
 
 def extract_cd_denom(start_graph, subgraph):
-    """Extract the appropriate CD denominator using the subgraph rule.
+    """Extract the computer-readable denominator using the subgraph rule.
 
     Args:
         start_graph (NetworkX MultiDiGraph): The studied graph.
@@ -327,10 +327,10 @@ class MbptDiagram(adg.diag.Diagram):
         return denominator
 
     def cd_denominator(self):
-        """Return the CD-formatted denominator of the graph.
+        """Return the computer-readable denominator of the graph.
 
         Return:
-            (str): The graph denominator tailored for C. Drishcler's framework.
+            (str): The graph denominator tailored for automated frameworks.
 
         """
         denominator = ""
@@ -364,10 +364,10 @@ class MbptDiagram(adg.diag.Diagram):
         return numerator
 
     def cd_numerator(self):
-        """Return the numerator under CD format.
+        """Return the computer-readable numerator.
 
         Returns:
-            (str): The graph numerator tailored for C. Drishcler's framework.
+            (str): The graph numerator tailored for automated frameworks.
 
         """
         graph = self.graph
