@@ -54,7 +54,10 @@ def parse_command_line():
         "-can", "--canonical", action="store_true",
         help="consider only canonical diagrams")
     bmbpt_args.add_argument(
-        "-3N", "--with_three_body", action="store_true",
+        "-nobs", "--nbody_observable", type=int, choices=range(1, 4), default=2,
+        help="maximal n-body character of the observable [1-3], default = 2")
+    bmbpt_args.add_argument(
+        "-3NF", "--with_3NF", action="store_true",
         help="use two and three-body forces for BMBPT diagrams")
     bmbpt_args.add_argument(
         "-dt", "--draw_tsds", action="store_true",
@@ -83,7 +86,8 @@ def parse_command_line():
     # Avoid conflicting flags
     if args.theory != 'BMBPT' and not args.interactive:
         args.canonical = None
-        args.with_three_body = None
+        args.with_3NF = None
+        args.nobs = 2
         args.draw_tsds = None
     if args.theory != 'MBPT' and not args.interactive:
         args.cd_output = None
@@ -120,8 +124,18 @@ def interactive_interface(commands):
     if commands.theory == "BMBPT":
         commands.canonical = raw_input(
             "Consider only canonical diagrams? (y/N)").lower() == 'y'
-        commands.with_three_body = raw_input(
+        commands.with_3NF = raw_input(
             "Include three-body forces? (y/N)").lower() == 'y'
+        try:
+            commands.nbody_observable = int(raw_input(
+                "Maximal n-body character of the observable? [1-3]"))
+        except ValueError:
+            print "Please enter an integer value! Program exiting."
+            exit()
+        while commands.nbody_observable < 1 or commands.nbody_observable > 3:
+            print "The observable must be 1-body, 2-body or 3-body!"
+            commands.nbody_observable = int(raw_input(
+                "Maximal n-body character of the observable? [1-3]"))
         commands.draw_tsds = raw_input(
             "Draw time-structure diagrams? (y/N)").lower() == 'y'
 
@@ -146,11 +160,33 @@ def attribute_directory(commands):
     Returns:
         (str): Path to the result folder.
 
+    >>> com = argparse.Namespace()
+    >>>
+    >>> com.theory, com.order = 'BMBPT', 4
+    >>> com.with_3NF, com.nbody_observable, com.canonical = False, 2, False
+    >>>
+    >>> attribute_directory(com)
+    'BMBPT/Order-4_2body_observable'
+    >>>
+    >>> com.theory, com.order = 'BMBPT', 5
+    >>> com.with_3NF, com.nbody_observable, com.canonical = True, 3, False
+    >>>
+    >>> attribute_directory(com)
+    'BMBPT/Order-5_3body_observable_with3N'
+    >>>
+    >>> com.theory, com.order = 'MBPT', 3
+    >>> com.with_3NF, com.nbody_observable, com.canonical = False, 2, False
+    >>>
+    >>> attribute_directory(com)
+    'MBPT/Order-3'
+
     """
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.canonical:
         directory += '_canonical'
-    if commands.with_three_body:
+    if commands.theory == 'BMBPT':
+        directory += '_%ibody_observable' % commands.nbody_observable
+    if commands.with_3NF:
         directory += '_with3N'
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -173,7 +209,8 @@ def generate_diagrams(commands):
         diagrams = adg.mbpt.diagrams_generation(commands.order)
     elif commands.theory == "BMBPT":
         diagrams = adg.bmbpt.diagrams_generation(commands.order,
-                                                 commands.with_three_body,
+                                                 commands.with_3NF,
+                                                 commands.nbody_observable,
                                                  commands.canonical)
     else:
         print "Invalid theory! Exiting program."
@@ -240,7 +277,7 @@ def print_diags_numbers(commands, diags_nbs):
             print(
                 "2N non-canonical diagrams: %i" % diags_nbs['nb_2_not_hf']
             )
-        if commands.with_three_body:
+        if commands.with_3NF:
             print(
                 "\n3N valid diagrams: %i\n" % diags_nbs['nb_3']
                 + "3N energy canonical diagrams: %i\n" % diags_nbs['nb_3_hf']

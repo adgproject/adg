@@ -17,6 +17,15 @@ def diagrams_generation(order):
     Returns:
         (list): A list of NumPy arrays with the diagrams adjacency matrices.
 
+    >>> diagrams_generation(2) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2], [2, 0]])]
+    >>> diagrams_generation(3) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 0], [0, 0, 2], [2, 0, 0]]),
+     array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+     array([[0, 0, 2], [2, 0, 0], [0, 2, 0]])]
+    >>> diagrams_generation(1)
+    []
+
     """
     # Generate all 1-magic square of dimension order
     seeds = [k for k in itertools.permutations(range(order), order)]
@@ -98,12 +107,11 @@ def order_diagrams(diagrams):
     """Order the MBPT diagrams and return the number of diags for each type.
 
     Args:
-        diagrams (list): The unordered redundent MbptDiagrams.
+        diagrams (list): The unordered MbptDiagrams.
 
     Returns:
-        (tuple): First element are the ordered, topologically unique
-            MbptDiagrams. Second element is the number of diagrams for each
-            excitation level type.
+        (tuple): First element are the ordered MbptDiagrams. Second element is
+        the number of diagrams for each excitation level type.
 
     """
     singles = []
