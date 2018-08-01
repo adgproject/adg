@@ -10,8 +10,8 @@ To run the program and generate BMBPT diagrams at order 4 for example, use
 
   adg -o 4 -t BMBPT -d -c
 
-where the ```-o``` flag is for the order, ```-t``` for the type of theory,
-```-d``` indicates you want the diagrams to be drawn and ```-c``` that you want
+where the ``-o`` flag is for the order, ``-t`` for the type of theory,
+``-d`` indicates you want the diagrams to be drawn and ``-c`` that you want
 ADG to compile the LaTeX output.
 
 You can alternatively run the program in interactive mode by typing
@@ -40,14 +40,15 @@ Generic options:
 BMBPT options:
 **************
 
--can, --canonical      consider only canonical diagrams
--3N, --with_three_body  use two and three-body forces for BMBPT diagrams
--dt, --draw_tsds        draw Time-Structure Diagrams
+-can, --canonical           consider only canonical diagrams
+-nobs, --nbody_observable   maximal n-body character of the observable [1-3], default = 2
+-3NF, --with_3NF            use two and three-body forces for BMBPT diagrams
+-dt, --draw_tsds            draw Time-Structure Diagrams
 
 MBPT option:
 ************
 
--cd, --cd_output  produce output for C. Drischler's framework
+-cd, --cd_output  produce computer-readable output for automated frameworks
 
 Run management options:
 ***********************
@@ -60,9 +61,11 @@ Output files
 ------------
 
 The output of the program is stored in a folder named after the theory, and a
-subfolder named after the order, i.e. for our previous example, results would
-be stored under ``/BMBPT/Order-4``. In the case of BMBPT, suffixes are added
-for diagrams computed using three-body forces.
+subfolder named after the order, e.g. ``/MBPT/Order-4``. In the case of BMBPT,
+suffixes are added depending on the n-body forces of the observable, and if
+three-body forces were used or only canonial diagrams computed, i.e. for our
+previous example, results would be stored under
+``BMBPT/Order-4_2body_observable``.
 
 The main output file of the program, called ``result.tex``, is a LaTeX file
 containing the expressions of the diagrams along other basic infos on their
@@ -75,5 +78,5 @@ separately in the ``adj_matrices.list`` file to allow for an easy use with
 another many-body diagrams code.
 
 In the case of a MBPT calculations, it is possible to produce output
-specifically tailored for C. Drischler's automated calculations framework by
+specifically tailored for automated calculations framework by
 using the ``-cd`` flag. The associated output files use ``CD_`` as a prefix.
