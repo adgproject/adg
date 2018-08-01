@@ -44,6 +44,8 @@ script:
       make html;
       cd ..;
     fi
-  - cd adg/tests
-  - source run_test_suite.sh
-  - cd ../..
+  - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
+      cd adg/tests;
+      source run_test_suite.sh;
+      cd ../..;
+    fi

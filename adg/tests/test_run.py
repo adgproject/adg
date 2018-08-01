@@ -105,7 +105,7 @@ def test_print_diags_numbers(capsys):
     adg.run.print_diags_numbers(com, diags_nb_per_type)
     output = capsys.readouterr()
     assert output.out == (
-        "Number of connected diagrams,  0\n\n"
+        "Number of connected diagrams:  0\n\n"
         "Valid diagrams: 0\n\n"
         "Singles: 1\n"
         "Doubles: 2\n"
@@ -132,7 +132,7 @@ def test_print_diags_numbers(capsys):
     adg.run.print_diags_numbers(com, diags_nb_per_type)
     output = capsys.readouterr()
     assert output.out == (
-        "Number of connected diagrams,  5\n\n"
+        "Number of connected diagrams:  5\n\n"
         "2N valid diagrams: 6\n"
         "2N energy canonical diagrams: 0\n"
         "2N canonical diagrams for a generic operator only: 1\n"
@@ -145,7 +145,7 @@ def test_print_diags_numbers(capsys):
     adg.run.print_diags_numbers(com, diags_nb_per_type)
     output = capsys.readouterr()
     assert output.out == (
-        "Number of connected diagrams,  5\n\n"
+        "Number of connected diagrams:  5\n\n"
         "2N valid diagrams: 6\n"
         "2N energy canonical diagrams: 0\n"
         "2N canonical diagrams for a generic operator only: 1\n"
