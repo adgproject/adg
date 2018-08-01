@@ -1,5 +1,7 @@
 # ADG - Automatic Diagram Generator
 
+[![Documentation Status](https://readthedocs.org/projects/adg/badge/?version=master)](https://adg.readthedocs.io/en/master/?badge=master)
+
 ## Description
 ADG is a tool generating diagrams and producing their expressions for given
 many-body formalisms. Diagrammatic rules from the formalism are combined with
@@ -9,7 +11,7 @@ error-safe way.
 The only input consists in the theory and order of interest, and the N-body
 character of the operators of interest. The main output is a LaTeX file
 containing the diagrams, their associated expressions and additional
-informations that can be compiled by ADG id needed. Other computer-readable
+informations that can be compiled by ADG if needed. Other computer-readable
 files may be produced as well.
 
 ## Status
@@ -29,7 +31,16 @@ Restored BMBPT as well as diagrams and expressions generation for Gorkov
 Self-Consistent Green's Functions (GSCGF).
 
 ## Install
-To install ADG, download the source files and run
+The easiest way to install the latest stable version of ADG is to use
+```
+pip2 install adg
+```
+Updating after the release of a new version can be done via
+```
+pip2 install --upgrade adg
+```
+
+To install ADG after downloading the source files, run
 ```
 pip2 install <project_folder>
 ```
@@ -71,6 +82,15 @@ adg -i
 Finally, to obtain more information on all the available flags, use
 ```
 adg -h
+```
+
+## Documentation
+
+An extensive on-line documentation is available at https://adg.rtfd.io/.
+Alternatively, the documentation can be generated from entering the ```doc```
+folder and using
+```
+make html
 ```
 
 ## Package structure

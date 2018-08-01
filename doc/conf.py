@@ -167,7 +167,8 @@ texinfo_documents = [
     (master_doc, 'ADG',
      u'ADG - Automated Diagram Generator Documentation',
      author, 'ADG-AutomatedDiagramGenerator',
-     'One line description of project.',
+     'A powerful diagram generator and evaluator for many-body '
+     'formalisms in physics and chemistry.',
      'Miscellaneous'),
 ]
 

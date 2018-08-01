@@ -2,5 +2,5 @@
 
 __license__ = 'GPLv3'
 __version__ = '0.1.0'
-__author__ = __maintainer__ = 'Pierre Arthuis'
+__author__ = 'ADG Dev Team'
 __email__ = 'pierre.arthuis@protonmail.com'

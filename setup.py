@@ -37,7 +37,7 @@ setup(
     author=adg.__author__,
     author_email=adg.__email__,
     license=adg.__license__,
-    url='',
+    url='https://github.com/adgproject/adg',
     install_requires=[
         "networkx>=2.0",
         "numpy",
@@ -72,7 +72,17 @@ setup(
     ],
     description='A powerful diagram generator and evaluator for many-body '
                 'formalisms in physics and chemistry',
-    long_description='',
+    long_description='ADG is a tool generating diagrams and producing their '
+                     'expressions for given many-body formalisms. Diagrammatic '
+                     'rules from the formalism are combined with graph theory '
+                     'objects to produce diagrams and expressions in a fast, '
+                     'simple and error-safe way.\n\n'
+                     'The only input consists in the theory and order of '
+                     'interest, and the N-body character of the operators of '
+                     'interest. The main output is a LaTeX file containing the '
+                     'diagrams, their associated expressions and additional '
+                     'informations that can be compiled by ADG if needed. '
+                     'Other computer-readable files may be produced as well.',
     keywords=[
         'physics',
         'chemistry',
