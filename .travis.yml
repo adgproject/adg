@@ -1,0 +1,47 @@
+# Yaml script for Travis-CI
+
+language: python
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+matrix:
+  include:
+    - os: linux
+      python: 2.7
+      env:
+      - OPTIONAL_DEPS=1
+      - BUILD_DOCS=1
+    - os: linux
+      python: 2.7
+      env:
+      - OPTIONAL_DEPS=1
+    - os: linux
+      python: 2.7
+      env:
+      - OPTIONAL_DEPS=1
+      - PIP_FLAGS="--pre"
+    - python: 2.7
+
+install:
+  # install required packages
+  - pip install --upgrade pip
+  - pip install --retries 3 "${PIP_FLAGS}" networkx>=2.0 numpy scipy
+  - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
+      pip install --retries 3 "${PIP_FLAGS}" pytest pytest-cov roman sphinx sphinx_rtd_theme;
+    fi
+  # install adg
+  - printenv PWD
+  - pip install .
+  # show what's installed
+  - python --version
+  - pip list
+
+script:
+  - if [[ "${BUILD_DOCS}" == 1 ]]; then
+      cd doc;
+      make html;
+      cd ..;
+    fi
+  - source adg/tests/run_test_suite.sh
