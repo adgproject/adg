@@ -46,4 +46,4 @@ script:
     fi
   - cd adg/tests
   - source run_test_suite.sh
-  -cd ../..
+  - cd ../..
