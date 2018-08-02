@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.abspath('..'))
 import adg
 
 project = u'ADG - Automated Diagram Generator'
-copyright = u'2018, ADG Developers'
-author = u'ADG Developers'
+copyright = u'2018, ADG Dev Team'
+author = u'ADG Dev Team'
 
 # The short X.Y version
 version = adg.__version__
@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
@@ -142,7 +143,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'ADG.tex',
      u'ADG - Automated Diagram Generator Documentation',
-     u'ADG Developers', 'manual'),
+     u'ADG Dev Team', 'manual'),
 ]
 
 
@@ -166,7 +167,8 @@ texinfo_documents = [
     (master_doc, 'ADG',
      u'ADG - Automated Diagram Generator Documentation',
      author, 'ADG-AutomatedDiagramGenerator',
-     'One line description of project.',
+     'A powerful diagram generator and evaluator for many-body '
+     'formalisms in physics and chemistry.',
      'Miscellaneous'),
 ]
 

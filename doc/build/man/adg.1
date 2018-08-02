@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "Jun 14, 2018" "0.0.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Aug 02, 2018" "0.2.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -37,39 +37,58 @@ ADG is a tool generating diagrams and producing their expressions for given
 many\-body formalisms. Diagrammatic rules from the formalism are combined with
 graph theory objects to produce diagrams and expressions in a fast, simple and
 error\-safe way.
+.sp
+The only input consists in the theory and order of interest, and the N\-body
+character of the operators of interest. The main output is a LaTeX file
+containing the diagrams, their associated expressions and additional
+informations that can be compiled by ADG id needed. Other computer\-readable
+files may be produced as well.
 .SS Status
 .sp
-As for now, the code is capable of handling two differents formalisms, i.e.
+As for now, the code is capable of handling two different formalisms, i.e.
 Many\-Body Perturbation Theory (MBPT) and Bogoliubov Many\-Body Perturbation
 Theory (BMBPT).
 .INDENT 0.0
 .INDENT 3.5
 .INDENT 0.0
 .IP \(bu 2
-For MBPT, the code generates all canonical (i.e. HF) diagrams at any given
+For MBPT, the code generates all Hartree\-Fock energy diagrams at any given
 order along with their expression and additional information
 (conjugate diagram, excitation level...).
 .IP \(bu 2
-For BMBPT, the code generates all diagrams along with their time\-dependent
-and time\-integrated expressions for all operator diagrams.
+For BMBPT, the code generates all diagrams for a generic observable
+commuting with the Hamiltonian, along with their time\-dependent and
+time\-integrated expressions.
 .UNINDENT
 .UNINDENT
 .UNINDENT
 .SS Future developments
 .sp
 Extensions under discussions are diagrams and expressions for Particle\-Number
-Restored BMBPT as well as diagrams and expressions generation for Gorkov
+Projected BMBPT as well as diagrams and expressions generation for Gorkov
 Self\-Consistent Green\(aqs Functions (GSCGF).
 .SH INSTALL ADG ON YOUR COMPUTER
 .SS Install
 .sp
-To install ADG starting, download the source files and run
+To install ADG, download the source files and run
 .INDENT 0.0
 .INDENT 3.5
 .sp
 .nf
 .ft C
-pip install <project_folder>
+pip2 install <project_folder>
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+or alternatively
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+python2 setup.py install
 .ft P
 .fi
 .UNINDENT
@@ -81,7 +100,7 @@ If you want to install ADG in \fBdevelop\fP mode, then run
 .sp
 .nf
 .ft C
-pip install \-e <project_folder>
+pip2 install \-e <project_folder>
 .ft P
 .fi
 .UNINDENT
@@ -97,6 +116,8 @@ following Python libraries:
 networkx >= 2.0
 .IP \(bu 2
 numpy
+.IP \(bu 2
+scipy
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -119,8 +140,8 @@ adg \-o 4 \-t BMBPT \-d \-c
 .UNINDENT
 .UNINDENT
 .sp
-where the \fB\(ga\-o\(ga\fP flag is for the order, \fB\(ga\-t\(ga\fP for the type of theory,
-\fB\(ga\-d\(ga\fP indicates you want the diagrams to be drawn and \fB\(ga\-c\(ga\fP that you want
+where the \fB\-o\fP flag is for the order, \fB\-t\fP for the type of theory,
+\fB\-d\fP indicates you want the diagrams to be drawn and \fB\-c\fP that you want
 ADG to compile the LaTeX output.
 .sp
 You can alternatively run the program in interactive mode by typing
@@ -165,7 +186,10 @@ execute ADG in interactive mode
 .BI \-c\fB an\fP,\fB \ \-\-canonical
 consider only canonical diagrams
 .TP
-.BI \-3\fB N\fP,\fB \ \-\-with_three_body
+.BI \-n\fB obs\fP,\fB \ \-\-nbody_observable
+maximal n\-body character of the observable [1\-3], default = 2
+.TP
+.BI \-3\fB NF\fP,\fB \ \-\-with_3NF
 use two and three\-body forces for BMBPT diagrams
 .TP
 .BI \-d\fB t\fP,\fB \ \-\-draw_tsds
@@ -175,7 +199,7 @@ draw Time\-Structure Diagrams
 .INDENT 0.0
 .TP
 .BI \-c\fB d\fP,\fB \ \-\-cd_output
-produce output for C. Drischler\(aqs framework
+produce computer\-readable output for automated frameworks
 .UNINDENT
 .SS Run management options:
 .INDENT 0.0
@@ -189,9 +213,11 @@ compile the LaTeX output file with PDFLaTeX
 .SS Output files
 .sp
 The output of the program is stored in a folder named after the theory, and a
-subfolder named after the order, i.e. for our previous example, results would
-be stored under \fB/BMBPT/Order\-4\fP\&. In the case of BMBPT, suffixes are added
-for diagrams computed using three\-body forces.
+subfolder named after the order, e.g. \fB/MBPT/Order\-4\fP\&. In the case of BMBPT,
+suffixes are added depending on the n\-body forces of the observable, and if
+three\-body forces were used or only canonial diagrams computed, i.e. for our
+previous example, results would be stored under
+\fBBMBPT/Order\-4_2body_observable\fP\&.
 .sp
 The main output file of the program, called \fBresult.tex\fP, is a LaTeX file
 containing the expressions of the diagrams along other basic infos on their
@@ -204,7 +230,7 @@ separately in the \fBadj_matrices.list\fP file to allow for an easy use with
 another many\-body diagrams code.
 .sp
 In the case of a MBPT calculations, it is possible to produce output
-specifically tailored for C. Drischler\(aqs automated calculations framework by
+specifically tailored for automated calculations framework by
 using the \fB\-cd\fP flag. The associated output files use \fBCD_\fP as a prefix.
 .SH ADG REFERENCE FOR DEVELOPERS
 .SS Main script
@@ -233,6 +259,30 @@ Path to the result folder.
 .B Return type
 (str)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> com = argparse.Namespace()
+>>>
+>>> com.theory, com.order = \(aqBMBPT\(aq, 4
+>>> com.with_3NF, com.nbody_observable, com.canonical = False, 2, False
+>>>
+>>> attribute_directory(com)
+\(aqBMBPT/Order\-4_2body_observable\(aq
+>>>
+>>> com.theory, com.order = \(aqBMBPT\(aq, 5
+>>> com.with_3NF, com.nbody_observable, com.canonical = True, 3, False
+>>>
+>>> attribute_directory(com)
+\(aqBMBPT/Order\-5_3body_observable_with3N\(aq
+>>>
+>>> com.theory, com.order = \(aqMBPT\(aq, 3
+>>> com.with_3NF, com.nbody_observable, com.canonical = False, 2, False
+>>>
+>>> attribute_directory(com)
+\(aqMBPT/Order\-3\(aq
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -471,7 +521,7 @@ Write the graph of the diagram to the LaTeX file.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.diag.check_vertex_degree(matrices, three_body_use, canonical_only, vertex_id)
+.B adg.diag.check_vertex_degree(matrices, three_body_use, nbody_max_observable, canonical_only, vertex_id)
 Check the degree of a specific vertex in a set of matrices.
 .INDENT 7.0
 .TP
@@ -480,13 +530,27 @@ Check the degree of a specific vertex in a set of matrices.
 .IP \(bu 2
 \fBmatrices\fP (\fIlist\fP) \-\- Adjacency matrices.
 .IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- \fBTrue\fP if one uses three\-body operators.
+\fBthree_body_use\fP (\fIbool\fP) \-\- \fBTrue\fP if one uses three\-body forces.
+.IP \(bu 2
+\fBnbody_max_observable\fP (\fIint\fP) \-\- Maximum body number for the observable.
 .IP \(bu 2
 \fBcanonical_only\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
 .IP \(bu 2
 \fBvertex_id\fP (\fIint\fP) \-\- The position of the studied vertex.
 .UNINDENT
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]],         [[2, 0, 2], [1, 2, 3], [1, 0, 0]],         [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+>>> check_vertex_degree(test_matrices, True, 3, False, 0)
+>>> test_matrices
+[[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
+>>> check_vertex_degree(test_matrices, False, 2, False, 0)
+>>> test_matrices
+[[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -576,6 +640,21 @@ The adjacency matrices without non\-zero diagonal elements.
 .B Return type
 (list)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> test_matrices = [[[0, 1, 2], [2, 0, 1], [5, 2, 0]],     [[2, 2, 2], [1, 2, 3], [0, 0, 0]],     [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+>>> no_trace(test_matrices)
+[[[0, 1, 2], [2, 0, 1], [5, 2, 0]], [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+>>> no_trace()
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/doctest.py", line 1315, in __run
+    compileflags, 1) in test.globs
+  File "<doctest __main__.no_trace[4]>", line 1, in <module>
+    no_trace()
+TypeError: no_trace() takes exactly 1 argument (0 given)
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -702,11 +781,11 @@ The singles / doubles / etc. character of the graph.
 .INDENT 7.0
 .TP
 .B cd_denominator()
-Return the CD\-formatted denominator of the graph.
+Return the computer\-readable denominator of the graph.
 .INDENT 7.0
 .TP
 .B Returns
-The graph denominator tailored for C. Drishcler\(aqs framework.
+The graph denominator tailored for automated frameworks.
 .TP
 .B Return type
 (str)
@@ -715,11 +794,11 @@ The graph denominator tailored for C. Drishcler\(aqs framework.
 .INDENT 7.0
 .TP
 .B cd_numerator()
-Return the numerator under CD format.
+Return the computer\-readable numerator.
 .INDENT 7.0
 .TP
 .B Returns
-The graph numerator tailored for C. Drishcler\(aqs framework.
+The graph numerator tailored for automated frameworks.
 .TP
 .B Return type
 (str)
@@ -857,11 +936,24 @@ A list of NumPy arrays with the diagrams adjacency matrices.
 .B Return type
 (list)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> diagrams_generation(2) # doctest: +NORMALIZE_WHITESPACE
+[array([[0, 2], [2, 0]])]
+>>> diagrams_generation(3) # doctest: +NORMALIZE_WHITESPACE
+[array([[0, 2, 0], [0, 0, 2], [2, 0, 0]]),
+ array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+ array([[0, 0, 2], [2, 0, 0], [0, 2, 0]])]
+>>> diagrams_generation(1)
+[]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
 .B adg.mbpt.extract_cd_denom(start_graph, subgraph)
-Extract the appropriate CD denominator using the subgraph rule.
+Extract the computer\-readable denominator using the subgraph rule.
 .INDENT 7.0
 .TP
 .B Parameters
@@ -887,16 +979,11 @@ Order the MBPT diagrams and return the number of diags for each type.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBdiagrams\fP (\fIlist\fP) \-\- The unordered redundent MbptDiagrams.
+\fBdiagrams\fP (\fIlist\fP) \-\- The unordered MbptDiagrams.
 .TP
 .B Returns
-.INDENT 7.0
-.TP
-.B First element are the ordered, topologically unique
-MbptDiagrams. Second element is the number of diagrams for each
-excitation level type.
-.UNINDENT
-
+First element are the ordered MbptDiagrams. Second element is
+the number of diagrams for each excitation level type.
 .TP
 .B Return type
 (tuple)
@@ -905,7 +992,7 @@ excitation level type.
 .INDENT 0.0
 .TP
 .B adg.mbpt.print_cd_output(directory, diagrams)
-Print a computer\-readable file for C. Drischler\(aqs framework.
+Print a computer\-readable file for automated frameworks.
 .INDENT 7.0
 .TP
 .B Parameters
@@ -1210,10 +1297,20 @@ have been filled.
 \fBlength_mat\fP (\fIint\fP) \-\- The size of the square matrices.
 .UNINDENT
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> mats = [[[0, 2, 0], [2, 0, 0], [0, 0, 0]],                 [[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+>>>
+>>> check_unconnected_spawn(mats, 1, 3)
+>>> mats
+[[[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
-.B adg.bmbpt.diagrams_generation(p_order, three_body_use, canonical)
+.B adg.bmbpt.diagrams_generation(p_order, three_body_use, nbody_obs, canonical)
 Generate diagrams for BMBPT from bottom up.
 .INDENT 7.0
 .TP
@@ -1222,7 +1319,9 @@ Generate diagrams for BMBPT from bottom up.
 .IP \(bu 2
 \fBp_order\fP (\fIint\fP) \-\- The BMBPT perturbative order of the studied diagrams.
 .IP \(bu 2
-\fBthree_body_use\fP (\fIbool\fP) \-\- Flag for the use of three\-body operators.
+\fBthree_body_use\fP (\fIbool\fP) \-\- Flag for the use of three\-body forces.
+.IP \(bu 2
+\fBnbody_obs\fP (\fIint\fP) \-\- N\-body character of the obervable of interest.
 .IP \(bu 2
 \fBcanonical\fP (\fIbool\fP) \-\- \fBTrue\fP if one draws only canonical diagrams.
 .UNINDENT
@@ -1233,6 +1332,18 @@ NumPy arrays encoding the adjacency matrices of the graphs.
 .B Return type
 (list)
 .UNINDENT
+.sp
+.nf
+.ft C
+>>> diagrams_generation(1, False, 2, False) #doctest: +NORMALIZE_WHITESPACE
+[array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+>>> diagrams_generation(1, True, 3, False)  #doctest: +NORMALIZE_WHITESPACE
+[array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+>>> diagrams_generation(2, False, 2, True)  #doctest: +NORMALIZE_WHITESPACE
+[array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
+ array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
+.ft P
+.fi
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1456,6 +1567,12 @@ Order TSDs, produce their expressions, return also number of trees.
 .TP
 .B Parameters
 \fBdiagrams_time\fP (\fIlist\fP) \-\- All the associated TSDs.
+.TP
+.B Returns
+List of TSDs, number of tree TSDs
+.TP
+.B Return type
+(tuple)
 .UNINDENT
 .UNINDENT
 .INDENT 0.0
@@ -1502,15 +1619,15 @@ They have been involved in the making of ADG over the past years:
 .INDENT 3.5
 .INDENT 0.0
 .IP \(bu 2
-Pierre Arthuis
+Pierre Arthuis \- Irfu, CEA, Université Paris\-Saclay & CEA/DAM/DIF
 .IP \(bu 2
-Thomas Duguet
+Thomas Duguet \- Irfu, CEA, Université Paris\-Saclay & KU Leuven, IKS
 .IP \(bu 2
-Jean\-Paul Ebran
+Jean\-Paul Ebran \- CEA/DAM/DIF
 .IP \(bu 2
-Raphaël\-David Lasseri
+Raphaël\-David Lasseri \- IPN, CNRS/IN2P3, Université Paris\-Sud, Université Paris\-Saclay
 .IP \(bu 2
-Alexander Tichai
+Alexander Tichai \- ESNT, Irfu, CEA, Université Paris\-Saclay
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1520,7 +1637,23 @@ If you use ADG in your research work, we kindly ask you to cite the following
 paper: []
 .SH LICENSE
 .sp
-ADG is licensed under
+ADG is licensed under under GNU General Public License version 3
+(see LICENSE.txt for the full GPLv3 License).
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Copyright (C) 2018 ADG Dev Team
+Pierre Arthuis
+Thomas Duguet
+Jean\-Paul Ebran
+Raphaël\-David Lasseri
+Alexander Tichai
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
 .INDENT 0.0
 .IP \(bu 2
 genindex
@@ -1530,8 +1663,8 @@ modindex
 search
 .UNINDENT
 .SH AUTHOR
-ADG Developers
+ADG Dev Team
 .SH COPYRIGHT
-2018, ADG Developers
+2018, ADG Dev Team
 .\" Generated by docutils manpage writer.
 .

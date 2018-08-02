@@ -2,9 +2,9 @@
 """Installation script for the Automated Diagaram Generator.
 
 You can install the program either by running
-    pip install <folder>
+    pip2 install <folder>
 or
-    python setup.py install
+    python2 setup.py install
 """
 
 
@@ -24,7 +24,7 @@ for dep in main_dependencies:
             "Error: You do not have %s installed, please\n"
             "       install it. For example doing\n"
             "\n"
-            "       pip install %s\n" % (dep, dep)
+            "       pip2 install %s\n" % (dep, dep)
         )
         sys.exit(1)
 
@@ -33,21 +33,24 @@ setup(
     name='adg',
     version=adg.__version__,
     maintainer='Pierre Arthuis',
-    maintainer_email='pierre.arthuis@pm.me',
+    maintainer_email='pierre.arthuis@protonmail.com',
     author=adg.__author__,
     author_email=adg.__email__,
     license=adg.__license__,
-    url='',
+    url='https://github.com/adgproject/adg',
     install_requires=[
         "networkx>=2.0",
         "numpy",
+        "scipy",
     ],
     python_requires='>=2.7.1',
     extras_require=dict(
         # List additional groups of dependencies here (e.g. development
         # dependencies). You can install these using the following syntax:
-        # $ pip install -e .[develop]
+        # $ pip2 install -e .[develop]
         develop=[
+            'pytest',
+            'pytest-cov',
             'roman',
             'sphinx',
             'sphinx_rtd_theme',
@@ -69,7 +72,17 @@ setup(
     ],
     description='A powerful diagram generator and evaluator for many-body '
                 'formalisms in physics and chemistry',
-    long_description='',
+    long_description='ADG is a tool generating diagrams and producing their '
+                     'expressions for given many-body formalisms. Diagrammatic '
+                     'rules from the formalism are combined with graph theory '
+                     'objects to produce diagrams and expressions in a fast, '
+                     'simple and error-safe way.\n\n'
+                     'The only input consists in the theory and order of '
+                     'interest, and the N-body character of the operators of '
+                     'interest. The main output is a LaTeX file containing the '
+                     'diagrams, their associated expressions and additional '
+                     'informations that can be compiled by ADG if needed. '
+                     'Other computer-readable files may be produced as well.',
     keywords=[
         'physics',
         'chemistry',

@@ -17,6 +17,15 @@ def diagrams_generation(order):
     Returns:
         (list): A list of NumPy arrays with the diagrams adjacency matrices.
 
+    >>> diagrams_generation(2) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2], [2, 0]])]
+    >>> diagrams_generation(3) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 0], [0, 0, 2], [2, 0, 0]]),
+     array([[0, 1, 1], [1, 0, 1], [1, 1, 0]]),
+     array([[0, 0, 2], [2, 0, 0], [0, 2, 0]])]
+    >>> diagrams_generation(1)
+    []
+
     """
     # Generate all 1-magic square of dimension order
     seeds = [k for k in itertools.permutations(range(order), order)]
@@ -74,7 +83,7 @@ def write_header(tex_file, diags_nbs):
 
 
 def print_cd_output(directory, diagrams):
-    """Print a computer-readable file for C. Drischler's framework.
+    """Print a computer-readable file for automated frameworks.
 
     Args:
         directory (str): The path to the output directory.
@@ -98,12 +107,11 @@ def order_diagrams(diagrams):
     """Order the MBPT diagrams and return the number of diags for each type.
 
     Args:
-        diagrams (list): The unordered redundent MbptDiagrams.
+        diagrams (list): The unordered MbptDiagrams.
 
     Returns:
-        (tuple): First element are the ordered, topologically unique
-            MbptDiagrams. Second element is the number of diagrams for each
-            excitation level type.
+        (tuple): First element are the ordered MbptDiagrams. Second element is
+        the number of diagrams for each excitation level type.
 
     """
     singles = []
@@ -168,7 +176,7 @@ def attribute_conjugate(diagrams):
 
 
 def extract_cd_denom(start_graph, subgraph):
-    """Extract the appropriate CD denominator using the subgraph rule.
+    """Extract the computer-readable denominator using the subgraph rule.
 
     Args:
         start_graph (NetworkX MultiDiGraph): The studied graph.
@@ -319,10 +327,10 @@ class MbptDiagram(adg.diag.Diagram):
         return denominator
 
     def cd_denominator(self):
-        """Return the CD-formatted denominator of the graph.
+        """Return the computer-readable denominator of the graph.
 
         Return:
-            (str): The graph denominator tailored for C. Drishcler's framework.
+            (str): The graph denominator tailored for automated frameworks.
 
         """
         denominator = ""
@@ -356,10 +364,10 @@ class MbptDiagram(adg.diag.Diagram):
         return numerator
 
     def cd_numerator(self):
-        """Return the numerator under CD format.
+        """Return the computer-readable numerator.
 
         Returns:
-            (str): The graph numerator tailored for C. Drishcler's framework.
+            (str): The graph numerator tailored for automated frameworks.
 
         """
         graph = self.graph

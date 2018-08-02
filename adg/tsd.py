@@ -165,6 +165,8 @@ def find_cycle(graph):
             if len(paths) >= 2:
                 cycle_nodes = (node_a, node_b)
                 cycle_found = True
+                # Avoid false positive when node_a has 2+ branches out
+                # but only one goes to node_b
                 for test_node in paths[0][1:-1]:
                     if test_node in paths[1][1:-1]:
                         cycle_found = False
@@ -180,6 +182,9 @@ def treat_tsds(diagrams_time):
 
     Args:
         diagrams_time (list): All the associated TSDs.
+
+    Returns:
+        (tuple): List of TSDs, number of tree TSDs
 
     """
     tree_tsds = []
