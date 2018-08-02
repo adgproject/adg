@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "Jul 27, 2018" "0.1.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Aug 02, 2018" "0.2.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -140,8 +140,8 @@ adg \-o 4 \-t BMBPT \-d \-c
 .UNINDENT
 .UNINDENT
 .sp
-where the \fB\(ga\-o\(ga\fP flag is for the order, \fB\(ga\-t\(ga\fP for the type of theory,
-\fB\(ga\-d\(ga\fP indicates you want the diagrams to be drawn and \fB\(ga\-c\(ga\fP that you want
+where the \fB\-o\fP flag is for the order, \fB\-t\fP for the type of theory,
+\fB\-d\fP indicates you want the diagrams to be drawn and \fB\-c\fP that you want
 ADG to compile the LaTeX output.
 .sp
 You can alternatively run the program in interactive mode by typing
@@ -186,7 +186,10 @@ execute ADG in interactive mode
 .BI \-c\fB an\fP,\fB \ \-\-canonical
 consider only canonical diagrams
 .TP
-.BI \-3\fB N\fP,\fB \ \-\-with_three_body
+.BI \-n\fB obs\fP,\fB \ \-\-nbody_observable
+maximal n\-body character of the observable [1\-3], default = 2
+.TP
+.BI \-3\fB NF\fP,\fB \ \-\-with_3NF
 use two and three\-body forces for BMBPT diagrams
 .TP
 .BI \-d\fB t\fP,\fB \ \-\-draw_tsds
@@ -196,7 +199,7 @@ draw Time\-Structure Diagrams
 .INDENT 0.0
 .TP
 .BI \-c\fB d\fP,\fB \ \-\-cd_output
-produce output for C. Drischler\(aqs framework
+produce computer\-readable output for automated frameworks
 .UNINDENT
 .SS Run management options:
 .INDENT 0.0
@@ -210,9 +213,11 @@ compile the LaTeX output file with PDFLaTeX
 .SS Output files
 .sp
 The output of the program is stored in a folder named after the theory, and a
-subfolder named after the order, i.e. for our previous example, results would
-be stored under \fB/BMBPT/Order\-4\fP\&. In the case of BMBPT, suffixes are added
-for diagrams computed using three\-body forces.
+subfolder named after the order, e.g. \fB/MBPT/Order\-4\fP\&. In the case of BMBPT,
+suffixes are added depending on the n\-body forces of the observable, and if
+three\-body forces were used or only canonial diagrams computed, i.e. for our
+previous example, results would be stored under
+\fBBMBPT/Order\-4_2body_observable\fP\&.
 .sp
 The main output file of the program, called \fBresult.tex\fP, is a LaTeX file
 containing the expressions of the diagrams along other basic infos on their
@@ -225,7 +230,7 @@ separately in the \fBadj_matrices.list\fP file to allow for an easy use with
 another many\-body diagrams code.
 .sp
 In the case of a MBPT calculations, it is possible to produce output
-specifically tailored for C. Drischler\(aqs automated calculations framework by
+specifically tailored for automated calculations framework by
 using the \fB\-cd\fP flag. The associated output files use \fBCD_\fP as a prefix.
 .SH ADG REFERENCE FOR DEVELOPERS
 .SS Main script
