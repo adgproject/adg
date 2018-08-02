@@ -1,6 +1,8 @@
 # ADG - Automatic Diagram Generator
 
 [![Documentation Status](https://readthedocs.org/projects/adg/badge/?version=master)](https://adg.readthedocs.io/en/master/?badge=master)
+[![Build Status](https://travis-ci.com/adgproject/adg.svg?branch=master)](https://travis-ci.com/adgproject/adg)
+[![PyPI version](https://badge.fury.io/py/adg.svg)](https://badge.fury.io/py/adg)
 
 ## Description
 ADG is a tool generating diagrams and producing their expressions for given
