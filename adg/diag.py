@@ -50,15 +50,16 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
         canonical_only (bool): ``True`` if one draws only canonical diagrams.
         vertex_id (int): The position of the studied vertex.
 
-    >>> test_matrices = [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], \
-        [[2, 0, 2], [1, 2, 3], [1, 0, 0]], \
-        [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
+    >>> test_matrices = [numpy.array([[0, 1, 2], [1, 0, 1], [0, 2, 0]]), \
+        numpy.array([[2, 0, 2], [1, 2, 3], [1, 0, 0]]), \
+        numpy.array([[0, 1, 3], [2, 0, 8], [2, 1, 0]])]
     >>> check_vertex_degree(test_matrices, True, 3, False, 0)
-    >>> test_matrices
-    [[[0, 1, 2], [1, 0, 1], [0, 2, 0]], [[2, 0, 2], [1, 2, 3], [1, 0, 0]]]
+    >>> test_matrices #doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 1, 2], [1, 0, 1], [0, 2, 0]]),
+     array[[2, 0, 2], [1, 2, 3], [1, 0, 0]])]
     >>> check_vertex_degree(test_matrices, False, 2, False, 0)
-    >>> test_matrices
-    [[[0, 1, 2], [1, 0, 1], [0, 2, 0]]]
+    >>> test_matrices #doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 1, 2], [1, 0, 1], [0, 2, 0]])]
 
     """
     authorized_deg = [4]
@@ -70,9 +71,10 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
 
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
-        vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
-                            for index in xrange(len(matrix[0])))
-        vertex_degree -= matrix[vertex_id][vertex_id]
+        vertex_degree = sum(matrix.item((index, vertex_id))
+                            + matrix.item((vertex_id, index))
+                            for index in range(matrix.shape[0]))
+        vertex_degree -= matrix.item((vertex_id, vertex_id))
 
         if (vertex_id != 0 and vertex_degree not in authorized_deg) \
                 or (vertex_id == 0 and vertex_degree > 2*nbody_max_observable):

@@ -1,6 +1,5 @@
 """Routines and class for Bogoliubov MBPT diagrams."""
 
-import copy
 import itertools
 import numpy as np
 import networkx as nx
@@ -33,7 +32,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
     order = p_order + 1
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    matrices = [[[0 for _ in range(order)] for _ in range(order)]]
+    matrices = [np.zeros((order, order), dtype=int)]
 
     # Generate oriented adjacency matrices going vertex-wise
     vertices = range(order)
@@ -46,11 +45,12 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         for sum_index in xrange(vertex+1, order):
             for mat_indx in xrange(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
-                elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
+                elem_max = deg_max - sum(mat.item((k, vertex))
+                                         + mat.item((vertex, k))
                                          for k in vertices)
                 for elem in xrange(1, elem_max + 1, 1):
-                    temp_mat = copy.deepcopy(mat)
-                    temp_mat[vertex][sum_index] = elem
+                    temp_mat = mat.copy()
+                    temp_mat[vertex, sum_index] = elem
                     add(temp_mat)
         adg.diag.check_vertex_degree(
             matrices, three_body_use, nbody_obs, canonical, vertex
@@ -58,8 +58,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         if 0 < vertex < order-1:
             check_unconnected_spawn(matrices, vertex, order)
 
-    matrices.sort(reverse=True)
-    return [np.array(matrix) for matrix in matrices]
+    return matrices
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
@@ -71,36 +70,37 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
             have been filled.
         length_mat (int): The size of the square matrices.
 
-    >>> mats = [[[0, 2, 0], [2, 0, 0], [0, 0, 0]], \
-                [[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+    >>> mats = [numpy.array([[0, 2, 0], [2, 0, 0], [0, 0, 0]]), \
+                numpy.array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
     >>>
     >>> check_unconnected_spawn(mats, 1, 3)
-    >>> mats
-    [[[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+    >>> mats #doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
 
     """
-    empty_block = [0 for _ in range(length_mat - max_filled_vertex - 1)]
+    # empty_block = np.zeros((length_mat - max_filled_vertex - 1), dtype=int)
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         mat = matrices[ind_mat]
         is_disconnected = True
-        empty_lines = [index for index, line
-                       in enumerate(mat[0:max_filled_vertex + 1])
-                       if line[max_filled_vertex + 1:length_mat]
-                       == empty_block]
-        test_block = [0 for _ in range(length_mat - len(empty_lines))]
+        # Store the indexes of lines with an empty end in a list
+        empty_lines = [
+            index for index in range(mat.shape[0])
+            if not mat[index, max_filled_vertex + 1:length_mat].any()
+        ]
         for index in empty_lines:
-            test_line = copy.deepcopy(mat[index])
+            test_line = mat[index].copy()
             for index2 in empty_lines:
-                test_line.remove(mat[index][index2])
-            if test_line != test_block:
+                test_line[index2] = 0
+            if not test_line.any():
                 is_disconnected = False
                 break
         if is_disconnected and empty_lines != []:
-            for index, line in enumerate(mat[0:max_filled_vertex + 1]):
-                if index not in empty_lines:
-                    for _ in (idx for idx in empty_lines if line[idx] != 0):
-                        is_disconnected = False
-                        break
+            for index in [idx for idx in range(max_filled_vertex + 1)
+                          if idx not in empty_lines]:
+                for _ in (idx for idx in empty_lines
+                          if mat.item((index, idx)) != 0):
+                    is_disconnected = False
+                    break
             if is_disconnected:
                 del matrices[ind_mat]
 
