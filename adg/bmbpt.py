@@ -57,8 +57,42 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         )
         if 0 < vertex < order-1:
             check_unconnected_spawn(matrices, vertex, order)
+        if vertex == (order - 1):
+        # if vertex > 1:
+            check_topologically_equivalent(matrices, vertex)
 
     return matrices
+
+
+def check_topologically_equivalent(matrices, max_vertex):
+    """Exclude matrices that would spawn topologically equivalent graphs.
+
+    Args:
+        matrices (list): Adjacency matrices to be checked.
+        max_vertex (int): The maximum vertex which have been filled.
+    """
+    for ind_mat1 in xrange(len(matrices)-2, -1, -1):
+        mat1 = matrices[ind_mat1]
+        for ind_mat2 in xrange(len(matrices)-1, ind_mat1, -1):
+            mat2 = matrices[ind_mat2]
+            are_topologically_equivalent = False
+            # Basic check to avoid needless permutations
+            if (not ((np.sort(mat1[0, :]) - np.sort(mat2[0, :])).any())) \
+                and (not ((np.sort(mat1[1:max_vertex, :].flat)
+                           - np.sort(mat2[1:max_vertex, :].flat)).any()
+                          )):
+                # Test for all possible permutations with i < j
+                for ind_i in range(1, max_vertex + 1):
+                    for ind_j in range(ind_i + 1, max_vertex + 1):
+                        reorder_ind = range(mat1.shape[0])
+                        reorder_ind[ind_i], reorder_ind[ind_j] = ind_j, ind_i
+                        if not (mat1
+                                - mat2[:, reorder_ind][reorder_ind, :]).any():
+                            are_topologically_equivalent = True
+                            break
+                    if are_topologically_equivalent:
+                        del matrices[ind_mat2]
+                        break
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
@@ -78,7 +112,6 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
     [array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
 
     """
-    # empty_block = np.zeros((length_mat - max_filled_vertex - 1), dtype=int)
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         mat = matrices[ind_mat]
         is_disconnected = True
@@ -91,7 +124,7 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
             test_line = mat[index].copy()
             for index2 in empty_lines:
                 test_line[index2] = 0
-            if not test_line.any():
+            if test_line.any():
                 is_disconnected = False
                 break
         if is_disconnected and empty_lines != []:
