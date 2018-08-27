@@ -45,8 +45,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         for sum_index in xrange(vertex+1, order):
             for mat_indx in xrange(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
-                elem_max = deg_max - sum(mat.item((k, vertex))
-                                         + mat.item((vertex, k))
+                elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
                                          for k in vertices)
                 for elem in xrange(1, elem_max + 1, 1):
                     temp_mat = mat.copy()
@@ -55,13 +54,64 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         adg.diag.check_vertex_degree(
             matrices, three_body_use, nbody_obs, canonical, vertex
         )
-        if 0 < vertex < order-1:
+        if 0 < vertex < order:
             check_unconnected_spawn(matrices, vertex, order)
-        if vertex == (order - 1):
-        # if vertex > 1:
-            check_topologically_equivalent(matrices, vertex)
+    permutations = [[0] + list(k) for k in itertools.permutations(vertices[1:])]
+    for idx in xrange(len(matrices)-1, -1, -1):
+        is_disconnected = False
+        for reordering in permutations:
+            mat = matrices[idx][:, reordering][reordering, :]
+            for vert in vertices[1:]:
+                if not mat[vertices[:vert], :][:, vertices[vert:]].any() \
+                        and not mat[:, vertices[:vert]][vertices[vert:], :].any():
+                    is_disconnected = True
+                    break
+            if is_disconnected:
+                del matrices[idx]
+                break
+    matrices = order_and_remove_topologically_equiv(matrices, order - 1)
 
     return matrices
+
+
+def order_and_remove_topologically_equiv(matrices, max_vertex):
+    """Order the matrices in sub-list and remove topologically equivalent ones.
+
+    Args:
+        matrices (list): The adjacency matrices to be checked.
+        max_vertex (int): The maximum vertex which has been filled.
+    """
+    matrices_1 = []
+    matrices_2 = []
+    matrices_3 = []
+    matrices_4 = []
+    matrices_5 = []
+    matrices_6 = []
+    for idx in xrange(len(matrices)-1, -1, -1):
+        if matrices[idx][0, :].max() == 1:
+            matrices_1.append(matrices[idx])
+        elif matrices[idx][0, :].max() == 2:
+            matrices_2.append(matrices[idx])
+        elif matrices[idx][0, :].max() == 3:
+            matrices_3.append(matrices[idx])
+        elif matrices[idx][0, :].max() == 4:
+            matrices_4.append(matrices[idx])
+        elif matrices[idx][0, :].max() == 5:
+            matrices_5.append(matrices[idx])
+        elif matrices[idx][0, :].max() == 6:
+            matrices_6.append(matrices[idx])
+        del matrices[idx]
+    print len(matrices_1), len(matrices_2), len(matrices_3), len(matrices_4), \
+        len(matrices_5), len(matrices_6)
+    check_topologically_equivalent(matrices_1, max_vertex)
+    check_topologically_equivalent(matrices_2, max_vertex)
+    check_topologically_equivalent(matrices_3, max_vertex)
+    check_topologically_equivalent(matrices_4, max_vertex)
+    check_topologically_equivalent(matrices_5, max_vertex)
+    check_topologically_equivalent(matrices_6, max_vertex)
+
+    return matrices_1 + matrices_2 + matrices_3 + matrices_4 + matrices_5 \
+        + matrices_6
 
 
 def check_topologically_equivalent(matrices, max_vertex):
@@ -71,28 +121,31 @@ def check_topologically_equivalent(matrices, max_vertex):
         matrices (list): Adjacency matrices to be checked.
         max_vertex (int): The maximum vertex which have been filled.
     """
+    if not matrices:
+        return []
+    vertices = range(matrices[0].shape[0])
+    permutations = [[0] + list(k) + vertices[max_vertex+1:]
+                    for k in itertools.permutations(vertices[1:max_vertex+1])]
     for ind_mat1 in xrange(len(matrices)-2, -1, -1):
         mat1 = matrices[ind_mat1]
+        mat1_0_sorted = np.sort(mat1[0, :])
+        mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
         for ind_mat2 in xrange(len(matrices)-1, ind_mat1, -1):
             mat2 = matrices[ind_mat2]
-            are_topologically_equivalent = False
+            done_with_mat2 = False
             # Basic check to avoid needless permutations
-            if (not ((np.sort(mat1[0, :]) - np.sort(mat2[0, :])).any())) \
-                and (not ((np.sort(mat1[1:max_vertex, :].flat)
-                           - np.sort(mat2[1:max_vertex, :].flat)).any()
-                          )):
-                # Test for all possible permutations with i < j
-                for ind_i in range(1, max_vertex + 1):
-                    for ind_j in range(ind_i + 1, max_vertex + 1):
-                        reorder_ind = range(mat1.shape[0])
-                        reorder_ind[ind_i], reorder_ind[ind_j] = ind_j, ind_i
-                        if not (mat1
-                                - mat2[:, reorder_ind][reorder_ind, :]).any():
-                            are_topologically_equivalent = True
-                            break
-                    if are_topologically_equivalent:
+            if (not (mat1_0_sorted - np.sort(mat2[0, :])).any()) \
+                and (not (mat1_1plus_sorted
+                          - np.sort(mat2[1:max_vertex, :].flat)).any()):
+                # Test for all possible permutations
+                for reordering in permutations:
+                    if not (mat1 - mat2[:, reordering][reordering, :]).any():
                         del matrices[ind_mat2]
+                        done_with_mat2 = True
                         break
+            if done_with_mat2:
+                break
+    return matrices
 
 
 def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
@@ -112,30 +165,17 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
     [array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
 
     """
+    vertices = range(matrices[0].shape[0])
+    permutations = [[0] + list(k) + vertices[max_filled_vertex+1:]
+                    for k in itertools.permutations(vertices[1:max_filled_vertex+1])]
     for ind_mat in xrange(len(matrices)-1, -1, -1):
-        mat = matrices[ind_mat]
-        is_disconnected = True
-        # Store the indexes of lines with an empty end in a list
-        empty_lines = [
-            index for index in range(mat.shape[0])
-            if not mat[index, max_filled_vertex + 1:length_mat].any()
-        ]
-        for index in empty_lines:
-            test_line = mat[index].copy()
-            for index2 in empty_lines:
-                test_line[index2] = 0
-            if test_line.any():
-                is_disconnected = False
-                break
-        if is_disconnected and empty_lines != []:
-            for index in [idx for idx in range(max_filled_vertex + 1)
-                          if idx not in empty_lines]:
-                for _ in (idx for idx in empty_lines
-                          if mat.item((index, idx)) != 0):
-                    is_disconnected = False
-                    break
-            if is_disconnected:
+        # Test for all possible permutations with i <= j
+        for reordering in permutations:
+            mat = matrices[ind_mat][:, reordering][reordering, :]
+            if not mat[vertices[:max_filled_vertex], :][:, vertices[max_filled_vertex:]].any() \
+                    and not mat[:, vertices[:max_filled_vertex]][vertices[max_filled_vertex:], :].any():
                 del matrices[ind_mat]
+                break
 
 
 def write_header(tex_file, commands, diags_nbs):
@@ -226,12 +266,12 @@ def order_diagrams(diagrams):
                 diagrams_3_not_hf.append(diagrams[i_diag])
         del diagrams[i_diag]
 
-    adg.diag.topologically_distinct_diagrams(diagrams_2_hf)
-    adg.diag.topologically_distinct_diagrams(diagrams_2_ehf)
-    adg.diag.topologically_distinct_diagrams(diagrams_2_not_hf)
-    adg.diag.topologically_distinct_diagrams(diagrams_3_hf)
-    adg.diag.topologically_distinct_diagrams(diagrams_3_ehf)
-    adg.diag.topologically_distinct_diagrams(diagrams_3_not_hf)
+    # adg.diag.topologically_distinct_diagrams(diagrams_2_hf)
+    # adg.diag.topologically_distinct_diagrams(diagrams_2_ehf)
+    # adg.diag.topologically_distinct_diagrams(diagrams_2_not_hf)
+    # adg.diag.topologically_distinct_diagrams(diagrams_3_hf)
+    # adg.diag.topologically_distinct_diagrams(diagrams_3_ehf)
+    # adg.diag.topologically_distinct_diagrams(diagrams_3_not_hf)
 
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
         + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf

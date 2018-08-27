@@ -71,10 +71,9 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
 
     for i_mat in xrange(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
-        vertex_degree = sum(matrix.item((index, vertex_id))
-                            + matrix.item((vertex_id, index))
+        vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
                             for index in range(matrix.shape[0]))
-        vertex_degree -= matrix.item((vertex_id, vertex_id))
+        vertex_degree -= matrix[vertex_id][vertex_id]
 
         if (vertex_id != 0 and vertex_degree not in authorized_deg) \
                 or (vertex_id == 0 and vertex_degree > 2*nbody_max_observable):
