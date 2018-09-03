@@ -81,37 +81,21 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
         matrices (list): The adjacency matrices to be checked.
         max_vertex (int): The maximum vertex which has been filled.
     """
-    matrices_1 = []
-    matrices_2 = []
-    matrices_3 = []
-    matrices_4 = []
-    matrices_5 = []
-    matrices_6 = []
+    matrices_dict = {}
     for idx in xrange(len(matrices)-1, -1, -1):
-        if matrices[idx][0, :].max() == 1:
-            matrices_1.append(matrices[idx])
-        elif matrices[idx][0, :].max() == 2:
-            matrices_2.append(matrices[idx])
-        elif matrices[idx][0, :].max() == 3:
-            matrices_3.append(matrices[idx])
-        elif matrices[idx][0, :].max() == 4:
-            matrices_4.append(matrices[idx])
-        elif matrices[idx][0, :].max() == 5:
-            matrices_5.append(matrices[idx])
-        elif matrices[idx][0, :].max() == 6:
-            matrices_6.append(matrices[idx])
+        row0 = "".join("%i" % elem for elem
+                       in np.sort(matrices[idx][0, :]).tolist())
+        if row0 in matrices_dict:
+            matrices_dict[row0].append(matrices[idx])
+        else:
+            matrices_dict[row0] = [matrices[idx]]
         del matrices[idx]
-    print len(matrices_1), len(matrices_2), len(matrices_3), len(matrices_4), \
-        len(matrices_5), len(matrices_6)
-    check_topologically_equivalent(matrices_1, max_vertex)
-    check_topologically_equivalent(matrices_2, max_vertex)
-    check_topologically_equivalent(matrices_3, max_vertex)
-    check_topologically_equivalent(matrices_4, max_vertex)
-    check_topologically_equivalent(matrices_5, max_vertex)
-    check_topologically_equivalent(matrices_6, max_vertex)
-
-    return matrices_1 + matrices_2 + matrices_3 + matrices_4 + matrices_5 \
-        + matrices_6
+    for row_key in matrices_dict:
+        check_topologically_equivalent(matrices_dict[row_key], max_vertex)
+    matrices = []
+    for matrices_list in matrices_dict.values():
+        matrices += matrices_list
+    return matrices
 
 
 def check_topologically_equivalent(matrices, max_vertex):
