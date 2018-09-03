@@ -136,7 +136,7 @@ def test_print_diags_numbers(capsys):
         "2N valid diagrams: 6\n"
         "2N energy canonical diagrams: 0\n"
         "2N canonical diagrams for a generic operator only: 1\n"
-        "2N non-canonical diagrams: 2\n"
+        "2N non-canonical diagrams: 2\n\n"
     )
 
     com.theory, com.with_3NF, com.canonical = 'BMBPT', True, False
@@ -153,5 +153,5 @@ def test_print_diags_numbers(capsys):
         "3N valid diagrams: 7\n"
         "3N energy canonical diagrams: 3\n"
         "3N canonical diagrams for a generic operator only: 4\n"
-        "3N non-canonical diagrams: 4\n"
+        "3N non-canonical diagrams: 4\n\n"
     )
