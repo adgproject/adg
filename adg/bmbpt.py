@@ -112,15 +112,13 @@ def check_topologically_equivalent(matrices, max_vertex):
                     for k in itertools.permutations(vertices[1:max_vertex+1])]
     for ind_mat1 in xrange(len(matrices)-2, -1, -1):
         mat1 = matrices[ind_mat1]
-        mat1_0_sorted = np.sort(mat1[0, :])
         mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
         for ind_mat2 in xrange(len(matrices)-1, ind_mat1, -1):
             mat2 = matrices[ind_mat2]
             done_with_mat2 = False
             # Basic check to avoid needless permutations
-            if (not (mat1_0_sorted - np.sort(mat2[0, :])).any()) \
-                and (not (mat1_1plus_sorted
-                          - np.sort(mat2[1:max_vertex, :].flat)).any()):
+            if not (mat1_1plus_sorted
+                    - np.sort(mat2[1:max_vertex, :].flat)).any():
                 # Test for all possible permutations
                 for reordering in permutations:
                     if not (mat1 - mat2[:, reordering][reordering, :]).any():
@@ -249,13 +247,6 @@ def order_diagrams(diagrams):
             elif diagrams[i_diag].hf_type == "noHF":
                 diagrams_3_not_hf.append(diagrams[i_diag])
         del diagrams[i_diag]
-
-    # adg.diag.topologically_distinct_diagrams(diagrams_2_hf)
-    # adg.diag.topologically_distinct_diagrams(diagrams_2_ehf)
-    # adg.diag.topologically_distinct_diagrams(diagrams_2_not_hf)
-    # adg.diag.topologically_distinct_diagrams(diagrams_3_hf)
-    # adg.diag.topologically_distinct_diagrams(diagrams_3_ehf)
-    # adg.diag.topologically_distinct_diagrams(diagrams_3_not_hf)
 
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
         + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf

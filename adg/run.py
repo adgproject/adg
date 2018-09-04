@@ -220,9 +220,10 @@ def generate_diagrams(commands):
     diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
                                   parallel_edges=True) for diagram in diagrams]
 
-    for i_diag in xrange(len(diags)-1, -1, -1):
-        if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
-            del diags[i_diag]
+    if commands.theory == "MBPT":
+        for i_diag in xrange(len(diags)-1, -1, -1):
+            if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
+                del diags[i_diag]
 
     adg.diag.label_vertices(diags, commands.theory)
 
