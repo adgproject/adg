@@ -55,23 +55,35 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
             matrices, three_body_use, nbody_obs, canonical, vertex
         )
         if 0 < vertex < order:
-            check_unconnected_spawn(matrices, vertex, order)
-    permutations = [[0] + list(k) for k in itertools.permutations(vertices[1:])]
+            check_unconnected_spawn(matrices, vertex)
+    remove_disconnected_matrices(matrices)
+    matrices = order_and_remove_topologically_equiv(matrices, order - 1)
+
+    return matrices
+
+
+def remove_disconnected_matrices(matrices):
+    """Remove matrices corresponding to disconnected diagrams.
+
+    Args:
+        matrices (list): List of adjacency matrices.
+    """
+    vertices = range(matrices[0].shape[0])
+    permutations = [[0] + list(k)
+                    for k in itertools.permutations(vertices[1:])]
     for idx in xrange(len(matrices)-1, -1, -1):
         is_disconnected = False
         for reordering in permutations:
             mat = matrices[idx][:, reordering][reordering, :]
             for vert in vertices[1:]:
                 if not mat[vertices[:vert], :][:, vertices[vert:]].any() \
-                        and not mat[:, vertices[:vert]][vertices[vert:], :].any():
+                        and not mat[:, vertices[:vert]
+                                    ][vertices[vert:], :].any():
                     is_disconnected = True
                     break
             if is_disconnected:
                 del matrices[idx]
                 break
-    matrices = order_and_remove_topologically_equiv(matrices, order - 1)
-
-    return matrices
 
 
 def order_and_remove_topologically_equiv(matrices, max_vertex):
@@ -130,14 +142,13 @@ def check_topologically_equivalent(matrices, max_vertex):
     return matrices
 
 
-def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
+def check_unconnected_spawn(matrices, max_filled_vertex):
     """Exclude some matrices that would spawn unconnected diagrams.
 
     Args:
         matrices (list): The adjacency matrices to be checked.
         max_filled_vertex (int): The furthest vertex until which the matrices
             have been filled.
-        length_mat (int): The size of the square matrices.
 
     >>> mats = [numpy.array([[0, 2, 0], [2, 0, 0], [0, 0, 0]]), \
                 numpy.array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
@@ -149,13 +160,16 @@ def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
     """
     vertices = range(matrices[0].shape[0])
     permutations = [[0] + list(k) + vertices[max_filled_vertex+1:]
-                    for k in itertools.permutations(vertices[1:max_filled_vertex+1])]
+                    for k
+                    in itertools.permutations(vertices[1:max_filled_vertex+1])]
     for ind_mat in xrange(len(matrices)-1, -1, -1):
         # Test for all possible permutations with i <= j
         for reordering in permutations:
             mat = matrices[ind_mat][:, reordering][reordering, :]
-            if not mat[vertices[:max_filled_vertex], :][:, vertices[max_filled_vertex:]].any() \
-                    and not mat[:, vertices[:max_filled_vertex]][vertices[max_filled_vertex:], :].any():
+            if not mat[:, vertices[:max_filled_vertex]
+                       ][vertices[max_filled_vertex:], :].any() \
+                    and not mat[vertices[:max_filled_vertex],
+                                :][:, vertices[max_filled_vertex:]].any():
                 del matrices[ind_mat]
                 break
 
