@@ -6,6 +6,7 @@ import shutil
 import networkx as nx
 import adg.mbpt
 import adg.bmbpt
+import adg.pbmbpt
 import adg.diag
 
 
@@ -38,14 +39,14 @@ def parse_command_line():
         description="Arguments available only for MBPT calculations.\n")
     bmbpt_args = parser.add_argument_group(
         title="BMBPT-specific arguments",
-        description="Arguments available only for BMBPT calculations.\n")
+        description="Arguments available only for (P)BMBPT calculations.\n")
 
     basic_args.add_argument(
         "-o", "--order", type=int, choices=range(1, 10),
         help="order of the diagrams (>=1)")
     basic_args.add_argument(
-        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT'],
-        help="theory of interest: MBPT or BMBPT")
+        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT'],
+        help="theory of interest: MBPT, BMBPT or PBMBPT")
     basic_args.add_argument(
         "-i", "--interactive", action="store_true",
         help="execute ADG in interactive mode")
@@ -58,10 +59,10 @@ def parse_command_line():
         help="maximal n-body character of the observable [1-3], default = 2")
     bmbpt_args.add_argument(
         "-3NF", "--with_3NF", action="store_true",
-        help="use two and three-body forces for BMBPT diagrams")
+        help="use two and three-body forces for (P)BMBPT diagrams")
     bmbpt_args.add_argument(
         "-dt", "--draw_tsds", action="store_true",
-        help="draw Time-Structure Diagrams (BMBPT)")
+        help="draw Time-Structure Diagrams (BMBPT or PBMBPT)")
 
     run_args.add_argument(
         "-d", "--draw_diags", action="store_true",
@@ -84,7 +85,7 @@ def parse_command_line():
         exit()
 
     # Avoid conflicting flags
-    if args.theory != 'BMBPT' and not args.interactive:
+    if args.theory not in ('BMBPT', 'PBMBPT') and not args.interactive:
         args.canonical = None
         args.with_3NF = None
         args.nobs = 2
@@ -114,14 +115,14 @@ def interactive_interface(commands):
         print "Perturbative order too small or too high!"
         commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
 
-    theories = ["BMBPT", "MBPT"]
+    theories = ["BMBPT", "MBPT", "PBMBPT"]
 
-    commands.theory = raw_input('MBPT or BMBPT?\n').upper()
+    commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
     while commands.theory not in theories:
         print "Invalid theory!"
-        commands.theory = raw_input('MBPT or BMBPT?\n').upper()
+        commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
 
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         commands.canonical = raw_input(
             "Consider only canonical diagrams? (y/N)").lower() == 'y'
         commands.with_3NF = raw_input(
@@ -184,7 +185,7 @@ def attribute_directory(commands):
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.canonical:
         directory += '_canonical'
-    if commands.theory == 'BMBPT':
+    if commands.theory in ('BMBPT', 'PBMBPT'):
         directory += '_%ibody_observable' % commands.nbody_observable
     if commands.with_3NF:
         directory += '_with3N'
@@ -207,7 +208,7 @@ def generate_diagrams(commands):
     """
     if commands.theory == "MBPT":
         diagrams = adg.mbpt.diagrams_generation(commands.order)
-    elif commands.theory == "BMBPT":
+    elif commands.theory in ("BMBPT", "PBMBPT"):
         diagrams = adg.bmbpt.diagrams_generation(commands.order,
                                                  commands.with_3NF,
                                                  commands.nbody_observable,
