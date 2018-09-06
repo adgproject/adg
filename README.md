@@ -124,7 +124,8 @@ actual calculation output would be stored.
 
 ## Citing
 If you use ADG in your research work, we kindly ask you to cite the following
-paper: []
+paper: P. Arthuis, A.Tichai, T. Duguet, R.-D. Lasseri and J.-P. Ebran, (2018),
+arXiv:1809.01187 [nucl-th].
 
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt)
