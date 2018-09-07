@@ -125,7 +125,7 @@ def label_vertices(graphs_list, theory_type):
     for graph in graphs_list:
         for node in graph:
             graph.node[node]['operator'] = False
-        if theory_type == "BMBPT":
+        if theory_type == "BMBPT" or "PBMBPT":
             graph.node[0]['operator'] = True
 
 

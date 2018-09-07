@@ -21,6 +21,9 @@ def generate_anomalous_diags(graph, nbody_max):
     anom_graphs = [graph]
     vertices = [vert for vert in graph if not graph.node[vert]['operator']]
 
+    for edge in graph.edges(keys=True, data=True):
+        graph[edge[0]][edge[1]][edge[2]]['anomalous'] = False
+
     # Turn normal propagators in anomalous ones
     tweakable_edges = []
     for vert1 in vertices:
@@ -87,19 +90,12 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
 
     """
 
-    def __init__(self, bmbpt_diag):
+    def __init__(self, graph, tag, child_tag):
         """Generate a PBMBPT diagram by copying a BMBPT one.
 
         Args:
-            bmbpt_diag (adg.bmbpt.BmbptFeynmanDiagram)): The graph of interest.
+            graph (NetworkX MultiDiGraph)): The graph of interest.
 
         """
-        adg.bmbpt.BmbptFeynmanDiagram.__init__(self,
-                                               bmbpt_diag.graph,
-                                               bmbpt_diag.tags[0])
-        self.tags = [bmbpt_diag.tags[0]]
-        self.time_tag = bmbpt_diag.time_tag
-        self.tsd_is_tree = bmbpt_diag.tsd_is_tree
-        self.vert_exp = bmbpt_diag.vert_exp
-        for edge in self.graph.edges(keys=True, data=True):
-            edge[3]['anomalous'] = False
+        adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, tag)
+        self.tags = [tag, child_tag]

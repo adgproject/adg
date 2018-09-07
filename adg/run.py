@@ -228,7 +228,7 @@ def generate_diagrams(commands):
 
     adg.diag.label_vertices(diags, commands.theory)
 
-    if commands.theory == 'BMBPT':
+    if commands.theory == 'BMBPT' or "PBMBPT":
         diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, ind)
                     for ind, graph in enumerate(diags)]
     elif commands.theory == 'MBPT':
@@ -249,7 +249,7 @@ def order_diagrams(diagrams, commands):
         Second element is a dict with the number of diagrams per type.
 
     """
-    if commands.theory == "BMBPT":
+    if commands.theory == "BMBPT" or "PBMBPT":
         diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
 
     elif commands.theory == "MBPT":
@@ -268,7 +268,7 @@ def print_diags_numbers(commands, diags_nbs):
     """
     print "Number of connected diagrams: ", diags_nbs['nb_diags']
 
-    if commands.theory == "BMBPT":
+    if commands.theory == "BMBPT" or "PBMBPT":
         print(
             "\n2N valid diagrams: %i\n" % diags_nbs['nb_2']
             + "2N energy canonical diagrams: %i\n" % diags_nbs['nb_2_hf']
