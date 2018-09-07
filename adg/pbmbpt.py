@@ -2,15 +2,13 @@
 
 import copy
 import itertools
-import numpy as np
-import networkx as nx
 import adg.bmbpt
 import adg.tsd
 import adg.diag
 
 
 def generate_anomalous_diags(graph, nbody_max):
-    """Generate PBMBPT graphs with anomalous lines.
+    """Generate PBMBPT graphs with anomalous lines, with some redundancy.
 
     Args:
         graph (NetworkX MultiDiGraph): The graph to generate children from.
@@ -23,27 +21,53 @@ def generate_anomalous_diags(graph, nbody_max):
     anom_graphs = [graph]
     vertices = [vert for vert in graph if not graph.node[vert]['operator']]
 
-    # Loop to generate anomalous propagators
-    for iter_graph in anom_graphs:
-        for vertex1 in vertices:
-            edges = iter_graph.edges(vertex1, keys=True, data='anomalous')
-            for vertex2 in vertices[vertex1 + 1:]:
-                for edge in edges:
-                    if (edge[1], edge[3]) == (vertex2, False):
-                        new_graph = copy.deepcopy(iter_graph)
-                        new_graph[vertex1][vertex2][edge[2]]['anomalous'] = True
-                        anom_graphs.append(new_graph)
-                        break
+    # Turn normal propagators in anomalous ones
+    tweakable_edges = []
+    for vert1 in vertices:
+        for vert2 in vertices[vert1:]:
+            for _ in range(graph.number_of_edges(vert1, vert2)):
+                tweakable_edges.append((vert1, vert2))
+    for comb in generate_combinations(tweakable_edges):
+        new_graph = copy.deepcopy(graph)
+        for edge in comb:
+            key = sum(1 for prop
+                      in new_graph.edges(edge[0], edge[1], keys=True)
+                      if new_graph[prop[0]][prop[1]][prop[2]]['anomalous'])
+            new_graph[edge[0]][edge[1]][key]['anomalous'] = True
+        anom_graphs.append(new_graph)
 
     # Loop to generate self-contractions
-    for iter_graph in anom_graphs:
-        for vertex in vertices:
-            if iter_graph.degree(vertex) / 2 < nbody_max:
-                new_graph = copy.deepcopy(iter_graph)
-                new_graph.add_edge(vertex, vertex, anomalous=True)
-                anom_graphs.append(new_graph)
+    for idx in xrange(len(anom_graphs)-1, -1, -1):
+        iter_graph = anom_graphs[idx]
+        test_vertices = []
+        for vert in vertices:
+            for _ in range(nbody_max - (iter_graph.degree(vert) / 2)):
+                test_vertices.append(vert)
+        for comb in generate_combinations(test_vertices):
+            new_graph = copy.deepcopy(iter_graph)
+            for vert in comb:
+                new_graph.add_edge(vert, vert, anomalous=True)
+            anom_graphs.append(new_graph)
 
     return anom_graphs
+
+
+def generate_combinations(iter_list):
+    """Generate all possible combinations of length 1 to total.
+
+    Attributes:
+        iter_list (list): A list of iterable objects.
+
+    Returns:
+        (list): A list with all the possible combinations of all lengths.
+
+    """
+    combinations = []
+    for i in range(1, len(iter_list) + 1):
+        combinations += [k for k in itertools.combinations(iter_list, i)]
+    # Remove duplicates
+    combinations = list(set(combinations))
+    return combinations
 
 
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
