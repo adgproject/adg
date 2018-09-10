@@ -51,15 +51,15 @@ def main():
 
     if run_commands.theory == "PBMBPT":
         for idx in xrange(len(diagrams)-1, -1, -1):
-            new_graphs = adg.pbmbpt.generate_anomalous_diags(diagrams[idx].graph,
-                                                             run_commands.with_3NF)
+            new_graphs = adg.pbmbpt.generate_anomalous_diags(
+                diagrams[idx].graph, 3 if run_commands.with_3NF else 2)
             new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag, idx, spawn_idx)
                          for spawn_idx, diag in enumerate(new_graphs)]
             # adg.diag.topologically_distinct_diagrams(new_diags)
             del diagrams[idx]
             diagrams += new_diags
 
-        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
+        diagrams, diags_per_type = adg.pbmbpt.order_diagrams(diagrams)
 
     print "Time elapsed: ", datetime.now() - start_time
 

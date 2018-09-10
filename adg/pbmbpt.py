@@ -34,8 +34,9 @@ def generate_anomalous_diags(graph, nbody_max):
         new_graph = copy.deepcopy(graph)
         for edge in comb:
             key = sum(1 for prop
-                      in new_graph.edges(edge[0], edge[1], keys=True)
-                      if new_graph[prop[0]][prop[1]][prop[2]]['anomalous'])
+                      in new_graph.edges(keys=True, data=True)
+                      if (edge[0], edge[1]) == (prop[0], prop[1])
+                      and new_graph[prop[0]][prop[1]][prop[2]]['anomalous'])
             new_graph[edge[0]][edge[1]][key]['anomalous'] = True
         anom_graphs.append(new_graph)
 
@@ -73,6 +74,63 @@ def generate_combinations(iter_list):
     return combinations
 
 
+def order_diagrams(diagrams):
+    """Order the PBMBPT diagrams and return number of diags for each type.
+
+    Args:
+        diagrams (list): Possibly redundant BmbptFeynmanDiagrams.
+
+    Returns:
+        (tuple): First element is the list of topologically unique, ordered
+            diagrams. Second element is a dict with the number of diagrams
+            for each major type.
+
+    """
+    diagrams_2_hf = []
+    diagrams_2_ehf = []
+    diagrams_2_not_hf = []
+    diagrams_3_hf = []
+    diagrams_3_ehf = []
+    diagrams_3_not_hf = []
+
+    for i_diag in xrange(len(diagrams)-1, -1, -1):
+        if diagrams[i_diag].two_or_three_body == 2:
+            if diagrams[i_diag].hf_type == "HF":
+                diagrams_2_hf.append(diagrams[i_diag])
+            elif diagrams[i_diag].hf_type == "EHF":
+                diagrams_2_ehf.append(diagrams[i_diag])
+            elif diagrams[i_diag].hf_type == "noHF":
+                diagrams_2_not_hf.append(diagrams[i_diag])
+        elif diagrams[i_diag].two_or_three_body == 3:
+            if diagrams[i_diag].hf_type == "HF":
+                diagrams_3_hf.append(diagrams[i_diag])
+            elif diagrams[i_diag].hf_type == "EHF":
+                diagrams_3_ehf.append(diagrams[i_diag])
+            elif diagrams[i_diag].hf_type == "noHF":
+                diagrams_3_not_hf.append(diagrams[i_diag])
+        del diagrams[i_diag]
+
+    diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
+        + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf
+
+    diags_nb_per_type = {
+        'nb_2_hf': len(diagrams_2_hf),
+        'nb_2_ehf': len(diagrams_2_ehf),
+        'nb_2_not_hf': len(diagrams_2_not_hf),
+        'nb_3_hf': len(diagrams_3_hf),
+        'nb_3_ehf': len(diagrams_3_ehf),
+        'nb_3_not_hf': len(diagrams_3_not_hf),
+        'nb_diags': len(diagrams),
+        'nb_2': (len(diagrams_2_hf) + len(diagrams_2_ehf)
+                 + len(diagrams_2_not_hf)),
+        'nb_3': (len(diagrams_3_hf) + len(diagrams_3_ehf)
+                 + len(diagrams_3_not_hf))
+    }
+
+    return diagrams, diags_nb_per_type
+
+
+
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
     """Describes a PBMBPT diagram with its related properties.
 
@@ -99,3 +157,24 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """
         adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, tag)
         self.tags = [tag, child_tag]
+
+    def write_graph(self, latex_file, directory, write_time):
+        """Write the PBMBPT graph and its associated TSD to the LaTeX file.
+
+        Args:
+            latex_file (file): The LaTeX output file of the program.
+            directory (str): The path to the result folder.
+            write_time (bool): ``True`` if we want informations on the
+                associated TSDs.
+
+        """
+        latex_file.write('\n\\begin{center}\n')
+        adg.diag.draw_diagram(directory, latex_file,
+                              "%i_%i" % (self.tags[0], self.tags[1]), 'diag')
+        if write_time:
+            latex_file.write(
+                '\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
+                % (self.time_tag + 1))
+            adg.diag.draw_diagram(directory, latex_file,
+                                  str(self.time_tag), 'time')
+        latex_file.write('\n\\end{center}\n\n')

@@ -329,7 +329,10 @@ def create_feynmanmp_files(diagrams, theory, directory, diag_type):
 
     """
     for diag in diagrams:
-        diag_name = '%s_%i' % (diag_type, diag.tags[0])
+        if theory == "PBMBPT":
+            diag_name = '%s_%i_%i' % (diag_type, diag.tags[0], diag.tags[1])
+        else:
+            diag_name = '%s_%i' % (diag_type, diag.tags[0])
         adg.diag.feynmf_generator(diag.graph,
                                   'MBPT' if diag_type == 'time' else theory,
                                   diag_name)

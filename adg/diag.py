@@ -141,8 +141,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
     p_order = graph.number_of_nodes()
     diag_size = 20*p_order
 
-    theories = ["MBPT", "BMBPT"]
-    prop_types = ["half_prop", "prop_pm"]
+    theories = ["MBPT", "BMBPT", "PBMBPT"]
+    prop_types = ["half_prop", "prop_pm", "prop_pm"]
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
@@ -152,19 +152,11 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
     # Define the appropriate line propagator_style
     fmf_file.write(propagator_style(propa))
+    if theory_type == "PBMBPT":
+        fmf_file.write(propagator_style("prop_mm"))
 
     # Set the position of the vertices
-    fmf_file.write("\\fmftop{v%i}\\fmfbottom{v0}\n" % (p_order-1))
-    for vert in xrange(p_order-1):
-        fmf_file.write("\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)))
-        fmf_file.write(
-            "\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
-            if graph.node[vert]['operator']
-            else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick")
-        fmf_file.write("}{v%i}\n" % vert)
-    fmf_file.write("\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n"
-                   % (p_order-1))
-    fmf_file.write("\\fmffreeze\n")
+    fmf_file.write(vertex_positions(graph, p_order))
 
     # Loop over all elements of the graph to draw associated propagators
     for vert_i in graph:
@@ -182,16 +174,30 @@ def feynmf_generator(graph, theory_type, diagram_name):
                 fmf_file.write("\\fmf{%s," % propa)
                 fmf_file.write("right=" if props_left_to_draw % 2 == 1
                                else "left=")
-                if (props_left_to_draw == 6) or (props_left_to_draw == 5):
+                if props_left_to_draw in (5, 6):
                     fmf_file.write("0.9")
-                elif (props_left_to_draw == 4) or (props_left_to_draw == 3) \
-                    or ((props_left_to_draw == 1) and
-                        (graph.number_of_edges(vert_j, vert_i) == 2)):
+                elif props_left_to_draw in (3, 4) \
+                        or (props_left_to_draw == 1
+                            and graph.number_of_edges(vert_j, vert_i) == 2):
                     fmf_file.write("0.75")
-                elif (props_left_to_draw == 2) or (props_left_to_draw == 1):
+                elif props_left_to_draw in (1, 2):
                     fmf_file.write("0.5" if abs(vert_i-vert_j) == 1 else "0.6")
                 fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
                 props_left_to_draw -= 1
+        # Special config for self-contraction
+        props_left_to_draw = len(list(edge for edge
+                                      in nx.selfloop_edges(graph,
+                                                           data=True,
+                                                           keys=True)
+                                      if edge[0] == vert_i))
+        while props_left_to_draw > 0:
+            if props_left_to_draw > 1:
+                fmf_file.write("\\fmf{prop_mm,left=45}{v%i,v%i}\n"
+                               % (vert_i, vert_i))
+            else:
+                fmf_file.write("\\fmf{prop_mm,right=45}{v%i,v%i}\n"
+                               % (vert_i, vert_i))
+            props_left_to_draw -= 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
 
@@ -214,6 +220,12 @@ def propagator_style(prop_type):
         + "\tcfill (marrow (p, .75))\n" \
         + "endshrink;\nenddef;}\n"
 
+    line_styles['prop_mm'] = "\\fmfcmd{style_def prop_mm expr p =\n" \
+        + "draw_plain p;\nshrink(.7);\n" \
+        + "\tcfill (marrow (p, .75));\n" \
+        + "\tcfill (marrow (reverse p, .75))\n" \
+        + "endshrink;\nenddef;}\n"
+
     line_styles['half_prop'] = "\\fmfcmd{style_def half_prop expr p =\n" \
         + "draw_plain p;\nshrink(.7);\n" \
         + "\tcfill (marrow (p, .5))\n" \
@@ -222,17 +234,40 @@ def propagator_style(prop_type):
     return line_styles[prop_type]
 
 
+def vertex_positions(graph, order):
+    """Return the positions of the graph's vertices.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph of interest.
+        order (int): The perturbative order of the graph.
+
+    Returns:
+        (str): The FeynMP instructions for positioning the vertices.
+
+    """
+    positions = "\\fmftop{v%i}\\fmfbottom{v0}\n" % (order-1)
+    for vert in xrange(order-1):
+        positions += "\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)) \
+            + ("\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
+               if graph.node[vert]['operator']
+               else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick") \
+            + "}{v%i}\n" % vert
+    positions += "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" \
+        % (order-1) + "\\fmffreeze\n"
+    return positions
+
+
 def draw_diagram(directory, result_file, diagram_index, diag_type):
     """Copy the diagram feynmanmp instructions in the result file.
 
     Args:
         directory (str): The path to the output folder.
         result_file (file): The LaTeX ouput file of the program.
-        diagram_index (int): The number associated to the diagram.
+        diagram_index (str): The number associated to the diagram.
         diag_type (str): The type of diagram used here.
 
     """
-    diag_file = open(directory+"/Diagrams/%s_%i.tex" % (diag_type,
+    diag_file = open(directory+"/Diagrams/%s_%s.tex" % (diag_type,
                                                         diagram_index))
     result_file.write(diag_file.read())
     diag_file.close()

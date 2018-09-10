@@ -401,12 +401,13 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         """
         latex_file.write('\n\\begin{center}\n')
-        adg.diag.draw_diagram(directory, latex_file, self.tags[0], 'diag')
+        adg.diag.draw_diagram(directory, latex_file, str(self.tags[0]), 'diag')
         if write_time:
             latex_file.write(
                 '\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
                 % (self.time_tag + 1))
-            adg.diag.draw_diagram(directory, latex_file, self.time_tag, 'time')
+            adg.diag.draw_diagram(directory, latex_file,
+                                  str(self.time_tag), 'time')
         latex_file.write('\n\\end{center}\n\n')
 
     def write_tsd_info(self, diagrams_time, latex_file):
@@ -456,7 +457,11 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                     + diags_nbs['nb_3_ehf']:
                 result.write(
                     "\\subsection{Three-body non-canonical diagrams}\n\n")
-        result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
+        if commands.theory == "PBMBPT":
+            result.write("\\paragraph{Diagram %i.%i:}\n" % (self.tags[0] + 1,
+                                                            self.tags[1] + 1))
+        else:
+            result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         self.write_diag_exps(result, commands.order)
 
     def write_vertices_values(self, latex_file, mapping):
