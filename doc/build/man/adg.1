@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "Aug 02, 2018" "0.2.0" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Nov 19, 2018" "0.2.0" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -463,43 +463,83 @@ Describes a diagram with its related properties.
 .INDENT 7.0
 .TP
 .B graph
-\fINetworkX MultiDiGraph\fP \-\- The actual graph.
+The actual graph.
+.INDENT 7.0
+.TP
+.B Type
+NetworkX MultiDiGraph
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B unsorted_degrees
-\fItuple\fP \-\- The degrees of the graph vertices
+The degrees of the graph vertices
+.INDENT 7.0
+.TP
+.B Type
+tuple
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B degrees
-\fItuple\fP \-\- The ascendingly sorted degrees of the graph vertices.
+The ascendingly sorted degrees of the graph vertices.
+.INDENT 7.0
+.TP
+.B Type
+tuple
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B unsort_io_degrees
-\fItuple\fP \-\- The list of in\- and out\-degrees for each
+The list of in\- and out\-degrees for each
 vertex of the graph, stored in a (in, out) tuple.
+.INDENT 7.0
+.TP
+.B Type
+tuple
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B io_degrees
-\fItuple\fP \-\- The sorted version of unsort_io_degrees.
+The sorted version of unsort_io_degrees.
+.INDENT 7.0
+.TP
+.B Type
+tuple
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B max_degree
-\fIint\fP \-\- The maximal degree of a vertex in the graph.
+The maximal degree of a vertex in the graph.
+.INDENT 7.0
+.TP
+.B Type
+int
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B tags
-\fIlist\fP \-\- The tag numbers associated to a diagram.
+The tag numbers associated to a diagram.
+.INDENT 7.0
+.TP
+.B Type
+list
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B adjacency_mat
-\fINumPy array\fP \-\- The adjacency matrix of the graph.
+The adjacency matrix of the graph.
+.INDENT 7.0
+.TP
+.B Type
+NumPy array
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -731,29 +771,54 @@ Describes a MBPT diagram with its related properties.
 .INDENT 7.0
 .TP
 .B incidence
-\fINumPy array\fP \-\- The incidence matrix of the graph.
+The incidence matrix of the graph.
+.INDENT 7.0
+.TP
+.B Type
+NumPy array
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B excitation_level
-\fIint\fP \-\- The single, double, etc., excitation character.
+The single, double, etc., excitation character.
+.INDENT 7.0
+.TP
+.B Type
+int
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B complex_conjugate
-\fIint\fP \-\- The tag number of the diagram\(aqs complex
+The tag number of the diagram\(aqs complex
 conjugate. \-1 is the graph has none.
+.INDENT 7.0
+.TP
+.B Type
+int
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B expr
-\fIstr\fP \-\- The MBPT expression associated to the diagram.
+The MBPT expression associated to the diagram.
+.INDENT 7.0
+.TP
+.B Type
+str
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B cd_expr
-\fIstr\fP \-\- The expression associated to the diagram in a
+The expression associated to the diagram in a
 computer\-readable format.
+.INDENT 7.0
+.TP
+.B Type
+str
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -1047,40 +1112,75 @@ Describes a BMBPT Feynman diagram with its related properties.
 .INDENT 7.0
 .TP
 .B two_or_three_body
-\fIint\fP \-\- The 2 or 3\-body characted of the vertices.
+The 2 or 3\-body characted of the vertices.
+.INDENT 7.0
+.TP
+.B Type
+int
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B time_tag
-\fIint\fP \-\- The tag number associated to the diagram\(aqs
+The tag number associated to the diagram\(aqs
 associated TSD.
+.INDENT 7.0
+.TP
+.B Type
+int
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B tsd_is_tree
-\fIbool\fP \-\- The tree or non\-tree character of the
+The tree or non\-tree character of the
 associated TSD.
+.INDENT 7.0
+.TP
+.B Type
+bool
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B feynman_exp
-\fIstr\fP \-\- The Feynman expression associated to the diagram.
+The Feynman expression associated to the diagram.
+.INDENT 7.0
+.TP
+.B Type
+str
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B diag_exp
-\fIstr\fP \-\- The Goldstone expression associated to the diagram.
+The Goldstone expression associated to the diagram.
+.INDENT 7.0
+.TP
+.B Type
+str
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B vert_exp
-\fIlist\fP \-\- The expression associated to the vertices.
+The expression associated to the vertices.
+.INDENT 7.0
+.TP
+.B Type
+list
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B hf_type
-\fIstr\fP \-\- The Hartree\-Fock, non\-Hartree\-Fock or Hartree\-Fock for
+The Hartree\-Fock, non\-Hartree\-Fock or Hartree\-Fock for
 the energy operator only character of the graph.
+.INDENT 7.0
+.TP
+.B Type
+str
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -1411,24 +1511,44 @@ Describes a time\-structure diagram with its related properties.
 .INDENT 7.0
 .TP
 .B perms
-\fIdict\fP \-\- The permutations on the vertices for all the BMBPT
+The permutations on the vertices for all the BMBPT
 diagrams associated to this TSD.
+.INDENT 7.0
+.TP
+.B Type
+dict
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B equivalent_trees
-\fIlist\fP \-\- The tag numbers of the equivalent tree TSDs
+The tag numbers of the equivalent tree TSDs
 associated to a non\-tree TSD.
+.INDENT 7.0
+.TP
+.B Type
+list
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B is_tree
-\fIbool\fP \-\- The tree or non\-tree character of a TSD.
+The tree or non\-tree character of a TSD.
+.INDENT 7.0
+.TP
+.B Type
+bool
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
 .B expr
-\fIstr\fP \-\- The Goldstone denominator associated to the TSD.
+The Goldstone denominator associated to the TSD.
+.INDENT 7.0
+.TP
+.B Type
+str
+.UNINDENT
 .UNINDENT
 .INDENT 7.0
 .TP
@@ -1619,11 +1739,11 @@ They have been involved in the making of ADG over the past years:
 .INDENT 3.5
 .INDENT 0.0
 .IP \(bu 2
-Pierre Arthuis \- Irfu, CEA, Université Paris\-Saclay & CEA/DAM/DIF
+Pierre Arthuis \- Irfu, CEA, Université Paris\-Saclay & CEA, DAM, DIF
 .IP \(bu 2
 Thomas Duguet \- Irfu, CEA, Université Paris\-Saclay & KU Leuven, IKS
 .IP \(bu 2
-Jean\-Paul Ebran \- CEA/DAM/DIF
+Jean\-Paul Ebran \- CEA, DAM, DIF
 .IP \(bu 2
 Raphaël\-David Lasseri \- IPN, CNRS/IN2P3, Université Paris\-Sud, Université Paris\-Saclay
 .IP \(bu 2
@@ -1634,7 +1754,8 @@ Alexander Tichai \- ESNT, Irfu, CEA, Université Paris\-Saclay
 .SH CITING
 .sp
 If you use ADG in your research work, we kindly ask you to cite the following
-paper: []
+paper: P. Arthuis, T. Duguet, A. Tichai, R.\-D. Lasseri and J.\-P. Ebran, (2018),
+(accepted in Comput. Phys. Commun.), arXiv:1809.01187 [nucl\-th].
 .SH LICENSE
 .sp
 ADG is licensed under under GNU General Public License version 3
