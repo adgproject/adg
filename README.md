@@ -124,10 +124,11 @@ actual calculation output would be stored.
 
 ## Citing
 If you use ADG in your research work, we kindly ask you to cite the following
-paper: []
+paper: P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran, (2018),
+(accepted in Comput. Phys. Commun.), arXiv:1809.01187 [nucl-th].
 
 ## License
-ADG is licensed under GNU General Public License version 3 (see LICENSE.txt)
+ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
 Copyright (C) 2018 ADG Dev Team
 Pierre Arthuis - Irfu, CEA, UPSaclay & CEA/DAM/DIF
