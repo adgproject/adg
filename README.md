@@ -131,9 +131,9 @@ paper: P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran, (2018),
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
 Copyright (C) 2018 ADG Dev Team
-Pierre Arthuis - Irfu, CEA, UPSaclay & CEA/DAM/DIF
+Pierre Arthuis - Irfu, CEA, UPSaclay & CEA, DAM, DIF
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
-Jean-Paul Ebran - CEA/DAM/DIF
+Jean-Paul Ebran - CEA, DAM, DIF
 Raphaël-David Lasseri - IPN, CNRS/IN2P3, UPSud, UPSaclay
 Alexander Tichai - ESNT, Irfu, CEA, UPSaclay
 ```
