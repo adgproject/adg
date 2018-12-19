@@ -308,6 +308,76 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             if denominator != "" \
             else "%s%s%s\n" % (prefactor, numerator, extra_factor)
 
+    def get_equation(self):
+
+        # Determine the sign (prefactor numerator)
+        sign = (-1)**(len(self.graph)-1)
+        if self.has_crossing_sign():
+            sign *= -1
+
+        # Determine prefactor denominator
+        sym_fact = 1
+
+        # Vertex exchange
+        for vertex_degrees in self.unsort_io_degrees:
+            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
+
+                # Starts at -2 as the identity belongs to the set of permutations
+                factor = -2
+                graph = self.graph
+                perm_vertices = [vertex for vertex, degrees
+                                 in enumerate(self.unsort_io_degrees)
+                                 if graph.node[vertex]['operator'] is False
+                                 and self.unsort_io_degrees.count(degrees) >= 2]
+                for permutation in itertools.permutations(perm_vertices):
+                    permuted_graph = nx.relabel_nodes(graph,
+                                                      dict(zip(perm_vertices,
+                                                               permutation)),
+                                                      copy=True)
+                    if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
+                        factor += 2
+                if factor != 0:
+                    sym_fact *= factor
+                break
+
+        # Symmetry factor
+        prop_multiplicity = [0 for _ in xrange(6)]
+        for vertex_i in self.graph:
+            for vertex_j in self.graph:
+                if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:
+                    prop_multiplicity[self.graph.number_of_edges(vertex_i, vertex_j) - 1] += 1
+        for prop_id, multiplicity in enumerate(prop_multiplicity):
+            for i in range(multiplicity):
+                for k in range(prop_id+1):
+                    sym_fact *= k+1
+
+        # Determine list of tensors
+        #numerator = self.extract_numerator()
+        numerator = []
+        graph = self.graph
+        for vertex in graph:
+
+            # Get I, J
+            tensorI = self.unsort_io_degrees[vertex][1]
+            tensorJ = self.unsort_io_degrees[vertex][0]
+
+            # Get symbol
+            tensorTex = "{O}" if graph.node[vertex]['operator'] else "{\\Omega}" + "^{%i%i}" % (tensorI,tensorJ)
+
+            # Build indices
+            # First add the qp states corresponding to propagators going out
+            # Add the qp states corresponding to propagators coming in
+            indices = []
+            indices.extend([int(prop[3]['qp_state'][3:-1]) for prop in graph.out_edges(vertex, keys=True, data=True)])
+            previous_vertex = vertex - 1
+            while previous_vertex >= 0:
+                indices.extend([int(prop[3]['qp_state'][3:-1]) for prop in graph.in_edges(vertex, keys=True, data=True) if prop[0] == previous_vertex])
+                previous_vertex -= 1
+
+            numerator.append([tensorTex,tensorI,tensorJ,indices])
+
+        return [sign,sym_fact,numerator]
+
     def vertex_expression(self, vertex):
         """Return the expression associated to a given vertex.
 
