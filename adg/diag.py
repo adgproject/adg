@@ -93,22 +93,36 @@ def topologically_distinct_diagrams(diagrams):
     import adg.tsd
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
+    anom_em = iso.categorical_multiedge_match('anomalous', True)
     for i_diag in xrange(len(diagrams)-1, -1, -1):
         graph = diagrams[i_diag].graph
         diag_io_degrees = diagrams[i_diag].io_degrees
         for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
             if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
+                # Check for topolically equivalent diags considering vertex
+                # properties but not edge attributes, i.e. anomalous character
                 matcher = iso.DiGraphMatcher(graph,
                                              diagrams[i_comp_diag].graph,
                                              node_match=op_nm)
                 if matcher.is_isomorphic():
-                    diagrams[i_diag].tags += diagrams[i_comp_diag].tags
+                    # Store the set of permutations to recover the original TSD
                     if isinstance(diagrams[i_diag],
                                   adg.tsd.TimeStructureDiagram):
                         diagrams[i_diag].perms.update(
                             diagrams[i_comp_diag].perms)
                         diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
                             = matcher.mapping
+                    # Check anomalous character of props for PBMBPT
+                    elif isinstance(diagrams[i_diag],
+                                    adg.pbmbpt.ProjectedBmbptDiagram):
+                        matcher = iso.DiGraphMatcher(graph,
+                                                     diagrams[i_comp_diag].graph,
+                                                     node_match=op_nm,
+                                                     edge_match=anom_em)
+                        # Keep the diags if the anomalous props are not equiv
+                        if not matcher.is_isomorphic():
+                            break
+                    diagrams[i_diag].tags += diagrams[i_comp_diag].tags
                     del diagrams[i_comp_diag]
                     break
     return diagrams

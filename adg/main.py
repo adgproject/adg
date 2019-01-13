@@ -55,7 +55,7 @@ def main():
                 diagrams[idx].graph, 3 if run_commands.with_3NF else 2)
             new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag, idx, spawn_idx)
                          for spawn_idx, diag in enumerate(new_graphs)]
-            # adg.diag.topologically_distinct_diagrams(new_diags)
+            adg.diag.topologically_distinct_diagrams(new_diags)
             del diagrams[idx]
             diagrams += new_diags
 
