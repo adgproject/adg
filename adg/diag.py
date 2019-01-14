@@ -143,6 +143,7 @@ def label_vertices(graphs_list, theory_type):
             graph.node[0]['operator'] = True
 
 
+# Previous versions working for theories other than PBMBPT
 # def feynmf_generator(graph, theory_type, diagram_name):
 #     """Generate the feynmanmp instructions corresponding to the diagram.
 #
@@ -272,18 +273,20 @@ def feynmf_generator(graph, theory_type, diagram_name):
             key = 0
             for prop in props_to_draw:
                 if prop[1] < prop[0] \
-                        and not graph[prop[0]][prop[1]][prop[2]]['anomalous']:
+                        and not ('anomalous' in prop[3]
+                                 and prop[3]['anomalous']):
                     fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
                                    % (propa, props_dir[key], vert_j, vert_i))
                     key += 1
             for prop in props_to_draw:
                 if prop[0] < prop[1] \
-                        and not graph[prop[0]][prop[1]][prop[2]]['anomalous']:
+                        and not ('anomalous' in prop[3]
+                                 and prop[3]['anomalous']):
                     fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
                                    % (propa, props_dir[key], vert_i, vert_j))
                     key += 1
             for prop in props_to_draw:
-                if graph[prop[0]][prop[1]][prop[2]]['anomalous']:
+                if 'anomalous' in prop[3] and prop[3]['anomalous']:
                     fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
                                    % (props_dir[key], vert_i, vert_j))
                     key += 1
@@ -294,11 +297,12 @@ def feynmf_generator(graph, theory_type, diagram_name):
                          if edge[0] == vert_i]
         angle = [",right=45", ",left=45"]
         key = 0
-        for prop in props_to_draw:
-            if graph[prop[0]][prop[1]][prop[2]]['anomalous']:
-                fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
-                               % (angle[key], vert_i, vert_i))
-                key += 1
+        if theory_type == "PBMBPT":
+            for prop in props_to_draw:
+                if prop[3]['anomalous']:
+                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
+                                   % (angle[key], vert_i, vert_i))
+                    key += 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
 

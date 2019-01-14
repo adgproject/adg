@@ -329,7 +329,7 @@ def create_feynmanmp_files(diagrams, theory, directory, diag_type):
 
     """
     for diag in diagrams:
-        if theory == "PBMBPT":
+        if theory == "PBMBPT" and diag_type == 'diag':
             diag_name = '%s_%i_%i' % (diag_type, diag.tags[0], diag.tags[1])
         else:
             diag_name = '%s_%i' % (diag_type, diag.tags[0])

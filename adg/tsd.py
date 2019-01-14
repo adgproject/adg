@@ -6,20 +6,25 @@ import networkx as nx
 import adg.diag
 
 
-def time_structure_graph(graph):
+def time_structure_graph(diag):
     """Return the time-structure graph associated to the graph.
 
     Args:
-        graph (NetwrokX MultiDiGraph): The BMBPT graph of interest.
+        diag (BmbptFeymmanDiagram): The BMBPT graph of interest.
 
     Returns:
         (NetworkX MultiDiGraph): The time-structure diagram.
 
     """
-    time_graph = graph.to_directed()
+    import adg.pbmbpt
+    time_graph = diag.graph.to_directed()
     if time_graph.node[0]['operator']:
         for vertex in xrange(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
+    if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
+        for edge in time_graph.edges(keys=True, data=True):
+            if 'anomalous' in edge[3] and edge[3]['anomalous']:
+                time_graph.remove_edge(edge[0], edge[1], edge[2])
     return adg.diag.to_skeleton(time_graph)
 
 
@@ -231,7 +236,7 @@ class TimeStructureDiagram(adg.diag.Diagram):
             tag_num (int): The number associated to the TSD.
 
         """
-        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
+        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
         self.tags = [tag_num]
         self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
         self.equivalent_trees = []
