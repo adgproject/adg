@@ -22,7 +22,7 @@ def generate_anomalous_diags(graph, nbody_max):
     vertices = [vert for vert in graph if not graph.node[vert]['operator']]
 
     for edge in graph.edges(keys=True, data=True):
-        graph[edge[0]][edge[1]][edge[2]]['anomalous'] = False
+        edge[3]['anomalous'] = False
 
     # Turn normal propagators in anomalous ones
     tweakable_edges = []
@@ -36,7 +36,7 @@ def generate_anomalous_diags(graph, nbody_max):
             key = sum(1 for prop
                       in new_graph.edges(keys=True, data=True)
                       if (edge[0], edge[1]) == (prop[0], prop[1])
-                      and new_graph[prop[0]][prop[1]][prop[2]]['anomalous'])
+                      and prop[3]['anomalous'])
             new_graph[edge[0]][edge[1]][key]['anomalous'] = True
         anom_graphs.append(new_graph)
 

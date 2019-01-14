@@ -249,9 +249,10 @@ def order_diagrams(diagrams, commands):
         Second element is a dict with the number of diagrams per type.
 
     """
-    if commands.theory == "BMBPT" or "PBMBPT":
+    if commands.theory == "BMBPT":
         diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
-
+    elif commands.theory == "PBMBPT":
+        diagrams, diags_per_type = adg.pbmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
         diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
 
