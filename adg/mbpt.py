@@ -216,6 +216,9 @@ class MbptDiagram(adg.diag.Diagram):
 
     """
 
+    __slots__ = ('incidence', 'excitation_level', 'complex_conjugate', 'expr',
+                 'cd_expr')
+
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph.
 

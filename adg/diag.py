@@ -457,6 +457,9 @@ class Diagram(object):
 
     """
 
+    __slots__ = ('graph', 'unsort_degrees', 'degrees', 'unsort_io_degrees',
+                 'io_degrees', 'max_degree', 'tags', 'adjacency_mat')
+
     def __init__(self, nx_graph):
         """Generate a Diagram object starting from the NetworkX graph.
 

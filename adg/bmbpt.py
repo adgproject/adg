@@ -299,7 +299,10 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
             the energy operator only character of the graph.
 
-        """
+    """
+
+    __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
+                 'diag_exp', 'vert_exp', 'hf_type')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.

@@ -224,8 +224,11 @@ class TimeStructureDiagram(adg.diag.Diagram):
             associated to a non-tree TSD.
         is_tree (bool): The tree or non-tree character of a TSD.
         expr (str): The Goldstone denominator associated to the TSD.
+        resum (int): The resummation power of a tree TSD.
 
     """
+
+    __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
 
     def __init__(self, bmbpt_diag, tag_num):
         """Generate a tsd diagram out of a BMBPT one.

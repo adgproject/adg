@@ -130,7 +130,6 @@ def order_diagrams(diagrams):
     return diagrams, diags_nb_per_type
 
 
-
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
     """Describes a PBMBPT diagram with its related properties.
 
@@ -147,6 +146,8 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             the energy operator only character of the graph.
 
     """
+
+    __slots__ = ()
 
     def __init__(self, graph, tag, child_tag):
         """Generate a PBMBPT diagram by copying a BMBPT one.
