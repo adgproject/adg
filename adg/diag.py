@@ -246,15 +246,30 @@ def feynmf_generator(graph, theory_type, diagram_name):
     # Set the position of the vertices
     fmf_file.write(vertex_positions(graph, p_order))
 
+    # Special config for self-contraction
+    for vert in graph:
+        props_to_draw = [edge for edge
+                         in nx.selfloop_edges(graph, data=True, keys=True)
+                         if edge[0] == vert]
+        angle = [",right=45", ",left=45"]
+        key = 0
+        if theory_type == "PBMBPT":
+            for prop in props_to_draw:
+                if prop[3]['anomalous']:
+                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
+                                   % (angle[key], vert, vert))
+                    key += 1
+    fmf_file.write("\\fmffreeze\n")
+
     directions = [",left=0.9", ",left=0.75", ",left=0.6", ",left=0.5", "",
                   ",right=0.5", ",right=0.6", ",right=0.75", ",right=0.9"]
 
     # Loop over all elements of the graph to draw associated propagators
     for vert_i in graph:
         for vert_j in list(graph.nodes())[vert_i+1:]:
-            props_to_draw = [edge for edge in graph.edges(data=True, keys=True)
-                             if edge[0] in (vert_i, vert_j)
-                             and edge[1] in (vert_i, vert_j)
+            props_to_draw = [edge for edge in graph.edges([vert_i, vert_j],
+                                                          data=True, keys=True)
+                             if edge[1] in (vert_i, vert_j)
                              and edge[0] != edge[1]]
             # Set the list of propagators directions to use
             if vert_j - vert_i != 1:
@@ -291,18 +306,6 @@ def feynmf_generator(graph, theory_type, diagram_name):
                                    % (props_dir[key], vert_i, vert_j))
                     key += 1
 
-        # Special config for self-contraction
-        props_to_draw = [edge for edge
-                         in nx.selfloop_edges(graph, data=True, keys=True)
-                         if edge[0] == vert_i]
-        angle = [",right=45", ",left=45"]
-        key = 0
-        if theory_type == "PBMBPT":
-            for prop in props_to_draw:
-                if prop[3]['anomalous']:
-                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
-                                   % (angle[key], vert_i, vert_i))
-                    key += 1
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
 
@@ -469,11 +472,11 @@ class Diagram(object):
         """
         self.graph = nx_graph
         self.unsort_degrees = tuple(nx_graph.degree(node) for node in nx_graph)
-        self.degrees = sorted(self.unsort_degrees)
+        self.degrees = tuple(sorted(self.unsort_degrees))
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
                                         nx_graph.out_degree(node))
                                        for node in nx_graph)
-        self.io_degrees = sorted(self.unsort_io_degrees)
+        self.io_degrees = tuple(sorted(self.unsort_io_degrees))
         self.max_degree = self.degrees[-1]
         self.tags = [0]
         self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
