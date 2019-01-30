@@ -5,6 +5,7 @@ import adg.run
 import adg.bmbpt
 import adg.mbpt
 import adg.pbmbpt
+import adg.tools
 import adg.tsd
 
 
@@ -31,20 +32,24 @@ def main():
     print "Running"
     start_time = datetime.now()
 
-    diagrams = adg.run.generate_diagrams(run_commands)
+    id_gene = adg.tools.UniqueID()
+
+    diagrams = adg.run.generate_diagrams(run_commands, id_gene)
 
     if run_commands.theory == "PBMBPT":
         for idx in xrange(len(diagrams)-1, -1, -1):
             new_graphs = adg.pbmbpt.generate_anomalous_diags(
                 diagrams[idx].graph, 3 if run_commands.with_3NF else 2)
-            new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag, idx, spawn_idx)
+            new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag, id_gene.get(),
+                                                          idx, spawn_idx)
                          for spawn_idx, diag in enumerate(new_graphs)]
             adg.diag.topologically_distinct_diagrams(new_diags)
             del diagrams[idx]
             diagrams += new_diags
 
     # Ordering the diagrams in a convenient way
-    diagrams, diags_per_type = adg.run.order_diagrams(diagrams, run_commands)
+    diagrams, diags_nbs, section_flags = adg.run.order_diagrams(diagrams,
+                                                                run_commands)
 
     # Produce TSD for the expressions of BMBPT diagrams
     if run_commands.theory == "BMBPT" or "PBMBPT":
@@ -61,7 +66,7 @@ def main():
 
     print "Time elapsed: ", datetime.now() - start_time
 
-    adg.run.print_diags_numbers(run_commands, diags_per_type)
+    adg.run.print_diags_numbers(run_commands, diags_nbs)
 
     # Writing a feynmp file for each graph
     if run_commands.draw_diags:
@@ -71,13 +76,13 @@ def main():
     # Write everything down in a nice LaTeX file
     latex_file = open(directory + '/result.tex', 'w')
 
-    adg.run.write_file_header(latex_file, run_commands, diags_per_type)
+    adg.run.write_file_header(latex_file, run_commands, diags_nbs)
 
     if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
         adg.tsd.write_section(latex_file, directory, run_commands.draw_diags,
                               diagrams_time, nb_tree_tsds)
     for diag in diagrams:
-        diag.write_section(latex_file, run_commands, diags_per_type)
+        diag.write_section(latex_file, run_commands, section_flags)
 
         if run_commands.draw_diags:
             diag.write_graph(latex_file, directory, run_commands.draw_tsds)

@@ -235,7 +235,8 @@ def order_diagrams(diagrams):
     Returns:
         (tuple): First element is the list of topologically unique, ordered
             diagrams. Second element is a dict with the number of diagrams
-            for each major type.
+            for each major type. Third element is a dict with the identifiers
+            of diagrams starting each output file section.
 
     """
     diagrams_2_hf = []
@@ -281,7 +282,19 @@ def order_diagrams(diagrams):
                  + len(diagrams_3_not_hf))
     }
 
-    return diagrams, diags_nb_per_type
+    section_flags = {
+        'two_body_hf': diagrams_2_hf[0].unique_id if diagrams_2_hf else -1,
+        'two_body_ehf': diagrams_2_ehf[0].unique_id if diagrams_2_ehf else -1,
+        'two_body_not_hf': diagrams_2_not_hf[0].unique_id
+                           if diagrams_2_not_hf else -1,
+        'three_body_hf': diagrams_3_hf[0].unique_id if diagrams_3_hf else -1,
+        'three_body_ehf': diagrams_3_ehf[0].unique_id
+                          if diagrams_3_ehf else -1,
+        'three_body_not_hf': diagrams_3_not_hf[0].unique_id
+                             if diagrams_3_not_hf else -1
+    }
+
+    return diagrams, diags_nb_per_type, section_flags
 
 
 class BmbptFeynmanDiagram(adg.diag.Diagram):
@@ -302,7 +315,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
     """
 
     __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
-                 'diag_exp', 'vert_exp', 'hf_type')
+                 'diag_exp', 'vert_exp', 'hf_type', 'unique_id')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
@@ -326,6 +339,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             self.hf_type = "EHF"
         else:
             self.hf_type = "noHF"
+        self.unique_id = tag_num
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -430,34 +444,33 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             + "%s\\end{equation}\n" % time_diag.expr)
         self.write_vertices_values(latex_file, time_diag.perms[self.tags[0]])
 
-    def write_section(self, result, commands, diags_nbs):
+    def write_section(self, result, commands, section_flags):
         """Write section and subsections for BMBPT result file.
 
         Args:
             result (file): The LaTeX output file of the program.
             commands (dict): The flags associated with run management.
-            diags_nbs (dict): The number of diagrams per type.
+            section_flags (dict): UniqueIDs of diags starting each section.
 
         """
-        if self.tags[0] == 0:
+        if self.unique_id == section_flags['two_body_hf']:
             result.write(
                 "\\section{Two-body diagrams}\n\n"
                 + "\\subsection{Two-body energy canonical diagrams}\n\n")
-        elif self.tags[0] == diags_nbs['nb_2_hf']:
+        elif self.unique_id == section_flags['two_body_ehf']:
             result.write("\\subsection{Two-body canonical diagrams " +
                          "for a generic operator only}\n\n")
-        elif self.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
+        elif self.unique_id == section_flags['two_body_not_hf']:
             result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
         if commands.with_3NF:
-            if self.tags[0] == diags_nbs['nb_2']:
+            if self.unique_id == section_flags['three_body_hf']:
                 result.write(
                     "\\section{Three-body diagrams}\n\n"
                     + "\\subsection{Three-body energy canonical diagrams}\n\n")
-            elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']:
+            elif self.unique_id == section_flags['three_body_ehf']:
                 result.write("\\subsection{Three-body canonical diagrams " +
                              "for a generic operator only}\n\n")
-            elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
-                    + diags_nbs['nb_3_ehf']:
+            elif self.unique_id == section_flags['three_body_not_hf']:
                 result.write(
                     "\\subsection{Three-body non-canonical diagrams}\n\n")
         if commands.theory == "PBMBPT":

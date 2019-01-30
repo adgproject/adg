@@ -83,7 +83,8 @@ def order_diagrams(diagrams):
     Returns:
         (tuple): First element is the list of topologically unique, ordered
             diagrams. Second element is a dict with the number of diagrams
-            for each major type.
+            for each major type. Third element is a dict with the identifiers
+            of diagrams starting each output file section.
 
     """
     diagrams_2_hf = []
@@ -127,7 +128,19 @@ def order_diagrams(diagrams):
                  + len(diagrams_3_not_hf))
     }
 
-    return diagrams, diags_nb_per_type
+    section_flags = {
+        'two_body_hf': diagrams_2_hf[0].unique_id if diagrams_2_hf else -1,
+        'two_body_ehf': diagrams_2_ehf[0].unique_id if diagrams_2_ehf else -1,
+        'two_body_not_hf': diagrams_2_not_hf[0].unique_id
+                           if diagrams_2_not_hf else -1,
+        'three_body_hf': diagrams_3_hf[0].unique_id if diagrams_3_hf else -1,
+        'three_body_ehf': diagrams_3_ehf[0].unique_id
+                          if diagrams_3_ehf else -1,
+        'three_body_not_hf': diagrams_3_not_hf[0].unique_id
+                             if diagrams_3_not_hf else -1
+    }
+
+    return diagrams, diags_nb_per_type, section_flags
 
 
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
@@ -149,14 +162,14 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
 
     __slots__ = ()
 
-    def __init__(self, graph, tag, child_tag):
+    def __init__(self, graph, unique_id, tag, child_tag):
         """Generate a PBMBPT diagram by copying a BMBPT one.
 
         Args:
             graph (NetworkX MultiDiGraph)): The graph of interest.
 
         """
-        adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, tag)
+        adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, unique_id)
         self.tags = [tag, child_tag]
 
     def write_graph(self, latex_file, directory, write_time):

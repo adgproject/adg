@@ -196,11 +196,12 @@ def attribute_directory(commands):
     return directory
 
 
-def generate_diagrams(commands):
+def generate_diagrams(commands, id_generator):
     """Return a list with diagrams of the appropriate type.
 
     Args:
         commands (Namespace): Flags for the run management.
+        id_generator (UniqueID): A unique ID number generator.
 
     Returns:
         (list): All the diagrams of the appropriate Class and order.
@@ -229,11 +230,11 @@ def generate_diagrams(commands):
     adg.diag.label_vertices(diags, commands.theory)
 
     if commands.theory == 'BMBPT' or "PBMBPT":
-        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, ind)
-                    for ind, graph in enumerate(diags)]
+        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, id_generator.get())
+                    for graph in diags]
     elif commands.theory == 'MBPT':
-        diagrams = [adg.mbpt.MbptDiagram(graph, ind)
-                    for ind, graph in enumerate(diags)]
+        diagrams = [adg.mbpt.MbptDiagram(graph, id_generator.get())
+                    for graph in diags]
     return diagrams
 
 
@@ -246,17 +247,20 @@ def order_diagrams(diagrams, commands):
 
     Returns:
         (tuple): First element is the list of ordered and unique diagrams.
-        Second element is a dict with the number of diagrams per type.
+        Second element is a dict with the number of diagrams per type. Third
+        element is a dict with the identifiers of diagrams starting each output
+        file section.
 
     """
     if commands.theory == "BMBPT":
-        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
+        diagrams, diag_nbs, section_flags = adg.bmbpt.order_diagrams(diagrams)
     elif commands.theory == "PBMBPT":
-        diagrams, diags_per_type = adg.pbmbpt.order_diagrams(diagrams)
+        diagrams, diag_nbs, section_flags = adg.pbmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
-        diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
+        diagrams, diag_nbs = adg.mbpt.order_diagrams(diagrams)
+        section_flags = {}
 
-    return diagrams, diags_per_type
+    return diagrams, diag_nbs, section_flags
 
 
 def print_diags_numbers(commands, diags_nbs):
