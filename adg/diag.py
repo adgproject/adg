@@ -56,7 +56,7 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
     >>> check_vertex_degree(test_matrices, True, 3, False, 0)
     >>> test_matrices #doctest: +NORMALIZE_WHITESPACE
     [array([[0, 1, 2], [1, 0, 1], [0, 2, 0]]),
-     array[[2, 0, 2], [1, 2, 3], [1, 0, 0]])]
+     array([[2, 0, 2], [1, 2, 3], [1, 0, 0]])]
     >>> check_vertex_degree(test_matrices, False, 2, False, 0)
     >>> test_matrices #doctest: +NORMALIZE_WHITESPACE
     [array([[0, 1, 2], [1, 0, 1], [0, 2, 0]])]

@@ -20,12 +20,12 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
     >>> diagrams_generation(1, False, 2, False) #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+    [array([[0, 2], [0, 0]]), array([[0, 4], [0, 0]])]
     >>> diagrams_generation(1, True, 3, False)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+    [array([[0, 2], [0, 0]]), array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]])]
     >>> diagrams_generation(2, False, 2, True)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
-     array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
+    [array([[0, 1, 1], [0, 0, 3], [0, 0, 0]]),
+     array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])]
 
     """
     # Matrices contain operator vertex + p_order perturbative vertices
@@ -150,11 +150,12 @@ def check_unconnected_spawn(matrices, max_filled_vertex):
         max_filled_vertex (int): The furthest vertex until which the matrices
             have been filled.
 
+    >>> import numpy
     >>> mats = [numpy.array([[0, 2, 0], [2, 0, 0], [0, 0, 0]]), \
                 numpy.array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
     >>>
-    >>> check_unconnected_spawn(mats, 1, 3)
-    >>> mats #doctest: +NORMALIZE_WHITESPACE
+    >>> check_unconnected_spawn(mats, 1)
+    >>> mats # doctest: +NORMALIZE_WHITESPACE
     [array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
 
     """

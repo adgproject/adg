@@ -3,25 +3,27 @@
 import argparse
 import pytest
 import adg.run
+import adg.tools
 
 
 def test_generate_diagrams():
     """Unit and regression test for generate_diagrams."""
     com = argparse.Namespace()
+    id_gen = adg.tools.UniqueID()
 
     # Tests for the number of diagrams produced for simple known cases
 
     com.theory, com.order, com.with_3NF = 'BMBPT', 1, False
     com.nbody_observable, com.canonical = 2, False
-    assert len(adg.run.generate_diagrams(com)) == 2
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 2
 
     com.theory, com.order, com.with_3NF = 'MBPT', 2, False
     com.nbody_observable, com.canonical = 2, False
-    assert len(adg.run.generate_diagrams(com)) == 1
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 1
 
     com.theory, com.order, com.with_3NF = 'BMBPT', 1, True
     com.nbody_observable, com.canonical = 3, False
-    assert len(adg.run.generate_diagrams(com)) == 3
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 3
 
     # Test for anomalous cases
 
@@ -31,12 +33,13 @@ def test_generate_diagrams():
     com.theory, com.order, com.with_three_body = 'SCGF', 2, True
     com.nbody_observable, com.canonical = 2, False
     with pytest.raises(SystemExit):
-        adg.run.generate_diagrams(com)
+        adg.run.generate_diagrams(com, id_gen)
 
 
 def test_order_diagrams():
     """Unit and regression test for order_diagrams."""
     com = argparse.Namespace()
+    id_gen = adg.tools.UniqueID()
 
     # Tests for the number of diagrams produced for simple known cases
 
@@ -44,24 +47,19 @@ def test_order_diagrams():
     com.nbody_observable, com.canonical = 2, False
 
     # Use generate_diagrams as a seed
-    diagrams = adg.run.generate_diagrams(com)
+    diagrams = adg.run.generate_diagrams(com, id_gen)
     assert len(diagrams) == 2
 
     # Test that diagrams are processed
-    assert len(adg.run.order_diagrams(diagrams, com)[0]) == 2
-
-    # Test for the removing of topologically identical diagrams
-    diagrams = adg.run.generate_diagrams(com) + adg.run.generate_diagrams(com)
-    assert len(diagrams) == 4
     assert len(adg.run.order_diagrams(diagrams, com)[0]) == 2
 
     # Test for the ordering with simple three-body case
     com = argparse.Namespace()
     com.theory, com.order, com.with_3NF = 'BMBPT', 1, True
     com.nbody_observable, com.canonical = 3, False
-    diagrams = adg.run.generate_diagrams(com)
+    diagrams = adg.run.generate_diagrams(com, id_gen)
     assert len(diagrams) == 3
-    diagrams, diag_nbs = adg.run.order_diagrams(diagrams, com)
+    diagrams, diag_nbs, _ = adg.run.order_diagrams(diagrams, com)
     assert len(diagrams) == 3
     assert diagrams[-1].two_or_three_body == 3
     assert diag_nbs['nb_2'] == 2
@@ -78,7 +76,7 @@ def test_order_diagrams():
     com.theory, com.order = 'MBPT', 3
 
     # Use generate_diagrams as a seed
-    diagrams = adg.run.generate_diagrams(com)
+    diagrams = adg.run.generate_diagrams(com, id_gen)
     assert len(diagrams) == 3
 
     # Test that diagrams are processed
@@ -136,7 +134,7 @@ def test_print_diags_numbers(capsys):
         "2N valid diagrams: 6\n"
         "2N energy canonical diagrams: 0\n"
         "2N canonical diagrams for a generic operator only: 1\n"
-        "2N non-canonical diagrams: 2\n"
+        "2N non-canonical diagrams: 2\n\n"
     )
 
     com.theory, com.with_3NF, com.canonical = 'BMBPT', True, False
@@ -153,5 +151,5 @@ def test_print_diags_numbers(capsys):
         "3N valid diagrams: 7\n"
         "3N energy canonical diagrams: 3\n"
         "3N canonical diagrams for a generic operator only: 4\n"
-        "3N non-canonical diagrams: 4\n"
+        "3N non-canonical diagrams: 4\n\n"
     )

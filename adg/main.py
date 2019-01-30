@@ -52,7 +52,7 @@ def main():
                                                                 run_commands)
 
     # Produce TSD for the expressions of BMBPT diagrams
-    if run_commands.theory == "BMBPT" or "PBMBPT":
+    if run_commands.theory in ("BMBPT", "PBMBPT"):
 
         diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])
                          for diagram in diagrams]
