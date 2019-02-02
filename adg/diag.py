@@ -242,24 +242,14 @@ def feynmf_generator(graph, theory_type, diagram_name):
     fmf_file.write(propagator_style(propa))
     if theory_type == "PBMBPT":
         fmf_file.write(propagator_style("prop_mm"))
+        fmf_file.write(propagator_style("half_prop"))
 
     # Set the position of the vertices
     fmf_file.write(vertex_positions(graph, p_order))
 
     # Special config for self-contraction
-    for vert in graph:
-        props_to_draw = [edge for edge
-                         in nx.selfloop_edges(graph, data=True, keys=True)
-                         if edge[0] == vert]
-        angle = [",right=45", ",left=45"]
-        key = 0
-        if theory_type == "PBMBPT":
-            for prop in props_to_draw:
-                if prop[3]['anomalous']:
-                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
-                                   % (angle[key], vert, vert))
-                    key += 1
-    fmf_file.write("\\fmffreeze\n")
+    if theory_type == "PBMBPT":
+        fmf_file.write(self_contractions(graph))
 
     directions = [",left=0.9", ",left=0.75", ",left=0.6", ",left=0.5", "",
                   ",right=0.5", ",right=0.6", ",right=0.75", ",right=0.9"]
@@ -363,6 +353,38 @@ def vertex_positions(graph, order):
     positions += "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" \
         % (order-1) + "\\fmffreeze\n"
     return positions
+
+
+def self_contractions(graph):
+    """Return the instructions for drawing the graph's self-contractions.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph being drawn.
+
+    Returns:
+        (str): FeynMF instructions for drawing the self-contractions.
+
+    """
+    instructions = ""
+    for vert in graph:
+        props_to_draw = [edge for edge
+                         in nx.selfloop_edges(graph, data=True, keys=True)
+                         if edge[0] == vert]
+        positions = ["15pt", "-15pt"]
+        key = 0
+        for prop in props_to_draw:
+            if prop[3]['anomalous']:
+                a_name = "a%i%i" % (vert, key)
+                instructions += ("\\fmfv{}{%s}\n" % a_name
+                                 + "\\fmffixed{(%s,0)}{v%i,%s}\n"
+                                 % (positions[key], vert, a_name)
+                                 + "\\fmf{half_prop,right}{%s,v%i}\n"
+                                 % (a_name, vert)
+                                 + "\\fmf{half_prop,left}{%s,v%i}\n"
+                                 % (a_name, vert))
+                key += 1
+    instructions += "\\fmffreeze\n"
+    return instructions
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
