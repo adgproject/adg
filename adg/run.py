@@ -257,8 +257,7 @@ def order_diagrams(diagrams, commands):
     elif commands.theory == "PBMBPT":
         diagrams, diag_nbs, section_flags = adg.pbmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
-        diagrams, diag_nbs = adg.mbpt.order_diagrams(diagrams)
-        section_flags = {}
+        diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
 
     return diagrams, diag_nbs, section_flags
 

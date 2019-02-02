@@ -153,7 +153,16 @@ def order_diagrams(diagrams):
         'quintuples+': len(quintuples_and_higher)
         }
 
-    return diagrams, diags_nb_per_type
+    section_flags = {
+        'singles': singles[0].tags[0] if singles else -1,
+        'doubles': doubles[0].tags[0] if doubles else -1,
+        'triples': triples[0].tags[0] if triples else -1,
+        'quadruples': quadruples[0].tags[0] if quadruples else -1,
+        'quintuples+': quintuples_and_higher[0].tags[0]
+                       if quintuples_and_higher else -1
+    }
+
+    return diagrams, diags_nb_per_type, section_flags
 
 
 def attribute_conjugate(diagrams):
@@ -416,28 +425,24 @@ class MbptDiagram(adg.diag.Diagram):
             nb_loops += 1
         return nb_loops
 
-    def write_section(self, result, commands, diags_nbs):
+    def write_section(self, result, commands, flags):
         """Write sections for MBPT result file.
 
         Args:
             result (file): The LaTeX output file to be written in.
             commands (dict): The flags associated with run management.
-            diags_nbs (dict): A dict with the number of diagrams per
-                excitation level type.
+            flags (dict): The identifier of each section-starting graph.
 
         """
-        if self.tags[0] == 0 and diags_nbs['singles'] != 0:
+        if self.tags[0] == flags['singles']:
             result.write("\\section{Singles}\n\n")
-        elif self.tags[0] == diags_nbs['singles']:
+        elif self.tags[0] == flags['doubles']:
             result.write("\\section{Doubles}\n\n")
-        elif self.tags[0] == diags_nbs['singles'] + diags_nbs['doubles']:
+        elif self.tags[0] == flags['triples']:
             result.write("\\section{Triples}\n\n")
-        elif self.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
-                              + diags_nbs['triples']):
+        elif self.tags[0] == flags['quadruples']:
             result.write("\\section{Quadruples}\n\n")
-        elif self.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
-                              + diags_nbs['triples']
-                              + diags_nbs['quadruples']):
+        elif self.tags[0] == flags['quintuples+']:
             result.write("\\section{Quintuples and higher}\n\n")
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         if self.complex_conjugate >= 0:
