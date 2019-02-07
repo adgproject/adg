@@ -235,6 +235,21 @@ def generate_diagrams(commands, id_generator):
     elif commands.theory == 'MBPT':
         diagrams = [adg.mbpt.MbptDiagram(graph, id_generator.get())
                     for graph in diags]
+
+    if commands.theory == "PBMBPT":
+        for idx in xrange(len(diagrams)-1, -1, -1):
+            new_graphs = adg.pbmbpt.generate_anomalous_diags(
+                diagrams[idx].graph,
+                3 if commands.with_3NF else 2
+            )
+            new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag,
+                                                          id_generator.get(),
+                                                          idx,
+                                                          spawn_idx)
+                         for spawn_idx, diag in enumerate(new_graphs)]
+            adg.diag.topologically_distinct_diagrams(new_diags)
+            del diagrams[idx]
+            diagrams += new_diags
     return diagrams
 
 

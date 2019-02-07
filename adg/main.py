@@ -4,7 +4,6 @@ from datetime import datetime
 import adg.run
 import adg.bmbpt
 import adg.mbpt
-import adg.pbmbpt
 import adg.tools
 import adg.tsd
 
@@ -35,17 +34,6 @@ def main():
     id_gene = adg.tools.UniqueID()
 
     diagrams = adg.run.generate_diagrams(run_commands, id_gene)
-
-    if run_commands.theory == "PBMBPT":
-        for idx in xrange(len(diagrams)-1, -1, -1):
-            new_graphs = adg.pbmbpt.generate_anomalous_diags(
-                diagrams[idx].graph, 3 if run_commands.with_3NF else 2)
-            new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag, id_gene.get(),
-                                                          idx, spawn_idx)
-                         for spawn_idx, diag in enumerate(new_graphs)]
-            adg.diag.topologically_distinct_diagrams(new_diags)
-            del diagrams[idx]
-            diagrams += new_diags
 
     # Ordering the diagrams in a convenient way
     diagrams, diags_nbs, section_flags = adg.run.order_diagrams(diagrams,
