@@ -443,7 +443,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         latex_file.write(
             "\\begin{equation}\n\\text{T}%i = " % (self.time_tag + 1)
             + "%s\\end{equation}\n" % time_diag.expr)
-        self.write_vertices_values(latex_file, time_diag.perms[self.tags[0]])
+        self.write_vertices_values(latex_file, time_diag.perms[self.unique_id])
 
     def write_section(self, result, commands, section_flags):
         """Write section and subsections for BMBPT result file.
