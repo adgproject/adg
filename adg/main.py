@@ -7,6 +7,12 @@ import adg.mbpt
 import adg.tools
 import adg.tsd
 
+#------------------------------------------
+
+import pickle
+
+#------------------------------------------
+
 
 def main():
     """Launch the ADG program."""
@@ -53,6 +59,20 @@ def main():
         diagrams_time = []
 
     print "Time elapsed: ", datetime.now() - start_time
+
+    # Name of output file
+    outputFile = "../ClebschDrudge/pickles/adg_bmbpt_order%i.b" %(len(diagrams[0].graph)-1)
+
+    # Add all bmbpt contributions
+    bmbpt_equation = []
+    for diag in diagrams:
+        bmbpt_equation.append(diag.get_equation())
+
+    # Dump the results
+    equations = []
+    equations.append([("{\\Omega}_{0}",0,0,[]),bmbpt_equation])
+    with open(outputFile,"wb") as fp:
+        pickle.dump(equations,fp)
 
     adg.run.print_diags_numbers(run_commands, diags_nbs)
 

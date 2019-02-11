@@ -63,7 +63,7 @@ Output files
 The output of the program is stored in a folder named after the theory, and a
 subfolder named after the order, e.g. ``/MBPT/Order-4``. In the case of BMBPT,
 suffixes are added depending on the n-body forces of the observable, and if
-three-body forces were used or only canonial diagrams computed, i.e. for our
+three-body forces were used or only canonical diagrams computed, i.e. for our
 previous example, results would be stored under
 ``BMBPT/Order-4_2body_observable``.
 
