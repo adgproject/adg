@@ -82,7 +82,8 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
-def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
+def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds,
+                  diagrams):
     """Write the appropriate section for tsd diagrams in the LaTeX file.
 
     Args:
@@ -91,6 +92,7 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
         pdiag (bool): ``True`` if diagrams are to be drawn.
         time_diagrams (list): The ensemble of TSDs.
         nb_tree_tsds (int): Number of tree TSDs.
+        diagrams (list): All produced BmbptFeymmanDiagrams.
 
     """
     latex_file.write("\\section{Time-structure diagrams}\n\n"
@@ -119,8 +121,8 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
             latex_file.write('\n\\end{center}\n\n')
         latex_file.write("Number of related Feynman diagrams: %i.\n\n"
                          % (len(tdiag.tags)-1))
-        feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
-        latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
+        latex_file.write("Related Feynman diagrams:%s.\n\n"
+                         % tdiag.get_feynman_diags(diagrams))
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
@@ -315,3 +317,27 @@ class TimeStructureDiagram(adg.diag.Diagram):
             power /= 1 + len(nx.descendants(self.graph, node))
 
         return power
+
+    def get_feynman_diags(self, feyn_diagrams):
+        """Return the list of Feynman diagrams associated to the TSD.
+
+        Args:
+            feyn_diagrams (list): All produced BmbptFeymmanDiagrams.
+
+        Returns:
+            (str): All the identifiers of associated BmbptFeymmanDiagrams.
+
+        """
+        if isinstance(feyn_diagrams[0], adg.pbmbpt.ProjectedBmbptDiagram):
+            identifiers = ""
+            for tag in self.tags[1:]:
+                for diag in feyn_diagrams:
+                    if diag.unique_id == tag:
+                        identifiers += " %i.%i," % (diag.tags[0]+1,
+                                                    diag.tags[1]+1)
+                        break
+            identifiers = identifiers.strip(',')
+        else:
+            identifiers = ",".join(" %i" % (tag+1) for tag in self.tags[1:])
+
+        return identifiers

@@ -66,16 +66,17 @@ def main():
 
     adg.run.write_file_header(latex_file, run_commands, diags_nbs)
 
-    if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
+    if run_commands.theory in ("BMBPT", "PBMBPT") and run_commands.draw_tsds:
         adg.tsd.write_section(latex_file, directory, run_commands.draw_diags,
-                              diagrams_time, nb_tree_tsds)
+                              diagrams_time, nb_tree_tsds, diagrams)
     for diag in diagrams:
         diag.write_section(latex_file, run_commands, section_flags)
 
         if run_commands.draw_diags:
             diag.write_graph(latex_file, directory, run_commands.draw_tsds)
 
-        if run_commands.theory == 'BMBPT' and run_commands.draw_tsds:
+        if run_commands.theory in ("BMBPT", "PBMBPT") \
+                and run_commands.draw_tsds:
             diag.write_tsd_info(diagrams_time, latex_file)
 
     latex_file.write("\\end{document}")
