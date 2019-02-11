@@ -42,7 +42,7 @@ def main():
     # Produce TSD for the expressions of BMBPT diagrams
     if run_commands.theory in ("BMBPT", "PBMBPT"):
 
-        diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])
+        diagrams_time = [adg.tsd.TimeStructureDiagram(diagram)
                          for diagram in diagrams]
 
         diagrams_time, nb_tree_tsds = adg.tsd.treat_tsds(diagrams_time)

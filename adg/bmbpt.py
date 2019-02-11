@@ -220,7 +220,7 @@ def produce_expressions(diagrams, diagrams_time):
     for diag in diagrams:
         diag.attribute_qp_labels()
         for t_diag in diagrams_time:
-            if diag.tags[0] in t_diag.tags[1:]:
+            if diag.unique_id in t_diag.tags[1:]:
                 diag.time_tag = t_diag.tags[0]
                 diag.tsd_is_tree = t_diag.is_tree
                 break
@@ -353,7 +353,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                          for vertex in self.graph]
         numerator = self.extract_numerator()
         denominator = self.time_tree_denominator(
-            nx.relabel_nodes(time_diag.graph, time_diag.perms[self.tags[0]])
+            nx.relabel_nodes(time_diag.graph, time_diag.perms[self.unique_id])
         ) if self.tsd_is_tree else ""
 
         extra_factor = "" if self.tsd_is_tree \
@@ -361,7 +361,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             + " + ".join("\\frac{1}{%s}"
                          % self.time_tree_denominator(
                              nx.relabel_nodes(equi_t_graph,
-                                              time_diag.perms[self.tags[0]]))
+                                              time_diag.perms[self.unique_id]))
                          for equi_t_graph in time_diag.equivalent_trees) \
             + " \\right]"
 

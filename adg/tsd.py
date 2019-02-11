@@ -230,18 +230,18 @@ class TimeStructureDiagram(adg.diag.Diagram):
 
     __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
 
-    def __init__(self, bmbpt_diag, tag_num):
+    def __init__(self, bmbpt_diag):
         """Generate a tsd diagram out of a BMBPT one.
 
         Args:
             bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph used to be
                 turned into a TSD.
-            tag_num (int): The number associated to the TSD.
 
         """
         adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
-        self.tags = [tag_num]
-        self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
+        self.tags = [bmbpt_diag.unique_id]
+        self.perms = {bmbpt_diag.unique_id: {i: i
+                                             for i in xrange(len(self.graph))}}
         self.equivalent_trees = []
         if nx.is_arborescence(self.graph):
             self.is_tree = True
