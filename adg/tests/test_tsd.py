@@ -15,9 +15,10 @@ def test_time_structure_graph():
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT')
+    diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
-    assert list(adg.tsd.time_structure_graph(graph).edges()) == [(0, 1),
-                                                                 (1, 2)]
+    assert list(adg.tsd.time_structure_graph(diag).edges()) == [(0, 1),
+                                                                (1, 2)]
 
     # Test the case where not all vertices are link to the bottom vertex
     diagram = np.array([[0, 0, 2], [0, 0, 2], [0, 0, 0]])
@@ -25,9 +26,10 @@ def test_time_structure_graph():
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT')
+    diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
-    assert list(adg.tsd.time_structure_graph(graph).edges()) == [(0, 1),
-                                                                 (1, 2)]
+    assert list(adg.tsd.time_structure_graph(diag).edges()) == [(0, 1),
+                                                                (1, 2)]
 
     # Test for a cycle topography
     diagram = np.array([[0, 2, 2, 0],
@@ -38,11 +40,12 @@ def test_time_structure_graph():
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT')
+    diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
-    assert list(adg.tsd.time_structure_graph(graph).edges()) == [(0, 1),
-                                                                 (0, 2),
-                                                                 (1, 3),
-                                                                 (2, 3)]
+    assert list(adg.tsd.time_structure_graph(diag).edges()) == [(0, 1),
+                                                                (0, 2),
+                                                                (1, 3),
+                                                                (2, 3)]
 
 
 def test_find_cycle():

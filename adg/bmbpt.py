@@ -1,6 +1,5 @@
 """Routines and class for Bogoliubov MBPT diagrams."""
 
-import copy
 import itertools
 import numpy as np
 import networkx as nx
@@ -21,19 +20,19 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
     >>> diagrams_generation(1, False, 2, False) #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+    [array([[0, 2], [0, 0]]), array([[0, 4], [0, 0]])]
     >>> diagrams_generation(1, True, 3, False)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
+    [array([[0, 2], [0, 0]]), array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]])]
     >>> diagrams_generation(2, False, 2, True)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
-     array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
+    [array([[0, 1, 1], [0, 0, 3], [0, 0, 0]]),
+     array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])]
 
     """
     # Matrices contain operator vertex + p_order perturbative vertices
     order = p_order + 1
 
     # Create a null oriented adjacency matrix of dimension (p_order,p_order)
-    matrices = [[[0 for _ in range(order)] for _ in range(order)]]
+    matrices = [np.zeros((order, order), dtype=int)]
 
     # Generate oriented adjacency matrices going vertex-wise
     vertices = range(order)
@@ -49,60 +48,131 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
                 elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
                                          for k in vertices)
                 for elem in xrange(1, elem_max + 1, 1):
-                    temp_mat = copy.deepcopy(mat)
-                    temp_mat[vertex][sum_index] = elem
+                    temp_mat = mat.copy()
+                    temp_mat[vertex, sum_index] = elem
                     add(temp_mat)
         adg.diag.check_vertex_degree(
             matrices, three_body_use, nbody_obs, canonical, vertex
         )
-        if 0 < vertex < order-1:
-            check_unconnected_spawn(matrices, vertex, order)
+        if 0 < vertex < order:
+            check_unconnected_spawn(matrices, vertex)
+    remove_disconnected_matrices(matrices)
+    matrices = order_and_remove_topologically_equiv(matrices, order - 1)
 
-    matrices.sort(reverse=True)
-    return [np.array(matrix) for matrix in matrices]
+    return matrices
 
 
-def check_unconnected_spawn(matrices, max_filled_vertex, length_mat):
+def remove_disconnected_matrices(matrices):
+    """Remove matrices corresponding to disconnected diagrams.
+
+    Args:
+        matrices (list): List of adjacency matrices.
+    """
+    vertices = range(matrices[0].shape[0])
+    permutations = [[0] + list(k)
+                    for k in itertools.permutations(vertices[1:])]
+    for idx in xrange(len(matrices)-1, -1, -1):
+        is_disconnected = False
+        for reordering in permutations:
+            mat = matrices[idx][:, reordering][reordering, :]
+            for vert in vertices[1:]:
+                if not mat[vertices[:vert], :][:, vertices[vert:]].any() \
+                        and not mat[:, vertices[:vert]
+                                    ][vertices[vert:], :].any():
+                    is_disconnected = True
+                    break
+            if is_disconnected:
+                del matrices[idx]
+                break
+
+
+def order_and_remove_topologically_equiv(matrices, max_vertex):
+    """Order the matrices in sub-list and remove topologically equivalent ones.
+
+    Args:
+        matrices (list): The adjacency matrices to be checked.
+        max_vertex (int): The maximum vertex which has been filled.
+    """
+    matrices_dict = {}
+    for idx in xrange(len(matrices)-1, -1, -1):
+        row0 = "".join("%i" % elem for elem
+                       in np.sort(matrices[idx][0, :]).tolist())
+        if row0 in matrices_dict:
+            matrices_dict[row0].append(matrices[idx])
+        else:
+            matrices_dict[row0] = [matrices[idx]]
+        del matrices[idx]
+    for row_key in matrices_dict:
+        check_topologically_equivalent(matrices_dict[row_key], max_vertex)
+    matrices = []
+    for matrices_list in matrices_dict.values():
+        matrices += matrices_list
+    return matrices
+
+
+def check_topologically_equivalent(matrices, max_vertex):
+    """Exclude matrices that would spawn topologically equivalent graphs.
+
+    Args:
+        matrices (list): Adjacency matrices to be checked.
+        max_vertex (int): The maximum vertex which have been filled.
+    """
+    if not matrices:
+        return []
+    vertices = range(matrices[0].shape[0])
+    permutations = [[0] + list(k) + vertices[max_vertex+1:]
+                    for k in itertools.permutations(vertices[1:max_vertex+1])]
+    for ind_mat1 in xrange(len(matrices)-2, -1, -1):
+        mat1 = matrices[ind_mat1]
+        mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
+        for ind_mat2 in xrange(len(matrices)-1, ind_mat1, -1):
+            mat2 = matrices[ind_mat2]
+            done_with_mat2 = False
+            # Basic check to avoid needless permutations
+            if not (mat1_1plus_sorted
+                    - np.sort(mat2[1:max_vertex, :].flat)).any():
+                # Test for all possible permutations
+                for reordering in permutations:
+                    if not (mat1 - mat2[:, reordering][reordering, :]).any():
+                        del matrices[ind_mat2]
+                        done_with_mat2 = True
+                        break
+            if done_with_mat2:
+                break
+    return matrices
+
+
+def check_unconnected_spawn(matrices, max_filled_vertex):
     """Exclude some matrices that would spawn unconnected diagrams.
 
     Args:
         matrices (list): The adjacency matrices to be checked.
         max_filled_vertex (int): The furthest vertex until which the matrices
             have been filled.
-        length_mat (int): The size of the square matrices.
 
-    >>> mats = [[[0, 2, 0], [2, 0, 0], [0, 0, 0]], \
-                [[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+    >>> import numpy
+    >>> mats = [numpy.array([[0, 2, 0], [2, 0, 0], [0, 0, 0]]), \
+                numpy.array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
     >>>
-    >>> check_unconnected_spawn(mats, 1, 3)
-    >>> mats
-    [[[0, 2, 1], [2, 0, 1], [0, 0, 0]]]
+    >>> check_unconnected_spawn(mats, 1)
+    >>> mats # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
 
     """
-    empty_block = [0 for _ in range(length_mat - max_filled_vertex - 1)]
+    vertices = range(matrices[0].shape[0])
+    permutations = [[0] + list(k) + vertices[max_filled_vertex+1:]
+                    for k
+                    in itertools.permutations(vertices[1:max_filled_vertex+1])]
     for ind_mat in xrange(len(matrices)-1, -1, -1):
-        mat = matrices[ind_mat]
-        is_disconnected = True
-        empty_lines = [index for index, line
-                       in enumerate(mat[0:max_filled_vertex + 1])
-                       if line[max_filled_vertex + 1:length_mat]
-                       == empty_block]
-        test_block = [0 for _ in range(length_mat - len(empty_lines))]
-        for index in empty_lines:
-            test_line = copy.deepcopy(mat[index])
-            for index2 in empty_lines:
-                test_line.remove(mat[index][index2])
-            if test_line != test_block:
-                is_disconnected = False
-                break
-        if is_disconnected and empty_lines != []:
-            for index, line in enumerate(mat[0:max_filled_vertex + 1]):
-                if index not in empty_lines:
-                    for _ in (idx for idx in empty_lines if line[idx] != 0):
-                        is_disconnected = False
-                        break
-            if is_disconnected:
+        # Test for all possible permutations with i <= j
+        for reordering in permutations:
+            mat = matrices[ind_mat][:, reordering][reordering, :]
+            if not mat[:, vertices[:max_filled_vertex]
+                       ][vertices[max_filled_vertex:], :].any() \
+                    and not mat[vertices[:max_filled_vertex],
+                                :][:, vertices[max_filled_vertex:]].any():
                 del matrices[ind_mat]
+                break
 
 
 def write_header(tex_file, commands, diags_nbs):
@@ -150,7 +220,7 @@ def produce_expressions(diagrams, diagrams_time):
     for diag in diagrams:
         diag.attribute_qp_labels()
         for t_diag in diagrams_time:
-            if diag.tags[0] in t_diag.tags[1:]:
+            if diag.unique_id in t_diag.tags[1:]:
                 diag.time_tag = t_diag.tags[0]
                 diag.tsd_is_tree = t_diag.is_tree
                 break
@@ -166,7 +236,8 @@ def order_diagrams(diagrams):
     Returns:
         (tuple): First element is the list of topologically unique, ordered
             diagrams. Second element is a dict with the number of diagrams
-            for each major type.
+            for each major type. Third element is a dict with the identifiers
+            of diagrams starting each output file section.
 
     """
     diagrams_2_hf = []
@@ -193,13 +264,6 @@ def order_diagrams(diagrams):
                 diagrams_3_not_hf.append(diagrams[i_diag])
         del diagrams[i_diag]
 
-    adg.diag.topologically_distinct_diagrams(diagrams_2_hf)
-    adg.diag.topologically_distinct_diagrams(diagrams_2_ehf)
-    adg.diag.topologically_distinct_diagrams(diagrams_2_not_hf)
-    adg.diag.topologically_distinct_diagrams(diagrams_3_hf)
-    adg.diag.topologically_distinct_diagrams(diagrams_3_ehf)
-    adg.diag.topologically_distinct_diagrams(diagrams_3_not_hf)
-
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
         + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf
     for ind, diagram in enumerate(diagrams):
@@ -219,7 +283,19 @@ def order_diagrams(diagrams):
                  + len(diagrams_3_not_hf))
     }
 
-    return diagrams, diags_nb_per_type
+    section_flags = {
+        'two_body_hf': diagrams_2_hf[0].unique_id if diagrams_2_hf else -1,
+        'two_body_ehf': diagrams_2_ehf[0].unique_id if diagrams_2_ehf else -1,
+        'two_body_not_hf': diagrams_2_not_hf[0].unique_id
+                           if diagrams_2_not_hf else -1,
+        'three_body_hf': diagrams_3_hf[0].unique_id if diagrams_3_hf else -1,
+        'three_body_ehf': diagrams_3_ehf[0].unique_id
+                          if diagrams_3_ehf else -1,
+        'three_body_not_hf': diagrams_3_not_hf[0].unique_id
+                             if diagrams_3_not_hf else -1
+    }
+
+    return diagrams, diags_nb_per_type, section_flags
 
 
 class BmbptFeynmanDiagram(adg.diag.Diagram):
@@ -237,7 +313,10 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
             the energy operator only character of the graph.
 
-        """
+    """
+
+    __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
+                 'diag_exp', 'vert_exp', 'hf_type', 'unique_id')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
@@ -261,6 +340,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             self.hf_type = "EHF"
         else:
             self.hf_type = "noHF"
+        self.unique_id = tag_num
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -273,7 +353,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                          for vertex in self.graph]
         numerator = self.extract_numerator()
         denominator = self.time_tree_denominator(
-            nx.relabel_nodes(time_diag.graph, time_diag.perms[self.tags[0]])
+            nx.relabel_nodes(time_diag.graph, time_diag.perms[self.unique_id])
         ) if self.tsd_is_tree else ""
 
         extra_factor = "" if self.tsd_is_tree \
@@ -281,7 +361,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             + " + ".join("\\frac{1}{%s}"
                          % self.time_tree_denominator(
                              nx.relabel_nodes(equi_t_graph,
-                                              time_diag.perms[self.tags[0]]))
+                                              time_diag.perms[self.unique_id]))
                          for equi_t_graph in time_diag.equivalent_trees) \
             + " \\right]"
 
@@ -409,12 +489,13 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         """
         latex_file.write('\n\\begin{center}\n')
-        adg.diag.draw_diagram(directory, latex_file, self.tags[0], 'diag')
+        adg.diag.draw_diagram(directory, latex_file, str(self.tags[0]), 'diag')
         if write_time:
             latex_file.write(
                 '\\hspace{10pt} $\\rightarrow$ \\hspace{10pt} T%i:'
                 % (self.time_tag + 1))
-            adg.diag.draw_diagram(directory, latex_file, self.time_tag, 'time')
+            adg.diag.draw_diagram(directory, latex_file,
+                                  str(self.time_tag), 'time')
         latex_file.write('\n\\end{center}\n\n')
 
     def write_tsd_info(self, diagrams_time, latex_file):
@@ -432,39 +513,42 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         latex_file.write(
             "\\begin{equation}\n\\text{T}%i = " % (self.time_tag + 1)
             + "%s\\end{equation}\n" % time_diag.expr)
-        self.write_vertices_values(latex_file, time_diag.perms[self.tags[0]])
+        self.write_vertices_values(latex_file, time_diag.perms[self.unique_id])
 
-    def write_section(self, result, commands, diags_nbs):
+    def write_section(self, result, commands, section_flags):
         """Write section and subsections for BMBPT result file.
 
         Args:
             result (file): The LaTeX output file of the program.
             commands (dict): The flags associated with run management.
-            diags_nbs (dict): The number of diagrams per type.
+            section_flags (dict): UniqueIDs of diags starting each section.
 
         """
-        if self.tags[0] == 0:
+        if self.unique_id == section_flags['two_body_hf']:
             result.write(
                 "\\section{Two-body diagrams}\n\n"
                 + "\\subsection{Two-body energy canonical diagrams}\n\n")
-        elif self.tags[0] == diags_nbs['nb_2_hf']:
+        elif self.unique_id == section_flags['two_body_ehf']:
             result.write("\\subsection{Two-body canonical diagrams " +
                          "for a generic operator only}\n\n")
-        elif self.tags[0] == diags_nbs['nb_2_hf'] + diags_nbs['nb_2_ehf']:
+        elif self.unique_id == section_flags['two_body_not_hf']:
             result.write("\\subsection{Two-body non-canonical diagrams}\n\n")
         if commands.with_3NF:
-            if self.tags[0] == diags_nbs['nb_2']:
+            if self.unique_id == section_flags['three_body_hf']:
                 result.write(
                     "\\section{Three-body diagrams}\n\n"
                     + "\\subsection{Three-body energy canonical diagrams}\n\n")
-            elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf']:
+            elif self.unique_id == section_flags['three_body_ehf']:
                 result.write("\\subsection{Three-body canonical diagrams " +
                              "for a generic operator only}\n\n")
-            elif self.tags[0] == diags_nbs['nb_2'] + diags_nbs['nb_3_hf'] \
-                    + diags_nbs['nb_3_ehf']:
+            elif self.unique_id == section_flags['three_body_not_hf']:
                 result.write(
                     "\\subsection{Three-body non-canonical diagrams}\n\n")
-        result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
+        if commands.theory == "PBMBPT":
+            result.write("\\paragraph{Diagram %i.%i:}\n" % (self.tags[0] + 1,
+                                                            self.tags[1] + 1))
+        else:
+            result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         self.write_diag_exps(result, commands.order)
 
     def write_vertices_values(self, latex_file, mapping):

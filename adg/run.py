@@ -6,6 +6,7 @@ import shutil
 import networkx as nx
 import adg.mbpt
 import adg.bmbpt
+import adg.pbmbpt
 import adg.diag
 
 
@@ -38,14 +39,14 @@ def parse_command_line():
         description="Arguments available only for MBPT calculations.\n")
     bmbpt_args = parser.add_argument_group(
         title="BMBPT-specific arguments",
-        description="Arguments available only for BMBPT calculations.\n")
+        description="Arguments available only for (P)BMBPT calculations.\n")
 
     basic_args.add_argument(
         "-o", "--order", type=int, choices=range(1, 10),
         help="order of the diagrams (>=1)")
     basic_args.add_argument(
-        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT'],
-        help="theory of interest: MBPT or BMBPT")
+        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT'],
+        help="theory of interest: MBPT, BMBPT or PBMBPT")
     basic_args.add_argument(
         "-i", "--interactive", action="store_true",
         help="execute ADG in interactive mode")
@@ -58,10 +59,10 @@ def parse_command_line():
         help="maximal n-body character of the observable [1-3], default = 2")
     bmbpt_args.add_argument(
         "-3NF", "--with_3NF", action="store_true",
-        help="use two and three-body forces for BMBPT diagrams")
+        help="use two and three-body forces for (P)BMBPT diagrams")
     bmbpt_args.add_argument(
         "-dt", "--draw_tsds", action="store_true",
-        help="draw Time-Structure Diagrams (BMBPT)")
+        help="draw Time-Structure Diagrams (BMBPT or PBMBPT)")
 
     run_args.add_argument(
         "-d", "--draw_diags", action="store_true",
@@ -84,7 +85,7 @@ def parse_command_line():
         exit()
 
     # Avoid conflicting flags
-    if args.theory != 'BMBPT' and not args.interactive:
+    if args.theory not in ('BMBPT', 'PBMBPT') and not args.interactive:
         args.canonical = None
         args.with_3NF = None
         args.nobs = 2
@@ -114,14 +115,14 @@ def interactive_interface(commands):
         print "Perturbative order too small or too high!"
         commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
 
-    theories = ["BMBPT", "MBPT"]
+    theories = ["BMBPT", "MBPT", "PBMBPT"]
 
-    commands.theory = raw_input('MBPT or BMBPT?\n').upper()
+    commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
     while commands.theory not in theories:
         print "Invalid theory!"
-        commands.theory = raw_input('MBPT or BMBPT?\n').upper()
+        commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
 
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         commands.canonical = raw_input(
             "Consider only canonical diagrams? (y/N)").lower() == 'y'
         commands.with_3NF = raw_input(
@@ -184,7 +185,7 @@ def attribute_directory(commands):
     directory = '%s/Order-%i' % (commands.theory, commands.order)
     if commands.canonical:
         directory += '_canonical'
-    if commands.theory == 'BMBPT':
+    if commands.theory in ('BMBPT', 'PBMBPT'):
         directory += '_%ibody_observable' % commands.nbody_observable
     if commands.with_3NF:
         directory += '_with3N'
@@ -195,11 +196,12 @@ def attribute_directory(commands):
     return directory
 
 
-def generate_diagrams(commands):
+def generate_diagrams(commands, id_generator):
     """Return a list with diagrams of the appropriate type.
 
     Args:
         commands (Namespace): Flags for the run management.
+        id_generator (UniqueID): A unique ID number generator.
 
     Returns:
         (list): All the diagrams of the appropriate Class and order.
@@ -207,7 +209,7 @@ def generate_diagrams(commands):
     """
     if commands.theory == "MBPT":
         diagrams = adg.mbpt.diagrams_generation(commands.order)
-    elif commands.theory == "BMBPT":
+    elif commands.theory in ("BMBPT", "PBMBPT"):
         diagrams = adg.bmbpt.diagrams_generation(commands.order,
                                                  commands.with_3NF,
                                                  commands.nbody_observable,
@@ -220,18 +222,34 @@ def generate_diagrams(commands):
     diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
                                   parallel_edges=True) for diagram in diagrams]
 
-    for i_diag in xrange(len(diags)-1, -1, -1):
-        if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
-            del diags[i_diag]
+    if commands.theory == "MBPT":
+        for i_diag in xrange(len(diags)-1, -1, -1):
+            if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
+                del diags[i_diag]
 
     adg.diag.label_vertices(diags, commands.theory)
 
-    if commands.theory == 'BMBPT':
-        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, ind)
-                    for ind, graph in enumerate(diags)]
+    if commands.theory in ('BMBPT', "PBMBPT"):
+        diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, id_generator.get())
+                    for graph in diags]
     elif commands.theory == 'MBPT':
-        diagrams = [adg.mbpt.MbptDiagram(graph, ind)
-                    for ind, graph in enumerate(diags)]
+        diagrams = [adg.mbpt.MbptDiagram(graph, id_generator.get())
+                    for graph in diags]
+
+    if commands.theory == "PBMBPT":
+        for idx in xrange(len(diagrams)-1, -1, -1):
+            new_graphs = adg.pbmbpt.generate_anomalous_diags(
+                diagrams[idx].graph,
+                3 if commands.with_3NF else 2
+            )
+            new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag,
+                                                          id_generator.get(),
+                                                          idx,
+                                                          spawn_idx)
+                         for spawn_idx, diag in enumerate(new_graphs)]
+            adg.diag.topologically_distinct_diagrams(new_diags)
+            del diagrams[idx]
+            diagrams += new_diags
     return diagrams
 
 
@@ -244,16 +262,19 @@ def order_diagrams(diagrams, commands):
 
     Returns:
         (tuple): First element is the list of ordered and unique diagrams.
-        Second element is a dict with the number of diagrams per type.
+        Second element is a dict with the number of diagrams per type. Third
+        element is a dict with the identifiers of diagrams starting each output
+        file section.
 
     """
     if commands.theory == "BMBPT":
-        diagrams, diags_per_type = adg.bmbpt.order_diagrams(diagrams)
-
+        diagrams, diag_nbs, section_flags = adg.bmbpt.order_diagrams(diagrams)
+    elif commands.theory == "PBMBPT":
+        diagrams, diag_nbs, section_flags = adg.pbmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
-        diagrams, diags_per_type = adg.mbpt.order_diagrams(diagrams)
+        diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
 
-    return diagrams, diags_per_type
+    return diagrams, diag_nbs, section_flags
 
 
 def print_diags_numbers(commands, diags_nbs):
@@ -266,7 +287,7 @@ def print_diags_numbers(commands, diags_nbs):
     """
     print "Number of connected diagrams: ", diags_nbs['nb_diags']
 
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         print(
             "\n2N valid diagrams: %i\n" % diags_nbs['nb_2']
             + "2N energy canonical diagrams: %i\n" % diags_nbs['nb_2_hf']
@@ -327,7 +348,10 @@ def create_feynmanmp_files(diagrams, theory, directory, diag_type):
 
     """
     for diag in diagrams:
-        diag_name = '%s_%i' % (diag_type, diag.tags[0])
+        if theory == "PBMBPT" and diag_type == 'diag':
+            diag_name = '%s_%i_%i' % (diag_type, diag.tags[0], diag.tags[1])
+        else:
+            diag_name = '%s_%i' % (diag_type, diag.tags[0])
         adg.diag.feynmf_generator(diag.graph,
                                   'MBPT' if diag_type == 'time' else theory,
                                   diag_name)
@@ -359,7 +383,7 @@ def write_file_header(latex_file, commands, diags_nbs):
     header = header \
         + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
         % (commands.order, commands.theory) \
-        + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
+        + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":

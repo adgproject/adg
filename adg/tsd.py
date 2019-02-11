@@ -6,20 +6,25 @@ import networkx as nx
 import adg.diag
 
 
-def time_structure_graph(graph):
+def time_structure_graph(diag):
     """Return the time-structure graph associated to the graph.
 
     Args:
-        graph (NetwrokX MultiDiGraph): The BMBPT graph of interest.
+        diag (BmbptFeymmanDiagram): The BMBPT graph of interest.
 
     Returns:
         (NetworkX MultiDiGraph): The time-structure diagram.
 
     """
-    time_graph = graph.to_directed()
+    import adg.pbmbpt
+    time_graph = diag.graph.to_directed()
     if time_graph.node[0]['operator']:
         for vertex in xrange(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
+    if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
+        for edge in time_graph.edges(keys=True, data=True):
+            if 'anomalous' in edge[3] and edge[3]['anomalous']:
+                time_graph.remove_edge(edge[0], edge[1], edge[2])
     return adg.diag.to_skeleton(time_graph)
 
 
@@ -77,7 +82,8 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
-def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
+def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds,
+                  diagrams):
     """Write the appropriate section for tsd diagrams in the LaTeX file.
 
     Args:
@@ -86,6 +92,7 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
         pdiag (bool): ``True`` if diagrams are to be drawn.
         time_diagrams (list): The ensemble of TSDs.
         nb_tree_tsds (int): Number of tree TSDs.
+        diagrams (list): All produced BmbptFeymmanDiagrams.
 
     """
     latex_file.write("\\section{Time-structure diagrams}\n\n"
@@ -114,8 +121,8 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
             latex_file.write('\n\\end{center}\n\n')
         latex_file.write("Number of related Feynman diagrams: %i.\n\n"
                          % (len(tdiag.tags)-1))
-        feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
-        latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
+        latex_file.write("Related Feynman diagrams:%s.\n\n"
+                         % tdiag.get_feynman_diags(diagrams))
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
@@ -219,21 +226,24 @@ class TimeStructureDiagram(adg.diag.Diagram):
             associated to a non-tree TSD.
         is_tree (bool): The tree or non-tree character of a TSD.
         expr (str): The Goldstone denominator associated to the TSD.
+        resum (int): The resummation power of a tree TSD.
 
     """
 
-    def __init__(self, bmbpt_diag, tag_num):
+    __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
+
+    def __init__(self, bmbpt_diag):
         """Generate a tsd diagram out of a BMBPT one.
 
         Args:
             bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph used to be
                 turned into a TSD.
-            tag_num (int): The number associated to the TSD.
 
         """
-        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
-        self.tags = [tag_num]
-        self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
+        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
+        self.tags = [bmbpt_diag.unique_id]
+        self.perms = {bmbpt_diag.unique_id: {i: i
+                                             for i in xrange(len(self.graph))}}
         self.equivalent_trees = []
         if nx.is_arborescence(self.graph):
             self.is_tree = True
@@ -307,3 +317,27 @@ class TimeStructureDiagram(adg.diag.Diagram):
             power /= 1 + len(nx.descendants(self.graph, node))
 
         return power
+
+    def get_feynman_diags(self, feyn_diagrams):
+        """Return the list of Feynman diagrams associated to the TSD.
+
+        Args:
+            feyn_diagrams (list): All produced BmbptFeymmanDiagrams.
+
+        Returns:
+            (str): All the identifiers of associated BmbptFeymmanDiagrams.
+
+        """
+        if isinstance(feyn_diagrams[0], adg.pbmbpt.ProjectedBmbptDiagram):
+            identifiers = ""
+            for tag in self.tags[1:]:
+                for diag in feyn_diagrams:
+                    if diag.unique_id == tag:
+                        identifiers += " %i.%i," % (diag.tags[0]+1,
+                                                    diag.tags[1]+1)
+                        break
+            identifiers = identifiers.strip(',')
+        else:
+            identifiers = ",".join(" %i" % (tag+1) for tag in self.tags[1:])
+
+        return identifiers
