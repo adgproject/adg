@@ -3,6 +3,7 @@
 import itertools
 import pickle
 import os
+from math import factorial
 import numpy as np
 import networkx as nx
 import adg.tsd
@@ -345,7 +346,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
     """
 
     __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
-                 'diag_exp', 'vert_exp', 'hf_type', 'unique_id')
+                 'diag_exp', 'vert_exp', 'hf_type', 'unique_id',
+                 'vert_exchange_sym_fact')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
@@ -370,6 +372,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         else:
             self.hf_type = "noHF"
         self.unique_id = tag_num
+        self.vert_exchange_sym_fact = 1
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -447,14 +450,28 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         for vertex_i in graph:
             for vertex_j in graph:
                 if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:
-                    prop_multiplicity[graph.number_of_edges(vertex_i, vertex_j) - 1] += 1
+                    prop_multiplicity[graph.number_of_edges(vertex_i,
+                                                            vertex_j) - 1] += 1
+        # Take the factorial of the number of lines to the power
+        # of the multiplicity
         for prop_id, multiplicity in enumerate(prop_multiplicity):
             for _ in range(multiplicity):
-                for k in range(prop_id+1):
-                    sym_fact *= k+1
+                sym_fact *= factorial(prop_id)
 
         # Determine list of tensors
+        numerator = self.get_pickle_numerator()
+
+        return [sign, sym_fact, numerator]
+
+    def get_pickle_numerator(self):
+        """Return the numerator of the diagram in pickle format.
+
+        Returns:
+            (list): The elements of the numerator in pickle format.
+
+        """
         numerator = []
+        graph = self.graph
         for vertex in graph:
 
             # Get I, J
@@ -482,8 +499,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 previous_vertex -= 1
 
             numerator.append([tensor_tex, tensor_i, tensor_j, indices])
-
-        return [sign, sym_fact, numerator]
+        return numerator
 
     def vertex_expression(self, vertex):
         """Return the expression associated to a given vertex.
@@ -614,23 +630,27 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the symmetry factor associated with vertex exchange.
 
         Returns:
-            (str): The symmetry factor for vertex exchange.
+            (int): The symmetry factor for vertex exchange.
 
         """
-        # Starts at -2 as the identity belongs to the set of permutations
-        factor = -2
-        graph = self.graph
-        perm_vertices = [vertex for vertex, degrees
-                         in enumerate(self.unsort_io_degrees)
-                         if graph.node[vertex]['operator'] is False
-                         and self.unsort_io_degrees.count(degrees) >= 2]
-        for permutation in itertools.permutations(perm_vertices):
-            permuted_graph = nx.relabel_nodes(graph,
-                                              dict(zip(perm_vertices,
-                                                       permutation)),
-                                              copy=True)
-            if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
-                factor += 2
+        if self.vert_exchange_sym_fact == 1:
+            # Starts at -2 as the identity belongs to the set of permutations
+            factor = -2
+            graph = self.graph
+            perm_vertices = [vertex for vertex, degrees
+                             in enumerate(self.unsort_io_degrees)
+                             if graph.node[vertex]['operator'] is False
+                             and self.unsort_io_degrees.count(degrees) >= 2]
+            for permutation in itertools.permutations(perm_vertices):
+                permuted_graph = nx.relabel_nodes(graph,
+                                                  dict(zip(perm_vertices,
+                                                           permutation)),
+                                                  copy=True)
+                if nx.is_isomorphic(graph,
+                                    nx.intersection(graph, permuted_graph)):
+                    factor += 2
+        else:
+            factor = self.vert_exchange_sym_fact
         return factor
 
     def extract_integral(self):
