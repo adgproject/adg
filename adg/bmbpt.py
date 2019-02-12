@@ -2,6 +2,7 @@
 
 import itertools
 import pickle
+import os
 import numpy as np
 import networkx as nx
 import adg.tsd
@@ -186,6 +187,10 @@ def drop_pickle(diagrams):
     # Name of output file
     output_file = "./pickles/adg_bmbpt_order%i.b" \
         % (len(diagrams[0].graph)-1)
+
+    # Check for existence of pickles directory
+    if not os.path.exists("./pickles"):
+        os.makedirs("./pickles")
 
     # Add all bmbpt contributions
     bmbpt_equation = []
