@@ -242,7 +242,6 @@ def feynmf_generator(graph, theory_type, diagram_name):
     fmf_file.write(propagator_style(propa))
     if theory_type == "PBMBPT":
         fmf_file.write(propagator_style("prop_mm"))
-        fmf_file.write(propagator_style("half_prop"))
 
     # Set the position of the vertices
     fmf_file.write(vertex_positions(graph, p_order))
@@ -366,24 +365,27 @@ def self_contractions(graph):
 
     """
     instructions = ""
-    for vert in graph:
-        props_to_draw = [edge for edge
-                         in nx.selfloop_edges(graph, data=True, keys=True)
-                         if edge[0] == vert]
-        positions = ["15pt", "-15pt"]
-        key = 0
-        for prop in props_to_draw:
-            if prop[3]['anomalous']:
-                a_name = "a%i%i" % (vert, key)
-                instructions += ("\\fmfv{}{%s}\n" % a_name
-                                 + "\\fmffixed{(%s,0)}{v%i,%s}\n"
-                                 % (positions[key], vert, a_name)
-                                 + "\\fmf{half_prop,right}{%s,v%i}\n"
-                                 % (a_name, vert)
-                                 + "\\fmf{half_prop,left}{%s,v%i}\n"
-                                 % (a_name, vert))
-                key += 1
-    instructions += "\\fmffreeze\n"
+    # Check for self-contractions before going further
+    if [nx.selfloop_edges(graph)]:
+        instructions += propagator_style("half_prop")
+        for vert in graph:
+            props_to_draw = [edge for edge
+                             in nx.selfloop_edges(graph, data=True, keys=True)
+                             if edge[0] == vert]
+            positions = ["15pt", "-15pt"]
+            key = 0
+            for prop in props_to_draw:
+                if prop[3]['anomalous']:
+                    a_name = "a%i%i" % (vert, key)
+                    instructions += ("\\fmfv{}{%s}\n" % a_name
+                                     + "\\fmffixed{(%s,0)}{v%i,%s}\n"
+                                     % (positions[key], vert, a_name)
+                                     + "\\fmf{half_prop,right}{%s,v%i}\n"
+                                     % (a_name, vert)
+                                     + "\\fmf{half_prop,left}{%s,v%i}\n"
+                                     % (a_name, vert))
+                    key += 1
+        instructions += "\\fmffreeze\n"
     return instructions
 
 
