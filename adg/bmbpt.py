@@ -626,7 +626,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                               copy=True)
             if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
                 factor += 2
-        return "%i" % factor if factor != 0 else ""
+        return factor
 
     def extract_integral(self):
         """Return the integral part of the Feynman expression of the diag.
