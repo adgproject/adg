@@ -172,6 +172,44 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, unique_id)
         self.tags = [tag, child_tag]
 
+    def attribute_qp_labels(self):
+        """Attribute the appropriate qp labels to the graph's propagators."""
+        idx_counter = 1
+        for prop in self.graph.edges(keys=True, data=True):
+            if prop[3]['anomalous']:
+                prop[3]['qp_state'] = "k_{%i}k_{%i}" % (idx_counter,
+                                                        idx_counter + 1)
+                idx_counter += 2
+            else:
+                prop[3]['qp_state'] = "k_{%i}" % idx_counter
+                idx_counter += 1
+
+    def vertex_expression(self, vertex):
+        """Return the expression associated to a given vertex.
+
+        Args:
+            vertex (int): The vertex of interest in the graph.
+
+        """
+        expression = r"\epsilon^{" \
+            + "".join("%s"
+                      % prop[3]['qp_state']
+                      for prop
+                      in self.graph.out_edges(vertex, keys=True, data=True)
+                      if not prop[3]['anomalous']) \
+            + "}_{" \
+            + "".join("%s"
+                      % (prop[3]['qp_state'].split("}")[0] + "}")
+                      for prop
+                      in self.graph.in_edges(vertex, keys=True, data=True)) \
+            + "".join("%s"
+                      % (prop[3]['qp_state'].split("}")[1] + "}")
+                      for prop
+                      in self.graph.out_edges(vertex, keys=True, data=True)
+                      if prop[3]['anomalous']) \
+            + "}"
+        return expression
+
     def write_graph(self, latex_file, directory, write_time):
         """Write the PBMBPT graph and its associated TSD to the LaTeX file.
 
