@@ -95,6 +95,10 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
     Args:
         matrices (list): The adjacency matrices to be checked.
         max_vertex (int): The maximum vertex which has been filled.
+
+    Returns:
+        (list): The ordered topologically unique matrices.
+
     """
     matrices_dict = {}
     for idx in xrange(len(matrices)-1, -1, -1):
@@ -119,6 +123,10 @@ def check_topologically_equivalent(matrices, max_vertex):
     Args:
         matrices (list): Adjacency matrices to be checked.
         max_vertex (int): The maximum vertex which have been filled.
+
+    Returns:
+        (list): The topologically unique matrices.
+
     """
     if not matrices:
         return []
@@ -342,6 +350,9 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         vert_exp (list): The expression associated to the vertices.
         hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
             the energy operator only character of the graph.
+        unique_id (int): A unique number associated to the diagram.
+        vertex_exchange_sym_factor (int): The symmetry factor associated to the
+            vertex exchange, stored to avoid being computed several times.
 
     """
 
@@ -506,6 +517,9 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         Args:
             vertex (int): The vertex of interest in the graph.
+
+        Returns:
+            (str): The LaTeX expression associated to the vertex.
 
         """
         expression = r"\epsilon^{" \

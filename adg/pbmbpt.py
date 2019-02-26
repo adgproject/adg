@@ -190,6 +190,9 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         Args:
             vertex (int): The vertex of interest in the graph.
 
+        Returns:
+            (str): The LaTeX expression associated to the vertex.
+
         """
         expression = r"\epsilon^{" \
             + "".join("%s"
