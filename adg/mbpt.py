@@ -222,11 +222,12 @@ class MbptDiagram(adg.diag.Diagram):
         expr (str): The MBPT expression associated to the diagram.
         cd_expr (str): The expression associated to the diagram in a
             computer-readable format.
+        adjacency_mat (NumPy array): The adjacency matrix of the graph.
 
     """
 
     __slots__ = ('incidence', 'excitation_level', 'complex_conjugate', 'expr',
-                 'cd_expr')
+                 'cd_expr', 'adjacency_mat')
 
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph.
@@ -246,6 +247,7 @@ class MbptDiagram(adg.diag.Diagram):
         self.excitation_level = self.calc_excitation()
         self.complex_conjugate = -1
         self.loops_number()
+        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""

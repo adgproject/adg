@@ -464,7 +464,9 @@ def print_adj_matrices(directory, diagrams):
     with open(directory+"/adjacency_matrices.txt", "w") as mat_file:
         for idx, diagram in enumerate(diagrams):
             mat_file.write("Diagram n: %i\n" % (idx + 1))
-            numpy.savetxt(mat_file, diagram.adjacency_mat, fmt='%d')
+            numpy.savetxt(mat_file,
+                          nx.to_numpy_matrix(diagram.graph, dtype=int),
+                          fmt='%d')
             mat_file.write("\n")
 
 
@@ -480,12 +482,11 @@ class Diagram(object):
         io_degrees (tuple): The sorted version of unsort_io_degrees.
         max_degree (int): The maximal degree of a vertex in the graph.
         tags (list): The tag numbers associated to a diagram.
-        adjacency_mat (NumPy array): The adjacency matrix of the graph.
 
     """
 
     __slots__ = ('graph', 'unsort_degrees', 'degrees', 'unsort_io_degrees',
-                 'io_degrees', 'max_degree', 'tags', 'adjacency_mat')
+                 'io_degrees', 'max_degree', 'tags')
 
     def __init__(self, nx_graph):
         """Generate a Diagram object starting from the NetworkX graph.
@@ -503,7 +504,6 @@ class Diagram(object):
         self.io_degrees = tuple(sorted(self.unsort_io_degrees))
         self.max_degree = self.degrees[-1]
         self.tags = [0]
-        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the graph of the diagram to the LaTeX file.
