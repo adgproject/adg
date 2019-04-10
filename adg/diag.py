@@ -439,16 +439,36 @@ def extract_denom(start_graph, subgraph):
     """
     denomin = r"\epsilon^{" \
         + "".join("%s"
-                  % propa[3]['qp_state']
-                  for propa
+                  % prop[3]['qp_state']
+                  for prop
                   in start_graph.out_edges(subgraph, keys=True, data=True)
-                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+                  if not subgraph.has_edge(prop[0], prop[1], prop[2])
+                  and not ('anomalous' in prop[3] and prop[3]['anomalous'])) \
         + "}_{" \
         + "".join("%s"
-                  % propa[3]['qp_state']
-                  for propa
+                  % prop[3]['qp_state']
+                  for prop
                   in start_graph.in_edges(subgraph, keys=True, data=True)
-                  if not subgraph.has_edge(propa[0], propa[1], propa[2])) \
+                  if not subgraph.has_edge(prop[0], prop[1], prop[2])
+                  and not ('anomalous' in prop[3] and prop[3]['anomalous'])) \
+        + "".join("%s"
+                  % prop[3]['qp_state']
+                  for prop
+                  in start_graph.in_edges(subgraph, keys=True, data=True)
+                  if subgraph.has_edge(prop[0], prop[1], prop[2])
+                  and ('anomalous' in prop[3] and prop[3]['anomalous'])) \
+        + "".join("%s"
+                  % (prop[3]['qp_state'].split("}")[1] + "}")
+                  for prop
+                  in start_graph.in_edges(subgraph, keys=True, data=True)
+                  if not subgraph.has_edge(prop[0], prop[1], prop[2])
+                  and ('anomalous' in prop[3] and prop[3]['anomalous'])) \
+        + "".join("%s"
+                  % (prop[3]['qp_state'].split("}")[0] + "}")
+                  for prop
+                  in start_graph.out_edges(subgraph, keys=True, data=True)
+                  if not subgraph.has_edge(prop[0], prop[1], prop[2])
+                  and ('anomalous' in prop[3] and prop[3]['anomalous'])) \
         + "}"
     return denomin
 
