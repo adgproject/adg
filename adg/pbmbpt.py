@@ -213,6 +213,44 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             + "}"
         return expression
 
+    def extract_numerator(self):
+        """Return the numerator associated to a PBMBPT graph.
+
+        Returns:
+            (str): The numerator of the graph.
+
+        """
+        graph = self.graph
+        numerator = ""
+        for vertex in graph:
+            # Attribute the correct operator to each vertex
+            numerator += r"\tilde{O}" if graph.node[vertex]['operator'] \
+                else "\\Omega"
+            # Attribute the good "type number" to each vertex
+            numerator += "^{%i%i}_{" % (self.unsort_io_degrees[vertex][1],
+                                        self.unsort_io_degrees[vertex][0])
+            # First add the qp states corresponding to propagators going out
+            numerator += "".join(prop[3]['qp_state']
+                                 for prop
+                                 in graph.out_edges(vertex,
+                                                    keys=True, data=True))
+            # Add the qp states corresponding to propagators coming in
+            previous_vertex = vertex - 1
+            while previous_vertex >= 0:
+                numerator += "".join(
+                    prop[3]['qp_state']
+                    for prop in graph.in_edges(vertex, keys=True, data=True)
+                    if prop[0] == previous_vertex)
+                previous_vertex -= 1
+            numerator += r"} (\varphi) " if graph.node[vertex]['operator'] \
+                else "} "
+        # Add the terms correspoding to anomalous propagators
+        numerator += " ".join("R^{--}_{%s}(\\varphi)" % prop[3]['qp_state']
+                              for prop
+                              in graph.out_edges(keys=True, data=True)
+                              if prop[3]['anomalous'])
+        return numerator
+
     def write_graph(self, latex_file, directory, write_time):
         """Write the PBMBPT graph and its associated TSD to the LaTeX file.
 
