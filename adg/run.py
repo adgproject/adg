@@ -375,6 +375,8 @@ def write_file_header(latex_file, commands, diags_nbs):
 
     """
     header = "\\documentclass[10pt,a4paper]{article}\n" \
+        + "\\usepackage[left=2cm,right=2cm," \
+        + "bottom=2.5cm,top=2.5cm]{geometry}\n" \
         + "\\usepackage[utf8]{inputenc}\n" \
         + "\\usepackage[T1]{fontenc}\n" \
         + "\\usepackage{lmodern}\n" \
