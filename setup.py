@@ -6,6 +6,7 @@ You can install the program either by running
 or
     python2 setup.py install
 """
+from __future__ import print_function
 
 
 import sys

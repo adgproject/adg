@@ -1,4 +1,5 @@
 """Routines handling the run of ADG."""
+from __future__ import print_function
 
 import os
 import argparse
@@ -82,9 +83,9 @@ def parse_command_line():
 
     if (not args.interactive) and ((args.order is None)
                                    or (args.theory is None)):
-        print "\nPlease either run the interactive mode, or the batch mode by"
-        print "providing the theory and the order for the desired diagrams.\n"
-        print "Use 'adg -h' for help.\n"
+        print("\nPlease either run the interactive mode, or the batch mode by")
+        print("providing the theory and the order for the desired diagrams.\n")
+        print("Use 'adg -h' for help.\n")
         exit()
 
     # Avoid conflicting flags
@@ -113,17 +114,17 @@ def interactive_interface(commands):
     try:
         commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
     except ValueError:
-        print "Please enter an integer value! Program exiting."
+        print("Please enter an integer value! Program exiting.")
         exit()
     while commands.order < 1 or commands.order > 9:
-        print "Perturbative order too small or too high!"
+        print("Perturbative order too small or too high!")
         commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
 
     theories = ["BMBPT", "MBPT", "PBMBPT"]
 
     commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
     while commands.theory not in theories:
-        print "Invalid theory!"
+        print("Invalid theory!")
         commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
 
     if commands.theory in ("BMBPT", "PBMBPT"):
@@ -135,10 +136,10 @@ def interactive_interface(commands):
             commands.nbody_observable = int(raw_input(
                 "Maximal n-body character of the observable? [1-3]"))
         except ValueError:
-            print "Please enter an integer value! Program exiting."
+            print("Please enter an integer value! Program exiting.")
             exit()
         while commands.nbody_observable < 1 or commands.nbody_observable > 3:
-            print "The observable must be 1-body, 2-body or 3-body!"
+            print("The observable must be 1-body, 2-body or 3-body!")
             commands.nbody_observable = int(raw_input(
                 "Maximal n-body character of the observable? [1-3]"))
         commands.draw_tsds = raw_input(
@@ -221,9 +222,9 @@ def generate_diagrams(commands, id_generator):
                                                  commands.nbody_observable,
                                                  commands.canonical)
     else:
-        print "Invalid theory! Exiting program."
+        print("Invalid theory! Exiting program.")
         exit()
-    print "Number of matrices produced: ", len(diagrams)
+    print("Number of matrices produced: ", len(diagrams))
 
     diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
                                   parallel_edges=True) for diagram in diagrams]
@@ -291,7 +292,7 @@ def print_diags_numbers(commands, diags_nbs):
         diags_nbs (dict): The number of diagrams for each major type.
 
     """
-    print "Number of connected diagrams: ", diags_nbs['nb_diags']
+    print("Number of connected diagrams: ", diags_nbs['nb_diags'])
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         print(
@@ -324,7 +325,7 @@ def print_diags_numbers(commands, diags_nbs):
             + "Quadruples: %i\n" % diags_nbs['quadruples']
             + "Quintuples and higher: %i" % diags_nbs['quintuples+']
         )
-    print
+    print()
 
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
@@ -416,7 +417,7 @@ def compile_manager(directory, pdiag):
         # Second compilation needed
         os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     os.chdir("../..")
-    print "Result saved in %s/result.pdf" % directory
+    print("Result saved in %s/result.pdf" % directory)
 
 
 def clean_folders(directory, commands):

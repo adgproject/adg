@@ -1,4 +1,5 @@
 """Routines and class for Many-Body Perturbation Theory diagrams."""
+from __future__ import print_function
 
 import copy
 import itertools
@@ -132,7 +133,7 @@ def order_diagrams(diagrams):
         elif diagrams[i_diag].excitation_level >= 5:
             quintuples_and_higher.append(diagrams[i_diag])
         else:
-            print "Zero or negative excitation level!\n"
+            print("Zero or negative excitation level!\n")
             exit()
         del diagrams[i_diag]
 
