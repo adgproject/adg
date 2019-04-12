@@ -1,5 +1,7 @@
 """Routines and class for all types of diagrams, inherited by others."""
 
+from builtins import range
+from builtins import object
 import numpy
 import networkx as nx
 
@@ -69,10 +71,10 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
         authorized_deg.append(2)
     authorized_deg = tuple(authorized_deg)
 
-    for i_mat in xrange(len(matrices)-1, -1, -1):
+    for i_mat in range(len(matrices)-1, -1, -1):
         matrix = matrices[i_mat]
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
-                            for index in range(matrix.shape[0]))
+                            for index in list(range(matrix.shape[0])))
         vertex_degree -= matrix[vertex_id][vertex_id]
 
         if (vertex_id != 0 and vertex_degree not in authorized_deg) \
@@ -94,10 +96,10 @@ def topologically_distinct_diagrams(diagrams):
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
     anom_em = iso.categorical_multiedge_match('anomalous', True)
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
+    for i_diag in range(len(diagrams)-1, -1, -1):
         graph = diagrams[i_diag].graph
         diag_io_degrees = diagrams[i_diag].io_degrees
-        for i_comp_diag in xrange(i_diag+1, len(diagrams), 1):
+        for i_comp_diag in range(i_diag+1, len(diagrams), 1):
             if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
                 # Check for topolically equivalent diags considering vertex
                 # properties but not edge attributes, i.e. anomalous character
@@ -343,7 +345,7 @@ def vertex_positions(graph, order):
 
     """
     positions = "\\fmftop{v%i}\\fmfbottom{v0}\n" % (order-1)
-    for vert in xrange(order-1):
+    for vert in range(order-1):
         positions += "\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)) \
             + ("\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
                if graph.node[vert]['operator']

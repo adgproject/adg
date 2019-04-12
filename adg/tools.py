@@ -1,6 +1,7 @@
 """Miscellaneous diagram-unrelated tools for ADG."""
 
 
+from builtins import object
 class UniqueID(object):
     """Counter making sure of generating a unique ID number for diagrams.
 

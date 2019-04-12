@@ -1,5 +1,9 @@
 """Routines and class for Projected Bogoliubov MBPT diagrams."""
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import copy
 import itertools
 import adg.bmbpt
@@ -41,11 +45,11 @@ def generate_anomalous_diags(graph, nbody_max):
         anom_graphs.append(new_graph)
 
     # Loop to generate self-contractions
-    for idx in xrange(len(anom_graphs)-1, -1, -1):
+    for idx in range(len(anom_graphs)-1, -1, -1):
         iter_graph = anom_graphs[idx]
         test_vertices = []
         for vert in vertices:
-            for _ in range(nbody_max - (iter_graph.degree(vert) / 2)):
+            for _ in range(nbody_max - (old_div(iter_graph.degree(vert), 2))):
                 test_vertices.append(vert)
         for comb in generate_combinations(test_vertices):
             new_graph = copy.deepcopy(iter_graph)
@@ -94,7 +98,7 @@ def order_diagrams(diagrams):
     diagrams_3_ehf = []
     diagrams_3_not_hf = []
 
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
+    for i_diag in range(len(diagrams)-1, -1, -1):
         if diagrams[i_diag].two_or_three_body == 2:
             if diagrams[i_diag].hf_type == "HF":
                 diagrams_2_hf.append(diagrams[i_diag])
