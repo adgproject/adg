@@ -109,8 +109,7 @@ def test_treat_tsds():
              for ind, graph in enumerate(graphs)]
     for diag in diags:
         diag.attribute_qp_labels()
-    tsds = [adg.tsd.TimeStructureDiagram(diag, ind)
-            for ind, diag in enumerate(diags)]
+    tsds = [adg.tsd.TimeStructureDiagram(diag) for diag in diags]
 
     result_tsds, nb_trees = adg.tsd.treat_tsds(tsds)
 
@@ -131,7 +130,7 @@ def test___init__():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     assert tsd.is_tree
     assert tsd.resum == 1
@@ -147,7 +146,7 @@ def test___init__():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     assert not tsd.is_tree
     assert tsd.resum == 0
@@ -166,7 +165,7 @@ def test_treat_cycles():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     equivalent_trees = tsd.treat_cycles()
 
@@ -186,7 +185,7 @@ def test_treat_cycles():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     equivalent_trees = tsd.treat_cycles()
 
@@ -203,7 +202,7 @@ def test_resummation_power():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     assert tsd.resummation_power() == 1
 
@@ -215,6 +214,6 @@ def test_resummation_power():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     assert tsd.resummation_power() == 2
