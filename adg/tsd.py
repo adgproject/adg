@@ -71,9 +71,9 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     eq_labelled_tsds = ""
     for eq_tree_graph in equivalent_trees:
         for comp_tdiag in labelled_tsds:
-            if sorted(tuple((eq_tree_graph.in_degree(node),
-                             eq_tree_graph.out_degree(node))
-                            for node in eq_tree_graph)) \
+            if tuple(sorted(tuple((eq_tree_graph.in_degree(node),
+                                   eq_tree_graph.out_degree(node))
+                                  for node in eq_tree_graph))) \
                     == comp_tdiag.io_degrees \
                     and comp_tdiag.is_tree:
                 if nx.is_isomorphic(eq_tree_graph, comp_tdiag.graph, op_nm):
