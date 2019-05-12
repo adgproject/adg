@@ -385,7 +385,7 @@ def write_file_header(latex_file, commands, diags_nbs):
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
     if commands.draw_diags:
         header = "%s\\usepackage{feynmp-auto}\n" % header
-    if commands.theory == 'BMBPT' and commands.order >= 3:
+    if commands.theory in ('BMBPT', 'PBMBPT') and commands.order >= 3:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
     header = header \
@@ -394,7 +394,7 @@ def write_file_header(latex_file, commands, diags_nbs):
         + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         adg.bmbpt.write_header(latex_file, commands, diags_nbs)
     elif commands.theory == "MBPT":
         adg.mbpt.write_header(latex_file, diags_nbs)
@@ -423,7 +423,7 @@ def clean_folders(directory, commands):
     """Delete temporary files and folders.
 
     Args:
-        directory (str): Path to the ouput folder.
+        directory (str): Path to the output folder.
         commands (Namespace): Flags to manage the program's run.
 
     """
