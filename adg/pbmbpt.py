@@ -251,6 +251,22 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                               if prop[3]['anomalous'])
         return numerator
 
+    def write_diag_exps(self, latex_file, norder):
+        """Write the expressions associated to a diagram in the LaTeX file.
+
+        Args:
+            latex_file (file): The LaTeX outputfile of the program.
+            norder (int): The order in BMBPT formalism.
+
+        """
+        latex_file.write(
+            "\\begin{align}\n\\text{PO}%i.%i.%i\n" % (norder,
+                                                      (self.tags[0] + 1),
+                                                      (self.tags[1] + 1))
+            + "&= %s" % self.feynman_exp
+            + r" \nonumber \\" + "\n"
+            + "&= %s\\end{align}\n" % self.diag_exp)
+
     def write_graph(self, latex_file, directory, write_time):
         """Write the PBMBPT graph and its associated TSD to the LaTeX file.
 
