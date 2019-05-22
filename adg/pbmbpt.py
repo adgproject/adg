@@ -171,6 +171,26 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """
         adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, unique_id)
         self.tags = [tag, child_tag]
+        self.set_io_degrees()
+
+    def set_io_degrees(self):
+        """Attribute the correct in- and out-degrees to a PBMBPT diagram."""
+        unsort_io_degrees = []
+        for node in self.graph:
+            # Edges going out that are anomalous are annihilators going in
+            nb_anom_out_edges = sum(1 for edge
+                                    in self.graph.out_edges(nbunch=node,
+                                                            data=True,
+                                                            keys=True)
+                                    if edge[3]['anomalous'])
+            # And thus should be decounted to NetworkX's out_degree...
+            out_degree = self.graph.out_degree(node) - nb_anom_out_edges
+            # ...and added to NetworkX's in_degree
+            in_degree = self.graph.in_degree(node) + nb_anom_out_edges
+
+            unsort_io_degrees.append((in_degree, out_degree))
+        self.unsort_io_degrees = tuple(unsort_io_degrees)
+        self.io_degrees = tuple(sorted(self.unsort_io_degrees))
 
     def attribute_qp_labels(self):
         """Attribute the appropriate qp labels to the graph's propagators."""
