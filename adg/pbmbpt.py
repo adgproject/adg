@@ -286,6 +286,39 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                               if prop[3]['anomalous'])
         return numerator
 
+    def multiplicity_symmetry_factor(self):
+        """Return the symmetry factor associated with propagators multiplicity.
+
+        Returns:
+            (str): The symmetry factor associated with equivalent lines.
+
+        """
+        factor = ""
+        # Account for up to three-body operators
+        prop_multiplicity = [0 for _ in xrange(6)]
+        for vertex_i in self.graph:
+            for vertex_j in self.graph:
+                nb_normal_props = 0
+                nb_anomalous_props = 0
+                for prop in self.graph.edges(vertex_i,
+                                             keys=True,
+                                             data='anomalous'):
+                    if prop[1] == vertex_j and prop[3]:
+                        nb_anomalous_props += 1
+                    if prop[1] == vertex_j and not prop[3]:
+                        nb_normal_props += 1
+                if nb_anomalous_props >= 2:
+                    prop_multiplicity[nb_anomalous_props - 1] += 1
+                if nb_normal_props >= 2:
+                    prop_multiplicity[nb_normal_props - 1] += 1
+
+        for prop_id, multiplicity in enumerate(prop_multiplicity):
+            if multiplicity == 1:
+                factor += "(%i!)" % (prop_id+1)
+            elif multiplicity >= 2:
+                factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
+        return factor
+
     def write_diag_exps(self, latex_file, norder):
         """Write the expressions associated to a diagram in the LaTeX file.
 
