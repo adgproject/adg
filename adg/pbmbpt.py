@@ -197,8 +197,8 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         idx_counter = 1
         for prop in self.graph.edges(keys=True, data=True):
             if prop[3]['anomalous']:
-                prop[3]['qp_state'] = "k_{%i}k_{%i}" % (idx_counter,
-                                                        idx_counter + 1)
+                prop[3]['qp_state'] = "k_{%i}k_{%i}" % (idx_counter + 1,
+                                                        idx_counter)
                 idx_counter += 2
             else:
                 prop[3]['qp_state'] = "k_{%i}" % idx_counter
@@ -222,11 +222,12 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                       if not prop[3]['anomalous']) \
             + "}_{" \
             + "".join("%s"
-                      % (prop[3]['qp_state'].split("}")[0] + "}")
+                      % (prop[3]['qp_state'].split("}")[1] + "}"
+                         if prop[3]['anomalous'] else prop[3]['qp_state'])
                       for prop
                       in self.graph.in_edges(vertex, keys=True, data=True)) \
             + "".join("%s"
-                      % (prop[3]['qp_state'].split("}")[1] + "}")
+                      % (prop[3]['qp_state'].split("}")[0] + "}")
                       for prop
                       in self.graph.out_edges(vertex, keys=True, data=True)
                       if prop[3]['anomalous']) \
@@ -251,17 +252,31 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                                         self.unsort_io_degrees[vertex][0])
             # First add the qp states corresponding to propagators going out
             numerator += "".join(prop[3]['qp_state']
-                                 for prop
-                                 in graph.out_edges(vertex,
-                                                    keys=True, data=True))
+                                 for prop in graph.out_edges(vertex,
+                                                             keys=True,
+                                                             data=True)
+                                 if not prop[3]['anomalous'])
+
             # Add the qp states corresponding to propagators coming in
             previous_vertex = vertex - 1
             while previous_vertex >= 0:
                 numerator += "".join(
-                    prop[3]['qp_state']
+                    (prop[3]['qp_state'].split("}")[0] + "}"
+                     if prop[3]['anomalous'] else prop[3]['qp_state'])
                     for prop in graph.in_edges(vertex, keys=True, data=True)
-                    if prop[0] == previous_vertex)
+                    if prop[0] == previous_vertex and prop[0] != prop[1])
                 previous_vertex -= 1
+            # Add self-contractions
+            numerator += "".join(
+                (prop[3].split("}")[1] + "}" + prop[3].split("}")[0] + "}")
+                for prop in graph.edges(vertex, keys=True, data='qp_state')
+                if prop[0] == prop[1])
+            # Add anomalous propagators entering from above
+            numerator += "".join(prop[3]['qp_state'].split("}")[1] + "}"
+                                 for prop in graph.out_edges(vertex,
+                                                             keys=True,
+                                                             data=True)
+                                 if prop[3]['anomalous'] and prop[1] > prop[0])
             numerator += r"} (\varphi) " if graph.node[vertex]['operator'] \
                 else "} "
         # Add the terms correspoding to anomalous propagators
