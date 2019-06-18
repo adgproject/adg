@@ -31,7 +31,7 @@ install:
   - printenv PWD
   # with dev dependencies
   - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
-      pip install --retries 3 ${PIP_FLAGS} -e .;
+      pip install --retries 3 ${PIP_FLAGS} -e .[develop];
     fi
   # standard user dependencies
   - if [[ "${OPTIONAL_DEPS}" != 1 ]]; then
