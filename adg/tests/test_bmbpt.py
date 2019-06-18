@@ -108,6 +108,19 @@ def test_vertex_exchange_sym_factor():
 
     assert diag.vertex_exchange_sym_factor() == '2'
 
+    # Test case with symmetry factor
+    diagram = np.array([[0, 2, 2, 2],
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0]])
+    graph = nx.from_numpy_matrix(diagram,
+                                 create_using=nx.MultiDiGraph(),
+                                 parallel_edges=True)
+    adg.diag.label_vertices([graph], 'BMBPT')
+    diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
+
+    assert diag.vertex_exchange_sym_factor() == '6'
+
     # Test case without symmetry factor
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
     graph = nx.from_numpy_matrix(diagram,

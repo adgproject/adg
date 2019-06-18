@@ -359,7 +359,7 @@ def write_file_header(latex_file, commands, diags_nbs):
     header = header \
         + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
         % (commands.order, commands.theory) \
-        + "\\author{RDL, JR, PA, MD, AT, TD, JPE}\n"
+        + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory == "BMBPT":

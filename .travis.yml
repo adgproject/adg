@@ -27,13 +27,16 @@ matrix:
 install:
   # install required packages
   - pip install --upgrade pip
-  - pip install --retries 3 ${PIP_FLAGS} networkx>=2.0 numpy scipy
-  - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
-      pip install --retries 3 ${PIP_FLAGS} pytest pytest-cov roman sphinx sphinx_rtd_theme;
-    fi
   # install adg
   - printenv PWD
-  - pip install .
+  # with dev dependencies
+  - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
+      pip install --retries 3 ${PIP_FLAGS} -e .[develop];
+    fi
+  # standard user dependencies
+  - if [[ "${OPTIONAL_DEPS}" != 1 ]]; then
+      pip install --retries 3 ${PIP_FLAGS} .;
+    fi
   # show what's installed
   - python --version
   - pip list

@@ -436,8 +436,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             (str): The symmetry factor for vertex exchange.
 
         """
-        # Starts at -2 as the identity belongs to the set of permutations
-        factor = -2
+        # Starts at 0 as the identity belongs to the set of permutations
+        factor = 0
         graph = self.graph
         perm_vertices = [vertex for vertex, degrees
                          in enumerate(self.unsort_io_degrees)
@@ -449,8 +449,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                                        permutation)),
                                               copy=True)
             if nx.is_isomorphic(graph, nx.intersection(graph, permuted_graph)):
-                factor += 2
-        return "%i" % factor if factor != 0 else ""
+                factor += 1
+        return "%i" % factor if factor > 1 else ""
 
     def extract_integral(self):
         """Return the integral part of the Feynman expression of the diag.

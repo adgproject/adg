@@ -39,9 +39,9 @@ setup(
     license=adg.__license__,
     url='https://github.com/adgproject/adg',
     install_requires=[
-        "networkx>=2.0",
-        "numpy",
-        "scipy",
+        "networkx>=2.0,<2.3",
+        "numpy<1.17.0",
+        "scipy<1.3.0",
     ],
     python_requires='>=2.7.1',
     extras_require=dict(
@@ -49,10 +49,10 @@ setup(
         # dependencies). You can install these using the following syntax:
         # $ pip2 install -e .[develop]
         develop=[
-            'pytest',
+            'pytest>=3.6,<5.0',
             'pytest-cov',
             'roman',
-            'sphinx',
+            'sphinx<2.0',
             'sphinx_rtd_theme',
         ]
     ),
