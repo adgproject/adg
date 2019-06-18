@@ -50,7 +50,7 @@ setup(
         # $ pip2 install -e .[develop]
         develop=[
             'pytest<5.0',
-            'pytest-cov',
+            'pytest-cov<2.6.0',
             'roman',
             'sphinx<2.0',
             'sphinx_rtd_theme',
