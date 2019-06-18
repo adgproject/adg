@@ -28,7 +28,7 @@ Dependencies
 In order to run the code, you will need a Python2 install >= 2.7.1 and the
 following Python libraries:
 
-  - networkx >= 2.0
+  - networkx >= 2.0 and <2.3
   - numpy < 1.17.0
   - scipy < 1.3.0
 

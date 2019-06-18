@@ -39,7 +39,7 @@ setup(
     license=adg.__license__,
     url='https://github.com/adgproject/adg',
     install_requires=[
-        "networkx>=2.0",
+        "networkx>=2.0,<2.3",
         "numpy<1.17.0",
         "scipy<1.3.0",
     ],
