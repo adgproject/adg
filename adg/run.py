@@ -19,11 +19,11 @@ def parse_command_line():
     """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="AUTOMATIC DIAGRAM GENERATOR\n\n"
+        description="AUTOMATIC DIAGRAM GENERATOR v%s\n\n" % adg.__version__
         + "Generates diagrams at a given order for a "
         + "range of many-body formalisms",
         epilog="If a theory is chosen in batch mode, all flags associated\n"
-        + "will automatically be deactivated to avoid conflicts.\n\n")
+        + "to other theories will be deactivated to avoid conflicts.\n\n")
 
     basic_args = parser.add_argument_group(
         title="Basic arguments",
