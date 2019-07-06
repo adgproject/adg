@@ -109,28 +109,23 @@ def topologically_distinct_diagrams(diagrams):
                                                  doubled_comp_diag,
                                                  node_match=op_nm,
                                                  edge_match=anom_em)
-                    # Keep one of the diags if equivalent
-                    if matcher.is_isomorphic():
-                        diagrams[i_diag].tags += diagrams[i_comp_diag].tags
-                        del diagrams[i_comp_diag]
-                        break
+                # Check for topolically equivalent diags considering vertex
+                # properties but not edge attributes, i.e. anomalous character
                 else:
-                    # Check for topolically equivalent diags considering vertex
-                    # properties but not edge attributes, i.e. anomalous character
                     matcher = iso.DiGraphMatcher(graph,
                                                  diagrams[i_comp_diag].graph,
                                                  node_match=op_nm)
-                    if matcher.is_isomorphic():
-                        # Store the set of permutations to recover the original TSD
-                        if isinstance(diagrams[i_diag],
-                                      adg.tsd.TimeStructureDiagram):
-                            diagrams[i_diag].perms.update(
-                                diagrams[i_comp_diag].perms)
-                            diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
-                                = matcher.mapping
-                        diagrams[i_diag].tags += diagrams[i_comp_diag].tags
-                        del diagrams[i_comp_diag]
-                        break
+                if matcher.is_isomorphic():
+                    # Store the set of permutations to recover the original TSD
+                    if isinstance(diagrams[i_diag],
+                                  adg.tsd.TimeStructureDiagram):
+                        diagrams[i_diag].perms.update(
+                            diagrams[i_comp_diag].perms)
+                        diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
+                            = matcher.mapping
+                    diagrams[i_diag].tags += diagrams[i_comp_diag].tags
+                    del diagrams[i_comp_diag]
+                    break
     return diagrams
 
 
