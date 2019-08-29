@@ -273,12 +273,15 @@ def order_diagrams(diagrams, commands):
         file section.
 
     """
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         diagrams, diag_nbs, section_flags = adg.bmbpt.order_diagrams(diagrams)
-    elif commands.theory == "PBMBPT":
-        diagrams, diag_nbs, section_flags = adg.pbmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
         diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
+
+    # Reattribute a number to the BMBPT diagrams
+    if commands.theory == "BMBPT":
+        for ind, diagram in enumerate(diagrams):
+            diagram.tags[0] = ind
 
     return diagrams, diag_nbs, section_flags
 

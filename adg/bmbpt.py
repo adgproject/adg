@@ -304,8 +304,6 @@ def order_diagrams(diagrams):
 
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
         + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf
-    for ind, diagram in enumerate(diagrams):
-        diagram.tags[0] = ind
 
     diags_nb_per_type = {
         'nb_2_hf': len(diagrams_2_hf),
