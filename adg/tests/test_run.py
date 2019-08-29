@@ -17,12 +17,16 @@ def test_generate_diagrams():
     com.nbody_observable, com.canonical = 2, False
     assert len(adg.run.generate_diagrams(com, id_gen)) == 2
 
-    com.theory, com.order, com.with_3NF = 'MBPT', 2, False
+    com.theory, com.order, com.with_3NF = 'MBPT', 4, False
     com.nbody_observable, com.canonical = 2, False
-    assert len(adg.run.generate_diagrams(com, id_gen)) == 1
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 39
 
     com.theory, com.order, com.with_3NF = 'BMBPT', 1, True
     com.nbody_observable, com.canonical = 3, False
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 3
+
+    com.theory, com.order, com.with_3NF = 'PBMBPT', 1, False
+    com.nbody_observable, com.canonical = 2, False
     assert len(adg.run.generate_diagrams(com, id_gen)) == 3
 
     # Test for anomalous cases
@@ -66,6 +70,36 @@ def test_order_diagrams():
     assert diag_nbs['nb_3'] == 1
     assert diag_nbs['nb_2_hf'] == 1
     assert diag_nbs['nb_2_ehf'] == 0
+    assert diag_nbs['nb_2_not_hf'] == 1
+
+    # Similar test for PBMBPT
+    com = argparse.Namespace()
+
+    # Tests for the number of diagrams produced for simple known cases
+
+    com.theory, com.order, com.with_3NF = 'PBMBPT', 1, False
+    com.nbody_observable, com.canonical = 2, False
+
+    # Use generate_diagrams as a seed
+    diagrams = adg.run.generate_diagrams(com, id_gen)
+    assert len(diagrams) == 3
+
+    # Test that diagrams are processed
+    assert len(adg.run.order_diagrams(diagrams, com)[0]) == 3
+
+    # Test for the ordering with simple three-body case
+    com = argparse.Namespace()
+    com.theory, com.order, com.with_3NF = 'PBMBPT', 1, True
+    com.nbody_observable, com.canonical = 3, False
+    diagrams = adg.run.generate_diagrams(com, id_gen)
+    assert len(diagrams) == 6
+    diagrams, diag_nbs, _ = adg.run.order_diagrams(diagrams, com)
+    assert len(diagrams) == 6
+    assert diagrams[-1].two_or_three_body == 3
+    assert diag_nbs['nb_2'] == 3
+    assert diag_nbs['nb_3'] == 3
+    assert diag_nbs['nb_2_hf'] == 1
+    assert diag_nbs['nb_2_ehf'] == 1
     assert diag_nbs['nb_2_not_hf'] == 1
 
     # Test that an empty list does not break the code
