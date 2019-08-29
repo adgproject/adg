@@ -120,13 +120,36 @@ def topologically_distinct_diagrams(diagrams):
                     if isinstance(diagrams[i_diag],
                                   adg.tsd.TimeStructureDiagram):
                         diagrams[i_diag].perms.update(
-                            diagrams[i_comp_diag].perms)
-                        diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
-                            = matcher.mapping
+                            update_permutations(diagrams[i_comp_diag].perms,
+                                                diagrams[i_comp_diag].tags[0],
+                                                matcher.mapping)
+                            )
                     diagrams[i_diag].tags += diagrams[i_comp_diag].tags
                     del diagrams[i_comp_diag]
                     break
     return diagrams
+
+
+def update_permutations(comp_graph_perms, comp_graph_tag, mapping):
+    """Update permutations associated to the BMBPT diags for a shared TSD.
+
+    Args:
+        comp_graph_perms (dict): Permutations to be updated.
+        comp_graph_tag (int): The tag associated to the TSD configuration.
+        mapping (dict): permutations to go from previous ref TSD to new one.
+
+    """
+    identity = {key: key for key in comp_graph_perms[comp_graph_tag]}
+    # Do permutations only when necessary
+    if mapping != identity:
+        for graph_id in comp_graph_perms:
+            # Create a dummy dictionarry to avoid overwriting some nodes
+            dummy_nodes = copy.deepcopy(comp_graph_perms[graph_id])
+            # Permute the nodes according to the new mapping
+            for node in comp_graph_perms[graph_id]:
+                comp_graph_perms[graph_id][node] = dummy_nodes[mapping[node]]
+
+    return comp_graph_perms
 
 
 def create_checkable_diagram(pbmbpt_graph):
