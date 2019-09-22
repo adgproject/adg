@@ -1,0 +1,55 @@
+# Yaml script for GitLab-CI
+
+default:
+  image: python:2
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Pip's cache doesn't store the python packages
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - $HOME/.cache/pip
+
+before_script:
+  - python -V  # Print out python version for debugging
+  # install required packages
+  - pip install --upgrade pip
+  - pip install --retries 3 ${PIP_FLAGS} networkx>=2.0 numpy scipy
+  - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
+      pip install --retries 3 ${PIP_FLAGS} pytest pytest-cov roman sphinx sphinx_rtd_theme;
+    fi
+  # install adg
+  - printenv PWD
+  - pip install .
+  # show what's installed
+  - pip list
+  
+standard:
+  script: "adg --help"
+  
+test:
+  variables:
+      - OPTIONAL_DEPS=1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+      
+test_and_docs:
+  variables:
+      - OPTIONAL_DEPS=1
+      - BUILD_DOCS=1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../adg/tests;
+      - source run_test_suite.sh;
+      - cd ../..
+
