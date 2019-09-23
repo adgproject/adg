@@ -30,10 +30,10 @@ before_script:
   - pip install .
   # show what's installed
   - pip list
-  
+
 standard:
   script: "adg --help"
-  
+
 test:
   variables:
       OPTIONAL_DEPS: 1
@@ -41,7 +41,7 @@ test:
       - cd adg/tests
       - source run_test_suite.sh
       - cd ../..
-      
+
 test_beta:
   variables:
       OPTIONAL_DEPS: 1
@@ -50,7 +50,7 @@ test_beta:
       - cd adg/tests
       - source run_test_suite.sh
       - cd ../..
-      
+
 test_and_docs:
   variables:
       OPTIONAL_DEPS: 1
@@ -62,3 +62,37 @@ test_and_docs:
       - source run_test_suite.sh;
       - cd ../..
 
+standard3:
+  image: python:3
+  script: "adg --help"
+
+test3:
+  image: python:3
+  variables:
+      OPTIONAL_DEPS: 1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_beta3:
+  image: python:3
+  variables:
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_and_docs3:
+  image: python:3
+  variables:
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../adg/tests;
+      - source run_test_suite.sh;
+      - cd ../..

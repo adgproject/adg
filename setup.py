@@ -40,6 +40,7 @@ setup(
     license=adg.__license__,
     url='https://github.com/adgproject/adg',
     install_requires=[
+        "future",
         "networkx>=2.0",
         "numpy",
         "scipy",
