@@ -36,7 +36,7 @@ standard:
   
 test:
   variables:
-      - OPTIONAL_DEPS: 1
+      OPTIONAL_DEPS: 1
   script:
       - cd adg/tests
       - source run_test_suite.sh
@@ -44,8 +44,8 @@ test:
       
 test_beta:
   variables:
-      - OPTIONAL_DEPS: 1
-      - PIP_FLAGS: "--pre"
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
   script:
       - cd adg/tests
       - source run_test_suite.sh
@@ -53,8 +53,8 @@ test_beta:
       
 test_and_docs:
   variables:
-      - OPTIONAL_DEPS: 1
-      - BUILD_DOCS: 1
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
   script:
       - cd doc;
       - make html;
