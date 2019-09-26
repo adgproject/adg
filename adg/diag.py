@@ -2,6 +2,8 @@
 
 from builtins import range
 from builtins import object
+
+import copy
 import numpy
 import networkx as nx
 
@@ -95,39 +97,81 @@ def topologically_distinct_diagrams(diagrams):
     import adg.tsd
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
-    anom_em = iso.categorical_multiedge_match('anomalous', True)
+    anom_em = iso.categorical_multiedge_match('anomalous', False)
     for i_diag in range(len(diagrams)-1, -1, -1):
         graph = diagrams[i_diag].graph
         diag_io_degrees = diagrams[i_diag].io_degrees
-        for i_comp_diag in range(i_diag+1, len(diagrams), 1):
+        for i_comp_diag in range(len(diagrams)-1, i_diag, -1):
             if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
+                # Check anomalous character of props for PBMBPT
+                if isinstance(diagrams[i_diag],
+                              adg.pbmbpt.ProjectedBmbptDiagram):
+                    doubled_graph = create_checkable_diagram(graph)
+                    doubled_comp_diag = create_checkable_diagram(diagrams[i_comp_diag].graph)
+                    matcher = iso.DiGraphMatcher(doubled_graph,
+                                                 doubled_comp_diag,
+                                                 node_match=op_nm,
+                                                 edge_match=anom_em)
                 # Check for topolically equivalent diags considering vertex
                 # properties but not edge attributes, i.e. anomalous character
-                matcher = iso.DiGraphMatcher(graph,
-                                             diagrams[i_comp_diag].graph,
-                                             node_match=op_nm)
+                else:
+                    matcher = iso.DiGraphMatcher(graph,
+                                                 diagrams[i_comp_diag].graph,
+                                                 node_match=op_nm)
                 if matcher.is_isomorphic():
                     # Store the set of permutations to recover the original TSD
                     if isinstance(diagrams[i_diag],
                                   adg.tsd.TimeStructureDiagram):
                         diagrams[i_diag].perms.update(
-                            diagrams[i_comp_diag].perms)
-                        diagrams[i_diag].perms[diagrams[i_comp_diag].tags[0]] \
-                            = matcher.mapping
-                    # Check anomalous character of props for PBMBPT
-                    elif isinstance(diagrams[i_diag],
-                                    adg.pbmbpt.ProjectedBmbptDiagram):
-                        matcher = iso.DiGraphMatcher(graph,
-                                                     diagrams[i_comp_diag].graph,
-                                                     node_match=op_nm,
-                                                     edge_match=anom_em)
-                        # Keep the diags if the anomalous props are not equiv
-                        if not matcher.is_isomorphic():
-                            break
+                            update_permutations(diagrams[i_comp_diag].perms,
+                                                diagrams[i_comp_diag].tags[0],
+                                                matcher.mapping)
+                            )
                     diagrams[i_diag].tags += diagrams[i_comp_diag].tags
                     del diagrams[i_comp_diag]
                     break
     return diagrams
+
+
+def update_permutations(comp_graph_perms, comp_graph_tag, mapping):
+    """Update permutations associated to the BMBPT diags for a shared TSD.
+
+    Args:
+        comp_graph_perms (dict): Permutations to be updated.
+        comp_graph_tag (int): The tag associated to the TSD configuration.
+        mapping (dict): permutations to go from previous ref TSD to new one.
+
+    """
+    identity = {key: key for key in comp_graph_perms[comp_graph_tag]}
+    # Do permutations only when necessary
+    if mapping != identity:
+        for graph_id in comp_graph_perms:
+            # Create a dummy dictionarry to avoid overwriting some nodes
+            dummy_nodes = copy.deepcopy(comp_graph_perms[graph_id])
+            # Permute the nodes according to the new mapping
+            for node in comp_graph_perms[graph_id]:
+                comp_graph_perms[graph_id][node] = dummy_nodes[mapping[node]]
+
+    return comp_graph_perms
+
+
+def create_checkable_diagram(pbmbpt_graph):
+    """Return agraph with anomalous props going both ways for topo check.
+
+    Args:
+        pbmbpt_graph (NetworkX MultiDiGraph): The graph to be copied.
+
+    Returns:
+        (NetworkX MultiDiGraph): Graph with double the anomalous props.
+    """
+    doubled_graph = copy.deepcopy(pbmbpt_graph)
+    props_to_add = []
+    for prop in doubled_graph.edges(keys=True, data=True):
+        if prop[3]['anomalous'] and not prop[0] == prop[1]:
+            props_to_add.append((prop[1], prop[0]))
+    for prop in props_to_add:
+        doubled_graph.add_edge(prop[0], prop[1], anomalous=True, weight=1)
+    return doubled_graph
 
 
 def label_vertices(graphs_list, theory_type):

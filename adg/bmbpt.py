@@ -309,8 +309,6 @@ def order_diagrams(diagrams):
 
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
         + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf
-    for ind, diagram in enumerate(diagrams):
-        diagram.tags[0] = ind
 
     diags_nb_per_type = {
         'nb_2_hf': len(diagrams_2_hf),
@@ -356,14 +354,15 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
             the energy operator only character of the graph.
         unique_id (int): A unique number associated to the diagram.
-        vertex_exchange_sym_factor (int): The symmetry factor associated to the
-            vertex exchange, stored to avoid being computed several times.
+        vertex_exchange_sym_factor (int): Lazy-initialized symmetry factor
+            associated to the vertex exchange, stored to avoid being computed
+            several times.
 
     """
 
     __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
                  'diag_exp', 'vert_exp', 'hf_type', 'unique_id',
-                 'vert_exchange_sym_fact')
+                 '_vert_exchange_sym_fact')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
@@ -388,7 +387,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         else:
             self.hf_type = "noHF"
         self.unique_id = tag_num
-        self.vert_exchange_sym_fact = 1
+        self._vert_exchange_sym_fact = None
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -420,8 +419,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         sym_fact = ""
         for vertex_degrees in self.unsort_io_degrees:
             if self.unsort_io_degrees.count(vertex_degrees) >= 2:
-                vertex_sym = self.vertex_exchange_sym_factor()
-                sym_fact += "%i" % vertex_sym if vertex_sym else ""
+                vertex_sym = self.vertex_exchange_sym_factor
+                sym_fact += "%i" % vertex_sym if vertex_sym > 1 else ""
                 break
         sym_fact += self.multiplicity_symmetry_factor()
         prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
@@ -456,8 +455,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         # Vertex exchange
         for vertex_degrees in self.unsort_io_degrees:
             if self.unsort_io_degrees.count(vertex_degrees) >= 2:
-                factor = self.vertex_exchange_sym_factor()
-                if factor != 0:
+                factor = self.vertex_exchange_sym_factor
+                if factor != 1:
                     sym_fact *= factor
                 break
 
@@ -645,6 +644,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             + r" \nonumber \\" + "\n"
             + "&= %s\\end{align}\n" % self.diag_exp)
 
+    @property
     def vertex_exchange_sym_factor(self):
         """Return the symmetry factor associated with vertex exchange.
 
@@ -652,9 +652,9 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             (int): The symmetry factor for vertex exchange.
 
         """
-        if self.vert_exchange_sym_fact == 1:
-            # Starts at -2 as the identity belongs to the set of permutations
-            factor = -2
+        if self._vert_exchange_sym_fact is None:
+            # Starts at 0 as the identity belongs to the set of permutations
+            factor = 0
             graph = self.graph
             perm_vertices = [vertex for vertex, degrees
                              in enumerate(self.unsort_io_degrees)
@@ -667,10 +667,9 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                                   copy=True)
                 if nx.is_isomorphic(graph,
                                     nx.intersection(graph, permuted_graph)):
-                    factor += 2
-        else:
-            factor = self.vert_exchange_sym_fact
-        return factor
+                    factor += 1
+            self._vert_exchange_sym_fact = max(factor, 1)
+        return self._vert_exchange_sym_fact
 
     def extract_integral(self):
         """Return the integral part of the Feynman expression of the diag.

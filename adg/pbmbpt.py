@@ -78,75 +78,6 @@ def generate_combinations(iter_list):
     return combinations
 
 
-def order_diagrams(diagrams):
-    """Order the PBMBPT diagrams and return number of diags for each type.
-
-    Args:
-        diagrams (list): Possibly redundant BmbptFeynmanDiagrams.
-
-    Returns:
-        (tuple): First element is the list of topologically unique, ordered
-            diagrams. Second element is a dict with the number of diagrams
-            for each major type. Third element is a dict with the identifiers
-            of diagrams starting each output file section.
-
-    """
-    diagrams_2_hf = []
-    diagrams_2_ehf = []
-    diagrams_2_not_hf = []
-    diagrams_3_hf = []
-    diagrams_3_ehf = []
-    diagrams_3_not_hf = []
-
-    for i_diag in range(len(diagrams)-1, -1, -1):
-        if diagrams[i_diag].two_or_three_body == 2:
-            if diagrams[i_diag].hf_type == "HF":
-                diagrams_2_hf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "EHF":
-                diagrams_2_ehf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "noHF":
-                diagrams_2_not_hf.append(diagrams[i_diag])
-        elif diagrams[i_diag].two_or_three_body == 3:
-            if diagrams[i_diag].hf_type == "HF":
-                diagrams_3_hf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "EHF":
-                diagrams_3_ehf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "noHF":
-                diagrams_3_not_hf.append(diagrams[i_diag])
-        del diagrams[i_diag]
-
-    diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
-        + diagrams_3_hf + diagrams_3_ehf + diagrams_3_not_hf
-
-    diags_nb_per_type = {
-        'nb_2_hf': len(diagrams_2_hf),
-        'nb_2_ehf': len(diagrams_2_ehf),
-        'nb_2_not_hf': len(diagrams_2_not_hf),
-        'nb_3_hf': len(diagrams_3_hf),
-        'nb_3_ehf': len(diagrams_3_ehf),
-        'nb_3_not_hf': len(diagrams_3_not_hf),
-        'nb_diags': len(diagrams),
-        'nb_2': (len(diagrams_2_hf) + len(diagrams_2_ehf)
-                 + len(diagrams_2_not_hf)),
-        'nb_3': (len(diagrams_3_hf) + len(diagrams_3_ehf)
-                 + len(diagrams_3_not_hf))
-    }
-
-    section_flags = {
-        'two_body_hf': diagrams_2_hf[0].unique_id if diagrams_2_hf else -1,
-        'two_body_ehf': diagrams_2_ehf[0].unique_id if diagrams_2_ehf else -1,
-        'two_body_not_hf': diagrams_2_not_hf[0].unique_id
-                           if diagrams_2_not_hf else -1,
-        'three_body_hf': diagrams_3_hf[0].unique_id if diagrams_3_hf else -1,
-        'three_body_ehf': diagrams_3_ehf[0].unique_id
-                          if diagrams_3_ehf else -1,
-        'three_body_not_hf': diagrams_3_not_hf[0].unique_id
-                             if diagrams_3_not_hf else -1
-    }
-
-    return diagrams, diags_nb_per_type, section_flags
-
-
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
     """Describes a PBMBPT diagram with its related properties.
 
@@ -175,14 +106,34 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """
         adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, unique_id)
         self.tags = [tag, child_tag]
+        self.set_io_degrees()
+
+    def set_io_degrees(self):
+        """Attribute the correct in- and out-degrees to a PBMBPT diagram."""
+        unsort_io_degrees = []
+        for node in self.graph:
+            # Edges going out that are anomalous are annihilators going in
+            nb_anom_out_edges = sum(1 for edge
+                                    in self.graph.out_edges(nbunch=node,
+                                                            data=True,
+                                                            keys=True)
+                                    if edge[3]['anomalous'])
+            # And thus should be decounted to NetworkX's out_degree...
+            out_degree = self.graph.out_degree(node) - nb_anom_out_edges
+            # ...and added to NetworkX's in_degree
+            in_degree = self.graph.in_degree(node) + nb_anom_out_edges
+
+            unsort_io_degrees.append((in_degree, out_degree))
+        self.unsort_io_degrees = tuple(unsort_io_degrees)
+        self.io_degrees = tuple(sorted(self.unsort_io_degrees))
 
     def attribute_qp_labels(self):
         """Attribute the appropriate qp labels to the graph's propagators."""
         idx_counter = 1
         for prop in self.graph.edges(keys=True, data=True):
             if prop[3]['anomalous']:
-                prop[3]['qp_state'] = "k_{%i}k_{%i}" % (idx_counter,
-                                                        idx_counter + 1)
+                prop[3]['qp_state'] = "k_{%i}k_{%i}" % (idx_counter + 1,
+                                                        idx_counter)
                 idx_counter += 2
             else:
                 prop[3]['qp_state'] = "k_{%i}" % idx_counter
@@ -206,11 +157,12 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                       if not prop[3]['anomalous']) \
             + "}_{" \
             + "".join("%s"
-                      % (prop[3]['qp_state'].split("}")[0] + "}")
+                      % (prop[3]['qp_state'].split("}")[1] + "}"
+                         if prop[3]['anomalous'] else prop[3]['qp_state'])
                       for prop
                       in self.graph.in_edges(vertex, keys=True, data=True)) \
             + "".join("%s"
-                      % (prop[3]['qp_state'].split("}")[1] + "}")
+                      % (prop[3]['qp_state'].split("}")[0] + "}")
                       for prop
                       in self.graph.out_edges(vertex, keys=True, data=True)
                       if prop[3]['anomalous']) \
@@ -235,17 +187,31 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                                         self.unsort_io_degrees[vertex][0])
             # First add the qp states corresponding to propagators going out
             numerator += "".join(prop[3]['qp_state']
-                                 for prop
-                                 in graph.out_edges(vertex,
-                                                    keys=True, data=True))
+                                 for prop in graph.out_edges(vertex,
+                                                             keys=True,
+                                                             data=True)
+                                 if not prop[3]['anomalous'])
+
             # Add the qp states corresponding to propagators coming in
             previous_vertex = vertex - 1
             while previous_vertex >= 0:
                 numerator += "".join(
-                    prop[3]['qp_state']
+                    (prop[3]['qp_state'].split("}")[0] + "}"
+                     if prop[3]['anomalous'] else prop[3]['qp_state'])
                     for prop in graph.in_edges(vertex, keys=True, data=True)
-                    if prop[0] == previous_vertex)
+                    if prop[0] == previous_vertex and prop[0] != prop[1])
                 previous_vertex -= 1
+            # Add self-contractions
+            numerator += "".join(
+                (prop[3].split("}")[1] + "}" + prop[3].split("}")[0] + "}")
+                for prop in graph.edges(vertex, keys=True, data='qp_state')
+                if prop[0] == prop[1])
+            # Add anomalous propagators entering from above
+            numerator += "".join(prop[3]['qp_state'].split("}")[1] + "}"
+                                 for prop in graph.out_edges(vertex,
+                                                             keys=True,
+                                                             data=True)
+                                 if prop[3]['anomalous'] and prop[1] > prop[0])
             numerator += r"} (\varphi) " if graph.node[vertex]['operator'] \
                 else "} "
         # Add the terms correspoding to anomalous propagators
@@ -254,6 +220,55 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                               in graph.out_edges(keys=True, data=True)
                               if prop[3]['anomalous'])
         return numerator
+
+    def multiplicity_symmetry_factor(self):
+        """Return the symmetry factor associated with propagators multiplicity.
+
+        Returns:
+            (str): The symmetry factor associated with equivalent lines.
+
+        """
+        factor = ""
+        # Account for up to three-body operators
+        prop_multiplicity = [0 for _ in xrange(6)]
+        for vertex_i in self.graph:
+            for vertex_j in self.graph:
+                nb_normal_props = 0
+                nb_anomalous_props = 0
+                for prop in self.graph.edges(vertex_i,
+                                             keys=True,
+                                             data='anomalous'):
+                    if prop[1] == vertex_j and prop[3]:
+                        nb_anomalous_props += 1
+                    if prop[1] == vertex_j and not prop[3]:
+                        nb_normal_props += 1
+                if nb_anomalous_props >= 2:
+                    prop_multiplicity[nb_anomalous_props - 1] += 1
+                if nb_normal_props >= 2:
+                    prop_multiplicity[nb_normal_props - 1] += 1
+
+        for prop_id, multiplicity in enumerate(prop_multiplicity):
+            if multiplicity == 1:
+                factor += "(%i!)" % (prop_id+1)
+            elif multiplicity >= 2:
+                factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
+        return factor
+
+    def write_diag_exps(self, latex_file, norder):
+        """Write the expressions associated to a diagram in the LaTeX file.
+
+        Args:
+            latex_file (file): The LaTeX outputfile of the program.
+            norder (int): The order in BMBPT formalism.
+
+        """
+        latex_file.write(
+            "\\begin{align}\n\\text{PO}%i.%i.%i\n" % (norder,
+                                                      (self.tags[0] + 1),
+                                                      (self.tags[1] + 1))
+            + "&= %s" % self.feynman_exp
+            + r" \nonumber \\" + "\n"
+            + "&= %s\\end{align}\n" % self.diag_exp)
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the PBMBPT graph and its associated TSD to the LaTeX file.

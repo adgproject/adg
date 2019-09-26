@@ -24,11 +24,11 @@ def parse_command_line():
     """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="AUTOMATIC DIAGRAM GENERATOR\n\n"
+        description="AUTOMATIC DIAGRAM GENERATOR v%s\n\n" % adg.__version__
         + "Generates diagrams at a given order for a "
         + "range of many-body formalisms",
         epilog="If a theory is chosen in batch mode, all flags associated\n"
-        + "will automatically be deactivated to avoid conflicts.\n\n")
+        + "to other theories will be deactivated to avoid conflicts.\n\n")
 
     basic_args = parser.add_argument_group(
         title="Basic arguments",
@@ -278,12 +278,15 @@ def order_diagrams(diagrams, commands):
         file section.
 
     """
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         diagrams, diag_nbs, section_flags = adg.bmbpt.order_diagrams(diagrams)
-    elif commands.theory == "PBMBPT":
-        diagrams, diag_nbs, section_flags = adg.pbmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
         diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
+
+    # Reattribute a number to the BMBPT diagrams
+    if commands.theory == "BMBPT":
+        for ind, diagram in enumerate(diagrams):
+            diagram.tags[0] = ind
 
     return diagrams, diag_nbs, section_flags
 
@@ -390,7 +393,7 @@ def write_file_header(latex_file, commands, diags_nbs):
         + "\\usepackage{amsfonts}\n\\usepackage{amssymb}\n"
     if commands.draw_diags:
         header = "%s\\usepackage{feynmp-auto}\n" % header
-    if commands.theory == 'BMBPT' and commands.order >= 3:
+    if commands.theory in ('BMBPT', 'PBMBPT') and commands.order >= 3:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
     header = header \
@@ -399,7 +402,7 @@ def write_file_header(latex_file, commands, diags_nbs):
         + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
-    if commands.theory == "BMBPT":
+    if commands.theory in ("BMBPT", "PBMBPT"):
         adg.bmbpt.write_header(latex_file, commands, diags_nbs)
     elif commands.theory == "MBPT":
         adg.mbpt.write_header(latex_file, diags_nbs)
@@ -428,7 +431,7 @@ def clean_folders(directory, commands):
     """Delete temporary files and folders.
 
     Args:
-        directory (str): Path to the ouput folder.
+        directory (str): Path to the output folder.
         commands (Namespace): Flags to manage the program's run.
 
     """

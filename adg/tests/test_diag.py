@@ -29,11 +29,11 @@ def test_feynmf_generator():
         + "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}\n" \
         + "\\fmffreeze\n" \
         + "\\fmf{prop_pm,left=0.9}{v0,v1}\n" \
-        + "\\fmf{prop_pm,right=0.9}{v0,v1}\n" \
         + "\\fmf{prop_pm,left=0.75}{v0,v1}\n" \
-        + "\\fmf{prop_pm,right=0.75}{v0,v1}\n" \
         + "\\fmf{prop_pm,left=0.5}{v0,v1}\n" \
         + "\\fmf{prop_pm,right=0.5}{v0,v1}\n" \
+        + "\\fmf{prop_pm,right=0.75}{v0,v1}\n" \
+        + "\\fmf{prop_pm,right=0.9}{v0,v1}\n" \
         + "\\end{fmfgraph*}\n" \
         + "\\end{fmffile}}\n"
 
