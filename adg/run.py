@@ -1,5 +1,10 @@
 """Routines handling the run of ADG."""
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
+from builtins import range
 import os
 import argparse
 import shutil
@@ -42,7 +47,7 @@ def parse_command_line():
         description="Arguments available only for (P)BMBPT calculations.\n")
 
     basic_args.add_argument(
-        "-o", "--order", type=int, choices=range(1, 10),
+        "-o", "--order", type=int, choices=list(range(1, 10)),
         help="order of the diagrams (>=1)")
     basic_args.add_argument(
         "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT'],
@@ -55,7 +60,7 @@ def parse_command_line():
         "-can", "--canonical", action="store_true",
         help="consider only canonical diagrams")
     bmbpt_args.add_argument(
-        "-nobs", "--nbody_observable", type=int, choices=range(1, 4), default=2,
+        "-nobs", "--nbody_observable", type=int, choices=list(range(1, 4)), default=2,
         help="maximal n-body character of the observable [1-3], default = 2")
     bmbpt_args.add_argument(
         "-3NF", "--with_3NF", action="store_true",
@@ -82,9 +87,9 @@ def parse_command_line():
 
     if (not args.interactive) and ((args.order is None)
                                    or (args.theory is None)):
-        print "\nPlease either run the interactive mode, or the batch mode by"
-        print "providing the theory and the order for the desired diagrams.\n"
-        print "Use 'adg -h' for help.\n"
+        print("\nPlease either run the interactive mode, or the batch mode by")
+        print("providing the theory and the order for the desired diagrams.\n")
+        print("Use 'adg -h' for help.\n")
         exit()
 
     # Avoid conflicting flags
@@ -111,49 +116,49 @@ def interactive_interface(commands):
 
     """
     try:
-        commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
+        commands.order = int(input('Order of the diagrams? [1-9]\n'))
     except ValueError:
-        print "Please enter an integer value! Program exiting."
+        print("Please enter an integer value! Program exiting.")
         exit()
     while commands.order < 1 or commands.order > 9:
-        print "Perturbative order too small or too high!"
-        commands.order = int(raw_input('Order of the diagrams? [1-9]\n'))
+        print("Perturbative order too small or too high!")
+        commands.order = int(input('Order of the diagrams? [1-9]\n'))
 
     theories = ["BMBPT", "MBPT", "PBMBPT"]
 
-    commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
+    commands.theory = input('MBPT, BMBPT or PBMBPT?\n').upper()
     while commands.theory not in theories:
-        print "Invalid theory!"
-        commands.theory = raw_input('MBPT, BMBPT or PBMBPT?\n').upper()
+        print("Invalid theory!")
+        commands.theory = input('MBPT, BMBPT or PBMBPT?\n').upper()
 
     if commands.theory in ("BMBPT", "PBMBPT"):
-        commands.canonical = raw_input(
+        commands.canonical = input(
             "Consider only canonical diagrams? (y/N)").lower() == 'y'
-        commands.with_3NF = raw_input(
+        commands.with_3NF = input(
             "Include three-body forces? (y/N)").lower() == 'y'
         try:
-            commands.nbody_observable = int(raw_input(
+            commands.nbody_observable = int(input(
                 "Maximal n-body character of the observable? [1-3]"))
         except ValueError:
-            print "Please enter an integer value! Program exiting."
+            print("Please enter an integer value! Program exiting.")
             exit()
         while commands.nbody_observable < 1 or commands.nbody_observable > 3:
-            print "The observable must be 1-body, 2-body or 3-body!"
-            commands.nbody_observable = int(raw_input(
+            print("The observable must be 1-body, 2-body or 3-body!")
+            commands.nbody_observable = int(input(
                 "Maximal n-body character of the observable? [1-3]"))
-        commands.draw_tsds = raw_input(
+        commands.draw_tsds = input(
             "Draw time-structure diagrams? (y/N)").lower() == 'y'
-        commands.pickle = raw_input(
+        commands.pickle = input(
             "Drop a pickle file with the expressions? (y/N)").lower() == 'y'
 
-    commands.draw_diags = raw_input(
+    commands.draw_diags = input(
         "Generate diagrams FeynMF instructions in TeX file? (y/N) "
         ).lower() == 'y'
 
     if commands.theory == "MBPT":
-        commands.cd_output = raw_input(
+        commands.cd_output = input(
             "Produce a CD output file? (y/N) ").lower() == 'y'
-    commands.compile = raw_input("Compile pdf? (y/N) ").lower() == 'y'
+    commands.compile = input("Compile pdf? (y/N) ").lower() == 'y'
 
     return commands
 
@@ -221,15 +226,15 @@ def generate_diagrams(commands, id_generator):
                                                  commands.nbody_observable,
                                                  commands.canonical)
     else:
-        print "Invalid theory! Exiting program."
+        print("Invalid theory! Exiting program.")
         exit()
-    print "Number of matrices produced: ", len(diagrams)
+    print("Number of matrices produced: ", len(diagrams))
 
     diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
                                   parallel_edges=True) for diagram in diagrams]
 
     if commands.theory == "MBPT":
-        for i_diag in xrange(len(diags)-1, -1, -1):
+        for i_diag in range(len(diags)-1, -1, -1):
             if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
                 del diags[i_diag]
 
@@ -243,7 +248,7 @@ def generate_diagrams(commands, id_generator):
                     for graph in diags]
 
     if commands.theory == "PBMBPT":
-        for idx in xrange(len(diagrams)-1, -1, -1):
+        for idx in range(len(diagrams)-1, -1, -1):
             new_graphs = adg.pbmbpt.generate_anomalous_diags(
                 diagrams[idx].graph,
                 3 if commands.with_3NF else 2
@@ -294,7 +299,7 @@ def print_diags_numbers(commands, diags_nbs):
         diags_nbs (dict): The number of diagrams for each major type.
 
     """
-    print "Number of connected diagrams: ", diags_nbs['nb_diags']
+    print("Number of connected diagrams: ", diags_nbs['nb_diags'])
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         print(
@@ -327,7 +332,7 @@ def print_diags_numbers(commands, diags_nbs):
             + "Quadruples: %i\n" % diags_nbs['quadruples']
             + "Quintuples and higher: %i" % diags_nbs['quintuples+']
         )
-    print
+    print()
 
 
 def prepare_drawing_instructions(directory, commands, diagrams, diagrams_time):
@@ -419,7 +424,7 @@ def compile_manager(directory, pdiag):
         # Second compilation needed
         os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     os.chdir("../..")
-    print "Result saved in %s/result.pdf" % directory
+    print("Result saved in %s/result.pdf" % directory)
 
 
 def clean_folders(directory, commands):

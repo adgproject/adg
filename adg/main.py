@@ -1,4 +1,5 @@
 """Main routine of the Automated Diagram Generator."""
+from __future__ import print_function
 
 from datetime import datetime
 import adg.run
@@ -28,7 +29,7 @@ def main():
     directory = adg.run.attribute_directory(run_commands)
 
     # Start computing everything
-    print "Running"
+    print("Running")
     start_time = datetime.now()
 
     id_gene = adg.tools.UniqueID()
@@ -52,7 +53,7 @@ def main():
     else:
         diagrams_time = []
 
-    print "Time elapsed: ", datetime.now() - start_time
+    print("Time elapsed: ", datetime.now() - start_time)
 
     if run_commands.theory in ("BMBPT", "PBMBPT") and run_commands.pickle:
         adg.bmbpt.drop_pickle(diagrams)
@@ -96,7 +97,7 @@ def main():
 
     adg.run.clean_folders(directory, run_commands)
 
-    print "\nADG ended successfully!\n"
+    print("\nADG ended successfully!\n")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,10 @@
 """Routines and class for Many-Body Perturbation Theory diagrams."""
+from __future__ import print_function
+from __future__ import division
 
+from builtins import map
+from builtins import range
+from past.utils import old_div
 import copy
 import itertools
 import string
@@ -28,13 +33,13 @@ def diagrams_generation(order):
 
     """
     # Generate all 1-magic square of dimension order
-    seeds = [k for k in itertools.permutations(range(order), order)]
+    seeds = [k for k in itertools.permutations(list(range(order)), order)]
     all_matrices = [[[0 if i != j else 1 for i in range(order)]
                      for j in k]
                     for k in seeds]
     traceless = adg.diag.no_trace(all_matrices)
     coeffs = [i for i in itertools.combinations_with_replacement(
-        range(len(traceless)), 2)]
+        list(range(len(traceless))), 2)]
     double = []
 
     for coef in coeffs:
@@ -120,7 +125,7 @@ def order_diagrams(diagrams):
     quadruples = []
     quintuples_and_higher = []
 
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
+    for i_diag in range(len(diagrams)-1, -1, -1):
         if diagrams[i_diag].excitation_level == 1:
             singles.append(diagrams[i_diag])
         elif diagrams[i_diag].excitation_level == 2:
@@ -132,7 +137,7 @@ def order_diagrams(diagrams):
         elif diagrams[i_diag].excitation_level >= 5:
             quintuples_and_higher.append(diagrams[i_diag])
         else:
-            print "Zero or negative excitation level!\n"
+            print("Zero or negative excitation level!\n")
             exit()
         del diagrams[i_diag]
 
@@ -273,7 +278,7 @@ class MbptDiagram(adg.diag.Diagram):
 
         """
         max_excited_states = 0
-        for row in xrange(1, self.graph.number_of_nodes()):
+        for row in range(1, self.graph.number_of_nodes()):
             nb_excited_states = 0
             for col in range(self.graph.number_of_edges()):
                 if self.incidence[0:row, col].sum() == 1:
@@ -283,7 +288,7 @@ class MbptDiagram(adg.diag.Diagram):
             if nb_excited_states > max_excited_states \
                     and nb_excited_states != 4:
                 max_excited_states = nb_excited_states
-        return max_excited_states / 2 if max_excited_states != 0 else 2
+        return old_div(max_excited_states, 2) if max_excited_states != 0 else 2
 
     def count_hole_lines(self):
         """Return an integer for the number of hole lines in the graph.

@@ -2,10 +2,11 @@
 """Installation script for the Automated Diagaram Generator.
 
 You can install the program either by running
-    pip2 install <folder>
+    pip install <folder>
 or
-    python2 setup.py install
+    python setup.py install
 """
+from __future__ import print_function
 
 
 import sys
@@ -24,7 +25,7 @@ for dep in main_dependencies:
             "Error: You do not have %s installed, please\n"
             "       install it. For example doing\n"
             "\n"
-            "       pip2 install %s\n" % (dep, dep)
+            "       pip install %s\n" % (dep, dep)
         )
         sys.exit(1)
 
@@ -39,6 +40,7 @@ setup(
     license=adg.__license__,
     url='https://github.com/adgproject/adg',
     install_requires=[
+        "future",
         "networkx>=2.0",
         "numpy",
         "scipy",
@@ -66,6 +68,10 @@ setup(
         'Operating System :: POSIX',
         'Operating System :: Unix',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Topic :: Scientific/Engineering :: Physics',

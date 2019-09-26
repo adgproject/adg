@@ -1,5 +1,10 @@
 """Routines and class for Bogoliubov MBPT diagrams."""
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import zip
+from builtins import range
 import itertools
 import pickle
 import os
@@ -38,19 +43,19 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
     matrices = [np.zeros((order, order), dtype=int)]
 
     # Generate oriented adjacency matrices going vertex-wise
-    vertices = range(order)
+    vertices = list(range(order))
     add = matrices.append
     for vertex in vertices:
         if vertex == 0:
             deg_max = 2*nbody_obs
         else:
             deg_max = 6 if three_body_use else 4
-        for sum_index in xrange(vertex+1, order):
-            for mat_indx in xrange(len(matrices)-1, -1, -1):
+        for sum_index in range(vertex+1, order):
+            for mat_indx in range(len(matrices)-1, -1, -1):
                 mat = matrices[mat_indx]
                 elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
                                          for k in vertices)
-                for elem in xrange(1, elem_max + 1, 1):
+                for elem in range(1, elem_max + 1, 1):
                     temp_mat = mat.copy()
                     temp_mat[vertex, sum_index] = elem
                     add(temp_mat)
@@ -71,10 +76,10 @@ def remove_disconnected_matrices(matrices):
     Args:
         matrices (list): List of adjacency matrices.
     """
-    vertices = range(matrices[0].shape[0])
+    vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k)
                     for k in itertools.permutations(vertices[1:])]
-    for idx in xrange(len(matrices)-1, -1, -1):
+    for idx in range(len(matrices)-1, -1, -1):
         is_disconnected = False
         for reordering in permutations:
             mat = matrices[idx][:, reordering][reordering, :]
@@ -101,7 +106,7 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
 
     """
     matrices_dict = {}
-    for idx in xrange(len(matrices)-1, -1, -1):
+    for idx in range(len(matrices)-1, -1, -1):
         row0 = "".join("%i" % elem for elem
                        in np.sort(matrices[idx][0, :]).tolist())
         if row0 in matrices_dict:
@@ -112,7 +117,7 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
     for row_key in matrices_dict:
         check_topologically_equivalent(matrices_dict[row_key], max_vertex)
     matrices = []
-    for matrices_list in matrices_dict.values():
+    for matrices_list in list(matrices_dict.values()):
         matrices += matrices_list
     return matrices
 
@@ -130,13 +135,13 @@ def check_topologically_equivalent(matrices, max_vertex):
     """
     if not matrices:
         return []
-    vertices = range(matrices[0].shape[0])
+    vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k) + vertices[max_vertex+1:]
                     for k in itertools.permutations(vertices[1:max_vertex+1])]
-    for ind_mat1 in xrange(len(matrices)-2, -1, -1):
+    for ind_mat1 in range(len(matrices)-2, -1, -1):
         mat1 = matrices[ind_mat1]
         mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
-        for ind_mat2 in xrange(len(matrices)-1, ind_mat1, -1):
+        for ind_mat2 in range(len(matrices)-1, ind_mat1, -1):
             mat2 = matrices[ind_mat2]
             done_with_mat2 = False
             # Basic check to avoid needless permutations
@@ -170,11 +175,11 @@ def check_unconnected_spawn(matrices, max_filled_vertex):
     [array([[0, 2, 1], [2, 0, 1], [0, 0, 0]])]
 
     """
-    vertices = range(matrices[0].shape[0])
+    vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k) + vertices[max_filled_vertex+1:]
                     for k
                     in itertools.permutations(vertices[1:max_filled_vertex+1])]
-    for ind_mat in xrange(len(matrices)-1, -1, -1):
+    for ind_mat in range(len(matrices)-1, -1, -1):
         # Test for all possible permutations with i <= j
         for reordering in permutations:
             mat = matrices[ind_mat][:, reordering][reordering, :]
@@ -285,7 +290,7 @@ def order_diagrams(diagrams):
     diagrams_3_ehf = []
     diagrams_3_not_hf = []
 
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
+    for i_diag in range(len(diagrams)-1, -1, -1):
         if diagrams[i_diag].two_or_three_body == 2:
             if diagrams[i_diag].hf_type == "HF":
                 diagrams_2_hf.append(diagrams[i_diag])
@@ -456,7 +461,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 break
 
         # Symmetry factor
-        prop_multiplicity = [0 for _ in xrange(6)]
+        prop_multiplicity = [0 for _ in range(6)]
         for vertex_i in graph:
             for vertex_j in graph:
                 if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:
@@ -657,8 +662,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                              and self.unsort_io_degrees.count(degrees) >= 2]
             for permutation in itertools.permutations(perm_vertices):
                 permuted_graph = nx.relabel_nodes(graph,
-                                                  dict(zip(perm_vertices,
-                                                           permutation)),
+                                                  dict(list(zip(perm_vertices,
+                                                           permutation))),
                                                   copy=True)
                 if nx.is_isomorphic(graph,
                                     nx.intersection(graph, permuted_graph)):
@@ -673,7 +678,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             (str): The integral part of its Feynman expression.
 
         """
-        pert_vertex_indices = range(1, len(self.graph))
+        pert_vertex_indices = list(range(1, len(self.graph)))
         integral = "".join("\\mathrm{d}\\tau_%i" % vertex
                            for vertex in pert_vertex_indices)
         if len(pert_vertex_indices) > 1:
@@ -737,8 +742,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         nb_crossings = 0
         for vertex in self.graph:
             for propagator in self.graph.out_edges(vertex, keys=True):
-                for vertex_ante in xrange(propagator[0]):
-                    for vertex_post in xrange(propagator[0]+1, propagator[1]):
+                for vertex_ante in range(propagator[0]):
+                    for vertex_post in range(propagator[0]+1, propagator[1]):
                         nb_crossings += self.graph.number_of_edges(vertex_ante,
                                                                    vertex_post)
         return nb_crossings % 2 == 1
@@ -752,7 +757,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """
         factor = ""
         # Account for up to three-body operators
-        prop_multiplicity = [0 for _ in xrange(6)]
+        prop_multiplicity = [0 for _ in range(6)]
         for vertex_i in self.graph:
             for vertex_j in self.graph:
                 if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:

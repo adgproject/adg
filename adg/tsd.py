@@ -1,5 +1,6 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
+from builtins import range
 import os
 import math
 import networkx as nx
@@ -19,7 +20,7 @@ def time_structure_graph(diag):
     import adg.pbmbpt
     time_graph = diag.graph.to_directed()
     if time_graph.node[0]['operator']:
-        for vertex in xrange(1, len(time_graph)):
+        for vertex in range(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
     if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
         for edge in time_graph.edges(keys=True, data=True):
@@ -195,7 +196,7 @@ def treat_tsds(diagrams_time):
 
     """
     tree_tsds = []
-    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
+    for i_diag in range(len(diagrams_time)-1, -1, -1):
         if diagrams_time[i_diag].is_tree:
             tree_tsds.append(diagrams_time[i_diag])
             del diagrams_time[i_diag]
@@ -243,7 +244,7 @@ class TimeStructureDiagram(adg.diag.Diagram):
         adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
         self.tags = [bmbpt_diag.unique_id]
         self.perms = {bmbpt_diag.unique_id: {i: i
-                                             for i in xrange(len(self.graph))}}
+                                             for i in range(len(self.graph))}}
         self.equivalent_trees = []
         if nx.is_arborescence(self.graph):
             self.is_tree = True
@@ -265,12 +266,12 @@ class TimeStructureDiagram(adg.diag.Diagram):
         tree_graphs = []
         cycles_left = True
         while cycles_left:
-            for gr_index in xrange(len(graphs)-1, -1, -1):
+            for gr_index in range(len(graphs)-1, -1, -1):
                 graphs += disentangle_cycle(graphs[gr_index],
                                             find_cycle(graphs[gr_index]))
                 del graphs[gr_index]
             cycles_left = False
-            for graph_indx in xrange(len(graphs)-1, -1, -1):
+            for graph_indx in range(len(graphs)-1, -1, -1):
                 if nx.is_arborescence(graphs[graph_indx]):
                     tree_graphs.append(graphs[graph_indx])
                     del graphs[graph_indx]
