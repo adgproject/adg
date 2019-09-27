@@ -178,6 +178,7 @@ def attribute_conjugate(diagrams):
 
     Args:
         diagrams (list): The topologically unique MbptDiagrams.
+
     """
     for idx, diag1 in enumerate(diagrams):
         if diag1.complex_conjugate == -1:

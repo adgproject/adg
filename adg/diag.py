@@ -22,13 +22,6 @@ def no_trace(matrices):
     [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
     >>> no_trace(test_matrices)
     [[[0, 1, 2], [2, 0, 1], [5, 2, 0]], [[0, 1, 3], [2, 0, 8], [2, 1, 0]]]
-    >>> no_trace()
-    Traceback (most recent call last):
-      File "/usr/lib/python2.7/doctest.py", line 1315, in __run
-        compileflags, 1) in test.globs
-      File "<doctest __main__.no_trace[4]>", line 1, in <module>
-        no_trace()
-    TypeError: no_trace() takes exactly 1 argument (0 given)
 
     """
     traceless_matrices = []
@@ -163,6 +156,7 @@ def create_checkable_diagram(pbmbpt_graph):
 
     Returns:
         (NetworkX MultiDiGraph): Graph with double the anomalous props.
+
     """
     doubled_graph = copy.deepcopy(pbmbpt_graph)
     props_to_add = []

@@ -75,6 +75,7 @@ def remove_disconnected_matrices(matrices):
 
     Args:
         matrices (list): List of adjacency matrices.
+
     """
     vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k)

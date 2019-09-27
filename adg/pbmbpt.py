@@ -230,7 +230,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """
         factor = ""
         # Account for up to three-body operators
-        prop_multiplicity = [0 for _ in xrange(6)]
+        prop_multiplicity = [0 for _ in range(6)]
         for vertex_i in self.graph:
             for vertex_j in self.graph:
                 nb_normal_props = 0
