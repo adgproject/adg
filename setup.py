@@ -51,15 +51,15 @@ setup(
         # dependencies). You can install these using the following syntax:
         # $ pip2 install -e .[develop]
         develop=[
-            'pytest',
+            'pytest>=3.6,<5.0',
             'pytest-cov',
             'roman',
-            'sphinx',
+            'sphinx<2.0',
             'sphinx_rtd_theme',
         ]
     ),
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Science/Research',
