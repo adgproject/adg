@@ -16,11 +16,15 @@ variables:
 cache:
   paths:
     - $HOME/.cache/pip
+    - venv/
 
 before_script:
   - python -V  # Print out python version for debugging
   # install required packages
   - pip install --upgrade pip
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
   - pip install --retries 3 ${PIP_FLAGS} networkx>=2.0 numpy scipy
   - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
       pip install --retries 3 ${PIP_FLAGS} pytest pytest-cov roman sphinx sphinx_rtd_theme;
@@ -51,15 +55,13 @@ test_beta:
       - source run_test_suite.sh
       - cd ../..
 
-test_and_docs:
+docs:
   variables:
       OPTIONAL_DEPS: 1
       BUILD_DOCS: 1
   script:
       - cd doc;
       - make html;
-      - cd ../adg/tests;
-      - source run_test_suite.sh;
       - cd ../..
 
 standard3:
@@ -85,7 +87,7 @@ test_beta3:
       - source run_test_suite.sh
       - cd ../..
 
-test_and_docs3:
+docs3:
   image: python:3
   variables:
       OPTIONAL_DEPS: 1
@@ -93,6 +95,4 @@ test_and_docs3:
   script:
       - cd doc;
       - make html;
-      - cd ../adg/tests;
-      - source run_test_suite.sh;
       - cd ../..
