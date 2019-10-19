@@ -64,12 +64,12 @@ docs:
       - make html;
       - cd ../..
 
-standard3:
-  image: python:3
+standard3.7:
+  image: python:3.7
   script: "adg --help"
 
-test3:
-  image: python:3
+test3.7:
+  image: python:3.7
   variables:
       OPTIONAL_DEPS: 1
   script:
@@ -77,8 +77,8 @@ test3:
       - source run_test_suite.sh
       - cd ../..
 
-test_beta3:
-  image: python:3
+test_beta3.7:
+  image: python:3.7
   variables:
       OPTIONAL_DEPS: 1
       PIP_FLAGS: "--pre"
@@ -87,8 +87,8 @@ test_beta3:
       - source run_test_suite.sh
       - cd ../..
 
-docs3:
-  image: python:3
+docs3.7:
+  image: python:3.7
   variables:
       OPTIONAL_DEPS: 1
       BUILD_DOCS: 1
