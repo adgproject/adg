@@ -183,80 +183,6 @@ def label_vertices(graphs_list, theory_type):
             graph.node[0]['operator'] = True
 
 
-# Previous versions working for theories other than PBMBPT
-# def feynmf_generator(graph, theory_type, diagram_name):
-#     """Generate the feynmanmp instructions corresponding to the diagram.
-#
-#     Args:
-#         graph (NetworkX MultiDiGraph): The graph of interest.
-#         theory_type (str): The name of the theory of interest.
-#         diagram_name (str): The name of the studied diagram.
-#
-#     """
-#     p_order = graph.number_of_nodes()
-#     diag_size = 20*p_order
-#
-#     theories = ["MBPT", "BMBPT", "PBMBPT"]
-#     prop_types = ["half_prop", "prop_pm", "prop_pm"]
-#     propa = prop_types[theories.index(theory_type)]
-#
-#     fmf_file = open(diagram_name + ".tex", 'w')
-#     fmf_file.write("\\parbox{%ipt}{\\begin{fmffile}{%s}\n" % (diag_size,
-#                                                               diagram_name)
-#                    + "\\begin{fmfgraph*}(%i,%i)\n" % (diag_size, diag_size))
-#
-#     # Define the appropriate line propagator_style
-#     fmf_file.write(propagator_style(propa))
-#     if theory_type == "PBMBPT":
-#         fmf_file.write(propagator_style("prop_mm"))
-#
-#     # Set the position of the vertices
-#     fmf_file.write(vertex_positions(graph, p_order))
-#
-#     # Loop over all elements of the graph to draw associated propagators
-#     for vert_i in graph:
-#         for vert_j in graph:
-#             props_left_to_draw = graph.number_of_edges(vert_i, vert_j)
-#             # Special config for consecutive vertices
-#             if (props_left_to_draw % 2 == 1) and (abs(vert_i-vert_j) == 1):
-#                 fmf_file.write("\\fmf{%s" % propa)
-#                 # Check for specific MBPT configuration
-#                 if graph.number_of_edges(vert_j, vert_i) == 1:
-#                     fmf_file.write(",right=0.5")
-#                 fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
-#                 props_left_to_draw -= 1
-#             while props_left_to_draw > 0:
-#                 fmf_file.write("\\fmf{%s," % propa)
-#                 fmf_file.write("right=" if props_left_to_draw % 2 == 1
-#                                else "left=")
-#                 if props_left_to_draw in (5, 6):
-#                     fmf_file.write("0.9")
-#                 elif props_left_to_draw in (3, 4) \
-#                         or (props_left_to_draw == 1
-#                             and graph.number_of_edges(vert_j, vert_i) == 2):
-#                     fmf_file.write("0.75")
-#                 elif props_left_to_draw in (1, 2):
-#                     fmf_file.write("0.5" if abs(vert_i-vert_j) == 1 else "0.6")
-#                 fmf_file.write("}{v%i,v%i}\n" % (vert_i, vert_j))
-#                 props_left_to_draw -= 1
-#         # Special config for self-contraction
-#         props_left_to_draw = len(list(edge for edge
-#                                       in nx.selfloop_edges(graph,
-#                                                            data=True,
-#                                                            keys=True)
-#                                       if edge[0] == vert_i))
-#         while props_left_to_draw > 0:
-#             if props_left_to_draw > 1:
-#                 fmf_file.write("\\fmf{prop_mm,left=45}{v%i,v%i}\n"
-#                                % (vert_i, vert_i))
-#             else:
-#                 fmf_file.write("\\fmf{prop_mm,right=45}{v%i,v%i}\n"
-#                                % (vert_i, vert_i))
-#             props_left_to_draw -= 1
-#     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
-#     fmf_file.close()
-
-
 def feynmf_generator(graph, theory_type, diagram_name):
     """Generate the feynmanmp instructions corresponding to the diagram.
 
@@ -290,8 +216,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
     if theory_type == "PBMBPT":
         fmf_file.write(self_contractions(graph))
 
-    directions = [",left=0.9", ",left=0.75", ",left=0.6", ",left=0.5", "",
-                  ",right=0.5", ",right=0.6", ",right=0.75", ",right=0.9"]
+    directions = [",right=0.9", ",right=0.75", ",right=0.6", ",right=0.5", "",
+                  ",left=0.5", ",left=0.6", ",left=0.75", ",left=0.9"]
 
     # Loop over all elements of the graph to draw associated propagators
     for vert_i in graph:
@@ -322,6 +248,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
                     fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
                                    % (propa, props_dir[key], vert_j, vert_i))
                     key += 1
+            # Reinitialise the drawing configuration as we change direction
+            key = 0
             for prop in props_to_draw:
                 if prop[0] < prop[1] \
                         and not ('anomalous' in prop[3]
