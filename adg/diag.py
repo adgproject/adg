@@ -216,9 +216,6 @@ def feynmf_generator(graph, theory_type, diagram_name):
     if theory_type == "PBMBPT":
         fmf_file.write(self_contractions(graph))
 
-    directions = [",right=0.9", ",right=0.75", ",right=0.6", ",right=0.5", "",
-                  ",left=0.5", ",left=0.6", ",left=0.75", ",left=0.9"]
-
     # Loop over all elements of the graph to draw associated propagators
     for vert_i in graph:
         for vert_j in list(graph.nodes())[vert_i+1:]:
@@ -227,20 +224,10 @@ def feynmf_generator(graph, theory_type, diagram_name):
                              if edge[1] in (vert_i, vert_j)
                              and edge[0] != edge[1]]
             # Set the list of propagators directions to use
-            if vert_j - vert_i != 1:
-                props_dir = directions[:3] + directions[-3:]
-            else:
-                props_dir = directions[:2] + directions[3:6] + directions[-2:]
-                if len(props_to_draw) % 2 != 1:
-                    props_dir = props_dir[:3] + props_dir[-3:]
-                else:
-                    props_dir = props_dir[1:]
-            if len(props_to_draw) < 5:
-                props_dir = props_dir[1:-1]
-                if len(props_to_draw) < 3:
-                    props_dir = props_dir[1:-1]
+            props_dir = prop_directions(vert_j - vert_i, len(props_to_draw))
             # Draw the diagrams
             key = 0
+            # Start with props going down, used in MBPT only
             for prop in props_to_draw:
                 if prop[1] < prop[0] \
                         and not ('anomalous' in prop[3]
@@ -265,6 +252,36 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
+
+
+def prop_directions(vert_distance, nb_props):
+    """Return a list of possible propagators directions.
+
+    Args:
+        vert_distance (int): Fistance between the two connected vertices.
+        nb_props (int): Number of propagators to be drawn.
+
+    Returns:
+        (list): Propagators directions stored as strings.
+
+    """
+    directions = [",right=0.9", ",right=0.75", ",right=0.6", ",right=0.5", "",
+                  ",left=0.5", ",left=0.6", ",left=0.75", ",left=0.9"]
+
+    if vert_distance != 1:
+        props_dir = directions[:3] + directions[-3:]
+    else:
+        props_dir = directions[:2] + directions[3:6] + directions[-2:]
+        if nb_props % 2 != 1:
+            props_dir = props_dir[:3] + props_dir[-3:]
+        else:
+            props_dir = props_dir[1:]
+    if nb_props < 5:
+        props_dir = props_dir[1:-1]
+        if nb_props < 3:
+            props_dir = props_dir[1:-1]
+
+    return props_dir
 
 
 def propagator_style(prop_type):
