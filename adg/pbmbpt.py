@@ -40,7 +40,7 @@ def generate_anomalous_diags(graph, nbody_max):
             key = sum(1 for prop
                       in new_graph.edges(keys=True, data=True)
                       if (edge[0], edge[1]) == (prop[0], prop[1])
-                      and prop[3]['anomalous'])
+                      and not prop[3]['anomalous']) - 1
             new_graph[edge[0]][edge[1]][key]['anomalous'] = True
         anom_graphs.append(new_graph)
 
