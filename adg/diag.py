@@ -238,16 +238,16 @@ def feynmf_generator(graph, theory_type, diagram_name):
             # Reinitialise the drawing configuration as we change direction
             key = 0
             for prop in props_to_draw:
+                if 'anomalous' in prop[3] and prop[3]['anomalous']:
+                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
+                                   % (props_dir[key], vert_i, vert_j))
+                    key += 1
+            for prop in props_to_draw:
                 if prop[0] < prop[1] \
                         and not ('anomalous' in prop[3]
                                  and prop[3]['anomalous']):
                     fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
                                    % (propa, props_dir[key], vert_i, vert_j))
-                    key += 1
-            for prop in props_to_draw:
-                if 'anomalous' in prop[3] and prop[3]['anomalous']:
-                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
-                                   % (props_dir[key], vert_i, vert_j))
                     key += 1
 
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
