@@ -443,13 +443,13 @@ def extract_denom(start_graph, subgraph):
                   if subgraph.has_edge(prop[0], prop[1], prop[2])
                   and ('anomalous' in prop[3] and prop[3]['anomalous'])) \
         + "".join("%s"
-                  % (prop[3]['qp_state'].split("}")[1] + "}")
+                  % (prop[3]['qp_state'].split("}")[0] + "}")
                   for prop
                   in start_graph.in_edges(subgraph, keys=True, data=True)
                   if not subgraph.has_edge(prop[0], prop[1], prop[2])
                   and ('anomalous' in prop[3] and prop[3]['anomalous'])) \
         + "".join("%s"
-                  % (prop[3]['qp_state'].split("}")[0] + "}")
+                  % (prop[3]['qp_state'].split("}")[1] + "}")
                   for prop
                   in start_graph.out_edges(subgraph, keys=True, data=True)
                   if not subgraph.has_edge(prop[0], prop[1], prop[2])
