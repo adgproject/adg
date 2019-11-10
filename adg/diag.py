@@ -178,9 +178,9 @@ def label_vertices(graphs_list, theory_type):
     """
     for graph in graphs_list:
         for node in graph:
-            graph.node[node]['operator'] = False
+            graph.nodes[node]['operator'] = False
         if theory_type == "BMBPT" or "PBMBPT":
-            graph.node[0]['operator'] = True
+            graph.nodes[0]['operator'] = True
 
 
 def feynmf_generator(graph, theory_type, diagram_name):
@@ -331,7 +331,7 @@ def vertex_positions(graph, order):
     for vert in range(order-1):
         positions += "\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)) \
             + ("\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
-               if graph.node[vert]['operator']
+               if graph.nodes[vert]['operator']
                else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick") \
             + "}{v%i}\n" % vert
     positions += "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" \

@@ -23,7 +23,7 @@ def generate_anomalous_diags(graph, nbody_max):
 
     """
     anom_graphs = [graph]
-    vertices = [vert for vert in graph if not graph.node[vert]['operator']]
+    vertices = [vert for vert in graph if not graph.nodes[vert]['operator']]
 
     for edge in graph.edges(keys=True, data=True):
         edge[3]['anomalous'] = False
@@ -180,7 +180,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         numerator = ""
         for vertex in graph:
             # Attribute the correct operator to each vertex
-            numerator += r"\tilde{O}" if graph.node[vertex]['operator'] \
+            numerator += r"\tilde{O}" if graph.nodes[vertex]['operator'] \
                 else "\\Omega"
             # Attribute the good "type number" to each vertex
             numerator += "^{%i%i}_{" % (self.unsort_io_degrees[vertex][1],
@@ -212,7 +212,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                                                              keys=True,
                                                              data=True)
                                  if prop[3]['anomalous'] and prop[1] > prop[0])
-            numerator += r"} (\varphi) " if graph.node[vertex]['operator'] \
+            numerator += r"} (\varphi) " if graph.nodes[vertex]['operator'] \
                 else "} "
         # Add the terms correspoding to anomalous propagators
         numerator += " ".join("R^{--}_{%s}(\\varphi)" % prop[3]['qp_state']

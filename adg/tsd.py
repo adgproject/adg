@@ -19,7 +19,7 @@ def time_structure_graph(diag):
     """
     import adg.pbmbpt
     time_graph = diag.graph.to_directed()
-    if time_graph.node[0]['operator']:
+    if time_graph.nodes[0]['operator']:
         for vertex in range(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
     if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
@@ -42,16 +42,16 @@ def tree_time_structure_den(time_graph):
     denominator = ""
     i = 0
     for vertex in time_graph:
-        if not time_graph.node[vertex]['operator']:
-            time_graph.node[vertex]['label'] = 'a_%i' % (i + 1)
+        if not time_graph.nodes[vertex]['operator']:
+            time_graph.nodes[vertex]['label'] = 'a_%i' % (i + 1)
             i += 1
     for vertex in time_graph:
-        if not time_graph.node[vertex]['operator']:
+        if not time_graph.nodes[vertex]['operator']:
             if time_graph.out_degree(vertex) == 0:
-                denominator += time_graph.node[vertex]['label']
+                denominator += time_graph.nodes[vertex]['label']
             else:
-                denominator += "(%s" % time_graph.node[vertex]['label'] \
-                    + "".join("+ %s" % time_graph.node[descendant]['label']
+                denominator += "(%s" % time_graph.nodes[vertex]['label'] \
+                    + "".join("+ %s" % time_graph.nodes[descendant]['label']
                               for descendant
                               in nx.descendants(time_graph, vertex)) + ")"
     return denominator

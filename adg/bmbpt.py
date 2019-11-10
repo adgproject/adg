@@ -495,7 +495,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             tensor_j = self.unsort_io_degrees[vertex][0]
 
             # Get symbol
-            tensor_tex = "{O}" if graph.node[vertex]['operator'] \
+            tensor_tex = "{O}" if graph.nodes[vertex]['operator'] \
                 else "{\\Omega}" + "^{%i%i}" % (tensor_i, tensor_j)
 
             # Build indices
@@ -659,7 +659,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             graph = self.graph
             perm_vertices = [vertex for vertex, degrees
                              in enumerate(self.unsort_io_degrees)
-                             if graph.node[vertex]['operator'] is False
+                             if graph.nodes[vertex]['operator'] is False
                              and self.unsort_io_degrees.count(degrees) >= 2]
             for permutation in itertools.permutations(perm_vertices):
                 permuted_graph = nx.relabel_nodes(graph,
@@ -709,7 +709,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         numerator = ""
         for vertex in graph:
             # Attribute the correct operator to each vertex
-            numerator += "O" if graph.node[vertex]['operator'] else "\\Omega"
+            numerator += "O" if graph.nodes[vertex]['operator'] else "\\Omega"
             # Attribute the good "type number" to each vertex
             numerator += "^{%i%i}_{" % (self.unsort_io_degrees[vertex][1],
                                         self.unsort_io_degrees[vertex][0])
