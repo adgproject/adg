@@ -1,6 +1,7 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
 from builtins import range
+import copy
 import os
 import math
 import networkx as nx
@@ -23,7 +24,8 @@ def time_structure_graph(diag):
         for vertex in range(1, len(time_graph)):
             time_graph.add_edge(0, vertex)
     if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
-        for edge in time_graph.edges(keys=True, data=True):
+        edges_copy = copy.deepcopy(time_graph.edges(keys=True, data=True))
+        for edge in edges_copy:
             if 'anomalous' in edge[3] and edge[3]['anomalous']:
                 time_graph.remove_edge(edge[0], edge[1], edge[2])
     return adg.diag.to_skeleton(time_graph)
