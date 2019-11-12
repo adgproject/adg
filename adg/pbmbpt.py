@@ -194,12 +194,24 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
 
             # Add the qp states corresponding to propagators coming in
             previous_vertex = vertex - 1
+            # Iterate over the lower vertices
             while previous_vertex >= 0:
+                # Start with normal propagators
                 numerator += "".join(
-                    (prop[3]['qp_state'].split("}")[0] + "}"
-                     if prop[3]['anomalous'] else prop[3]['qp_state'])
+                    prop[3]['qp_state']
                     for prop in graph.in_edges(vertex, keys=True, data=True)
-                    if prop[0] == previous_vertex and prop[0] != prop[1])
+                    if prop[0] == previous_vertex and prop[0] != prop[1]
+                    and not prop[3]['anomalous'])
+                # Read anomalous propagators backwards
+                anom_props = [prop for prop
+                              in graph.in_edges(vertex, keys=True, data=True)
+                              if prop[0] == previous_vertex
+                              and prop[0] != prop[1]
+                              and prop[3]['anomalous']]
+                numerator += "".join(
+                    (anom_props[idx][3]['qp_state'].split("}")[0] + "}")
+                    for idx in range(len(anom_props)-1, -1, -1)
+                    )
                 previous_vertex -= 1
             # Add self-contractions
             numerator += "".join(
