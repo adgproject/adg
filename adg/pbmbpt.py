@@ -4,8 +4,10 @@ from __future__ import division
 from builtins import str
 from builtins import range
 from past.utils import old_div
+from operator import xor
 import copy
 import itertools
+import networkx as nx
 import adg.bmbpt
 import adg.tsd
 import adg.diag
@@ -169,6 +171,54 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             + "}"
         return expression
 
+    def attribute_expressions(self, time_diag):
+        """Attribute the correct Feynman and Goldstone expressions.
+
+        Args:
+            time_diag (TimeStructureDiagram): The associated TSD.
+
+        """
+        self.vert_exp = [self.vertex_expression(vertex)
+                         for vertex in self.graph]
+        numerator = self.extract_numerator()
+        denominator = self.time_tree_denominator(
+            nx.relabel_nodes(time_diag.graph, time_diag.perms[self.unique_id])
+        ) if self.tsd_is_tree else ""
+
+        extra_factor = "" if self.tsd_is_tree \
+            else "\\left[" \
+            + " + ".join("\\frac{1}{%s}"
+                         % self.time_tree_denominator(
+                             nx.relabel_nodes(equi_t_graph,
+                                              time_diag.perms[self.unique_id]))
+                         for equi_t_graph in time_diag.equivalent_trees) \
+            + " \\right]"
+
+        # Determine the pre-factor
+        prefactor = "(-1)^%i " % (len(self.graph) - 1)
+        # Use exclusive or for the sign factor
+        if xor(self.has_crossing_sign(), self.has_anom_props_linked_sign()):
+            prefactor = "-%s" % prefactor
+        sym_fact = ""
+        for vertex_degrees in self.unsort_io_degrees:
+            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
+                vertex_sym = self.vertex_exchange_sym_factor
+                sym_fact += "%i" % vertex_sym if vertex_sym > 1 else ""
+                break
+        sym_fact += self.multiplicity_symmetry_factor()
+        prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
+            if sym_fact != "" else "%s\\sum_{k_i}" % prefactor
+
+        # Set the Feynman and Goldstone expressions
+        self.feynman_exp = \
+            "\\lim\\limits_{\\tau \\to \\infty}%s%s\\int_{0}^{\\tau}%s\n" \
+            % (prefactor, numerator, self.extract_integral())
+        self.diag_exp = \
+            "%s\\frac{%s}{%s} %s\n" % (prefactor, numerator,
+                                       denominator, extra_factor) \
+            if denominator != "" \
+            else "%s%s%s\n" % (prefactor, numerator, extra_factor)
+
     def extract_numerator(self):
         """Return the numerator associated to a PBMBPT graph.
 
@@ -265,6 +315,34 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             elif multiplicity >= 2:
                 factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
         return factor
+
+    def has_anom_props_linked_sign(self):
+        """Return True if there is a minus sign associated to anom props.
+
+        Anomalous propagators departing to higher vertices introduce a sign
+        factor if a normal propagator is going to an even higher vertex, as it
+        departs from the canonical representation used for numerator
+        extraction.
+
+        Returns:
+            (bool): The presence of the sign factor.
+
+        """
+        counter = 0
+        for vertex in self.graph:
+            for prop_a in self.graph.out_edges(vertex,
+                                               keys=True,
+                                               data='anomalous'):
+                # Check that prop_a is anomalous and not a self-contraction
+                if prop_a[3] and prop_a[1] != prop_a[0]:
+                    for prop_b in self.graph.out_edges(vertex,
+                                                       keys=True,
+                                                       data='anomalous'):
+                        # Check for a normal prop going to a higher vertex
+                        if prop_b[1] > prop_a[1] and not prop_b[3]:
+                            counter += 1
+        # True if overall factor is odd
+        return counter % 2 == 1
 
     def write_diag_exps(self, latex_file, norder):
         """Write the expressions associated to a diagram in the LaTeX file.
