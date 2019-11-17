@@ -149,7 +149,7 @@ def update_permutations(comp_graph_perms, comp_graph_tag, mapping):
 
 
 def create_checkable_diagram(pbmbpt_graph):
-    """Return agraph with anomalous props going both ways for topo check.
+    """Return a graph with anomalous props going both ways for topo check.
 
     Args:
         pbmbpt_graph (NetworkX MultiDiGraph): The graph to be copied.
@@ -179,7 +179,7 @@ def label_vertices(graphs_list, theory_type):
     for graph in graphs_list:
         for node in graph:
             graph.nodes[node]['operator'] = False
-        if theory_type == "BMBPT" or "PBMBPT":
+        if theory_type in ("BMBPT", "PBMBPT"):
             graph.nodes[0]['operator'] = True
 
 
