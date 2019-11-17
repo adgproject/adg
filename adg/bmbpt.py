@@ -415,7 +415,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         # Determine the pre-factor
         prefactor = "(-1)^%i " % (len(self.graph) - 1)
-        if self.has_crossing_sign():
+        if self.has_sign_factor():
             prefactor = "-%s" % prefactor
         sym_fact = ""
         for vertex_degrees in self.unsort_io_degrees:
@@ -436,6 +436,18 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                        denominator, extra_factor) \
             if denominator != "" \
             else "%s%s%s\n" % (prefactor, numerator, extra_factor)
+
+    def has_sign_factor(self):
+        """Return True if a sign factor is associated to the diagram.
+
+        Wrapper allowing for easy refactoring of expression code.
+
+        Returns:
+            (boolean): The presence of a sign factor.
+
+        """
+        # Use exclusive or for the sign factor
+        return self.has_crossing_sign()
 
     def get_equation(self):
         """Provide the diagram equation tailored for J. Ripoche Clebsch codes.
