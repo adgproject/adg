@@ -7,7 +7,6 @@ from past.utils import old_div
 from operator import xor
 import copy
 import itertools
-import networkx as nx
 import adg.bmbpt
 import adg.tsd
 import adg.diag
