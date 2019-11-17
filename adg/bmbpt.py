@@ -62,7 +62,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         adg.diag.check_vertex_degree(
             matrices, three_body_use, nbody_obs, canonical, vertex
         )
-        if 0 < vertex < order:
+        if 0 < vertex < order-1:
             check_unconnected_spawn(matrices, vertex)
     remove_disconnected_matrices(matrices)
     matrices = order_and_remove_topologically_equiv(matrices, order - 1)
@@ -162,6 +162,12 @@ def check_topologically_equivalent(matrices, max_vertex):
 def check_unconnected_spawn(matrices, max_filled_vertex):
     """Exclude some matrices that would spawn unconnected diagrams.
 
+    Do several permutations among the rows and columns corresponding to already
+    filled vertices, and check if one obtains a block-diagonal organisation,
+    where the off-diagonals blocks connecting the already-filled and
+    yet-unfilled parts of the matrix would be empty. In that case, remove the
+    matrix.
+
     Args:
         matrices (list): The adjacency matrices to be checked.
         max_filled_vertex (int): The furthest vertex until which the matrices
@@ -181,13 +187,14 @@ def check_unconnected_spawn(matrices, max_filled_vertex):
                     for k
                     in itertools.permutations(vertices[1:max_filled_vertex+1])]
     for ind_mat in range(len(matrices)-1, -1, -1):
-        # Test for all possible permutations with i <= j
+        # Test for all possible permutations
         for reordering in permutations:
             mat = matrices[ind_mat][:, reordering][reordering, :]
-            if not mat[:, vertices[:max_filled_vertex]
-                       ][vertices[max_filled_vertex:], :].any() \
-                    and not mat[vertices[:max_filled_vertex],
-                                :][:, vertices[max_filled_vertex:]].any():
+            # Check for non-zero elements in off-diagonal blocks
+            if not mat[:, vertices[:max_filled_vertex+1]
+                       ][vertices[max_filled_vertex+1:], :].any() \
+                    and not mat[vertices[:max_filled_vertex+1],
+                                :][:, vertices[max_filled_vertex+1:]].any():
                 del matrices[ind_mat]
                 break
 
