@@ -28,12 +28,12 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
     >>> diagrams_generation(1, False, 2, False) #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 2], [0, 0]]), array([[0, 4], [0, 0]])]
+    [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
     >>> diagrams_generation(1, True, 3, False)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 2], [0, 0]]), array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]])]
+    [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
     >>> diagrams_generation(2, False, 2, True)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 1, 1], [0, 0, 3], [0, 0, 0]]),
-     array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])]
+    [array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
+     array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
 
     """
     # Matrices contain operator vertex + p_order perturbative vertices
@@ -65,9 +65,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         if 0 < vertex < order-1:
             check_unconnected_spawn(matrices, vertex)
     remove_disconnected_matrices(matrices)
-    matrices = order_and_remove_topologically_equiv(matrices, order - 1)
-
-    return matrices
+    return order_and_remove_topologically_equiv(matrices, order - 1)
 
 
 def remove_disconnected_matrices(matrices):
@@ -115,7 +113,7 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
         else:
             matrices_dict[row0] = [matrices[idx]]
         del matrices[idx]
-    for row_key in matrices_dict:
+    for row_key in sorted(matrices_dict.keys()):
         check_topologically_equivalent(matrices_dict[row_key], max_vertex)
     matrices = []
     for matrices_list in list(matrices_dict.values()):
