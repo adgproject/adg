@@ -5,6 +5,7 @@ from __future__ import division
 from builtins import map
 from builtins import range
 from past.utils import old_div
+from adg.tools import reversed_enumerate
 import copy
 import itertools
 import string
@@ -125,17 +126,17 @@ def order_diagrams(diagrams):
     quadruples = []
     quintuples_and_higher = []
 
-    for i_diag in reversed(range(len(diagrams))):
-        if diagrams[i_diag].excitation_level == 1:
-            singles.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 2:
-            doubles.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 3:
-            triples.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 4:
-            quadruples.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level >= 5:
-            quintuples_and_higher.append(diagrams[i_diag])
+    for i_diag, diag in reversed_enumerate(diagrams):
+        if diag.excitation_level == 1:
+            singles.append(diag)
+        elif diag.excitation_level == 2:
+            doubles.append(diag)
+        elif diag.excitation_level == 3:
+            triples.append(diag)
+        elif diag.excitation_level == 4:
+            quadruples.append(diag)
+        elif diag.excitation_level >= 5:
+            quintuples_and_higher.append(diag)
         else:
             print("Zero or negative excitation level!\n")
             exit()

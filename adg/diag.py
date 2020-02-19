@@ -2,6 +2,7 @@
 
 from builtins import range
 from builtins import object
+from adg.tools import reversed_enumerate
 
 import copy
 import numpy
@@ -26,12 +27,10 @@ def no_trace(matrices):
     """
     traceless_matrices = []
     for matrix in matrices:
-        test_traceless = True
         for ind_i, line in enumerate(matrix):
             if line[ind_i] != 0:
-                test_traceless = False
                 break
-        if test_traceless:
+        else:
             traceless_matrices.append(matrix)
     return traceless_matrices
 
@@ -66,8 +65,7 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
         authorized_deg.append(2)
     authorized_deg = tuple(authorized_deg)
 
-    for i_mat in reversed(range(len(matrices))):
-        matrix = matrices[i_mat]
+    for i_mat, matrix in reversed_enumerate(matrices):
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
                             for index in list(range(matrix.shape[0])))
         vertex_degree -= matrix[vertex_id][vertex_id]
@@ -91,36 +89,36 @@ def topologically_distinct_diagrams(diagrams):
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
     anom_em = iso.categorical_multiedge_match('anomalous', False)
-    for i_diag in reversed(range(len(diagrams))):
-        graph = diagrams[i_diag].graph
-        diag_io_degrees = diagrams[i_diag].io_degrees
-        for i_comp_diag in range(len(diagrams)-1, i_diag, -1):
-            if diag_io_degrees == diagrams[i_comp_diag].io_degrees:
+    for i_diag, diag in reversed_enumerate(diagrams):
+        graph = diag.graph
+        diag_io_degrees = diag.io_degrees
+        for i_comp_diag, comp_diag in reversed_enumerate(diagrams[:i_diag]):
+            if diag_io_degrees == comp_diag.io_degrees:
                 # Check anomalous character of props for PBMBPT
-                if isinstance(diagrams[i_diag],
+                if isinstance(diag,
                               adg.pbmbpt.ProjectedBmbptDiagram):
                     doubled_graph = create_checkable_diagram(graph)
-                    doubled_comp_diag = create_checkable_diagram(diagrams[i_comp_diag].graph)
+                    doubled_comp_diag = create_checkable_diagram(comp_diag.graph)
                     matcher = iso.DiGraphMatcher(doubled_graph,
                                                  doubled_comp_diag,
                                                  node_match=op_nm,
                                                  edge_match=anom_em)
-                # Check for topolically equivalent diags considering vertex
+                # Check for topologically equivalent diags considering vertex
                 # properties but not edge attributes, i.e. anomalous character
                 else:
                     matcher = iso.DiGraphMatcher(graph,
-                                                 diagrams[i_comp_diag].graph,
+                                                 comp_diag.graph,
                                                  node_match=op_nm)
                 if matcher.is_isomorphic():
                     # Store the set of permutations to recover the original TSD
-                    if isinstance(diagrams[i_diag],
+                    if isinstance(diag,
                                   adg.tsd.TimeStructureDiagram):
-                        diagrams[i_diag].perms.update(
-                            update_permutations(diagrams[i_comp_diag].perms,
-                                                diagrams[i_comp_diag].tags[0],
+                        diag.perms.update(
+                            update_permutations(comp_diag.perms,
+                                                comp_diag.tags[0],
                                                 matcher.mapping)
                             )
-                    diagrams[i_diag].tags += diagrams[i_comp_diag].tags
+                    diag.tags += comp_diag.tags
                     del diagrams[i_comp_diag]
                     break
     return diagrams
@@ -139,7 +137,7 @@ def update_permutations(comp_graph_perms, comp_graph_tag, mapping):
     # Do permutations only when necessary
     if mapping != identity:
         for graph_id in comp_graph_perms:
-            # Create a dummy dictionarry to avoid overwriting some nodes
+            # Create a dummy dictionary to avoid overwriting some nodes
             dummy_nodes = copy.deepcopy(comp_graph_perms[graph_id])
             # Permute the nodes according to the new mapping
             for node in comp_graph_perms[graph_id]:

@@ -1,7 +1,22 @@
 """Miscellaneous diagram-unrelated tools for ADG."""
 
 
-from builtins import object
+from builtins import object, zip
+from itertools import count
+
+
+def reversed_enumerate(data):
+    """Return the index and item of the data in reversed order.
+
+    Args:
+        data (iterable data structure): The data to be used..
+
+    Returns:
+        (tuple): Index and item.
+
+    """
+    for index, item in zip(count(len(data) - 1, -1), reversed(data)):
+        yield index, item
 
 
 class UniqueID(object):

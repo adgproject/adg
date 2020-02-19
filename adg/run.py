@@ -5,6 +5,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import input
 from builtins import range
+from adg.tools import reversed_enumerate
 import os
 import argparse
 import shutil
@@ -234,8 +235,8 @@ def generate_diagrams(commands, id_generator):
                                   parallel_edges=True) for diagram in diagrams]
 
     if commands.theory == "MBPT":
-        for i_diag in reversed(range(len(diags))):
-            if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
+        for i_diag, diag in reversed_enumerate(diags):
+            if (nx.number_weakly_connected_components(diag)) != 1:
                 del diags[i_diag]
 
     adg.diag.label_vertices(diags, commands.theory)
@@ -248,9 +249,9 @@ def generate_diagrams(commands, id_generator):
                     for graph in diags]
 
     if commands.theory == "PBMBPT":
-        for idx in reversed(range(len(diagrams))):
+        for idx, diagram in reversed_enumerate(diagrams):
             new_graphs = adg.pbmbpt.generate_anomalous_diags(
-                diagrams[idx].graph,
+                diagram.graph,
                 3 if commands.with_3NF else 2
             )
             new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag,

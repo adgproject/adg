@@ -1,6 +1,7 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
 from builtins import range
+from adg.tools import reversed_enumerate
 import copy
 import os
 import math
@@ -198,9 +199,9 @@ def treat_tsds(diagrams_time):
 
     """
     tree_tsds = []
-    for i_diag in reversed(range(len(diagrams_time))):
-        if diagrams_time[i_diag].is_tree:
-            tree_tsds.append(diagrams_time[i_diag])
+    for i_diag, diag in reversed_enumerate(diagrams_time):
+        if diag.is_tree:
+            tree_tsds.append(diag)
             del diagrams_time[i_diag]
 
     adg.diag.topologically_distinct_diagrams(tree_tsds)
@@ -268,14 +269,13 @@ class TimeStructureDiagram(adg.diag.Diagram):
         tree_graphs = []
         cycles_left = True
         while cycles_left:
-            for gr_index in reversed(range(len(graphs))):
-                graphs += disentangle_cycle(graphs[gr_index],
-                                            find_cycle(graphs[gr_index]))
+            for gr_index, graph in reversed_enumerate(graphs):
+                graphs += disentangle_cycle(graph, find_cycle(graph))
                 del graphs[gr_index]
             cycles_left = False
-            for graph_indx in reversed(range(len(graphs))):
-                if nx.is_arborescence(graphs[graph_indx]):
-                    tree_graphs.append(graphs[graph_indx])
+            for graph_indx, graph in reversed_enumerate(graphs):
+                if nx.is_arborescence(graph):
+                    tree_graphs.append(graph)
                     del graphs[graph_indx]
                 else:
                     cycles_left = True
@@ -293,7 +293,7 @@ class TimeStructureDiagram(adg.diag.Diagram):
         """Draw the equivalent tree TSDs for a given non-tree TSD.
 
         Args:
-            latex_file (file): The output LaTeX file of the priogram.
+            latex_file (file): The output LaTeX file of the program.
 
         """
         for index, graph in enumerate(self.equivalent_trees):

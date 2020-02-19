@@ -5,6 +5,7 @@ standard_library.install_aliases()
 from builtins import str
 from builtins import zip
 from builtins import range
+from adg.tools import reversed_enumerate
 import itertools
 import pickle
 import os
@@ -77,9 +78,9 @@ def remove_disconnected_matrices(matrices):
     vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k)
                     for k in itertools.permutations(vertices[1:])]
-    for idx in reversed(range(len(matrices))):
+    for idx, matrix in reversed_enumerate(matrices):
         for reordering in permutations:
-            mat = matrices[idx][:, reordering][reordering, :]
+            mat = matrix[:, reordering][reordering, :]
             for vert in vertices[1:]:
                 # Check if the permuted matrix is block-diagonal
                 if not mat[vertices[:vert], :][:, vertices[vert:]].any() \
@@ -104,13 +105,13 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
 
     """
     matrices_dict = {}
-    for idx in reversed(range(len(matrices))):
+    for idx, matrix in reversed_enumerate(matrices):
         row0 = "".join("%i" % elem for elem
-                       in np.sort(matrices[idx][0, :]).tolist())
+                       in np.sort(matrix[0, :]).tolist())
         if row0 in matrices_dict:
-            matrices_dict[row0].append(matrices[idx])
+            matrices_dict[row0].append(matrix)
         else:
-            matrices_dict[row0] = [matrices[idx]]
+            matrices_dict[row0] = [matrix]
         del matrices[idx]
     for row_key in sorted(matrices_dict.keys()):
         check_topologically_equivalent(matrices_dict[row_key], max_vertex)
@@ -136,8 +137,7 @@ def check_topologically_equivalent(matrices, max_vertex):
     vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k) + vertices[max_vertex+1:]
                     for k in itertools.permutations(vertices[1:max_vertex+1])]
-    for ind_mat1 in reversed(range(len(matrices[:-1]))):
-        mat1 = matrices[ind_mat1]
+    for ind_mat1, mat1 in reversed_enumerate(matrices[:-1]):
         mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
         for ind_mat2 in range(len(matrices)-1, ind_mat1, -1):
             mat2 = matrices[ind_mat2]
@@ -182,10 +182,10 @@ def check_unconnected_spawn(matrices, max_filled_vertex):
     permutations = [[0] + list(k) + vertices[max_filled_vertex+1:]
                     for k
                     in itertools.permutations(vertices[1:max_filled_vertex+1])]
-    for ind_mat in reversed(range(len(matrices))):
+    for ind_mat, matrix in reversed_enumerate(matrices):
         # Test for all possible permutations
         for reordering in permutations:
-            mat = matrices[ind_mat][:, reordering][reordering, :]
+            mat = matrix[:, reordering][reordering, :]
             # Check for non-zero elements in off-diagonal blocks
             if not mat[:, vertices[:max_filled_vertex+1]
                        ][vertices[max_filled_vertex+1:], :].any() \
@@ -294,21 +294,21 @@ def order_diagrams(diagrams):
     diagrams_3_ehf = []
     diagrams_3_not_hf = []
 
-    for i_diag in reversed(range(len(diagrams))):
-        if diagrams[i_diag].two_or_three_body == 2:
-            if diagrams[i_diag].hf_type == "HF":
-                diagrams_2_hf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "EHF":
-                diagrams_2_ehf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "noHF":
-                diagrams_2_not_hf.append(diagrams[i_diag])
-        elif diagrams[i_diag].two_or_three_body == 3:
-            if diagrams[i_diag].hf_type == "HF":
-                diagrams_3_hf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "EHF":
-                diagrams_3_ehf.append(diagrams[i_diag])
-            elif diagrams[i_diag].hf_type == "noHF":
-                diagrams_3_not_hf.append(diagrams[i_diag])
+    for i_diag, diag in reversed_enumerate(diagrams):
+        if diag.two_or_three_body == 2:
+            if diag.hf_type == "HF":
+                diagrams_2_hf.append(diag)
+            elif diag.hf_type == "EHF":
+                diagrams_2_ehf.append(diag)
+            elif diag.hf_type == "noHF":
+                diagrams_2_not_hf.append(diag)
+        elif diag.two_or_three_body == 3:
+            if diag.hf_type == "HF":
+                diagrams_3_hf.append(diag)
+            elif diag.hf_type == "EHF":
+                diagrams_3_ehf.append(diag)
+            elif diag.hf_type == "noHF":
+                diagrams_3_not_hf.append(diag)
         del diagrams[i_diag]
 
     diagrams = diagrams_2_hf + diagrams_2_ehf + diagrams_2_not_hf \
