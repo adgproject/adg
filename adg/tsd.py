@@ -107,10 +107,10 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds,
         latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                          % (tdiag.tags[0]+1))
         if pdiag:
-            time_file = open(directory
-                             + "/Diagrams/time_%i.tex" % tdiag.tags[0])
-            latex_file.write('\n\\begin{center}\n%s\n\\end{center}\n\n'
-                             % time_file.read())
+            with open(directory
+                      + "/Diagrams/time_%i.tex" % tdiag.tags[0]) as time_file:
+                latex_file.write('\n\\begin{center}\n%s\n\\end{center}\n\n'
+                                 % time_file.read())
         latex_file.write("\\begin{equation}\n\\text{T%i} = "
                          "%s\\end{equation}\n\n"
                          % (tdiag.tags[0]+1, tdiag.expr))

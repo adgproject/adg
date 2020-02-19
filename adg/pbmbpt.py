@@ -221,8 +221,8 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                               and prop[0] != prop[1]
                               and prop[3]['anomalous']]
                 numerator += "".join(
-                    (anom_props[idx][3]['qp_state'].split("}")[0] + "}")
-                    for idx in range(len(anom_props)-1, -1, -1)
+                    (anom_prop[3]['qp_state'].split("}")[0] + "}")
+                    for anom_prop in reversed(anom_props)
                     )
                 previous_vertex -= 1
             # Add self-contractions
