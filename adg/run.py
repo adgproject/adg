@@ -234,7 +234,7 @@ def generate_diagrams(commands, id_generator):
                                   parallel_edges=True) for diagram in diagrams]
 
     if commands.theory == "MBPT":
-        for i_diag in range(len(diags)-1, -1, -1):
+        for i_diag in reversed(range(len(diags))):
             if (nx.number_weakly_connected_components(diags[i_diag])) != 1:
                 del diags[i_diag]
 
@@ -248,7 +248,7 @@ def generate_diagrams(commands, id_generator):
                     for graph in diags]
 
     if commands.theory == "PBMBPT":
-        for idx in range(len(diagrams)-1, -1, -1):
+        for idx in reversed(range(len(diagrams))):
             new_graphs = adg.pbmbpt.generate_anomalous_diags(
                 diagrams[idx].graph,
                 3 if commands.with_3NF else 2

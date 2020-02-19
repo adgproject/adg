@@ -66,7 +66,7 @@ def check_vertex_degree(matrices, three_body_use, nbody_max_observable,
         authorized_deg.append(2)
     authorized_deg = tuple(authorized_deg)
 
-    for i_mat in range(len(matrices)-1, -1, -1):
+    for i_mat in reversed(range(len(matrices))):
         matrix = matrices[i_mat]
         vertex_degree = sum(matrix[index][vertex_id] + matrix[vertex_id][index]
                             for index in list(range(matrix.shape[0])))
@@ -91,7 +91,7 @@ def topologically_distinct_diagrams(diagrams):
     iso = nx.algorithms.isomorphism
     op_nm = iso.categorical_node_match('operator', False)
     anom_em = iso.categorical_multiedge_match('anomalous', False)
-    for i_diag in range(len(diagrams)-1, -1, -1):
+    for i_diag in reversed(range(len(diagrams))):
         graph = diagrams[i_diag].graph
         diag_io_degrees = diagrams[i_diag].io_degrees
         for i_comp_diag in range(len(diagrams)-1, i_diag, -1):
@@ -384,10 +384,9 @@ def draw_diagram(directory, result_file, diagram_index, diag_type):
         diag_type (str): The type of diagram used here.
 
     """
-    diag_file = open(directory+"/Diagrams/%s_%s.tex" % (diag_type,
-                                                        diagram_index))
-    result_file.write(diag_file.read())
-    diag_file.close()
+    with open(directory+"/Diagrams/%s_%s.tex"
+              % (diag_type, diagram_index)) as diag_file:
+        result_file.write(diag_file.read())
 
 
 def to_skeleton(graph):

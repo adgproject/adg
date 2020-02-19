@@ -198,7 +198,7 @@ def treat_tsds(diagrams_time):
 
     """
     tree_tsds = []
-    for i_diag in range(len(diagrams_time)-1, -1, -1):
+    for i_diag in reversed(range(len(diagrams_time))):
         if diagrams_time[i_diag].is_tree:
             tree_tsds.append(diagrams_time[i_diag])
             del diagrams_time[i_diag]
@@ -268,12 +268,12 @@ class TimeStructureDiagram(adg.diag.Diagram):
         tree_graphs = []
         cycles_left = True
         while cycles_left:
-            for gr_index in range(len(graphs)-1, -1, -1):
+            for gr_index in reversed(range(len(graphs))):
                 graphs += disentangle_cycle(graphs[gr_index],
                                             find_cycle(graphs[gr_index]))
                 del graphs[gr_index]
             cycles_left = False
-            for graph_indx in range(len(graphs)-1, -1, -1):
+            for graph_indx in reversed(range(len(graphs))):
                 if nx.is_arborescence(graphs[graph_indx]):
                     tree_graphs.append(graphs[graph_indx])
                     del graphs[graph_indx]
@@ -281,12 +281,11 @@ class TimeStructureDiagram(adg.diag.Diagram):
                     cycles_left = True
         tree_graphs_uniq = []
         for t_graph in tree_graphs:
-            new_graph = True
             for t_graph_uniq in tree_graphs_uniq:
                 if nx.edges(t_graph) == nx.edges(t_graph_uniq):
-                    new_graph = False
                     break
-            if new_graph:
+            # If the TSD is a new one
+            else:
                 tree_graphs_uniq.append(t_graph)
         return tree_graphs_uniq
 
@@ -302,9 +301,9 @@ class TimeStructureDiagram(adg.diag.Diagram):
                                       'MBPT',
                                       'equivalent%i_%i' % (self.tags[0],
                                                            index))
-            diag_file = open("equivalent%i_%i.tex" % (self.tags[0], index))
-            latex_file.write(diag_file.read())
-            diag_file.close()
+            with open("equivalent%i_%i.tex"
+                      % (self.tags[0], index)) as diag_file:
+                latex_file.write(diag_file.read())
             os.unlink("./equivalent%i_%i.tex" % (self.tags[0], index))
 
     def resummation_power(self):

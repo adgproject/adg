@@ -46,8 +46,7 @@ def generate_anomalous_diags(graph, nbody_max):
         anom_graphs.append(new_graph)
 
     # Loop to generate self-contractions
-    for idx in range(len(anom_graphs)-1, -1, -1):
-        iter_graph = anom_graphs[idx]
+    for iter_graph in reversed(anom_graphs):
         test_vertices = []
         for vert in vertices:
             for _ in range(nbody_max - (old_div(iter_graph.degree(vert), 2))):

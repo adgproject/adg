@@ -51,11 +51,10 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         else:
             deg_max = 6 if three_body_use else 4
         for sum_index in range(vertex+1, order):
-            for mat_indx in range(len(matrices)-1, -1, -1):
-                mat = matrices[mat_indx]
+            for mat in reversed(matrices):
                 elem_max = deg_max - sum(mat[k][vertex] + mat[vertex][k]
                                          for k in vertices)
-                for elem in range(1, elem_max + 1, 1):
+                for elem in range(1, elem_max + 1):
                     temp_mat = mat.copy()
                     temp_mat[vertex, sum_index] = elem
                     add(temp_mat)
@@ -78,19 +77,19 @@ def remove_disconnected_matrices(matrices):
     vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k)
                     for k in itertools.permutations(vertices[1:])]
-    for idx in range(len(matrices)-1, -1, -1):
-        is_disconnected = False
+    for idx in reversed(range(len(matrices))):
         for reordering in permutations:
             mat = matrices[idx][:, reordering][reordering, :]
             for vert in vertices[1:]:
+                # Check if the permuted matrix is block-diagonal
                 if not mat[vertices[:vert], :][:, vertices[vert:]].any() \
                         and not mat[:, vertices[:vert]
                                     ][vertices[vert:], :].any():
-                    is_disconnected = True
+                    del matrices[idx]
                     break
-            if is_disconnected:
-                del matrices[idx]
-                break
+            else:
+                continue
+            break
 
 
 def order_and_remove_topologically_equiv(matrices, max_vertex):
@@ -105,7 +104,7 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
 
     """
     matrices_dict = {}
-    for idx in range(len(matrices)-1, -1, -1):
+    for idx in reversed(range(len(matrices))):
         row0 = "".join("%i" % elem for elem
                        in np.sort(matrices[idx][0, :]).tolist())
         if row0 in matrices_dict:
@@ -137,12 +136,11 @@ def check_topologically_equivalent(matrices, max_vertex):
     vertices = list(range(matrices[0].shape[0]))
     permutations = [[0] + list(k) + vertices[max_vertex+1:]
                     for k in itertools.permutations(vertices[1:max_vertex+1])]
-    for ind_mat1 in range(len(matrices)-2, -1, -1):
+    for ind_mat1 in reversed(range(len(matrices[:-1]))):
         mat1 = matrices[ind_mat1]
         mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
         for ind_mat2 in range(len(matrices)-1, ind_mat1, -1):
             mat2 = matrices[ind_mat2]
-            done_with_mat2 = False
             # Basic check to avoid needless permutations
             if not (mat1_1plus_sorted
                     - np.sort(mat2[1:max_vertex, :].flat)).any():
@@ -150,9 +148,9 @@ def check_topologically_equivalent(matrices, max_vertex):
                 for reordering in permutations:
                     if not (mat1 - mat2[:, reordering][reordering, :]).any():
                         del matrices[ind_mat2]
-                        done_with_mat2 = True
                         break
-            if done_with_mat2:
+                else:
+                    continue
                 break
     return matrices
 
@@ -184,7 +182,7 @@ def check_unconnected_spawn(matrices, max_filled_vertex):
     permutations = [[0] + list(k) + vertices[max_filled_vertex+1:]
                     for k
                     in itertools.permutations(vertices[1:max_filled_vertex+1])]
-    for ind_mat in range(len(matrices)-1, -1, -1):
+    for ind_mat in reversed(range(len(matrices))):
         # Test for all possible permutations
         for reordering in permutations:
             mat = matrices[ind_mat][:, reordering][reordering, :]
@@ -296,7 +294,7 @@ def order_diagrams(diagrams):
     diagrams_3_ehf = []
     diagrams_3_not_hf = []
 
-    for i_diag in range(len(diagrams)-1, -1, -1):
+    for i_diag in reversed(range(len(diagrams))):
         if diagrams[i_diag].two_or_three_body == 2:
             if diagrams[i_diag].hf_type == "HF":
                 diagrams_2_hf.append(diagrams[i_diag])
@@ -681,7 +679,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             for permutation in itertools.permutations(perm_vertices):
                 permuted_graph = nx.relabel_nodes(graph,
                                                   dict(list(zip(perm_vertices,
-                                                           permutation))),
+                                                                permutation))),
                                                   copy=True)
                 if nx.is_isomorphic(graph,
                                     nx.intersection(graph, permuted_graph)):
@@ -736,13 +734,11 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                  in graph.out_edges(vertex,
                                                     keys=True, data=True))
             # Add the qp states corresponding to propagators coming in
-            previous_vertex = vertex - 1
-            while previous_vertex >= 0:
+            for previous_vertex in reversed(range(vertex)):
                 numerator += "".join(
                     prop[3]['qp_state']
                     for prop in graph.in_edges(vertex, keys=True, data=True)
                     if prop[0] == previous_vertex)
-                previous_vertex -= 1
             numerator += "} "
         return numerator
 

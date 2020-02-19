@@ -125,7 +125,7 @@ def order_diagrams(diagrams):
     quadruples = []
     quintuples_and_higher = []
 
-    for i_diag in range(len(diagrams)-1, -1, -1):
+    for i_diag in reversed(range(len(diagrams))):
         if diagrams[i_diag].excitation_level == 1:
             singles.append(diagrams[i_diag])
         elif diagrams[i_diag].excitation_level == 2:
