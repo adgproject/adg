@@ -88,6 +88,10 @@ def main():
 
     adg.diag.print_adj_matrices(directory, diagrams)
 
+    # Produce an output file for the angular-momentum coupling AMC code
+    if run_commands.amc:
+        adg.run.print_amc_output(directory, diagrams, run_commands)
+
     # Produce an output adapted to Christian Drischler's format
     if run_commands.cd_output:
         adg.mbpt.print_cd_output(directory, diagrams)
