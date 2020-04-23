@@ -343,6 +343,96 @@ def order_diagrams(diagrams):
     return diagrams, diags_nb_per_type, section_flags
 
 
+def print_amc_output(directory, diagrams):
+    """Print a the diagrams in the AMC code format.
+
+    Args:
+        directory (str): The path to the output directory.
+        diagrams (list): All the BmbptDiagrams.
+
+    """
+    with open(directory + '/output.amc', 'w') as amc_file:
+        amc_file.write("declare O {\n"
+                       + "    mode=0,\n"
+                       + "    latex=\"O_{0}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare O20 {\n"
+                       + "    mode=(2,0),\n"
+                       + "    latex=\"O^{20}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare O40 {\n"
+                       + "    mode=(4,0),\n"
+                       + "    latex=\"O^{40}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare O60 {\n"
+                       + "    mode=(6,0),\n"
+                       + "    latex=\"O^{60}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega20 {\n"
+                       + "    mode=(2,0),\n"
+                       + "    latex=\"\\Omega^{20}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega11 {\n"
+                       + "    mode=(1,1),\n"
+                       + "    latex=\"\\Omega^{11}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega02 {\n"
+                       + "    mode=(0,2),\n"
+                       + "    latex=\"\\Omega^{02}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega04 {\n"
+                       + "    mode=(0,4),\n"
+                       + "    latex=\"\\Omega^{04}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega13 {\n"
+                       + "    mode=(1,3),\n"
+                       + "    latex=\"\\Omega^{13}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega22 {\n"
+                       + "    mode=(2,2),\n"
+                       + "    latex=\"\\Omega^{22}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega31 {\n"
+                       + "    mode=(3,1),\n"
+                       + "    latex=\"\\Omega^{31}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega40 {\n"
+                       + "    mode=(4,0),\n"
+                       + "    latex=\"\\Omega^{40}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega60 {\n"
+                       + "    mode=(6,0),\n"
+                       + "    latex=\"\\Omega^{60}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega51 {\n"
+                       + "    mode=(5,1),\n"
+                       + "    latex=\"\\Omega^{51}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega42 {\n"
+                       + "    mode=(4,2),\n"
+                       + "    latex=\"\\Omega^{42}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega33 {\n"
+                       + "    mode=(3,3),\n"
+                       + "    latex=\"\\Omega^{33}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega24 {\n"
+                       + "    mode=(2,4),\n"
+                       + "    latex=\"\\Omega^{24}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega15 {\n"
+                       + "    mode=(1,5),\n"
+                       + "    latex=\"\\Omega^{15}\",\n"
+                       + "}\n\n")
+        amc_file.write("declare Omega60 {\n"
+                       + "    mode=(6,0),\n"
+                       + "    latex=\"\\Omega^{60}\",\n"
+                       + "}\n\n")
+        for diag in diagrams:
+            amc_file.write('O = %s\n' % diag.amc_expr)
+        amc_file.write('\n')
+
+
 class BmbptFeynmanDiagram(adg.diag.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties.
 
@@ -530,6 +620,95 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 previous_vertex -= 1
 
             numerator.append([tensor_tex, tensor_i, tensor_j, indices])
+        return numerator
+
+    @property
+    def amc_expr(self):
+        """Return the expression for the angular-momentum-coupling AMC code.
+
+        Return:
+            (str): The expression to the right format for text output.
+        """
+        if self._amc_expr is None:
+            graph = self.graph
+            # Determine the sign (prefactor numerator)
+            sign = (-1)**(len(graph)-1)
+            if self.has_crossing_sign():
+                sign *= -1
+
+            # Determine prefactor denominator
+            sym_fact = 1
+
+            # Vertex exchange
+            for vertex_degrees in self.unsort_io_degrees:
+                if self.unsort_io_degrees.count(vertex_degrees) >= 2:
+                    factor = self.vertex_exchange_sym_factor
+                    if factor != 1:
+                        sym_fact *= factor
+                    break
+
+            # Symmetry factor
+            prop_multiplicity = [0 for _ in range(6)]
+            for vertex_i in graph:
+                for vertex_j in graph:
+                    if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:
+                        prop_multiplicity[graph.number_of_edges(vertex_i,
+                                                                vertex_j) - 1] += 1
+            # Take the factorial of the number of lines to the power
+            # of the multiplicity
+            for prop_id, multiplicity in enumerate(prop_multiplicity):
+                for _ in range(multiplicity):
+                    sym_fact *= factorial(prop_id)
+
+            self._amc_expr = ("- " if sign == -1 else "") \
+                + ("1/%i * " % sym_fact if sym_fact != 1 else "") \
+                + self.get_amc_numerator()
+        return self._amc_expr
+
+    def get_amc_numerator(self):
+        """Return the numerator of the diagram in AMC format.
+
+        Returns:
+            (str): The numerator in AMC format.
+
+        """
+        graph = self.graph
+        indices = " ".join("q%i" % int(prop[3]['qp_state'][3:-1])
+                           for prop in graph.edges(keys=True, data=True))
+        numerator = "sum_{%s}(" % indices
+        for vertex in graph:
+
+            # Get I, J
+            tensor_j, tensor_i = self.unsort_io_degrees[vertex]
+
+            # Get symbol
+            tensor_tex = ("O" if graph.nodes[vertex]['operator']
+                          else "Omega") + "%i%i_{" % (tensor_i, tensor_j)
+
+            # Build indices
+            # First add the qp states corresponding to propagators going out
+            # Add the qp states corresponding to propagators coming in
+            indices = " ".join("q%i" % int(prop[3]['qp_state'][3:-1])
+                               for prop in graph.out_edges(vertex,
+                                                           keys=True,
+                                                           data=True))
+            previous_vertex = vertex - 1
+            while previous_vertex >= 0:
+                new_indices = " ".join("q%i" % int(prop[3]['qp_state'][3:-1])
+                                       for prop in graph.in_edges(vertex,
+                                                                  keys=True,
+                                                                  data=True)
+                                       if prop[0] == previous_vertex)
+                # Only if there were out-going props from this vertex
+                if indices != "" and new_indices != "":
+                    indices += " "
+                indices += new_indices
+                previous_vertex -= 1
+
+            numerator += tensor_tex + indices + "}"
+            if vertex < len(graph)-1:
+                numerator += " * "
+        numerator += ")"
         return numerator
 
     def vertex_expression(self, vertex):
