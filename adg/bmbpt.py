@@ -7,9 +7,6 @@ from builtins import zip
 from builtins import range
 from adg.tools import reversed_enumerate
 import itertools
-import pickle
-import os
-from math import factorial
 import numpy as np
 import networkx as nx
 import adg.tsd
@@ -193,33 +190,6 @@ def check_unconnected_spawn(matrices, max_filled_vertex):
                                 :][:, vertices[max_filled_vertex+1:]].any():
                 del matrices[ind_mat]
                 break
-
-
-def drop_pickle(diagrams):
-    """Dump the diagrams equations using pickles.
-
-    Args:
-        diagrams (list): The BmbptFeymmanDiagrams to be dropped.
-
-    """
-    # Name of output file
-    output_file = "./pickles/adg_bmbpt_order%i.b" \
-        % (len(diagrams[0].graph)-1)
-
-    # Check for existence of pickles directory
-    if not os.path.exists("./pickles"):
-        os.makedirs("./pickles")
-
-    # Add all bmbpt contributions
-    bmbpt_equation = []
-    for diag in diagrams:
-        bmbpt_equation.append(diag.get_equation())
-
-    # Dump the results
-    equations = []
-    equations.append([("{\\Omega}_{0}", 0, 0, []), bmbpt_equation])
-    with open(output_file, "wb") as dump_file:
-        pickle.dump(equations, dump_file)
 
 
 def write_header(tex_file, commands, diags_nbs):
@@ -452,85 +422,6 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         # Use exclusive or for the sign factor
         return self.has_crossing_sign()
 
-    def get_equation(self):
-        """Provide the diagram equation tailored for J. Ripoche Clebsch codes.
-
-        Returns:
-            (list): The constituents of the diagram's equation.
-
-        """
-        graph = self.graph
-        # Determine the sign (prefactor numerator)
-        sign = (-1)**(len(graph)-1)
-        if self.has_crossing_sign():
-            sign *= -1
-
-        # Determine prefactor denominator
-        sym_fact = 1
-
-        # Vertex exchange
-        for vertex_degrees in self.unsort_io_degrees:
-            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
-                factor = self.vertex_exchange_sym_factor
-                if factor != 1:
-                    sym_fact *= factor
-                break
-
-        # Symmetry factor
-        prop_multiplicity = [0 for _ in range(6)]
-        for vertex_i in graph:
-            for vertex_j in graph:
-                if self.graph.number_of_edges(vertex_i, vertex_j) >= 2:
-                    prop_multiplicity[graph.number_of_edges(vertex_i,
-                                                            vertex_j) - 1] += 1
-        # Take the factorial of the number of lines to the power
-        # of the multiplicity
-        for prop_id, multiplicity in enumerate(prop_multiplicity):
-            for _ in range(multiplicity):
-                sym_fact *= factorial(prop_id)
-
-        # Determine list of tensors
-        numerator = self.get_pickle_numerator()
-
-        return [sign, sym_fact, numerator]
-
-    def get_pickle_numerator(self):
-        """Return the numerator of the diagram in pickle format.
-
-        Returns:
-            (list): The elements of the numerator in pickle format.
-
-        """
-        numerator = []
-        graph = self.graph
-        for vertex in graph:
-
-            # Get I, J
-            tensor_i = self.unsort_io_degrees[vertex][1]
-            tensor_j = self.unsort_io_degrees[vertex][0]
-
-            # Get symbol
-            tensor_tex = "{O}" if graph.nodes[vertex]['operator'] \
-                else "{\\Omega}" + "^{%i%i}" % (tensor_i, tensor_j)
-
-            # Build indices
-            # First add the qp states corresponding to propagators going out
-            # Add the qp states corresponding to propagators coming in
-            indices = []
-            indices.extend([int(prop[3]['qp_state'][3:-1])
-                            for prop in graph.out_edges(vertex,
-                                                        keys=True, data=True)])
-            previous_vertex = vertex - 1
-            while previous_vertex >= 0:
-                indices.extend([int(prop[3]['qp_state'][3:-1])
-                                for prop in graph.in_edges(vertex,
-                                                           keys=True,
-                                                           data=True)
-                                if prop[0] == previous_vertex])
-                previous_vertex -= 1
-
-            numerator.append([tensor_tex, tensor_i, tensor_j, indices])
-        return numerator
 
     def vertex_expression(self, vertex):
         """Return the expression associated to a given vertex.

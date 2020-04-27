@@ -55,9 +55,6 @@ def main():
 
     print("Time elapsed: ", datetime.now() - start_time)
 
-    if run_commands.theory in ("BMBPT", "PBMBPT") and run_commands.pickle:
-        adg.bmbpt.drop_pickle(diagrams)
-
     adg.run.print_diags_numbers(run_commands, diags_nbs)
 
     # Writing a feynmp file for each graph

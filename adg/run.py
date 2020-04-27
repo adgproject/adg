@@ -69,9 +69,6 @@ def parse_command_line():
     bmbpt_args.add_argument(
         "-dt", "--draw_tsds", action="store_true",
         help="draw Time-Structure Diagrams (BMBPT or PBMBPT)")
-    bmbpt_args.add_argument(
-        "-p", "--pickle", action="store_true",
-        help="drop a pickle file with the diags expressions (BMBPT or PBMBPT)")
 
     run_args.add_argument(
         "-d", "--draw_diags", action="store_true",
@@ -99,7 +96,6 @@ def parse_command_line():
         args.with_3NF = None
         args.nobs = 2
         args.draw_tsds = None
-        args.pickle = None
     if args.theory != 'MBPT' and not args.interactive:
         args.cd_output = None
 
@@ -149,8 +145,6 @@ def interactive_interface(commands):
                 "Maximal n-body character of the observable? [1-3]"))
         commands.draw_tsds = input(
             "Draw time-structure diagrams? (y/N)").lower() == 'y'
-        commands.pickle = input(
-            "Drop a pickle file with the expressions? (y/N)").lower() == 'y'
 
     commands.draw_diags = input(
         "Generate diagrams FeynMF instructions in TeX file? (y/N) "
