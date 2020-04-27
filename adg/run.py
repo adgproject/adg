@@ -79,9 +79,6 @@ def parse_command_line():
     run_args.add_argument(
         "-c", "--compile", action="store_true",
         help="compile the LaTeX output file with PDFLaTeX")
-    run_args.add_argument(
-        "--amc", action="store_true",
-        help="produce output files for the angular-momentum coupling AMC code")
 
     mbpt_args.add_argument(
         "-cd", "--cd_output", action="store_true",
@@ -157,9 +154,6 @@ def interactive_interface(commands):
 
     commands.draw_diags = input(
         "Generate diagrams FeynMF instructions in TeX file? (y/N) "
-        ).lower() == 'y'
-    commands.amc = input(
-        "Generate an output file for the AMC code? (y/N) "
         ).lower() == 'y'
 
     if commands.theory == "MBPT":
@@ -415,23 +409,6 @@ def write_file_header(latex_file, commands, diags_nbs):
         adg.mbpt.write_header(latex_file, diags_nbs)
 
     latex_file.write("\n\\tableofcontents\n\n")
-
-
-def print_amc_output(directory, diagrams, commands):
-    """Wrap functions for producing an output for the AMC code.
-
-    Args:
-        directory (str): The working directory for ADG.
-        diagrams (list): The list of diagrams to process.
-        commands (Namespace): The flags for running the calculations.
-
-    """
-    if commands.theory == "MBPT":
-        adg.mbpt.print_amc_output(directory, diagrams)
-    elif commands.theory == "BMBPT":
-        adg.bmbpt.print_amc_output(directory, diagrams)
-    elif commands.theory == "PBMBPT":
-        adg.pbmbpt.print_amc_output(directory, diagrams)
 
 
 def compile_manager(directory, pdiag):

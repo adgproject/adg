@@ -109,28 +109,6 @@ def print_cd_output(directory, diagrams):
     conjug_file.close()
 
 
-def print_amc_output(directory, diagrams):
-    """Print a the diagrams in the AMC code format..
-
-    Args:
-        directory (str): The path to the output directory.
-        diagrams (list): All the MbptDiagrams.
-
-    """
-    with open(directory + '/output.amc', 'w') as amc_file:
-        amc_file.write("declare E {\n"
-                       + "    mode=0,\n"
-                       + "    latex=\"E_{0}\",\n"
-                       + "}\n\n")
-        amc_file.write("declare H {\n"
-                       + "    mode=4,\n"
-                       + "    latex=\"H\",\n"
-                       + "}\n\n")
-        for diag in diagrams:
-            amc_file.write('E = %s\n' % diag.amc_expr)
-        amc_file.write('\n')
-
-
 def order_diagrams(diagrams):
     """Order the MBPT diagrams and return the number of diags for each type.
 
@@ -294,39 +272,6 @@ class MbptDiagram(adg.diag.Diagram):
                                               self.cd_numerator(),
                                               self.cd_denominator())
 
-    @property
-    def amc_expr(self):
-        """Return the expression for the angular-momentum-coupling AMC code.
-
-        Return:
-            (str): The expression to the right format for text output.
-        """
-        if self._amc_expr is None:
-            sign = "-" if (self.count_hole_lines()
-                           - self.loops_number()) % 2 == 1 else ""
-            eq_lines = np.array(self.incidence.transpose())
-            neq_lines = np.asarray(list(i for i in set(map(tuple, eq_lines))))
-            nedges_eq = 2**(len(eq_lines)-len(neq_lines))
-
-            self._amc_expr = sign \
-                + " 1/%i *" % nedges_eq if nedges_eq != 1 else ""
-            graph = self.graph
-            indices = "".join(prop[3]['qp_state']
-                              for prop in graph.edges(keys=True, data=True))
-            numerator = " sum_%s(" % indices
-            for vertex in graph:
-                # First add the qp states corresponding to props going out
-                numerator += "H_" + "".join(
-                    prop[3]['qp_state']
-                    for prop in graph.out_edges(vertex, keys=True, data=True))
-                # Add the qp states corresponding to props coming in
-                numerator += "".join(
-                    prop[3]['qp_state']
-                    for prop in graph.in_edges(vertex, keys=True, data=True))
-                if vertex < len(graph)-1:
-                    numerator += " * "
-            self._amc_expr += numerator + ")"
-        return self._amc_expr
 
     def calc_excitation(self):
         """Return an integer coding for the excitation level of the diag.
