@@ -422,7 +422,6 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         # Use exclusive or for the sign factor
         return self.has_crossing_sign()
 
-
     def vertex_expression(self, vertex):
         """Return the expression associated to a given vertex.
 
@@ -572,6 +571,8 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                                   dict(list(zip(perm_vertices,
                                                                 permutation))),
                                                   copy=True)
+                # Check for a permutation that leaves the graph unchanged
+                # Use of intersection is fine as edge/node data is not needed
                 if nx.is_isomorphic(graph,
                                     nx.intersection(graph, permuted_graph)):
                     factor += 1

@@ -272,7 +272,6 @@ class MbptDiagram(adg.diag.Diagram):
                                               self.cd_numerator(),
                                               self.cd_denominator())
 
-
     def calc_excitation(self):
         """Return an integer coding for the excitation level of the diag.
 

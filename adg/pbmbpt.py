@@ -7,24 +7,46 @@ from past.utils import old_div
 from operator import xor
 import copy
 import itertools
+import networkx as nx
 import adg.bmbpt
 import adg.tsd
 import adg.diag
 
 
-def generate_anomalous_diags(graph, nbody_max):
+def generate_anomalous_diags(diag, nbody_max):
     """Generate PBMBPT graphs with anomalous lines, with some redundancy.
 
     Args:
-        graph (NetworkX MultiDiGraph): The graph to generate children from.
+        diag (BmbptFeynmanDiagram): The diagram to generate children from.
         nbody_max (int): The maximal n-body character of a graph vertex.
 
     Returns:
         (list): The anomalous graphs generated.
 
     """
+    graph = diag.graph
     anom_graphs = [graph]
     vertices = [vert for vert in graph if not graph.nodes[vert]['operator']]
+
+    # Determine possible redundancies in to-be-generated graphs
+    perm_vertices = [vertex for vertex, degrees
+                     in enumerate(diag.unsort_io_degrees)
+                     if graph.nodes[vertex]['operator'] is False
+                     and diag.unsort_io_degrees.count(degrees) >= 2]
+    permutations = []
+    op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
+    for permutation in itertools.permutations(perm_vertices):
+        permuted_graph = nx.relabel_nodes(graph,
+                                          dict(list(zip(perm_vertices,
+                                                        permutation))),
+                                          copy=True)
+        # Check for a permutation that leaves the graph unchanged
+        # (only way to keep the edge list of the same length)
+        # (is_isomorphic could possibly be replaced by something faster here)
+        if nx.is_isomorphic(graph,
+                            nx.intersection(graph, permuted_graph),
+                            node_match=op_nm):
+            permutations.append(dict(list(zip(perm_vertices, permutation))))
 
     for edge in graph.edges(keys=True, data=True):
         edge[3]['anomalous'] = False
@@ -35,7 +57,31 @@ def generate_anomalous_diags(graph, nbody_max):
         for vert2 in vertices[vert1:]:
             for _ in range(graph.number_of_edges(vert1, vert2)):
                 tweakable_edges.append((vert1, vert2))
-    for comb in generate_combinations(tweakable_edges):
+
+    edge_combs = generate_combinations(tweakable_edges)
+    unique_edge_combs = copy.deepcopy(edge_combs)
+
+    if len(permutations) > 1:
+        for idx, comb1 in enumerate(edge_combs):
+            for comb2 in edge_combs[idx+1:]:
+                is_same_perm = False
+                if len(comb1) == len(comb2):
+                    for permutation in permutations[1:]:
+                        new_comb = []
+                        for edge in comb2:
+                            new_0 = permutation[edge[0]] \
+                                if edge[0] in permutation.keys() else edge[0]
+                            new_1 = permutation[edge[1]] \
+                                if edge[1] in permutation.keys() else edge[1]
+                            new_comb.append(tuple((new_0, new_1)))
+                        if sorted(comb1) == sorted(new_comb):
+                            is_same_perm = True
+                            break
+                if is_same_perm:
+                    unique_edge_combs.remove(comb1)
+                    break
+
+    for comb in unique_edge_combs:
         new_graph = copy.deepcopy(graph)
         for edge in comb:
             key = sum(1 for prop
@@ -46,16 +92,76 @@ def generate_anomalous_diags(graph, nbody_max):
         anom_graphs.append(new_graph)
 
     # Loop to generate self-contractions
+    anom_em = nx.algorithms.isomorphism.categorical_multiedge_match('anomalous',
+                                                                    False)
     for iter_graph in reversed(anom_graphs):
         test_vertices = []
         for vert in vertices:
             for _ in range(nbody_max - (old_div(iter_graph.degree(vert), 2))):
                 test_vertices.append(vert)
-        for comb in generate_combinations(test_vertices):
-            new_graph = copy.deepcopy(iter_graph)
-            for vert in comb:
-                new_graph.add_edge(vert, vert, anomalous=True)
-            anom_graphs.append(new_graph)
+
+        if test_vertices:
+            unsort_io_degrees = []
+            for node in iter_graph:
+                # Edges going out that are anomalous are annihilators going in
+                nb_anom_out_edges = sum(1 for edge
+                                        in iter_graph.out_edges(nbunch=node,
+                                                                data=True,
+                                                                keys=True)
+                                        if edge[3]['anomalous'])
+                # And thus should be decounted to NetworkX's out_degree...
+                out_degree = iter_graph.out_degree(node) - nb_anom_out_edges
+                # ...and added to NetworkX's in_degree
+                in_degree = iter_graph.in_degree(node) + nb_anom_out_edges
+
+                unsort_io_degrees.append((in_degree, out_degree))
+            unsort_io_degrees = tuple(unsort_io_degrees)
+
+            perm_vertices = [vertex for vertex, degrees
+                             in enumerate(unsort_io_degrees)
+                             if iter_graph.nodes[vertex]['operator'] is False
+                             and unsort_io_degrees.count(degrees) >= 2]
+            permutations = []
+            doubled_graph = adg.diag.create_checkable_diagram(iter_graph)
+            for permutation in itertools.permutations(perm_vertices):
+                permuted_graph = nx.relabel_nodes(doubled_graph,
+                                                  dict(list(zip(perm_vertices,
+                                                                permutation))),
+                                                  copy=True)
+                intersection = copy.deepcopy(doubled_graph)
+                intersection.remove_edges_from(n for n in doubled_graph.edges()
+                                               if n not in permuted_graph.edges())
+                matcher = nx.algorithms.isomorphism.DiGraphMatcher(
+                    doubled_graph,
+                    intersection,
+                    node_match=op_nm,
+                    edge_match=anom_em)
+                if matcher.is_isomorphic():
+                    permutations.append(dict(list(zip(perm_vertices, permutation))))
+
+            combinations = generate_combinations(test_vertices)
+            unique_combs = copy.deepcopy(combinations)
+
+            for idx, comb1 in enumerate(combinations):
+                for comb2 in combinations[idx+1:]:
+                    is_same_perm = False
+                    if len(comb1) == len(comb2):
+                        for permutation in permutations[1:]:
+                            new_comb2 = [permutation[item]
+                                         if item in permutation.keys() else item
+                                         for item in comb2]
+                            if sorted(comb1) == sorted(new_comb2):
+                                is_same_perm = True
+                                break
+                    if is_same_perm:
+                        unique_combs.remove(comb1)
+                        break
+
+            for comb in unique_combs:
+                new_graph = copy.deepcopy(iter_graph)
+                for vert in comb:
+                    new_graph.add_edge(vert, vert, anomalous=True)
+                anom_graphs.append(new_graph)
 
     return anom_graphs
 

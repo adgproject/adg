@@ -245,7 +245,7 @@ def generate_diagrams(commands, id_generator):
     if commands.theory == "PBMBPT":
         for idx, diagram in reversed_enumerate(diagrams):
             new_graphs = adg.pbmbpt.generate_anomalous_diags(
-                diagram.graph,
+                diagram,
                 3 if commands.with_3NF else 2
             )
             new_diags = [adg.pbmbpt.ProjectedBmbptDiagram(diag,
