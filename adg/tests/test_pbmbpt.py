@@ -17,14 +17,11 @@ def test_generate_anomalous_diags():
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
 
-    for edge in diag.graph.edges(keys=True, data='anomalous'):
-        diag.graph[edge[0]][edge[1]][edge[2]]['anomalous'] = False
+    two_body_diags = adg.pbmbpt.generate_anomalous_diags(diag, 2)
+    assert len(two_body_diags) == 3
 
-    two_body_diags = adg.pbmbpt.generate_anomalous_diags(diag.graph, 2)
-    assert len(two_body_diags) == 4
-
-    three_body_diags = adg.pbmbpt.generate_anomalous_diags(diag.graph, 3)
-    assert len(three_body_diags) == 9
+    three_body_diags = adg.pbmbpt.generate_anomalous_diags(diag, 3)
+    assert len(three_body_diags) == 6
 
     diagram = np.array([[0, 2, 0], [0, 0, 2], [0, 0, 0]])
     graph = nx.from_numpy_matrix(diagram,
@@ -33,11 +30,9 @@ def test_generate_anomalous_diags():
     adg.diag.label_vertices([graph], "BMBPT")
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    for edge in diag.graph.edges(keys=True, data='anomalous'):
-        diag.graph[edge[0]][edge[1]][edge[2]]['anomalous'] = False
 
-    two_body_diags = adg.pbmbpt.generate_anomalous_diags(diag.graph, 2)
+    two_body_diags = adg.pbmbpt.generate_anomalous_diags(diag, 2)
     assert len(two_body_diags) == 6
 
-    three_body_diags = adg.pbmbpt.generate_anomalous_diags(diag.graph, 3)
+    three_body_diags = adg.pbmbpt.generate_anomalous_diags(diag, 3)
     assert len(three_body_diags) == 18
