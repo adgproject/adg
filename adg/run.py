@@ -256,7 +256,7 @@ def generate_diagrams(commands, id_generator):
             adg.diag.topologically_distinct_diagrams(new_diags)
             del diagrams[idx]
             diagrams += new_diags
-    adg.diag.topologically_distinct_diagrams(diagrams)
+        adg.diag.topologically_distinct_diagrams(diagrams)
     return diagrams
 
 
