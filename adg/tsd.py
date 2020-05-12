@@ -22,13 +22,14 @@ def time_structure_graph(diag):
     import adg.pbmbpt
     time_graph = diag.graph.to_directed()
     if time_graph.nodes[0]['operator']:
-        for vertex in range(1, len(time_graph)):
-            time_graph.add_edge(0, vertex)
+        time_graph.add_edges_from((0, vertex)
+                                  for vertex in range(1, len(time_graph)))
     if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
         edges_copy = copy.deepcopy(time_graph.edges(keys=True, data=True))
-        for edge in edges_copy:
-            if 'anomalous' in edge[3] and edge[3]['anomalous']:
-                time_graph.remove_edge(edge[0], edge[1], edge[2])
+        time_graph.remove_edges_from((edge[0], edge[1], edge[2])
+                                     for edge in edges_copy
+                                     if 'anomalous' in edge[3]
+                                     and edge[3]['anomalous'])
     return adg.diag.to_skeleton(time_graph)
 
 

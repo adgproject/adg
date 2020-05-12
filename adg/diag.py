@@ -157,12 +157,10 @@ def create_checkable_diagram(pbmbpt_graph):
 
     """
     doubled_graph = copy.deepcopy(pbmbpt_graph)
-    props_to_add = []
-    for prop in doubled_graph.edges(keys=True, data=True):
-        if prop[3]['anomalous'] and not prop[0] == prop[1]:
-            props_to_add.append((prop[1], prop[0]))
-    for prop in props_to_add:
-        doubled_graph.add_edge(prop[0], prop[1], anomalous=True, weight=1)
+    props_to_add = [(prop[1], prop[0]) for prop
+                    in doubled_graph.edges(keys=True, data='anomalous')
+                    if prop[3] and not prop[0] == prop[1]]
+    doubled_graph.add_edges_from(props_to_add, anomalous=True, weight=1)
     return doubled_graph
 
 
@@ -175,8 +173,7 @@ def label_vertices(graphs_list, theory_type):
 
     """
     for graph in graphs_list:
-        for node in graph:
-            graph.nodes[node]['operator'] = False
+        nx.set_node_attributes(graph, False, 'operator')
         if theory_type in ("BMBPT", "PBMBPT"):
             graph.nodes[0]['operator'] = True
 

@@ -4,7 +4,6 @@ from __future__ import division
 
 from builtins import map
 from builtins import range
-from past.utils import old_div
 from adg.tools import reversed_enumerate
 import copy
 import itertools
@@ -184,11 +183,11 @@ def attribute_conjugate(diagrams):
     for idx, diag1 in enumerate(diagrams):
         if diag1.complex_conjugate == -1:
             for diag2 in diagrams[idx+1:]:
-                if diag2.complex_conjugate == -1:
-                    if diag1.is_complex_conjug_of(diag2):
-                        diag1.complex_conjugate = diag2.tags[0]
-                        diag2.complex_conjugate = diag1.tags[0]
-                        break
+                if diag2.complex_conjugate == -1 \
+                        and diag1.is_complex_conjug_of(diag2):
+                    diag1.complex_conjugate = diag2.tags[0]
+                    diag2.complex_conjugate = diag1.tags[0]
+                    break
 
 
 def extract_cd_denom(start_graph, subgraph):
@@ -281,16 +280,13 @@ class MbptDiagram(adg.diag.Diagram):
         """
         max_excited_states = 0
         for row in range(1, self.graph.number_of_nodes()):
-            nb_excited_states = 0
-            for col in range(self.graph.number_of_edges()):
-                if self.incidence[0:row, col].sum() == 1:
-                    nb_excited_states += 1
-                elif self.incidence[0:row, col].sum() == -1:
-                    nb_excited_states += 1
+            nb_excited_states = sum(1 for col
+                                    in range(self.graph.number_of_edges())
+                                    if self.incidence[0:row, col].sum() == 1)
             if nb_excited_states > max_excited_states \
-                    and nb_excited_states != 4:
+                    and nb_excited_states != 2:
                 max_excited_states = nb_excited_states
-        return old_div(max_excited_states, 2) if max_excited_states != 0 else 2
+        return max_excited_states if max_excited_states != 0 else 2
 
     def count_hole_lines(self):
         """Return an integer for the number of hole lines in the graph.
@@ -320,16 +316,12 @@ class MbptDiagram(adg.diag.Diagram):
         labels = list(string.ascii_lowercase)
         # Labelling needs to be shifted for higher orders
         if len(self.graph) < 6:
-            h_labels = labels[0:8]
-            p_labels = labels[8:]
+            h_labels, p_labels = labels[0:8], labels[8:]
         else:
-            h_labels = labels[0:13]
-            p_labels = labels[13:]
+            h_labels, p_labels = labels[0:13], labels[13:]
         for prop in self.graph.edges(keys=True, data=True):
-            if prop[0] < prop[1]:
-                prop[3]['qp_state'] = h_labels.pop(0)
-            else:
-                prop[3]['qp_state'] = p_labels.pop(0)
+            prop[3]['qp_state'] = h_labels.pop(0) if prop[0] < prop[1] \
+                else p_labels.pop(0)
 
     def extract_denominator(self):
         """Return the denominator for a MBPT graph.

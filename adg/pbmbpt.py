@@ -28,8 +28,7 @@ def generate_anomalous_diags(diag, nbody_max):
     anom_graphs = [graph]
     vertices = [vert for vert in graph if not graph.nodes[vert]['operator']]
 
-    for edge in graph.edges(keys=True, data=True):
-        edge[3]['anomalous'] = False
+    nx.set_edge_attributes(graph, False, 'anomalous')
 
     # Turn normal propagators in anomalous ones
     tweakable_edges = []
@@ -161,7 +160,7 @@ def equivalent_permutations(graph):
     """Return the list of permutations generating equivalent PBMBPT diags.
 
     Attributes:
-        graph (Networkx <ultiDiGraph): The graph to be checked.
+        graph (Networkx MultiDiGraph): The graph to be checked.
 
     Returns:
         (list): The mappings giving equivalent graphs, inc. identity.
@@ -340,13 +339,11 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                 numerator += "".join(
                     prop[3]['qp_state']
                     for prop in graph.in_edges(vertex, keys=True, data=True)
-                    if prop[0] == previous_vertex and prop[0] != prop[1]
-                    and not prop[3]['anomalous'])
+                    if prop[0] == previous_vertex and not prop[3]['anomalous'])
                 # Read anomalous propagators backwards
                 anom_props = [prop for prop
                               in graph.in_edges(vertex, keys=True, data=True)
                               if prop[0] == previous_vertex
-                              and prop[0] != prop[1]
                               and prop[3]['anomalous']]
                 numerator += "".join(
                     (anom_prop[3]['qp_state'].split("}")[0] + "}")
@@ -385,15 +382,16 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         prop_multiplicity = [0 for _ in range(6)]
         for vertex_i in self.graph:
             for vertex_j in self.graph:
-                nb_normal_props = 0
-                nb_anomalous_props = 0
-                for prop in self.graph.edges(vertex_i,
-                                             keys=True,
-                                             data='anomalous'):
-                    if prop[1] == vertex_j and prop[3]:
-                        nb_anomalous_props += 1
-                    if prop[1] == vertex_j and not prop[3]:
-                        nb_normal_props += 1
+                nb_normal_props = sum(1 for prop
+                                      in self.graph.edges(vertex_i,
+                                                          keys=True,
+                                                          data='anomalous')
+                                      if prop[1] == vertex_j and not prop[3])
+                nb_anomalous_props = sum(1 for prop
+                                         in self.graph.edges(vertex_i,
+                                                             keys=True,
+                                                             data='anomalous')
+                                         if prop[1] == vertex_j and prop[3])
                 if nb_anomalous_props >= 2:
                     prop_multiplicity[nb_anomalous_props - 1] += 1
                 if nb_normal_props >= 2:
