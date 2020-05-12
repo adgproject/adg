@@ -559,25 +559,38 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
 
         """
         if self._vert_exchange_sym_fact is None:
-            # Starts at 0 as the identity belongs to the set of permutations
-            factor = 0
-            graph = self.graph
-            perm_vertices = [vertex for vertex, degrees
-                             in enumerate(self.unsort_io_degrees)
-                             if graph.nodes[vertex]['operator'] is False
-                             and self.unsort_io_degrees.count(degrees) >= 2]
-            for permutation in itertools.permutations(perm_vertices):
-                permuted_graph = nx.relabel_nodes(graph,
-                                                  dict(list(zip(perm_vertices,
-                                                                permutation))),
-                                                  copy=True)
-                # Check for a permutation that leaves the graph unchanged
-                # Use of intersection is fine as edge/node data is not needed
-                if nx.is_isomorphic(graph,
-                                    nx.intersection(graph, permuted_graph)):
-                    factor += 1
+            factor = len(self.equivalent_permutations())
             self._vert_exchange_sym_fact = max(factor, 1)
         return self._vert_exchange_sym_fact
+
+    def equivalent_permutations(self):
+        """Return the permutations generating equivalent diagrams.
+
+        Returns:
+            (list): Vertices permutations as dictionnaries.
+
+        """
+        perm_vertices = [vertex for vertex, degrees
+                         in enumerate(self.unsort_io_degrees)
+                         if not self.graph.nodes[vertex]['operator']
+                         and self.unsort_io_degrees.count(degrees) >= 2]
+        permutations = []
+        op_nm = nx.algorithms.isomorphism.categorical_node_match('operator',
+                                                                 False)
+        for permutation in itertools.permutations(perm_vertices):
+            permuted_graph = nx.relabel_nodes(self.graph,
+                                              dict(list(zip(perm_vertices,
+                                                            permutation))),
+                                              copy=True)
+            # Check for a permutation that leaves the graph unchanged
+            # (only way to keep the edge list of the same length)
+            # (is_isomorphic could maybe be replaced by something faster here)
+            if nx.is_isomorphic(self.graph,
+                                nx.intersection(self.graph, permuted_graph),
+                                node_match=op_nm):
+                permutations.append(dict(list(zip(perm_vertices,
+                                                  permutation))))
+        return permutations
 
     def extract_integral(self):
         """Return the integral part of the Feynman expression of the diag.
