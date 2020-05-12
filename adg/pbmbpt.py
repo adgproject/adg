@@ -406,6 +406,42 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                 factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
         return factor
 
+    def equivalent_permutations(self):
+        """Return the permutations generating equivalent diagrams.
+
+        Returns:
+            (list): Vertices permutations as dictionnaries.
+
+        """
+        op_nm = nx.algorithms.isomorphism.categorical_node_match('operator',
+                                                                 False)
+        anom_em = nx.algorithms.isomorphism.categorical_multiedge_match(
+            'anomalous', False)
+
+        perm_vertices = [vertex for vertex, degrees
+                         in enumerate(self.unsort_io_degrees)
+                         if not self.graph.nodes[vertex]['operator']
+                         and self.unsort_io_degrees.count(degrees) >= 2]
+        permutations = []
+        doubled_graph = adg.diag.create_checkable_diagram(self.graph)
+        for perm in itertools.permutations(perm_vertices):
+            permuted_graph = nx.relabel_nodes(doubled_graph,
+                                              dict(list(zip(perm_vertices,
+                                                            perm))),
+                                              copy=True)
+            # Check for a permutation that leaves the graph unchanged
+            # (only way to keep the edge list of the same length)
+            intersection = copy.deepcopy(doubled_graph)
+            intersection.remove_edges_from(e for e in doubled_graph.edges()
+                                           if e not in permuted_graph.edges())
+            check = nx.algorithms.isomorphism.DiGraphMatcher(doubled_graph,
+                                                             intersection,
+                                                             node_match=op_nm,
+                                                             edge_match=anom_em)
+            if check.is_isomorphic():
+                permutations.append(dict(list(zip(perm_vertices, perm))))
+        return permutations
+
     def has_anom_props_linked_sign(self):
         """Return True if there is a minus sign associated to anom props.
 
