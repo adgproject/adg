@@ -49,7 +49,7 @@ setup(
     extras_require=dict(
         # List additional groups of dependencies here (e.g. development
         # dependencies). You can install these using the following syntax:
-        # $ pip2 install -e .[develop]
+        # $ pip install -e .[develop]
         develop=[
             'pytest>=3.6,<5.0',
             'pytest-cov',
