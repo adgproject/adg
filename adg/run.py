@@ -255,8 +255,8 @@ def generate_diagrams(commands, id_generator):
                          for spawn_idx, diag in enumerate(new_graphs)]
             adg.diag.topologically_distinct_diagrams(new_diags)
             del diagrams[idx]
+            adg.pbmbpt.filter_new_diagrams(new_diags, diagrams)
             diagrams += new_diags
-        adg.diag.topologically_distinct_diagrams(diagrams)
     return diagrams
 
 

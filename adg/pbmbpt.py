@@ -205,6 +205,38 @@ def equivalent_permutations(graph):
     return permutations
 
 
+def filter_new_diagrams(new_diags, old_diags):
+    """Eliminate diagrams having a topologically equivalent diag.
+
+    Attibutes:
+        new_diags (list): The list of newly created PBMBPT diagrams.
+        old_diags (list): The list of already checked PBMBPT diagrams.
+
+    """
+    iso = nx.algorithms.isomorphism
+    op_nm = iso.categorical_node_match('operator', False)
+    anom_em = iso.categorical_multiedge_match('anomalous', False)
+    for ind, new_diag in adg.tools.reversed_enumerate(new_diags):
+        # Only anomalous props that are not self-contractions can produce
+        # topologically equivalent diagrams through our generation process
+        if new_diag.has_anom_non_selfcontracted_props():
+            new_gr = adg.diag.create_checkable_diagram(new_diag.graph)
+            # Go through the list backwards because first items are BMBPT diags
+            for old_diag in reversed(old_diags):
+                if not isinstance(old_diag, ProjectedBmbptDiagram):
+                    # All PBMBPT diags have been parsed
+                    break
+                if old_diag.has_anom_non_selfcontracted_props() \
+                        and old_diag.io_degrees == new_diag.io_degrees:
+                    old_gr = adg.diag.create_checkable_diagram(old_diag.graph)
+                    matcher = iso.DiGraphMatcher(old_gr, new_gr,
+                                                 node_match=op_nm,
+                                                 edge_match=anom_em)
+                    if matcher.is_isomorphic():
+                        del new_diags[ind]
+                        break
+
+
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
     """Describes a PBMBPT diagram with its related properties.
 
@@ -467,6 +499,18 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                             counter += 1
         # True if overall factor is odd
         return counter % 2 == 1
+
+    def has_anom_non_selfcontracted_props(self):
+        """Return True if the diagram has anomalous propagators.
+
+        Returns:
+            (bool): The presence of anomalous propagators.
+
+        """
+        for prop in self.graph.edges(keys=True, data='anomalous'):
+            if prop[3] and prop[1] != prop[0]:
+                return True
+        return False
 
     def write_diag_exps(self, latex_file, norder):
         """Write the expressions associated to a diagram in the LaTeX file.
