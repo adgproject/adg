@@ -14,6 +14,9 @@ def reversed_enumerate(data):
     Returns:
         (tuple): Index and item.
 
+    >>> list(reversed_enumerate(['A', 'B', 'C']))
+    [(2, 'C'), (1, 'B'), (0, 'A')]
+
     """
     for index, item in zip(count(len(data) - 1, -1), reversed(data)):
         yield index, item
