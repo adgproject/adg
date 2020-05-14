@@ -221,20 +221,34 @@ def filter_new_diagrams(new_diags, old_diags):
         # topologically equivalent diagrams through our generation process
         if new_diag.has_anom_non_selfcontracted_props():
             new_gr = adg.diag.create_checkable_diagram(new_diag.graph)
-            # Go through the list backwards because first items are BMBPT diags
-            for old_diag in reversed(old_diags):
-                if not isinstance(old_diag, ProjectedBmbptDiagram):
-                    # All PBMBPT diags have been parsed
-                    break
-                if old_diag.has_anom_non_selfcontracted_props() \
-                        and old_diag.io_degrees == new_diag.io_degrees:
-                    old_gr = adg.diag.create_checkable_diagram(old_diag.graph)
-                    matcher = iso.DiGraphMatcher(old_gr, new_gr,
+            has_equivalent = False
+            for new_diag_2 in new_diags[:ind]:
+                if new_diag_2.io_degrees == new_diag.io_degrees \
+                        and new_diag_2.has_anom_non_selfcontracted_props():
+                    new_gr_2 = adg.diag.create_checkable_diagram(new_diag_2.graph)
+                    matcher = iso.DiGraphMatcher(new_gr_2, new_gr,
                                                  node_match=op_nm,
                                                  edge_match=anom_em)
                     if matcher.is_isomorphic():
-                        del new_diags[ind]
+                        has_equivalent = True
                         break
+            if not has_equivalent:
+                # Go through the list backwards because first items are BMBPT diags
+                for old_diag in reversed(old_diags):
+                    if not isinstance(old_diag, ProjectedBmbptDiagram):
+                        # All PBMBPT diags have been parsed
+                        break
+                    if old_diag.io_degrees == new_diag.io_degrees \
+                            and old_diag.has_anom_non_selfcontracted_props():
+                        old_gr = adg.diag.create_checkable_diagram(old_diag.graph)
+                        matcher = iso.DiGraphMatcher(old_gr, new_gr,
+                                                     node_match=op_nm,
+                                                     edge_match=anom_em)
+                        if matcher.is_isomorphic():
+                            has_equivalent = True
+                            break
+            if has_equivalent:
+                del new_diags[ind]
 
 
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
