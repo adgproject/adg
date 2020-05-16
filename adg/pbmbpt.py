@@ -220,35 +220,31 @@ def filter_new_diagrams(new_diags, old_diags):
         # Only anomalous props that are not self-contractions can produce
         # topologically equivalent diagrams through our generation process
         if new_diag.has_anom_non_selfcontracted_props():
-            new_gr = adg.diag.create_checkable_diagram(new_diag.graph)
-            has_equivalent = False
             for new_diag_2 in new_diags[:ind]:
                 if new_diag_2.io_degrees == new_diag.io_degrees \
                         and new_diag_2.has_anom_non_selfcontracted_props():
-                    new_gr_2 = adg.diag.create_checkable_diagram(new_diag_2.graph)
-                    matcher = iso.DiGraphMatcher(new_gr_2, new_gr,
+                    matcher = iso.DiGraphMatcher(new_diag.check_graph,
+                                                 new_diag_2.check_graph,
                                                  node_match=op_nm,
                                                  edge_match=anom_em)
                     if matcher.is_isomorphic():
-                        has_equivalent = True
+                        del new_diags[ind]
                         break
-            if not has_equivalent:
-                # Go through the list backwards because first items are BMBPT diags
+            else:
+                # Go through the list backwards: first items are BMBPT diags
                 for old_diag in reversed(old_diags):
                     if not isinstance(old_diag, ProjectedBmbptDiagram):
                         # All PBMBPT diags have been parsed
                         break
                     if old_diag.io_degrees == new_diag.io_degrees \
                             and old_diag.has_anom_non_selfcontracted_props():
-                        old_gr = adg.diag.create_checkable_diagram(old_diag.graph)
-                        matcher = iso.DiGraphMatcher(old_gr, new_gr,
+                        matcher = iso.DiGraphMatcher(old_diag.check_graph,
+                                                     new_diag.check_graph,
                                                      node_match=op_nm,
                                                      edge_match=anom_em)
                         if matcher.is_isomorphic():
-                            has_equivalent = True
+                            del new_diags[ind]
                             break
-            if has_equivalent:
-                del new_diags[ind]
 
 
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
@@ -265,10 +261,16 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         vert_exp (list): The expression associated to the vertices.
         hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
             the energy operator only character of the graph.
+        unique_id (int): A unique number associated to the diagram.
+        vertex_exchange_sym_factor (int): Lazy-initialized symmetry factor
+            associated to the vertex exchange, stored to avoid being computed
+            several times.
+        check_graph (NetworkX MultiDiGraph): A copy of the graph that can be
+            used for topological equivalence checks (lazy-initialized).
 
     """
 
-    __slots__ = ()
+    __slots__ = ('_check_graph',)
 
     def __init__(self, graph, unique_id, tag, child_tag):
         """Generate a PBMBPT diagram by copying a BMBPT one.
@@ -299,6 +301,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             unsort_io_degrees.append((in_degree, out_degree))
         self.unsort_io_degrees = tuple(unsort_io_degrees)
         self.io_degrees = tuple(sorted(self.unsort_io_degrees))
+        self._check_graph = None
 
     def attribute_qp_labels(self):
         """Attribute the appropriate qp labels to the graph's propagators."""
@@ -467,18 +470,17 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                          if not self.graph.nodes[vertex]['operator']
                          and self.unsort_io_degrees.count(degrees) >= 2]
         permutations = []
-        doubled_graph = adg.diag.create_checkable_diagram(self.graph)
         for perm in itertools.permutations(perm_vertices):
-            permuted_graph = nx.relabel_nodes(doubled_graph,
+            permuted_graph = nx.relabel_nodes(self.check_graph,
                                               dict(list(zip(perm_vertices,
                                                             perm))),
                                               copy=True)
             # Check for a permutation that leaves the graph unchanged
             # (only way to keep the edge list of the same length)
-            intersection = copy.deepcopy(doubled_graph)
-            intersection.remove_edges_from(e for e in doubled_graph.edges()
+            intersection = copy.deepcopy(self.check_graph)
+            intersection.remove_edges_from(e for e in self.check_graph.edges()
                                            if e not in permuted_graph.edges())
-            check = nx.algorithms.isomorphism.DiGraphMatcher(doubled_graph,
+            check = nx.algorithms.isomorphism.DiGraphMatcher(self.check_graph,
                                                              intersection,
                                                              node_match=op_nm,
                                                              edge_match=anom_em)
@@ -541,6 +543,21 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             + "&= %s" % self.feynman_exp
             + r" \nonumber \\" + "\n"
             + "&= %s\\end{align}\n" % self.diag_exp)
+
+    @property
+    def check_graph(self):
+        """Return a graph that can be used for topological equivalence checks.
+
+        Lazy-initialized to reduce memory and CPU costs as this operation
+        requires a deep copy.
+
+        Returns:
+            (NetworkX MultiDiGraph): The graph with doubled anomalous props.
+
+        """
+        if self._check_graph is None:
+            self._check_graph = adg.diag.create_checkable_diagram(self.graph)
+        return self._check_graph
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the PBMBPT graph and its associated TSD to the LaTeX file.
