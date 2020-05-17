@@ -25,13 +25,29 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
-    >>> diagrams_generation(1, False, 2, False) #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
-    >>> diagrams_generation(1, True, 3, False)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 6], [0, 0]]), array([[0, 4], [0, 0]]), array([[0, 2], [0, 0]])]
-    >>> diagrams_generation(2, False, 2, True)  #doctest: +NORMALIZE_WHITESPACE
-    [array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]),
-     array([[0, 1, 1], [0, 0, 3], [0, 0, 0]])]
+    >>> diagrams = diagrams_generation(1, False, 2, False)
+    >>> len(diagrams)
+    2
+    >>> array([[0, 4], [0, 0]]) in diagrams
+    True
+    >>> array([[0, 2], [0, 0]]) in diagrams
+    True
+    >>> diagrams = diagrams_generation(1, True, 3, False)
+    >>> len(diagrams)
+    3
+    >>> array([[0, 6], [0, 0]]) in diagrams
+    True
+    >>> array([[0, 4], [0, 0]]) in diagrams
+    True
+    >>> array([[0, 2], [0, 0]]) in diagrams
+    True
+    >>> diagrams = diagrams_generation(2, False, 2, True)
+    >>> len(diagrams)
+    2
+    >>> array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]) in diagrams
+    True
+    >>> array([[0, 1, 1], [0, 0, 3], [0, 0, 0]]) in diagrams
+    True
 
     """
     # Matrices contain operator vertex + p_order perturbative vertices
