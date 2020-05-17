@@ -56,7 +56,7 @@ def generate_anomalous_diags(diag, nbody_max):
                                        - (old_div(iter_graph.degree(v), 2)))]
         if test_vertices:
             for comb in unique_vertex_combinations(
-                    test_vertices, equivalent_permutations(iter_graph)):
+                    test_vertices, equiv_generating_permutations(iter_graph)):
                 new_graph = copy.deepcopy(iter_graph)
                 new_graph.add_edges_from(((vert, vert) for vert in comb),
                                          anomalous=True)
@@ -156,7 +156,7 @@ def unique_vertex_combinations(vertices, permutations):
     return unique_combs
 
 
-def equivalent_permutations(graph):
+def equiv_generating_permutations(graph):
     """Return the list of permutations generating equivalent PBMBPT diags.
 
     Attributes:
