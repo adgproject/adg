@@ -73,6 +73,9 @@ def generate_combinations(iter_list):
     Returns:
         (list): A list with all the possible combinations of all lengths.
 
+    >>> print(generate_combinations([1, 2, 3]))
+    [(1, 2), (1, 3), (1,), (2,), (3,), (1, 2, 3), (2, 3)]
+
     """
     combinations = []
     for i in range(1, len(iter_list) + 1):
@@ -91,6 +94,11 @@ def unique_edge_combinations(edges, permutations):
 
     Returns:
         (list): The list of edges producing unique anomalous diagrams.
+
+    >>> edges = [(1, 3), (2, 3)]
+    >>> permutations = [{1: 1, 2: 2}, {1: 2, 2: 1}]
+    >>> print(unique_edge_combinations(edges, permutations))
+    [((1, 3), (2, 3)), ((2, 3),)]
 
     """
     edge_combs = generate_combinations(edges)
@@ -132,6 +140,11 @@ def unique_vertex_combinations(vertices, permutations):
 
     Returns:
         (list): Vertex combinations that do not produce equivalent diags.
+
+    >>> vertices = [1, 3]
+    >>> permutations = [{1: 1, 3: 3}, {1: 3, 3: 1}]
+    >>> print(unique_vertex_combinations(vertices, permutations))
+    [(1, 3), (1,)]
 
     """
     combinations = generate_combinations(vertices)
