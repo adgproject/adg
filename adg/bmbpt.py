@@ -25,28 +25,28 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
-    >>> diagrams = diagrams_generation(1, False, 2, False)
-    >>> len(diagrams)
+    >>> diags = diagrams_generation(1, False, 2, False)
+    >>> len(diags)
     2
-    >>> array([[0, 4], [0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 4], [0, 0]], diag) for diag in diags)
     True
-    >>> array([[0, 2], [0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 2], [0, 0]], diag) for diag in diags)
     True
-    >>> diagrams = diagrams_generation(1, True, 3, False)
-    >>> len(diagrams)
+    >>> diags = diagrams_generation(1, True, 3, False)
+    >>> len(diags)
     3
-    >>> array([[0, 6], [0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 6], [0, 0]], diag) for diag in diags)
     True
-    >>> array([[0, 4], [0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 4], [0, 0]], diag) for diag in diags)
     True
-    >>> array([[0, 2], [0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 2], [0, 0]], diag) for diag in diags)
     True
-    >>> diagrams = diagrams_generation(2, False, 2, True)
-    >>> len(diagrams)
+    >>> diags = diagrams_generation(2, False, 2, True)
+    >>> len(diags)
     2
-    >>> array([[0, 2, 2], [0, 0, 2], [0, 0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 2, 2], [0, 0, 2], [0, 0, 0]], d) for d in diags)
     True
-    >>> array([[0, 1, 1], [0, 0, 3], [0, 0, 0]]) in diagrams
+    >>> any(np.array_equal([[0, 1, 1], [0, 0, 3], [0, 0, 0]], d) for d in diags)
     True
 
     """
