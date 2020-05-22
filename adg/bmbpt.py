@@ -230,7 +230,7 @@ def write_header(tex_file, commands, diags_nbs):
         )
     if commands.with_3NF:
         tex_file.write(
-            "3N valid diagrams: %i\n\n" % diags_nbs['nb_3_hf']
+            "3N valid diagrams: %i\n\n" % diags_nbs['nb_3']
             + "3N canonical diagrams for the energy: %i\n\n"
             % diags_nbs['nb_3_hf']
             + "3N canonical diagrams for a generic operator only: %i\n\n"
