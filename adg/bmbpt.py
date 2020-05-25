@@ -406,13 +406,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         prefactor = "(-1)^%i " % (len(self.graph) - 1)
         if self.has_sign_factor():
             prefactor = "-%s" % prefactor
-        sym_fact = ""
-        for vertex_degrees in self.unsort_io_degrees:
-            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
-                vertex_sym = self.vertex_exchange_sym_factor
-                sym_fact += "%i" % vertex_sym if vertex_sym > 1 else ""
-                break
-        sym_fact += self.multiplicity_symmetry_factor()
+        sym_fact = self.symmetry_factor()
         prefactor = "\\frac{%s}{%s}\\sum_{k_i}" % (prefactor, sym_fact) \
             if sym_fact != "" else "%s\\sum_{k_i}" % prefactor
 
@@ -437,6 +431,21 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """
         # Use exclusive or for the sign factor
         return self.has_crossing_sign()
+
+    def symmetry_factor(self):
+        """Return the overall symmetry factor of the diagram.
+
+        Returns:
+            (str): The combination of all symmetry factors.
+        """
+        sym_factor = ""
+        for vertex_degrees in self.unsort_io_degrees:
+            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
+                vertex_sym = self.vertex_exchange_sym_factor
+                sym_factor += "%i" % vertex_sym if vertex_sym > 1 else ""
+                break
+        sym_factor += self.multiplicity_symmetry_factor()
+        return sym_factor
 
     def vertex_expression(self, vertex):
         """Return the expression associated to a given vertex.

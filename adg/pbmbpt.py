@@ -432,6 +432,24 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                               if prop[3]['anomalous'])
         return numerator
 
+    def symmetry_factor(self):
+        """Return the overall symmetry factor of the diagram.
+
+        Returns:
+            (str): The combination of all symmetry factors.
+        """
+        sym_factor = ""
+        vertex_sym = 1
+        anom_factor = self.anomalous_contractions_factor()
+        for vertex_degrees in self.unsort_io_degrees:
+            if self.unsort_io_degrees.count(vertex_degrees) >= 2:
+                vertex_sym = self.vertex_exchange_sym_factor
+                break
+        sym_factor += "%i" % (vertex_sym*anom_factor) \
+            if (vertex_sym*anom_factor) > 1 else ""
+        sym_factor += self.multiplicity_symmetry_factor()
+        return sym_factor
+
     def multiplicity_symmetry_factor(self):
         """Return the symmetry factor associated with propagators multiplicity.
 
@@ -465,6 +483,16 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             elif multiplicity >= 2:
                 factor += "(%i!)" % (prop_id+1) + "^%i" % multiplicity
         return factor
+
+    def anomalous_contractions_factor(self):
+        """Return the factor associated with anomalous self-contractions.
+
+        Returns:
+            (int): The anomalous self-contractions factor.
+
+        """
+        nb_self_contractions = len(list(nx.selfloop_edges(self.graph)))
+        return pow(2, nb_self_contractions)
 
     def equivalent_permutations(self):
         """Return the permutations generating equivalent diagrams.
