@@ -316,6 +316,32 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         self.io_degrees = tuple(sorted(self.unsort_io_degrees))
         self._check_graph = None
 
+    def extract_integral(self):
+        """Return the integral part of the Feynman expression of the diag.
+
+        Returns:
+            (str): The integral part of its Feynman expression.
+
+        """
+        pert_vertex_indices = list(range(1, len(self.graph)))
+        integral = "".join("\\mathrm{d}\\tau_%i" % vertex
+                           for vertex in pert_vertex_indices)
+
+        normal_props = [prop for prop in self.graph.edges(data='anomalous')
+                        if not prop[2]]
+
+        if len(pert_vertex_indices) > 1:
+            for vertex_i in pert_vertex_indices:
+                integral += "".join("\\theta(\\tau_%i-\\tau_%i) " % (vertex_j,
+                                                                     vertex_i)
+                                    for vertex_j in pert_vertex_indices
+                                    if (vertex_i, vertex_j, False)
+                                    in normal_props)
+        integral += "".join("e^{-\\tau_%i %s}"
+                            % (vertex, self.vert_exp[vertex])
+                            for vertex in pert_vertex_indices)
+        return integral
+
     def attribute_qp_labels(self):
         """Attribute the appropriate qp labels to the graph's propagators."""
         idx_counter = 1
@@ -437,6 +463,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
 
         Returns:
             (str): The combination of all symmetry factors.
+
         """
         sym_factor = ""
         vertex_sym = 1
