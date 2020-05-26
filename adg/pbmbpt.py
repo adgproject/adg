@@ -372,12 +372,12 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
                       if not prop[3]['anomalous']) \
             + "}_{" \
             + "".join("%s"
-                      % (prop[3]['qp_state'].split("}")[1] + "}"
+                      % (prop[3]['qp_state'].split("}")[0] + "}"
                          if prop[3]['anomalous'] else prop[3]['qp_state'])
                       for prop
                       in self.graph.in_edges(vertex, keys=True, data=True)) \
             + "".join("%s"
-                      % (prop[3]['qp_state'].split("}")[0] + "}")
+                      % (prop[3]['qp_state'].split("}")[1] + "}")
                       for prop
                       in self.graph.out_edges(vertex, keys=True, data=True)
                       if prop[3]['anomalous']) \
