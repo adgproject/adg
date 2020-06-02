@@ -38,7 +38,7 @@ Generic options:
 -i, --interactive   execute ADG in interactive mode
 
 (P)BMBPT options:
-**************
+*****************
 
 -can, --canonical           consider only canonical diagrams
 -nobs, --nbody_observable   maximal n-body character of the observable [1-3], default = 2
