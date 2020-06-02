@@ -1,5 +1,10 @@
 """Routines and class for Many-Body Perturbation Theory diagrams."""
+from __future__ import print_function
+from __future__ import division
 
+from builtins import map
+from builtins import range
+from adg.tools import reversed_enumerate
 import copy
 import itertools
 import string
@@ -28,13 +33,13 @@ def diagrams_generation(order):
 
     """
     # Generate all 1-magic square of dimension order
-    seeds = [k for k in itertools.permutations(range(order), order)]
+    seeds = [k for k in itertools.permutations(list(range(order)), order)]
     all_matrices = [[[0 if i != j else 1 for i in range(order)]
                      for j in k]
                     for k in seeds]
     traceless = adg.diag.no_trace(all_matrices)
     coeffs = [i for i in itertools.combinations_with_replacement(
-        range(len(traceless)), 2)]
+        list(range(len(traceless))), 2)]
     double = []
 
     for coef in coeffs:
@@ -120,19 +125,19 @@ def order_diagrams(diagrams):
     quadruples = []
     quintuples_and_higher = []
 
-    for i_diag in xrange(len(diagrams)-1, -1, -1):
-        if diagrams[i_diag].excitation_level == 1:
-            singles.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 2:
-            doubles.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 3:
-            triples.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level == 4:
-            quadruples.append(diagrams[i_diag])
-        elif diagrams[i_diag].excitation_level >= 5:
-            quintuples_and_higher.append(diagrams[i_diag])
+    for i_diag, diag in reversed_enumerate(diagrams):
+        if diag.excitation_level == 1:
+            singles.append(diag)
+        elif diag.excitation_level == 2:
+            doubles.append(diag)
+        elif diag.excitation_level == 3:
+            triples.append(diag)
+        elif diag.excitation_level == 4:
+            quadruples.append(diag)
+        elif diag.excitation_level >= 5:
+            quintuples_and_higher.append(diag)
         else:
-            print "Zero or negative excitation level!\n"
+            print("Zero or negative excitation level!\n")
             exit()
         del diagrams[i_diag]
 
@@ -153,7 +158,16 @@ def order_diagrams(diagrams):
         'quintuples+': len(quintuples_and_higher)
         }
 
-    return diagrams, diags_nb_per_type
+    section_flags = {
+        'singles': singles[0].tags[0] if singles else -1,
+        'doubles': doubles[0].tags[0] if doubles else -1,
+        'triples': triples[0].tags[0] if triples else -1,
+        'quadruples': quadruples[0].tags[0] if quadruples else -1,
+        'quintuples+': quintuples_and_higher[0].tags[0]
+                       if quintuples_and_higher else -1
+    }
+
+    return diagrams, diags_nb_per_type, section_flags
 
 
 def attribute_conjugate(diagrams):
@@ -164,15 +178,16 @@ def attribute_conjugate(diagrams):
 
     Args:
         diagrams (list): The topologically unique MbptDiagrams.
+
     """
     for idx, diag1 in enumerate(diagrams):
         if diag1.complex_conjugate == -1:
             for diag2 in diagrams[idx+1:]:
-                if diag2.complex_conjugate == -1:
-                    if diag1.is_complex_conjug_of(diag2):
-                        diag1.complex_conjugate = diag2.tags[0]
-                        diag2.complex_conjugate = diag1.tags[0]
-                        break
+                if diag2.complex_conjugate == -1 \
+                        and diag1.is_complex_conjug_of(diag2):
+                    diag1.complex_conjugate = diag2.tags[0]
+                    diag2.complex_conjugate = diag1.tags[0]
+                    break
 
 
 def extract_cd_denom(start_graph, subgraph):
@@ -213,8 +228,12 @@ class MbptDiagram(adg.diag.Diagram):
         expr (str): The MBPT expression associated to the diagram.
         cd_expr (str): The expression associated to the diagram in a
             computer-readable format.
+        adjacency_mat (NumPy array): The adjacency matrix of the graph.
 
     """
+
+    __slots__ = ('incidence', 'excitation_level', 'complex_conjugate', 'expr',
+                 'cd_expr', 'adjacency_mat')
 
     def __init__(self, mbpt_graph, tag_num):
         """Generate a MBPT diagram using the appropriate NetworkX graph.
@@ -234,6 +253,7 @@ class MbptDiagram(adg.diag.Diagram):
         self.excitation_level = self.calc_excitation()
         self.complex_conjugate = -1
         self.loops_number()
+        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
@@ -259,17 +279,14 @@ class MbptDiagram(adg.diag.Diagram):
 
         """
         max_excited_states = 0
-        for row in xrange(1, self.graph.number_of_nodes()):
-            nb_excited_states = 0
-            for col in range(self.graph.number_of_edges()):
-                if self.incidence[0:row, col].sum() == 1:
-                    nb_excited_states += 1
-                elif self.incidence[0:row, col].sum() == -1:
-                    nb_excited_states += 1
+        for row in range(1, self.graph.number_of_nodes()):
+            nb_excited_states = sum(1 for col
+                                    in range(self.graph.number_of_edges())
+                                    if self.incidence[0:row, col].sum() == 1)
             if nb_excited_states > max_excited_states \
-                    and nb_excited_states != 4:
+                    and nb_excited_states != 2:
                 max_excited_states = nb_excited_states
-        return max_excited_states / 2 if max_excited_states != 0 else 2
+        return max_excited_states if max_excited_states != 0 else 2
 
     def count_hole_lines(self):
         """Return an integer for the number of hole lines in the graph.
@@ -299,16 +316,12 @@ class MbptDiagram(adg.diag.Diagram):
         labels = list(string.ascii_lowercase)
         # Labelling needs to be shifted for higher orders
         if len(self.graph) < 6:
-            h_labels = labels[0:8]
-            p_labels = labels[8:]
+            h_labels, p_labels = labels[0:8], labels[8:]
         else:
-            h_labels = labels[0:13]
-            p_labels = labels[13:]
+            h_labels, p_labels = labels[0:13], labels[13:]
         for prop in self.graph.edges(keys=True, data=True):
-            if prop[0] < prop[1]:
-                prop[3]['qp_state'] = h_labels.pop(0)
-            else:
-                prop[3]['qp_state'] = p_labels.pop(0)
+            prop[3]['qp_state'] = h_labels.pop(0) if prop[0] < prop[1] \
+                else p_labels.pop(0)
 
     def extract_denominator(self):
         """Return the denominator for a MBPT graph.
@@ -413,28 +426,24 @@ class MbptDiagram(adg.diag.Diagram):
             nb_loops += 1
         return nb_loops
 
-    def write_section(self, result, commands, diags_nbs):
+    def write_section(self, result, commands, flags):
         """Write sections for MBPT result file.
 
         Args:
             result (file): The LaTeX output file to be written in.
             commands (dict): The flags associated with run management.
-            diags_nbs (dict): A dict with the number of diagrams per
-                excitation level type.
+            flags (dict): The identifier of each section-starting graph.
 
         """
-        if self.tags[0] == 0 and diags_nbs['singles'] != 0:
+        if self.tags[0] == flags['singles']:
             result.write("\\section{Singles}\n\n")
-        elif self.tags[0] == diags_nbs['singles']:
+        elif self.tags[0] == flags['doubles']:
             result.write("\\section{Doubles}\n\n")
-        elif self.tags[0] == diags_nbs['singles'] + diags_nbs['doubles']:
+        elif self.tags[0] == flags['triples']:
             result.write("\\section{Triples}\n\n")
-        elif self.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
-                              + diags_nbs['triples']):
+        elif self.tags[0] == flags['quadruples']:
             result.write("\\section{Quadruples}\n\n")
-        elif self.tags[0] == (diags_nbs['singles'] + diags_nbs['doubles']
-                              + diags_nbs['triples']
-                              + diags_nbs['quadruples']):
+        elif self.tags[0] == flags['quintuples+']:
             result.write("\\section{Quintuples and higher}\n\n")
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         if self.complex_conjugate >= 0:

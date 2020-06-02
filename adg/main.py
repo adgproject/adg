@@ -1,9 +1,11 @@
 """Main routine of the Automated Diagram Generator."""
+from __future__ import print_function
 
 from datetime import datetime
 import adg.run
 import adg.bmbpt
 import adg.mbpt
+import adg.tools
 import adg.tsd
 
 
@@ -27,18 +29,21 @@ def main():
     directory = adg.run.attribute_directory(run_commands)
 
     # Start computing everything
-    print "Running"
+    print("Running")
     start_time = datetime.now()
 
-    diagrams = adg.run.generate_diagrams(run_commands)
+    id_gene = adg.tools.UniqueID()
 
-    # Ordering the diagrams in a convenient way and checking them for doubles
-    diagrams, diags_per_type = adg.run.order_diagrams(diagrams, run_commands)
+    diagrams = adg.run.generate_diagrams(run_commands, id_gene)
+
+    # Ordering the diagrams in a convenient way
+    diagrams, diags_nbs, section_flags = adg.run.order_diagrams(diagrams,
+                                                                run_commands)
 
     # Produce TSD for the expressions of BMBPT diagrams
-    if run_commands.theory == "BMBPT":
+    if run_commands.theory in ("BMBPT", "PBMBPT"):
 
-        diagrams_time = [adg.tsd.TimeStructureDiagram(diagram, diagram.tags[0])
+        diagrams_time = [adg.tsd.TimeStructureDiagram(diagram)
                          for diagram in diagrams]
 
         diagrams_time, nb_tree_tsds = adg.tsd.treat_tsds(diagrams_time)
@@ -48,9 +53,9 @@ def main():
     else:
         diagrams_time = []
 
-    print "Time elapsed: ", datetime.now() - start_time
+    print("Time elapsed: ", datetime.now() - start_time)
 
-    adg.run.print_diags_numbers(run_commands, diags_per_type)
+    adg.run.print_diags_numbers(run_commands, diags_nbs)
 
     # Writing a feynmp file for each graph
     if run_commands.draw_diags:
@@ -60,18 +65,19 @@ def main():
     # Write everything down in a nice LaTeX file
     latex_file = open(directory + '/result.tex', 'w')
 
-    adg.run.write_file_header(latex_file, run_commands, diags_per_type)
+    adg.run.write_file_header(latex_file, run_commands, diags_nbs)
 
-    if run_commands.theory == "BMBPT" and run_commands.draw_tsds:
+    if run_commands.theory in ("BMBPT", "PBMBPT") and run_commands.draw_tsds:
         adg.tsd.write_section(latex_file, directory, run_commands.draw_diags,
-                              diagrams_time, nb_tree_tsds)
+                              diagrams_time, nb_tree_tsds, diagrams)
     for diag in diagrams:
-        diag.write_section(latex_file, run_commands, diags_per_type)
+        diag.write_section(latex_file, run_commands, section_flags)
 
         if run_commands.draw_diags:
             diag.write_graph(latex_file, directory, run_commands.draw_tsds)
 
-        if run_commands.theory == 'BMBPT' and run_commands.draw_tsds:
+        if run_commands.theory in ("BMBPT", "PBMBPT") \
+                and run_commands.draw_tsds:
             diag.write_tsd_info(diagrams_time, latex_file)
 
     latex_file.write("\\end{document}")
@@ -88,7 +94,7 @@ def main():
 
     adg.run.clean_folders(directory, run_commands)
 
-    print "\nADG ended successfully!\n"
+    print("\nADG ended successfully!\n")
 
 
 if __name__ == "__main__":
