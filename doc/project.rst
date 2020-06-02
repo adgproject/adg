@@ -17,18 +17,17 @@ files may be produced as well.
 
 Status
 ------
-As for now, the code is capable of handling two different formalisms, i.e.
-Many-Body Perturbation Theory (MBPT) and Bogoliubov Many-Body Perturbation
-Theory (BMBPT).
+As for now, the code is capable of handling three different formalisms, i.e.
+Many-Body Perturbation Theory (MBPT), Bogoliubov Many-Body Perturbation
+Theory (BMBPT). and Projected Bogoliubov Many-Body Perturbation Theory (PBMBPT).
   - For MBPT, the code generates all Hartree-Fock energy diagrams at any given
     order along with their expression and additional information
     (conjugate diagram, excitation level...).
-  - For BMBPT, the code generates all diagrams for a generic observable
+  - For (P)BMBPT, the code generates all diagrams for a generic observable
     commuting with the Hamiltonian, along with their time-dependent and
     time-integrated expressions.
 
 Future developments
 -------------------
-Extensions under discussions are diagrams and expressions for Particle-Number
-Projected BMBPT as well as diagrams and expressions generation for Gorkov
-Self-Consistent Green's Functions (GSCGF).
+ADG is currently being extended to diagrams and expressions generation for
+Gorkov Self-Consistent Green's Functions (GSCGF).

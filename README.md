@@ -18,41 +18,40 @@ files may be produced as well.
 
 ## Status
 As for now, the code is capable of handling two different formalisms, i.e.
-Many-Body Perturbation Theory (MBPT) and Bogoliubov Many-Body Perturbation
-Theory (BMBPT).
+Many-Body Perturbation Theory (MBPT), Bogoliubov Many-Body Perturbation
+Theory (BMBPT) and Projected Bogoliubov Many-Body Perturbation Theory (PBMBPT).
   - For MBPT, the code generates all Hartree-Fock energy diagrams at any given
     order along with their expression and additional information
     (conjugate diagram, excitation level...).
-  - For BMBPT, the code generates all diagrams for a generic observable
+  - For (P)BMBPT, the code generates all diagrams for a generic observable
     commuting with the Hamiltonian, along with their time-dependent and
     time-integrated expressions.
 
 ## Future developments
-Extensions under discussions are diagrams and expressions for Particle-Number
-Restored BMBPT as well as diagrams and expressions generation for Gorkov
-Self-Consistent Green's Functions (GSCGF).
+ADG is currently being extended to diagrams and expressions generation for
+Gorkov Self-Consistent Green's Functions (GSCGF).
 
 ## Install
 The easiest way to install the latest stable version of ADG is to use
 ```
-pip2 install adg
+pip install adg
 ```
 Updating after the release of a new version can be done via
 ```
-pip2 install --upgrade adg
+pip install --upgrade adg
 ```
 
 To install ADG after downloading the source files, run
 ```
-pip2 install <project_folder>
+pip install <project_folder>
 ```
 or alternatively
 ```
-python2 setup.py install
+python setup.py install
 ```
 If you want to install ADG in ```develop``` mode, then run
 ```
-pip2 install -e <project_folder>
+pip install -e <project_folder>
 ```
 
 ## Dependencies
@@ -61,6 +60,7 @@ In order to run the code, you will need a Python install >= 2.7.1
   	* networkx >= 2.0
     * numpy
     * scipy
+    * future
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,
@@ -131,10 +131,11 @@ following [DOI](https://doi.org/10.1016/j.cpc.2018.11.023).
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
-Copyright (C) 2018-2019 ADG Dev Team
+Copyright (C) 2018-2020 ADG Dev Team
 Pierre Arthuis - University of Surrey (previously Irfu, CEA, UPSaclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF
 Raphaël-David Lasseri - ESNT, Irfu, CEA, UPSaclay (previously IPN, CNRS/IN2P3, UPSud, UPSaclay)
-Alexander Tichai - ESNT, Irfu, CEA, UPSaclay
+Julien Ripoche - CEA, DAM, DIF
+Alexander Tichai - ESNT, Irfu, CEA, UPSaclay & MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & EMMI, GSI, Darmstadt
 ```

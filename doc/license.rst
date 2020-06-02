@@ -11,4 +11,5 @@ ADG is licensed under under GNU General Public License version 3
   Thomas Duguet
   Jean-Paul Ebran
   Raphaël-David Lasseri
+  Julien Ripoche
   Alexander Tichai
