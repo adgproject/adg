@@ -35,10 +35,10 @@ before_script:
   # show what's installed
   - pip list
 
-standard:
+standard2.7:
   script: "adg --help"
 
-test:
+test2.7:
   variables:
       OPTIONAL_DEPS: 1
   script:
@@ -46,7 +46,7 @@ test:
       - source run_test_suite.sh
       - cd ../..
 
-test_beta:
+test_beta2.7:
   variables:
       OPTIONAL_DEPS: 1
       PIP_FLAGS: "--pre"
@@ -55,7 +55,7 @@ test_beta:
       - source run_test_suite.sh
       - cd ../..
 
-docs:
+docs2.7:
   variables:
       OPTIONAL_DEPS: 1
       BUILD_DOCS: 1
@@ -63,6 +63,75 @@ docs:
       - cd doc;
       - make html;
       - cd ../..
+
+
+standard3.5:
+  image: python:3.7
+  script: "adg --help"
+
+test3.5:
+  image: python:3.5
+  variables:
+      OPTIONAL_DEPS: 1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_beta3.5:
+  image: python:3.5
+  variables:
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+docs3.5:
+  image: python:3.5
+  variables:
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../..
+
+
+standard3.6:
+  image: python:3.6
+  script: "adg --help"
+
+test3.6:
+  image: python:3.6
+  variables:
+      OPTIONAL_DEPS: 1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_beta3.6:
+  image: python:3.6
+  variables:
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+docs3.6:
+  image: python:3.6
+  variables:
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../..
+
 
 standard3.7:
   image: python:3.7
@@ -89,6 +158,40 @@ test_beta3.7:
 
 docs3.7:
   image: python:3.7
+  variables:
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../..
+
+
+standard3.8:
+  image: python:3.8
+  script: "adg --help"
+
+test3.8:
+  image: python:3.8
+  variables:
+      OPTIONAL_DEPS: 1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_beta3.8:
+  image: python:3.8
+  variables:
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+docs3.8:
+  image: python:3.8
   variables:
       OPTIONAL_DEPS: 1
       BUILD_DOCS: 1
