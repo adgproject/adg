@@ -2,7 +2,8 @@
 
 [![Documentation Status](https://readthedocs.org/projects/adg/badge/?version=master)](https://adg.readthedocs.io/en/master/?badge=master)
 [![Build Status](https://travis-ci.com/adgproject/adg.svg?branch=master)](https://travis-ci.com/adgproject/adg)
-[![PyPI version](https://badge.fury.io/py/adg.svg)](https://badge.fury.io/py/adg)
+[![PyPI version](https://img.shields.io/pypi/v/adg.svg)](https://pypi.org/project/adg/)
+[![Python version](https://img.shields.io/pypi/pyversions/adg)](https://pypi.org/project/adg/)
 
 ## Description
 ADG is a tool generating diagrams and producing their expressions for given
