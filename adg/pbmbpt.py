@@ -74,15 +74,14 @@ def generate_combinations(iter_list):
         (list): A list with all the possible combinations of all lengths.
 
     >>> print(generate_combinations([1, 2, 3]))
-    [(1, 2), (1, 3), (1,), (2,), (3,), (1, 2, 3), (2, 3)]
+    [(1,), (1, 2), (1, 2, 3), (1, 3), (2,), (2, 3), (3,)]
 
     """
     combinations = []
     for i in range(1, len(iter_list) + 1):
         combinations += [k for k in itertools.combinations(iter_list, i)]
     # Remove duplicates
-    combinations = list(set(combinations))
-    return combinations
+    return sorted(set(combinations))
 
 
 def unique_edge_combinations(edges, permutations):
@@ -144,7 +143,7 @@ def unique_vertex_combinations(vertices, permutations):
     >>> vertices = [1, 3]
     >>> permutations = [{1: 1, 3: 3}, {1: 3, 3: 1}]
     >>> print(unique_vertex_combinations(vertices, permutations))
-    [(1, 3), (1,)]
+    [(1, 3), (3,)]
 
     """
     combinations = generate_combinations(vertices)
