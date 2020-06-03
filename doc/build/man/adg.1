@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "Jun 02, 2020" "2.0.0-rc1" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Jun 03, 2020" "2.0.0-rc1" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -2452,7 +2452,7 @@ A list with all the possible combinations of all lengths.
 .nf
 .ft C
 >>> print(generate_combinations([1, 2, 3]))
-[(1, 2), (1, 3), (1,), (2,), (3,), (1, 2, 3), (2, 3)]
+[(1,), (1, 2), (1, 2, 3), (1, 3), (2,), (2, 3), (3,)]
 .ft P
 .fi
 .UNINDENT
@@ -2539,7 +2539,7 @@ Vertex combinations that do not produce equivalent diags.
 >>> vertices = [1, 3]
 >>> permutations = [{1: 1, 3: 3}, {1: 3, 3: 1}]
 >>> print(unique_vertex_combinations(vertices, permutations))
-[(1, 3), (1,)]
+[(1, 3), (3,)]
 .ft P
 .fi
 .UNINDENT
@@ -2855,6 +2855,66 @@ Write the appropriate section for tsd diagrams in the LaTeX file.
 \fBdiagrams\fP (\fIlist\fP) \-\- All produced BmbptFeymmanDiagrams.
 .UNINDENT
 .UNINDENT
+.UNINDENT
+.SS Tools and utilities
+.sp
+Miscellaneous diagram\-unrelated tools for ADG.
+.INDENT 0.0
+.TP
+.B class adg.tools.UniqueID
+Bases: \fBfuture.types.newobject.newobject\fP
+.sp
+Counter making sure of generating a unique ID number for diagrams.
+.INDENT 7.0
+.TP
+.B current
+The unique identifier to be attributedto a diagram.
+.INDENT 7.0
+.TP
+.B Type
+int
+.UNINDENT
+.UNINDENT
+.INDENT 7.0
+.TP
+.B current
+.UNINDENT
+.INDENT 7.0
+.TP
+.B get()
+Iterate on counter value and return current value.
+.INDENT 7.0
+.TP
+.B Returns
+A unique identifier for the diagram.
+.TP
+.B Return type
+(int)
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B adg.tools.reversed_enumerate(data)
+Return the index and item of the data in reversed order.
+.INDENT 7.0
+.TP
+.B Parameters
+\fBdata\fP (\fIiterable data structure\fP) \-\- The data to be used..
+.TP
+.B Returns
+Index and item.
+.TP
+.B Return type
+(tuple)
+.UNINDENT
+.sp
+.nf
+.ft C
+>>> list(reversed_enumerate([\(aqA\(aq, \(aqB\(aq, \(aqC\(aq]))
+[(2, \(aqC\(aq), (1, \(aqB\(aq), (0, \(aqA\(aq)]
+.ft P
+.fi
 .UNINDENT
 .SH DEVELOPERS TEAM
 .sp
