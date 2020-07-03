@@ -16,7 +16,7 @@ def test_attribute_expressions():
     adg.diag.label_vertices([graph], "BMBPT")
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     # Normally attributed in produce_expressions
     diag.tsd_is_tree = True
@@ -48,7 +48,7 @@ def test_attribute_expressions():
     adg.diag.label_vertices([graph], "BMBPT")
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
     tsd.equivalent_trees = tsd.treat_cycles()
 
     diag.attribute_expressions(tsd)
@@ -106,9 +106,9 @@ def test_vertex_exchange_sym_factor():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
-    assert diag.vertex_exchange_sym_factor() == '2'
+    assert diag.vertex_exchange_sym_factor == 2
 
-    # Test case with symmetry factor
+    # Test case with higher symmetry factor
     diagram = np.array([[0, 2, 2, 2],
                         [0, 0, 0, 0],
                         [0, 0, 0, 0],
@@ -119,7 +119,7 @@ def test_vertex_exchange_sym_factor():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
-    assert diag.vertex_exchange_sym_factor() == '6'
+    assert diag.vertex_exchange_sym_factor == 6
 
     # Test case without symmetry factor
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
@@ -129,7 +129,7 @@ def test_vertex_exchange_sym_factor():
     adg.diag.label_vertices([graph], 'BMBPT')
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
-    assert diag.vertex_exchange_sym_factor() == ''
+    assert diag.vertex_exchange_sym_factor == 1
 
 
 def test_extract_integral():
@@ -220,7 +220,7 @@ def test_time_tree_denominator():
     adg.diag.label_vertices([graph], "BMBPT")
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
-    tsd = adg.tsd.TimeStructureDiagram(diag, 0)
+    tsd = adg.tsd.TimeStructureDiagram(diag)
 
     denom_ref = "\\epsilon^{}_{k_{1}k_{2}}\\ \\epsilon^{}_{k_{3}k_{4}}\\ "
     assert diag.time_tree_denominator(tsd.graph) == denom_ref

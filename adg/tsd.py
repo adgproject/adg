@@ -1,25 +1,35 @@
 """Module with functions relative to time-stucture diagrams, called by ADG."""
 
+from builtins import range
+from adg.tools import reversed_enumerate
+import copy
 import os
 import math
 import networkx as nx
 import adg.diag
 
 
-def time_structure_graph(graph):
+def time_structure_graph(diag):
     """Return the time-structure graph associated to the graph.
 
     Args:
-        graph (NetwrokX MultiDiGraph): The BMBPT graph of interest.
+        diag (BmbptFeymmanDiagram): The BMBPT graph of interest.
 
     Returns:
         (NetworkX MultiDiGraph): The time-structure diagram.
 
     """
-    time_graph = graph.to_directed()
-    if time_graph.node[0]['operator']:
-        for vertex in xrange(1, len(time_graph)):
-            time_graph.add_edge(0, vertex)
+    import adg.pbmbpt
+    time_graph = diag.graph.to_directed()
+    if time_graph.nodes[0]['operator']:
+        time_graph.add_edges_from((0, vertex)
+                                  for vertex in range(1, len(time_graph)))
+    if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
+        edges_copy = copy.deepcopy(time_graph.edges(keys=True, data=True))
+        time_graph.remove_edges_from((edge[0], edge[1], edge[2])
+                                     for edge in edges_copy
+                                     if 'anomalous' in edge[3]
+                                     and edge[3]['anomalous'])
     return adg.diag.to_skeleton(time_graph)
 
 
@@ -36,16 +46,16 @@ def tree_time_structure_den(time_graph):
     denominator = ""
     i = 0
     for vertex in time_graph:
-        if not time_graph.node[vertex]['operator']:
-            time_graph.node[vertex]['label'] = 'a_%i' % (i + 1)
+        if not time_graph.nodes[vertex]['operator']:
+            time_graph.nodes[vertex]['label'] = 'a_%i' % (i + 1)
             i += 1
     for vertex in time_graph:
-        if not time_graph.node[vertex]['operator']:
+        if not time_graph.nodes[vertex]['operator']:
             if time_graph.out_degree(vertex) == 0:
-                denominator += time_graph.node[vertex]['label']
+                denominator += time_graph.nodes[vertex]['label']
             else:
-                denominator += "(%s" % time_graph.node[vertex]['label'] \
-                    + "".join("+ %s" % time_graph.node[descendant]['label']
+                denominator += "(%s" % time_graph.nodes[vertex]['label'] \
+                    + "".join("+ %s" % time_graph.nodes[descendant]['label']
                               for descendant
                               in nx.descendants(time_graph, vertex)) + ")"
     return denominator
@@ -66,9 +76,9 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     eq_labelled_tsds = ""
     for eq_tree_graph in equivalent_trees:
         for comp_tdiag in labelled_tsds:
-            if sorted(tuple((eq_tree_graph.in_degree(node),
-                             eq_tree_graph.out_degree(node))
-                            for node in eq_tree_graph)) \
+            if tuple(sorted(tuple((eq_tree_graph.in_degree(node),
+                                   eq_tree_graph.out_degree(node))
+                                  for node in eq_tree_graph))) \
                     == comp_tdiag.io_degrees \
                     and comp_tdiag.is_tree:
                 if nx.is_isomorphic(eq_tree_graph, comp_tdiag.graph, op_nm):
@@ -77,7 +87,8 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
     return "".join("%s." % eq_labelled_tsds.strip(','))
 
 
-def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
+def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds,
+                  diagrams):
     """Write the appropriate section for tsd diagrams in the LaTeX file.
 
     Args:
@@ -86,6 +97,7 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
         pdiag (bool): ``True`` if diagrams are to be drawn.
         time_diagrams (list): The ensemble of TSDs.
         nb_tree_tsds (int): Number of tree TSDs.
+        diagrams (list): All produced BmbptFeymmanDiagrams.
 
     """
     latex_file.write("\\section{Time-structure diagrams}\n\n"
@@ -96,10 +108,10 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
         latex_file.write("\\paragraph{Time-structure diagram T%i:}\n"
                          % (tdiag.tags[0]+1))
         if pdiag:
-            time_file = open(directory
-                             + "/Diagrams/time_%i.tex" % tdiag.tags[0])
-            latex_file.write('\n\\begin{center}\n%s\n\\end{center}\n\n'
-                             % time_file.read())
+            with open(directory
+                      + "/Diagrams/time_%i.tex" % tdiag.tags[0]) as time_file:
+                latex_file.write('\n\\begin{center}\n%s\n\\end{center}\n\n'
+                                 % time_file.read())
         latex_file.write("\\begin{equation}\n\\text{T%i} = "
                          "%s\\end{equation}\n\n"
                          % (tdiag.tags[0]+1, tdiag.expr))
@@ -114,8 +126,8 @@ def write_section(latex_file, directory, pdiag, time_diagrams, nb_tree_tsds):
             latex_file.write('\n\\end{center}\n\n')
         latex_file.write("Number of related Feynman diagrams: %i.\n\n"
                          % (len(tdiag.tags)-1))
-        feynman_diags = ",".join(" %i" % (tag+1) for tag in tdiag.tags[1:])
-        latex_file.write("Related Feynman diagrams:%s.\n\n" % feynman_diags)
+        latex_file.write("Related Feynman diagrams:%s.\n\n"
+                         % tdiag.get_feynman_diags(diagrams))
 
 
 def disentangle_cycle(time_graph, cycle_nodes):
@@ -188,9 +200,9 @@ def treat_tsds(diagrams_time):
 
     """
     tree_tsds = []
-    for i_diag in xrange(len(diagrams_time)-1, -1, -1):
-        if diagrams_time[i_diag].is_tree:
-            tree_tsds.append(diagrams_time[i_diag])
+    for i_diag, diag in reversed_enumerate(diagrams_time):
+        if diag.is_tree:
+            tree_tsds.append(diag)
             del diagrams_time[i_diag]
 
     adg.diag.topologically_distinct_diagrams(tree_tsds)
@@ -219,21 +231,24 @@ class TimeStructureDiagram(adg.diag.Diagram):
             associated to a non-tree TSD.
         is_tree (bool): The tree or non-tree character of a TSD.
         expr (str): The Goldstone denominator associated to the TSD.
+        resum (int): The resummation power of a tree TSD.
 
     """
 
-    def __init__(self, bmbpt_diag, tag_num):
+    __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
+
+    def __init__(self, bmbpt_diag):
         """Generate a tsd diagram out of a BMBPT one.
 
         Args:
             bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph used to be
                 turned into a TSD.
-            tag_num (int): The number associated to the TSD.
 
         """
-        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag.graph))
-        self.tags = [tag_num]
-        self.perms = {tag_num: {i: i for i in xrange(len(self.graph))}}
+        adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
+        self.tags = [bmbpt_diag.unique_id]
+        self.perms = {bmbpt_diag.unique_id: {i: i
+                                             for i in range(len(self.graph))}}
         self.equivalent_trees = []
         if nx.is_arborescence(self.graph):
             self.is_tree = True
@@ -255,25 +270,23 @@ class TimeStructureDiagram(adg.diag.Diagram):
         tree_graphs = []
         cycles_left = True
         while cycles_left:
-            for gr_index in xrange(len(graphs)-1, -1, -1):
-                graphs += disentangle_cycle(graphs[gr_index],
-                                            find_cycle(graphs[gr_index]))
+            for gr_index, graph in reversed_enumerate(graphs):
+                graphs += disentangle_cycle(graph, find_cycle(graph))
                 del graphs[gr_index]
             cycles_left = False
-            for graph_indx in xrange(len(graphs)-1, -1, -1):
-                if nx.is_arborescence(graphs[graph_indx]):
-                    tree_graphs.append(graphs[graph_indx])
+            for graph_indx, graph in reversed_enumerate(graphs):
+                if nx.is_arborescence(graph):
+                    tree_graphs.append(graph)
                     del graphs[graph_indx]
                 else:
                     cycles_left = True
         tree_graphs_uniq = []
         for t_graph in tree_graphs:
-            new_graph = True
             for t_graph_uniq in tree_graphs_uniq:
                 if nx.edges(t_graph) == nx.edges(t_graph_uniq):
-                    new_graph = False
                     break
-            if new_graph:
+            # If the TSD is a new one
+            else:
                 tree_graphs_uniq.append(t_graph)
         return tree_graphs_uniq
 
@@ -281,7 +294,7 @@ class TimeStructureDiagram(adg.diag.Diagram):
         """Draw the equivalent tree TSDs for a given non-tree TSD.
 
         Args:
-            latex_file (file): The output LaTeX file of the priogram.
+            latex_file (file): The output LaTeX file of the program.
 
         """
         for index, graph in enumerate(self.equivalent_trees):
@@ -289,9 +302,9 @@ class TimeStructureDiagram(adg.diag.Diagram):
                                       'MBPT',
                                       'equivalent%i_%i' % (self.tags[0],
                                                            index))
-            diag_file = open("equivalent%i_%i.tex" % (self.tags[0], index))
-            latex_file.write(diag_file.read())
-            diag_file.close()
+            with open("equivalent%i_%i.tex"
+                      % (self.tags[0], index)) as diag_file:
+                latex_file.write(diag_file.read())
             os.unlink("./equivalent%i_%i.tex" % (self.tags[0], index))
 
     def resummation_power(self):
@@ -307,3 +320,27 @@ class TimeStructureDiagram(adg.diag.Diagram):
             power /= 1 + len(nx.descendants(self.graph, node))
 
         return power
+
+    def get_feynman_diags(self, feyn_diagrams):
+        """Return the list of Feynman diagrams associated to the TSD.
+
+        Args:
+            feyn_diagrams (list): All produced BmbptFeymmanDiagrams.
+
+        Returns:
+            (str): All the identifiers of associated BmbptFeymmanDiagrams.
+
+        """
+        if isinstance(feyn_diagrams[0], adg.pbmbpt.ProjectedBmbptDiagram):
+            identifiers = ""
+            for tag in self.tags[1:]:
+                for diag in feyn_diagrams:
+                    if diag.unique_id == tag:
+                        identifiers += " %i.%i," % (diag.tags[0]+1,
+                                                    diag.tags[1]+1)
+                        break
+            identifiers = identifiers.strip(',')
+        else:
+            identifiers = ",".join(" %i" % (tag+1) for tag in self.tags[1:])
+
+        return identifiers

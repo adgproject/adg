@@ -34,11 +34,11 @@ Generic options:
 *****************
 
 -o, --order         order of the diagrams [1-9]
--t, --theory        theory of interest: MBPT or BMBPT
+-t, --theory        theory of interest: MBPT, BMBPT or PBMBPT
 -i, --interactive   execute ADG in interactive mode
 
-BMBPT options:
-**************
+(P)BMBPT options:
+*****************
 
 -can, --canonical           consider only canonical diagrams
 -nobs, --nbody_observable   maximal n-body character of the observable [1-3], default = 2
@@ -61,7 +61,7 @@ Output files
 ------------
 
 The output of the program is stored in a folder named after the theory, and a
-subfolder named after the order, e.g. ``/MBPT/Order-4``. In the case of BMBPT,
+subfolder named after the order, e.g. ``/MBPT/Order-4``. In the case of (P)BMBPT,
 suffixes are added depending on the n-body forces of the observable, and if
 three-body forces were used or only canonical diagrams computed, i.e. for our
 previous example, results would be stored under

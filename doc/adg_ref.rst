@@ -9,4 +9,6 @@ ADG Reference for Developers
     adg/diag
     adg/mbpt
     adg/bmbpt
+    adg/pbmbpt
     adg/tsd
+    adg/tools
