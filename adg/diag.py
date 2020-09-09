@@ -190,8 +190,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
     p_order = graph.number_of_nodes()
     diag_size = 20*p_order
 
-    theories = ["MBPT", "BMBPT", "PBMBPT"]
-    prop_types = ["half_prop", "prop_pm", "prop_pm"]
+    theories = ["MBPT", "BMBPT", "PBMBPT", "BIMSRG"]
+    prop_types = ["half_prop", "prop_pm", "prop_pm", "half_prop"]
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
@@ -205,7 +205,18 @@ def feynmf_generator(graph, theory_type, diagram_name):
         fmf_file.write(propagator_style("prop_mm"))
 
     # Set the position of the vertices
-    fmf_file.write(vertex_positions(graph, p_order))
+    if theory_type == "BIMSRG":
+        positions = "\\fmftop{v3}\\fmfbottom{v0}\n" \
+            + "\\fmf{phantom}{v0,v1}\n" \
+            + "\\fmf{phantom}{v1,v2}\n" \
+            + "\\fmf{phantom}{v2,v3}\n" \
+            + "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}\n" \
+            + "\\fmfv{d.shape=square,d.filled=empty,d.size=3thick}{v2}\n" \
+            + "\\fmffreeze\n"
+        fmf_file.write(positions)
+
+    else:
+        fmf_file.write(vertex_positions(graph, p_order))
 
     # Special config for self-contraction
     if theory_type == "PBMBPT":
@@ -326,7 +337,7 @@ def vertex_positions(graph, order):
     for vert in range(order-1):
         positions += "\\fmf{phantom}{v%i,v%i}\n" % (vert, (vert+1)) \
             + ("\\fmfv{d.shape=square,d.filled=full,d.size=3thick"
-               if graph.nodes[vert]['operator']
+               if 'operator' in graph.nodes[vert] and graph.nodes[vert]['operator']
                else "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick") \
             + "}{v%i}\n" % vert
     positions += "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v%i}\n" \

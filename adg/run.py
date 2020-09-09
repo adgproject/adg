@@ -51,8 +51,8 @@ def parse_command_line():
         "-o", "--order", type=int, choices=list(range(1, 10)),
         help="order of the diagrams (>=1)")
     basic_args.add_argument(
-        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT'],
-        help="theory of interest: MBPT, BMBPT or PBMBPT")
+        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT', 'BIMSRG'],
+        help="theory of interest: MBPT, BMBPT, PBMBPT, BIMSRG")
     basic_args.add_argument(
         "-i", "--interactive", action="store_true",
         help="execute ADG in interactive mode")
@@ -121,12 +121,12 @@ def interactive_interface(commands):
         print("Perturbative order too small or too high!")
         commands.order = int(input('Order of the diagrams? [1-9]\n'))
 
-    theories = ["BMBPT", "MBPT", "PBMBPT"]
+    theories = ["BMBPT", "MBPT", "PBMBPT", "BIMSRG"]
 
-    commands.theory = input('MBPT, BMBPT or PBMBPT?\n').upper()
+    commands.theory = input('MBPT, BMBPT, PBMBPT or BIMSRG?\n').upper()
     while commands.theory not in theories:
         print("Invalid theory!")
-        commands.theory = input('MBPT, BMBPT or PBMBPT?\n').upper()
+        commands.theory = input('MBPT, BMBPT, PBMBPT or BIMSRG?\n').upper()
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         commands.canonical = input(
@@ -220,6 +220,8 @@ def generate_diagrams(commands, id_generator):
                                                  commands.with_3NF,
                                                  commands.nbody_observable,
                                                  commands.canonical)
+    elif commands.theory == "BIMSRG":
+        diagrams = adg.bimsrg.diagrams_generation(commands.order)
     else:
         print("Invalid theory! Exiting program.")
         exit()
@@ -233,13 +235,17 @@ def generate_diagrams(commands, id_generator):
             if (nx.number_weakly_connected_components(diag)) != 1:
                 del diags[i_diag]
 
-    adg.diag.label_vertices(diags, commands.theory)
+    if commands.theory != "BIMSRG":
+        adg.diag.label_vertices(diags, commands.theory)
 
     if commands.theory in ('BMBPT', "PBMBPT"):
         diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, id_generator.get())
                     for graph in diags]
     elif commands.theory == 'MBPT':
         diagrams = [adg.mbpt.MbptDiagram(graph, id_generator.get())
+                    for graph in diags]
+    elif commands.theory == "BIMSRG":
+        diagrams = [adg.bimsrg.BimsrgDiagram(graph, id_generator.get())
                     for graph in diags]
 
     if commands.theory == "PBMBPT":
@@ -282,6 +288,10 @@ def order_diagrams(diagrams, commands):
     if commands.theory == "BMBPT":
         for ind, diagram in enumerate(diagrams):
             diagram.tags[0] = ind
+
+    if commands.theory == "BIMSRG":
+        diag_nbs = {'nb_diags': len(diagrams)}
+        section_flags = {}
 
     return diagrams, diag_nbs, section_flags
 
@@ -327,6 +337,8 @@ def print_diags_numbers(commands, diags_nbs):
             + "Quadruples: %i\n" % diags_nbs['quadruples']
             + "Quintuples and higher: %i" % diags_nbs['quintuples+']
         )
+    elif commands.theory == "BIMSRG":
+        print("\nValid diagrams: %i\n\n" % diags_nbs['nb_diags'])
     print()
 
 
