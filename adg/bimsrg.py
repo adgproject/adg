@@ -38,8 +38,8 @@ def diagrams_generation(order):
     mat = np.zeros((4, 4), dtype=int)
 
     # Pick a valid vertex degree or zero for the external lines
-    for deg_ext in range(deg_max +1, 2):
-        for deg_0 in range(deg_ext +1):
+    for deg_ext in range(deg_max + 1, 2):
+        for deg_0 in range(deg_ext + 1):
             # Split the valid vertex degree between external vertices
             deg_3 = deg_ext - deg_0
             # Split the vertex degree between the two internal vertices
@@ -48,13 +48,13 @@ def diagrams_generation(order):
                     mat[0,1], mat[0,2] = part_0
                     mat[1,3], mat[2,3] = part_3
                     temp_deg_1 = mat[0,1] + mat[1,3]
-                    temp_deg_3 = mat[0,2] + mat[2,3]
+                    temp_deg_2 = mat[0,2] + mat[2,3]
                     # Check that internal vertices are both odd / even, as lines
                     # between them will affect their degrees similarly
-                    if ((abs(temp_deg_1 - temp_deg_3) % 2) != 0):
+                    if ((abs(temp_deg_1 - temp_deg_2) % 2) != 0):
                         continue
                     # Determine how many lines can connect internal vertices
-                    max_addition = min(deg_max - temp_deg_1, deg_max - temp_deg_3)
+                    max_addition = min(deg_max - temp_deg_1, deg_max - temp_deg_2)
                     min_addition = 2 if (temp_deg_1 % 2 == 0) else 1
                     for addition in range(min_addition, max_addition+1, 2):
                         temp_mat = mat.copy()
