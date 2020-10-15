@@ -39,27 +39,27 @@ def diagrams_generation(order):
 
     # Pick a valid vertex degree or zero for the external lines
     for deg_ext in range(0, deg_max + 1, 2):
-        for deg_0 in range(deg_ext + 1):
-            # Split the valid vertex degree between external vertices
-            deg_3 = deg_ext - deg_0
+        # Split the valid vertex degree between external vertices
+        for deg_0, deg_3 in two_partitions(deg_ext):
             # Split the vertex degree between the two internal vertices
             for part_0 in two_partitions(deg_0):
+                mat[0,1], mat[0,2] = part_0
                 for part_3 in two_partitions(deg_3):
-                    mat[0,1], mat[0,2] = part_0
                     mat[1,3], mat[2,3] = part_3
                     temp_deg_1 = mat[0,1] + mat[1,3]
                     temp_deg_2 = mat[0,2] + mat[2,3]
                     # Check that internal vertices are both odd/even, as lines
                     # between them will affect their degrees similarly
-                    if ((abs(temp_deg_1 - temp_deg_2) % 2) != 0):
-                        continue
-                    # Determine how many lines can connect internal vertices
-                    max_addition = min(deg_max - temp_deg_1, deg_max - temp_deg_2)
-                    min_addition = 2 if (temp_deg_1 % 2 == 0) else 1
-                    for addition in range(min_addition, max_addition+1, 2):
-                        temp_mat = mat.copy()
-                        temp_mat[1,2] = addition
-                        matrices.append(temp_mat)
+                    if ((abs(temp_deg_1 - temp_deg_2) % 2) == 0):
+                        # Determine how many lines can connect the vertices
+                        max_addition = deg_max - max(temp_deg_1, temp_deg_2)
+                        # Check the odd/even character of vertices, since they
+                        # must eventually be even
+                        min_addition = 2 if (temp_deg_1 % 2 == 0) else 1
+                        for addition in range(min_addition, max_addition+1, 2):
+                            temp_mat = mat.copy()
+                            temp_mat[1,2] = addition
+                            matrices.append(temp_mat)
     return matrices
 
 
