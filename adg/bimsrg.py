@@ -34,7 +34,7 @@ def diagrams_generation(order):
     mat = np.zeros((4, 4), dtype=int)
 
     # Pick a valid vertex degree or zero for the external lines
-    for deg_ext in range(deg_max + 1, 2):
+    for deg_ext in range(0, deg_max + 1, 2):
         for deg_0 in range(deg_ext + 1):
             # Split the valid vertex degree between external vertices
             deg_3 = deg_ext - deg_0
