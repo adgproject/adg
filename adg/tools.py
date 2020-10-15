@@ -4,6 +4,43 @@
 from builtins import object, zip
 from itertools import count
 
+greek_alphabet = ['\\alpha',
+                  '\\beta',
+                  '\\gamma',
+                  '\\delta',
+                  '\\epsilon',
+                  '\\zeta',
+                  '\\eta',
+                  '\\theta',
+                  '\\iota',
+                  '\\kappa',
+                  '\\lambda'
+                  '\\mu',
+                  '\\nu',
+                  '\\omicron',
+                  '\\pi',
+                  '\\rho',
+                  '\\sigma',
+                  '\\tau',
+                  '\\upsilon',
+                  '\\phi',
+                  '\\chi',
+                  '\\psi',
+                  '\\omega']
+
+
+def greek_letter(number):
+    """Returns the lower-case Greek letter in LaTeX format.
+
+    Attributes:
+        number (int): The index of the letter with start at 0.
+
+    Returns:
+        (str): The Greek letter in LaTeX math format.
+
+    """
+    return greek_alphabet[number]
+
 
 def reversed_enumerate(data):
     """Return the index and item of the data in reversed order.

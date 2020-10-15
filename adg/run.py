@@ -221,6 +221,7 @@ def generate_diagrams(commands, id_generator):
                                                  commands.nbody_observable,
                                                  commands.canonical)
     elif commands.theory == "BIMSRG":
+        print(commands.order)
         diagrams = adg.bimsrg.diagrams_generation(commands.order)
     else:
         print("Invalid theory! Exiting program.")

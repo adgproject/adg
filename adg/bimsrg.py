@@ -4,8 +4,12 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import range
+import math
+import networkx as nx
 import numpy as np
 import adg.diag
+from adg.tools import greek_letter
+
 
 def two_partitions(number):
     """Return 2-partitions of the given integer.
@@ -45,7 +49,7 @@ def diagrams_generation(order):
                     mat[1,3], mat[2,3] = part_3
                     temp_deg_1 = mat[0,1] + mat[1,3]
                     temp_deg_2 = mat[0,2] + mat[2,3]
-                    # Check that internal vertices are both odd / even, as lines
+                    # Check that internal vertices are both odd/even, as lines
                     # between them will affect their degrees similarly
                     if ((abs(temp_deg_1 - temp_deg_2) % 2) != 0):
                         continue
@@ -74,13 +78,15 @@ class BimsrgDiagram(adg.diag.Diagram):
     """Describes a B-IMSRG Feynman diagram with its related properties.
 
     Attributes:
+        adjacency_matrix (Numpy array): The adjacency matrix of the diagram.
         two_or_three_body (int): The 2 or 3-body characted of the vertices.
         unique_id (int): A unique number associated to the diagram.
+        expr (str): The B-IMSRG expression associated to the diagram.
 
     """
 
-    __slots__ = ('two_or_three_body', 'unique_id',
-                 '_vert_exchange_sym_fact')
+    __slots__ = ('adjacency_mat', 'two_or_three_body', 'unique_id',
+                 '_vert_exchange_sym_fact', 'expr')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
@@ -94,6 +100,101 @@ class BimsrgDiagram(adg.diag.Diagram):
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
         self.unique_id = tag_num
+        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
+        self.expr = self.attribute_expression()
+
+    def attribute_expression(self):
+        """Returns the LaTeX expression of the diagram.
+
+        Returns:
+            (str): The LaTeX expression for the diagram.
+
+        """
+        return self.permutator() + self.symmetry_factor() \
+            + self.vertices_expression() \
+            + r"- \left[\eta \leftrightarrow \Omega\right]"
+
+    def permutator(self):
+        """Return the permutator associated to the diagram.
+
+        Returns:
+            (str): The permutator associated to the diagram in LaTeX format.
+
+        """
+        # Number of external lines tied to each vertex
+        nb_out_gen = self.adjacency_mat[2, 3]
+        nb_in_gen = self.adjacency_mat[0, 2]
+        nb_out_pot = self.adjacency_mat[1, 3]
+        nb_in_pot = self.adjacency_mat[0, 1]
+
+        perm = ""
+
+        # Permutator for out-going lines
+        if (nb_out_gen != 0) and (nb_out_pot != 0):
+            perm += "\\textbf{P}^{%s}_{%s} " \
+                % ("".join(greek_letter(idx) for idx in range(nb_out_gen)),
+                   "".join(greek_letter(idx) for idx
+                           in range(nb_out_gen, nb_out_gen + nb_out_pot)))
+
+        # Permutator for incoming lines
+        if (nb_in_gen != 0) and (nb_in_pot != 0):
+            perm += "\\textbf{P}^{%s}_{%s} " \
+                % ("".join(greek_letter(idx) for idx
+                           in range(nb_out_gen + nb_out_pot,
+                                    nb_out_gen + nb_out_pot + nb_in_gen)),
+                   "".join(greek_letter(idx) for idx
+                           in range(nb_out_gen + nb_out_pot + nb_in_gen,
+                                    nb_out_gen + nb_out_pot
+                                    + nb_in_gen + nb_in_pot)))
+        return perm
+
+    def symmetry_factor(self):
+        """Returns the symmetry factor of the diagram in LaTeX format.
+
+        Returns:
+            (str): The LaTeX-formatted symmetry factor.
+
+        """
+        factor = 1
+        # Iterate through the non-zero elements of the adjacency matrix
+        for elem in self.adjacency_mat.ravel().tolist()[0]:
+            if elem != 0:
+                factor *= elem
+        return "\\frac{1}{%i}" % factor if factor != 1 else ""
+
+    def vertices_expression(self):
+        """Return the expression associated to the vertices in LaTeX format.
+
+        Returns:
+            (str): The LaTeX-formatted expression for the vertices.
+        """
+        internal_lines = "".join("k_{%i}" % label for label
+                                 in range(1, self.adjacency_mat[1, 2] + 1))
+        # Number of external lines tied to each vertex
+        nb_out_gen = self.adjacency_mat[2, 3]
+        nb_in_gen = self.adjacency_mat[0, 2]
+        nb_out_pot = self.adjacency_mat[1, 3]
+        nb_in_pot = self.adjacency_mat[0, 1]
+        # Expression associatedto the generator vertex
+        generator = "\\eta^{%i%i}_{%s %s}" \
+            % (self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
+               "".join(greek_letter(idx) for idx in range(nb_out_gen))
+               + "".join(greek_letter(idx) for idx
+                         in range(nb_out_gen + nb_out_pot,
+                                  nb_out_gen + nb_out_pot + nb_in_gen)),
+               internal_lines)
+        # Expression associated to the potential vertex
+        potential = "\\Omega^{%i%i}_{%s %s}" \
+            % (self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0],
+               internal_lines,
+               "".join(greek_letter(idx) for idx
+                       in range(nb_out_gen, nb_out_gen + nb_out_pot))
+               + "".join(greek_letter(idx) for idx
+                         in range(nb_out_gen + nb_out_pot + nb_in_gen,
+                                  nb_out_gen + nb_out_pot
+                                  + nb_in_gen + nb_in_pot)))
+
+        return "\\sum_{%s} %s %s" % (internal_lines, potential, generator)
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the BMBPT graph and its associated TSD to the LaTeX file.
@@ -109,7 +210,6 @@ class BimsrgDiagram(adg.diag.Diagram):
         adg.diag.draw_diagram(directory, latex_file, str(self.tags[0]), 'diag')
         latex_file.write('\n\\end{center}\n\n')
 
-
     def write_section(self, result, commands, section_flags):
         """Write section and subsections for BMBPT result file.
 
@@ -120,3 +220,4 @@ class BimsrgDiagram(adg.diag.Diagram):
 
         """
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
+        result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)
