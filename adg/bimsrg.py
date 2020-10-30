@@ -8,7 +8,7 @@ import math
 import networkx as nx
 import numpy as np
 import adg.diag
-from adg.tools import greek_letter
+from adg.tools import greek_letter, reversed_enumerate
 
 
 def two_partitions(number):
@@ -63,8 +63,49 @@ def diagrams_generation(order):
     return matrices
 
 
+def order_diagrams(diagrams, order):
+    """Order the BIMSRG diagrams and return the number of diags for each type.
+
+    Args:
+        diagrams (list): The unordered BimsrgDiagrams.
+        order (int): The order of the B-IMSRG truncation.
+
+    Returns:
+        (tuple): First element are the ordered BimsrgDiagrams. Second element
+        is the number of diagrams for each type.
+
+    """
+    diags_per_order = {}
+    for n in range(1, order + 1):
+        diags_per_order[n] = []
+
+    for i_diag, diag in reversed_enumerate(diagrams):
+        diags_per_order[diag.max_degree/2].append(diag)
+        del diagrams[i_diag]
+
+    diags_nb_per_type = {}
+
+    for n in range(1, order + 1):
+        diags_nb_per_type[n] = len(diags_per_order[n])
+
+    diagrams = []
+    for n in range(1, order + 1):
+        diagrams += diags_per_order[n]
+    diags_nb_per_type['nb_diags'] = len(diagrams)
+
+    for ind, diagram in enumerate(diagrams):
+        diagram.tags[0] = ind
+
+    section_flags = {}
+
+    for n in range(1, order + 1):
+        section_flags[n] = diags_per_order[n][0].tags[0] if diags_per_order[n] else -1
+
+    return diagrams, diags_nb_per_type, section_flags
+
+
 def write_header(tex_file, commands, diags_nbs):
-    """Write overall header for BMBPT result file.
+    """Write overall header for BIMSRG result file.
 
     Args:
         tex_file (file): The ouput LaTeX file of the program.
@@ -72,6 +113,10 @@ def write_header(tex_file, commands, diags_nbs):
         diags_nbs (dict): The number of diagrams per type.
 
     """
+    tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags'])
+
+    for n in range(1, commands.order + 1):
+        tex_file.write("B-IMSRG(%i) diagrams: %i\n\n" % (n, diags_nbs[n]))
 
 
 class BimsrgDiagram(adg.diag.Diagram):
@@ -79,13 +124,12 @@ class BimsrgDiagram(adg.diag.Diagram):
 
     Attributes:
         adjacency_matrix (Numpy array): The adjacency matrix of the diagram.
-        two_or_three_body (int): The 2 or 3-body characted of the vertices.
         unique_id (int): A unique number associated to the diagram.
         expr (str): The B-IMSRG expression associated to the diagram.
 
     """
 
-    __slots__ = ('adjacency_mat', 'two_or_three_body', 'unique_id',
+    __slots__ = ('adjacency_mat', 'unique_id',
                  '_vert_exchange_sym_fact', 'expr')
 
     def __init__(self, nx_graph, tag_num):
@@ -97,11 +141,13 @@ class BimsrgDiagram(adg.diag.Diagram):
 
         """
         adg.diag.Diagram.__init__(self, nx_graph)
-        self.two_or_three_body = 3 if self.max_degree == 6 else 2
         self.tags = [tag_num]
         self.unique_id = tag_num
         self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
         self.expr = self.attribute_expression()
+        self.max_degree = max(self.unsort_degrees[0] + self.unsort_degrees[3],
+                              self.unsort_degrees[1],
+                              self.unsort_degrees[2])
 
     def attribute_expression(self):
         """Returns the LaTeX expression of the diagram.
@@ -219,5 +265,8 @@ class BimsrgDiagram(adg.diag.Diagram):
             section_flags (dict): UniqueIDs of diags starting each section.
 
         """
+        for n in range(1, commands.order + 1):
+            if self.tags[0] == section_flags[n]:
+                result.write("\\section{B-IMSRG(%i)}\n\n" % n)
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)

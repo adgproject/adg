@@ -283,15 +283,13 @@ def order_diagrams(diagrams, commands):
         diagrams, diag_nbs, section_flags = adg.bmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
         diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
+    elif commands.theory == "BIMSRG":
+        diagrams, diag_nbs, section_flags = adg.bimsrg.order_diagrams(diagrams, commands.order)
 
     # Reattribute a number to the BMBPT diagrams
     if commands.theory == "BMBPT":
         for ind, diagram in enumerate(diagrams):
             diagram.tags[0] = ind
-
-    if commands.theory == "BIMSRG":
-        diag_nbs = {'nb_diags': len(diagrams)}
-        section_flags = {}
 
     return diagrams, diag_nbs, section_flags
 
@@ -338,7 +336,9 @@ def print_diags_numbers(commands, diags_nbs):
             + "Quintuples and higher: %i" % diags_nbs['quintuples+']
         )
     elif commands.theory == "BIMSRG":
-        print("\nValid diagrams: %i\n\n" % diags_nbs['nb_diags'])
+        print("\nValid diagrams: %i" % diags_nbs['nb_diags'])
+        for n in range(1, commands.order + 1):
+            print("B-IMSRG(%i) diagrams: %i" % (n, diags_nbs[n]))
     print()
 
 
