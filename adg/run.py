@@ -417,19 +417,17 @@ def write_file_header(latex_file, commands, diags_nbs):
     latex_file.write("\n\\tableofcontents\n\n")
 
 
-def compile_manager(directory, pdiag):
+def compile_manager(directory):
     """Compile the program's LaTeX ouput file.
 
     Args:
         directory (str): Path to the ouput folder.
-        pdiag (bool): ``True`` if one wants to draw the diagrams.
 
     """
     os.chdir(directory)
     os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
-    if pdiag:
-        # Second compilation needed
-        os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
+    # Second compilation for table of contents and diagrams
+    os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     os.chdir("../..")
     print("Result saved in %s/result.pdf" % directory)
 

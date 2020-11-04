@@ -91,7 +91,7 @@ def main():
         adg.mbpt.print_cd_output(directory, diagrams)
 
     if run_commands.compile:
-        adg.run.compile_manager(directory, run_commands.draw_diags)
+        adg.run.compile_manager(directory)
 
     adg.run.clean_folders(directory, run_commands)
 

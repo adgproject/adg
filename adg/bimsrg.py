@@ -72,7 +72,8 @@ def order_diagrams(diagrams, order):
 
     Returns:
         (tuple): First element are the ordered BimsrgDiagrams. Second element
-        is the number of diagrams for each type.
+        is the number of diagrams for each type. Third element is flags for the
+        output processing.
 
     """
     diags_per_order = {}
@@ -90,16 +91,22 @@ def order_diagrams(diagrams, order):
 
     diagrams = []
     for n in range(1, order + 1):
-        diagrams += diags_per_order[n]
+        diagrams += sorted(diags_per_order[n],
+                           key=lambda diag: diag.ext_io_degree)
     diags_nb_per_type['nb_diags'] = len(diagrams)
+
+    section_flags = {1: 0}
 
     for ind, diagram in enumerate(diagrams):
         diagram.tags[0] = ind
+        if ind == 0:
+            section_flags['new_op_struct'] = [ind]
+        elif diagram.ext_io_degree != diagrams[ind-1].ext_io_degree:
+            section_flags['new_op_struct'].append(ind)
 
-    section_flags = {}
-
-    for n in range(1, order + 1):
-        section_flags[n] = diags_per_order[n][0].tags[0] if diags_per_order[n] else -1
+    for n in range(2, order + 1):
+        index = sum(len(diags_per_order[i]) for i in range(1, n))
+        section_flags[n] = diagrams[index].tags[0]
 
     return diagrams, diags_nb_per_type, section_flags
 
@@ -123,13 +130,15 @@ class BimsrgDiagram(adg.diag.Diagram):
     """Describes a B-IMSRG Feynman diagram with its related properties.
 
     Attributes:
-        adjacency_matrix (Numpy array): The adjacency matrix of the diagram.
+        adjacency_mat (Numpy array): The adjacency matrix of the diagram.
         unique_id (int): A unique number associated to the diagram.
         expr (str): The B-IMSRG expression associated to the diagram.
+        ext_io_degree (tuple): The degree of the operator component the diagram
+            corresponds to.
 
     """
 
-    __slots__ = ('adjacency_mat', 'unique_id',
+    __slots__ = ('adjacency_mat', 'unique_id', 'ext_io_degree',
                  '_vert_exchange_sym_fact', 'expr')
 
     def __init__(self, nx_graph, tag_num):
@@ -148,6 +157,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         self.max_degree = max(self.unsort_degrees[0] + self.unsort_degrees[3],
                               self.unsort_degrees[1],
                               self.unsort_degrees[2])
+        self.ext_io_degree = (self.unsort_degrees[0], self.unsort_degrees[3])
 
     def attribute_expression(self):
         """Returns the LaTeX expression of the diagram.
@@ -268,5 +278,8 @@ class BimsrgDiagram(adg.diag.Diagram):
         for n in range(1, commands.order + 1):
             if self.tags[0] == section_flags[n]:
                 result.write("\\section{B-IMSRG(%i)}\n\n" % n)
+        if self.tags[0] in section_flags['new_op_struct']:
+            result.write("\\subsection{Operator component %i%i}\n\n"
+                         % (self.ext_io_degree[0], self.ext_io_degree[1]))
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)
