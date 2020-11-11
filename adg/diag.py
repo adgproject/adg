@@ -251,7 +251,7 @@ def feynmf_generator(graph, theory_type, diagram_name):
                                     else ",left=0.3",
                                   key+offset+1,
                                   vert))
-            offset = nb_props - 1
+            offset = nb_props
         # Outgoing external lines
         offset = 0
         for vert in (1, 2):
@@ -266,7 +266,7 @@ def feynmf_generator(graph, theory_type, diagram_name):
                                     else ",left=0.3",
                                   vert,
                                   key+offset+1))
-            offset = nb_props - 1
+            offset = nb_props
     else:
         # Loop over all elements of the graph to draw associated propagators
         for vert_i in graph:
