@@ -195,9 +195,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
     propa = prop_types[theories.index(theory_type)]
 
     fmf_file = open(diagram_name + ".tex", 'w')
-    fmf_file.write("\\parbox{%ipt}{\\begin{fmffile}{%s}\n" % (diag_size,
-                                                              diagram_name)
-                   + "\\begin{fmfgraph*}(%i,%i)\n" % (diag_size, diag_size))
+    fmf_file.write("\\parbox{40pt}{\\begin{fmffile}{%s}\n" % diagram_name
+                   + "\\begin{fmfgraph*}(40pt,%i)\n" % diag_size)
 
     # Define the appropriate line propagator_style
     fmf_file.write(propagator_style(propa))
@@ -206,10 +205,18 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
     # Set the position of the vertices
     if theory_type == "BIMSRG":
-        positions = "\\fmftop{v3}\\fmfbottom{v0}\n" \
-            + "\\fmf{phantom}{v0,v1}\n" \
+        nb_out_edges = len(graph.in_edges(3, keys=True))
+        nb_in_edges = len(graph.out_edges(0, keys=True))
+        nb_top_vertices = nb_out_edges if nb_out_edges % 2 != 0 \
+            else nb_out_edges + 1
+        nb_bot_vertices = nb_in_edges if nb_in_edges % 2 != 0 \
+            else nb_in_edges + 1
+        positions = "\\fmfstraight\n" \
+            + "\\fmftopn{t}{%i}" % nb_top_vertices \
+            + "\\fmfbottomn{b}{%i}\n" % nb_bot_vertices \
+            + "\\fmf{phantom}{b%i,v1}\n" % (nb_in_edges//2 + 1) \
             + "\\fmf{phantom}{v1,v2}\n" \
-            + "\\fmf{phantom}{v2,v3}\n" \
+            + "\\fmf{phantom}{v2,t%i}\n" % (nb_out_edges//2 + 1) \
             + "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}\n" \
             + "\\fmfv{d.shape=square,d.filled=empty,d.size=3thick}{v2}\n" \
             + "\\fmffreeze\n"
@@ -222,39 +229,78 @@ def feynmf_generator(graph, theory_type, diagram_name):
     if theory_type == "PBMBPT":
         fmf_file.write(self_contractions(graph))
 
-    # Loop over all elements of the graph to draw associated propagators
-    for vert_i in graph:
-        for vert_j in list(graph.nodes())[vert_i+1:]:
-            props_to_draw = [edge for edge in graph.edges([vert_i, vert_j],
-                                                          data=True, keys=True)
-                             if edge[1] in (vert_i, vert_j)
-                             and edge[0] != edge[1]]
-            # Set the list of propagators directions to use
-            props_dir = prop_directions(vert_j - vert_i, len(props_to_draw))
+    if theory_type == "BIMSRG":
+        # Internal lines
+        nb_props = sum(1 for edge in graph.edges(1, keys=True) if edge[1] == 2)
+        # Set the list of propagators directions to use
+        props_dir = prop_directions(1, nb_props)
+        # Draw the diagrams
+        for idx in range(nb_props):
+            fmf_file.write("\\fmf{%s%s}{v1,v2}\n" % (propa, props_dir[idx]))
+        # Incoming external line
+        offset = 0
+        for vert in (1, 2):
+            nb_props = sum(1 for edge in graph.edges(0, keys=True)
+                           if edge[1] == vert)
             # Draw the diagrams
-            key = 0
-            # Start with props going down, used in MBPT only
-            for prop in props_to_draw:
-                if prop[1] < prop[0] \
-                        and not ('anomalous' in prop[3]
-                                 and prop[3]['anomalous']):
-                    fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
-                                   % (propa, props_dir[key], vert_j, vert_i))
-                    key += 1
-            # Reinitialise the drawing configuration as we change direction
-            key = 0
-            for prop in props_to_draw:
-                if 'anomalous' in prop[3] and prop[3]['anomalous']:
-                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
-                                   % (props_dir[key], vert_i, vert_j))
-                    key += 1
-            for prop in props_to_draw:
-                if prop[0] < prop[1] \
-                        and not ('anomalous' in prop[3]
-                                 and prop[3]['anomalous']):
-                    fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
-                                   % (propa, props_dir[key], vert_i, vert_j))
-                    key += 1
+            for key in range(nb_props):
+                fmf_file.write("\\fmf{%s%s}{b%i,v%i}\n"
+                               % (propa,
+                                  ",right=0.3" \
+                                    if key+offset+1 > nb_bot_vertices / 2 \
+                                    else ",left=0.3",
+                                  key+offset+1,
+                                  vert))
+            offset = nb_props - 1
+        # Outgoing external lines
+        offset = 0
+        for vert in (1, 2):
+            nb_props = sum(1 for edge in graph.in_edges(3, keys=True)
+                           if edge[0] == vert)
+            # Draw the diagrams
+            for key in range(nb_props):
+                fmf_file.write("\\fmf{%s%s}{v%i,t%i}\n"
+                               % (propa,
+                                  ",right=0.3" \
+                                    if key+offset+1 > nb_top_vertices / 2 \
+                                    else ",left=0.3",
+                                  vert,
+                                  key+offset+1))
+            offset = nb_props - 1
+    else:
+        # Loop over all elements of the graph to draw associated propagators
+        for vert_i in graph:
+            for vert_j in list(graph.nodes())[vert_i+1:]:
+                props_to_draw = [edge for edge in graph.edges([vert_i, vert_j],
+                                                              data=True, keys=True)
+                                 if edge[1] in (vert_i, vert_j)
+                                 and edge[0] != edge[1]]
+                # Set the list of propagators directions to use
+                props_dir = prop_directions(vert_j - vert_i, len(props_to_draw))
+                # Draw the diagrams
+                key = 0
+                # Start with props going down, used in MBPT only
+                for prop in props_to_draw:
+                    if prop[1] < prop[0] \
+                            and not ('anomalous' in prop[3]
+                                     and prop[3]['anomalous']):
+                        fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
+                                       % (propa, props_dir[key], vert_j, vert_i))
+                        key += 1
+                # Reinitialise the drawing configuration as we change direction
+                key = 0
+                for prop in props_to_draw:
+                    if 'anomalous' in prop[3] and prop[3]['anomalous']:
+                        fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
+                                       % (props_dir[key], vert_i, vert_j))
+                        key += 1
+                for prop in props_to_draw:
+                    if prop[0] < prop[1] \
+                            and not ('anomalous' in prop[3]
+                                     and prop[3]['anomalous']):
+                        fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
+                                       % (propa, props_dir[key], vert_i, vert_j))
+                        key += 1
 
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
@@ -264,28 +310,35 @@ def prop_directions(vert_distance, nb_props):
     """Return a list of possible propagators directions.
 
     Args:
-        vert_distance (int): Fistance between the two connected vertices.
+        vert_distance (int): Distance between the two connected vertices.
         nb_props (int): Number of propagators to be drawn.
 
     Returns:
         (list): Propagators directions stored as strings.
 
     """
-    directions = [",right=0.9", ",right=0.75", ",right=0.6", ",right=0.5", "",
-                  ",left=0.5", ",left=0.6", ",left=0.75", ",left=0.9"]
+    if nb_props < 7:
+        directions = [",right=0.9", ",right=0.75", ",right=0.6", ",right=0.5",
+                      "", ",left=0.5", ",left=0.6", ",left=0.75", ",left=0.9"]
 
-    if vert_distance != 1:
-        props_dir = directions[:3] + directions[-3:]
-    else:
-        props_dir = directions[:2] + directions[3:6] + directions[-2:]
-        if nb_props % 2 != 1:
-            props_dir = props_dir[:3] + props_dir[-3:]
+        if vert_distance != 1:
+            props_dir = directions[:3] + directions[-3:]
         else:
-            props_dir = props_dir[1:]
-    if nb_props < 5:
-        props_dir = props_dir[1:-1]
-        if nb_props < 3:
+            props_dir = directions[:2] + directions[3:6] + directions[-2:]
+            if nb_props % 2 != 1:
+                props_dir = props_dir[:3] + props_dir[-3:]
+            else:
+                props_dir = props_dir[1:]
+        if nb_props < 5:
             props_dir = props_dir[1:-1]
+            if nb_props < 3:
+                props_dir = props_dir[1:-1]
+
+    elif vert_distance == 1:
+        directions = [",right=0.%i" % angle for angle in range(90, 0, -10)] \
+            + [",left=0.%i" % angle for angle in range(10, 100, 10)]
+
+        props_dir = directions[nb_props//4:-(nb_props//4)]
 
     return props_dir
 
