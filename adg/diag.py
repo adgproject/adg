@@ -217,8 +217,8 @@ def feynmf_generator(graph, theory_type, diagram_name):
             + "\\fmf{phantom}{b%i,v1}\n" % (nb_in_edges//2 + 1) \
             + "\\fmf{phantom}{v1,v2}\n" \
             + "\\fmf{phantom}{v2,t%i}\n" % (nb_out_edges//2 + 1) \
-            + "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}\n" \
-            + "\\fmfv{d.shape=square,d.filled=empty,d.size=3thick}{v2}\n" \
+            + "\\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}\n" \
+            + "\\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}\n" \
             + "\\fmffreeze\n"
         fmf_file.write(positions)
 
