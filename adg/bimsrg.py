@@ -168,7 +168,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         """
         return self.permutator() + self.symmetry_factor() \
             + self.vertices_expression() \
-            + r"- \left[\eta \leftrightarrow \Omega\right]"
+            + r"- \left[A \leftrightarrow B\right]"
 
     def permutator(self):
         """Return the permutator associated to the diagram.
@@ -178,30 +178,29 @@ class BimsrgDiagram(adg.diag.Diagram):
 
         """
         # Number of external lines tied to each vertex
-        nb_out_gen = self.adjacency_mat[2, 3]
-        nb_in_gen = self.adjacency_mat[0, 2]
-        nb_out_pot = self.adjacency_mat[1, 3]
-        nb_in_pot = self.adjacency_mat[0, 1]
+        nb_out_A = self.adjacency_mat[2, 3]
+        nb_in_A = self.adjacency_mat[0, 2]
+        nb_out_B = self.adjacency_mat[1, 3]
+        nb_in_B = self.adjacency_mat[0, 1]
 
         perm = ""
 
         # Permutator for out-going lines
-        if (nb_out_gen != 0) and (nb_out_pot != 0):
-            perm += "\\textbf{P}^{%s}_{%s} " \
-                % ("".join(greek_letter(idx) for idx in range(nb_out_gen)),
+        if (nb_out_A != 0) and (nb_out_B != 0):
+            perm += "\\textbf{P}(%s/%s) " \
+                % ("".join(greek_letter(idx) for idx in range(nb_out_A)),
                    "".join(greek_letter(idx) for idx
-                           in range(nb_out_gen, nb_out_gen + nb_out_pot)))
+                           in range(nb_out_A, nb_out_A + nb_out_B)))
 
         # Permutator for incoming lines
-        if (nb_in_gen != 0) and (nb_in_pot != 0):
-            perm += "\\textbf{P}^{%s}_{%s} " \
+        if (nb_in_A != 0) and (nb_in_B != 0):
+            perm += "\\textbf{P}(%s/%s) " \
                 % ("".join(greek_letter(idx) for idx
-                           in range(nb_out_gen + nb_out_pot,
-                                    nb_out_gen + nb_out_pot + nb_in_gen)),
+                           in range(nb_out_A + nb_out_B,
+                                    nb_out_A + nb_out_B + nb_in_A)),
                    "".join(greek_letter(idx) for idx
-                           in range(nb_out_gen + nb_out_pot + nb_in_gen,
-                                    nb_out_gen + nb_out_pot
-                                    + nb_in_gen + nb_in_pot)))
+                           in range(nb_out_A + nb_out_B + nb_in_A,
+                                    nb_out_A + nb_out_B + nb_in_A + nb_in_B)))
         return perm
 
     def symmetry_factor(self):
@@ -227,30 +226,29 @@ class BimsrgDiagram(adg.diag.Diagram):
         internal_lines = "".join("k_{%i}" % label for label
                                  in range(1, self.adjacency_mat[1, 2] + 1))
         # Number of external lines tied to each vertex
-        nb_out_gen = self.adjacency_mat[2, 3]
-        nb_in_gen = self.adjacency_mat[0, 2]
-        nb_out_pot = self.adjacency_mat[1, 3]
-        nb_in_pot = self.adjacency_mat[0, 1]
-        # Expression associatedto the generator vertex
-        generator = "\\eta^{%i%i}_{%s %s}" \
+        nb_out_A = self.adjacency_mat[2, 3]
+        nb_in_A = self.adjacency_mat[0, 2]
+        nb_out_B = self.adjacency_mat[1, 3]
+        nb_in_B = self.adjacency_mat[0, 1]
+        # Expression associated to the upper vertex
+        expr_A = "A^{%i%i}_{%s %s}" \
             % (self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
-               "".join(greek_letter(idx) for idx in range(nb_out_gen))
+               "".join(greek_letter(idx) for idx in range(nb_out_A))
                + "".join(greek_letter(idx) for idx
-                         in range(nb_out_gen + nb_out_pot,
-                                  nb_out_gen + nb_out_pot + nb_in_gen)),
+                         in range(nb_out_A + nb_out_B,
+                                  nb_out_A + nb_out_B + nb_in_A)),
                internal_lines)
-        # Expression associated to the potential vertex
-        potential = "\\Omega^{%i%i}_{%s %s}" \
+        # Expression associated to the lower vertex
+        expr_B = "B^{%i%i}_{%s %s}" \
             % (self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0],
                internal_lines,
                "".join(greek_letter(idx) for idx
-                       in range(nb_out_gen, nb_out_gen + nb_out_pot))
+                       in range(nb_out_A, nb_out_A + nb_out_B))
                + "".join(greek_letter(idx) for idx
-                         in range(nb_out_gen + nb_out_pot + nb_in_gen,
-                                  nb_out_gen + nb_out_pot
-                                  + nb_in_gen + nb_in_pot)))
+                         in range(nb_out_A + nb_out_B + nb_in_A,
+                                  nb_out_A + nb_out_B + nb_in_A + nb_in_B)))
 
-        return "\\sum_{%s} %s %s" % (internal_lines, potential, generator)
+        return "\\sum_{%s} %s %s" % (internal_lines, expr_A, expr_B)
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the BMBPT graph and its associated TSD to the LaTeX file.
@@ -279,7 +277,7 @@ class BimsrgDiagram(adg.diag.Diagram):
             if self.tags[0] == section_flags[n]:
                 result.write("\\section{B-IMSRG(%i)}\n\n" % n)
         if self.tags[0] in section_flags['new_op_struct']:
-            result.write("\\subsection{Operator component %i%i}\n\n"
+            result.write("\\subsection{$C^{%i%i}$}\n\n"
                          % (self.ext_io_degree[0], self.ext_io_degree[1]))
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)
