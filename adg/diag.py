@@ -196,7 +196,7 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
     fmf_file = open(diagram_name + ".tex", 'w')
     fmf_file.write("\\parbox{40pt}{\\begin{fmffile}{%s}\n" % diagram_name
-                   + "\\begin{fmfgraph*}(40pt,%i)\n" % diag_size)
+                   + "\\begin{fmfgraph*}(40,%i)\n" % diag_size)
 
     # Define the appropriate line propagator_style
     fmf_file.write(propagator_style(propa))
