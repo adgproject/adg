@@ -166,7 +166,11 @@ class BimsrgDiagram(adg.diag.Diagram):
             (str): The LaTeX expression for the diagram.
 
         """
-        return self.permutator() + self.symmetry_factor() \
+        name = " C^{%i%i}(%i%i,%i%i) = " \
+            % (self.unsort_degrees[3], self.unsort_degrees[0],
+               self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
+               self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0])
+        return name + self.permutator() + self.symmetry_factor() \
             + self.vertices_expression() \
             + r"- \left[A \leftrightarrow B\right]"
 
@@ -278,6 +282,6 @@ class BimsrgDiagram(adg.diag.Diagram):
                 result.write("\\section{B-IMSRG(%i)}\n\n" % n)
         if self.tags[0] in section_flags['new_op_struct']:
             result.write("\\subsection{$C^{%i%i}$}\n\n"
-                         % (self.ext_io_degree[0], self.ext_io_degree[1]))
+                         % (self.ext_io_degree[1], self.ext_io_degree[0]))
         result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
         result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)
