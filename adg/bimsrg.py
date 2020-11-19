@@ -214,11 +214,8 @@ class BimsrgDiagram(adg.diag.Diagram):
             (str): The LaTeX-formatted symmetry factor.
 
         """
-        factor = 1
-        # Iterate through the non-zero elements of the adjacency matrix
-        for elem in self.adjacency_mat.ravel().tolist()[0]:
-            if elem > 1:
-                factor *= math.factorial(elem)
+        # Count the number of internal lines
+        factor = math.factorial(self.adjacency_mat[1, 2])
         return "\\frac{1}{%i}" % factor if factor != 1 else ""
 
     def vertices_expression(self):
