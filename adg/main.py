@@ -95,6 +95,7 @@ def main():
 
     adg.run.clean_folders(directory, run_commands)
 
+    print("\nResult saved in ./%s/result.pdf" % directory)
     print("\nADG ended successfully!\n")
 
 

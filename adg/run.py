@@ -429,7 +429,6 @@ def compile_manager(directory):
     # Second compilation for table of contents and diagrams
     os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     os.chdir("../..")
-    print("Result saved in %s/result.pdf" % directory)
 
 
 def clean_folders(directory, commands):
