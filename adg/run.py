@@ -413,6 +413,8 @@ def write_file_header(latex_file, commands, diags_nbs):
         adg.bmbpt.write_header(latex_file, commands, diags_nbs)
     elif commands.theory == "MBPT":
         adg.mbpt.write_header(latex_file, diags_nbs)
+    elif commands.theory == "BIMSRG":
+        adg.bimsrg.write_header(latex_file, commands, diags_nbs)
 
     latex_file.write("\n\\tableofcontents\n\n")
 
