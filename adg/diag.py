@@ -164,18 +164,29 @@ def create_checkable_diagram(pbmbpt_graph):
     return doubled_graph
 
 
-def label_vertices(graphs_list, theory_type):
+def label_vertices(graphs_list, theory_type, switch_flag):
     """Account for different status of vertices in operator diagrams.
 
     Args:
         graphs_list (list): The Diagrams of interest.
         theory_type (str): The name of the theory of interest.
+        switch_flag (int): When to switch A and B operators for BIMSRG.
 
     """
-    for graph in graphs_list:
-        nx.set_node_attributes(graph, False, 'operator')
-        if theory_type in ("BMBPT", "PBMBPT"):
-            graph.nodes[0]['operator'] = True
+    if theory_type != 'BIMSRG':
+        for graph in graphs_list:
+            nx.set_node_attributes(graph, False, 'operator')
+            if theory_type in ("BMBPT", "PBMBPT"):
+                graph.nodes[0]['operator'] = True
+    else:
+        for idx, graph in enumerate(graphs_list):
+            nx.set_node_attributes(graph, '', 'operator')
+            if idx < switch_flag:
+                graph.nodes[1]['operator'] = 'B'
+                graph.nodes[2]['operator'] = 'A'
+            else:
+                graph.nodes[1]['operator'] = 'A'
+                graph.nodes[2]['operator'] = 'B'
 
 
 def feynmf_generator(graph, theory_type, diagram_name):

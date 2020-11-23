@@ -275,7 +275,7 @@ def generate_diagrams(commands, id_generator):
                                                  commands.nbody_observable,
                                                  commands.canonical)
     elif commands.theory == "BIMSRG":
-        diagrams = adg.bimsrg.diagrams_generation(commands.order)
+        diagrams, switch_flag = adg.bimsrg.diagrams_generation(commands.order)
     else:
         print("Invalid theory! Exiting program.")
         exit()
@@ -289,8 +289,9 @@ def generate_diagrams(commands, id_generator):
             if (nx.number_weakly_connected_components(diag)) != 1:
                 del diags[i_diag]
 
-    if commands.theory != "BIMSRG":
-        adg.diag.label_vertices(diags, commands.theory)
+    adg.diag.label_vertices(diags,
+                            commands.theory,
+                            switch_flag if commands.theory == 'BIMSRG' else -1)
 
     if commands.theory in ('BMBPT', "PBMBPT"):
         diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, id_generator.get())
@@ -338,8 +339,9 @@ def order_diagrams(diagrams, commands):
     elif commands.theory == "MBPT":
         diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
     elif commands.theory == "BIMSRG":
+        order = max(commands.order)
         diagrams, diag_nbs, section_flags = adg.bimsrg.order_diagrams(diagrams,
-                                                                      commands.order[-1])
+                                                                      order)
 
     # Reattribute a number to the BMBPT diagrams
     if commands.theory == "BMBPT":

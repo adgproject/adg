@@ -30,15 +30,32 @@ def diagrams_generation(orders):
         orders (tuple): The B-IMSRG (N_A, N_B, N_C) order of the diagrams.
 
     Returns:
+        (tuple): NumPy arrays encoding the adjacency matrices of the graphs,
+            and number of diagrams with the A vertex on top.
+
+    """
+    deg_ext_max = 2*orders[-1]
+    diagrams_topA = diagrams_subset(2*orders[0], 2*orders[1], deg_ext_max)
+    diagrams_topB = diagrams_subset(2*orders[1], 2*orders[0], deg_ext_max)
+
+    return diagrams_topA + diagrams_topB, len(diagrams_topA)
+
+
+def diagrams_subset(deg_max_top, deg_max_bot, deg_max_ext):
+    """Generate diagrams for B-IMSRG.
+
+    Args:
+        orders (tuple): The B-IMSRG (N_A, N_B, N_C) order of the diagrams.
+
+    Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
     """
     matrices = []
-    deg_max = 2*orders[-1]
     mat = np.zeros((4, 4), dtype=int)
 
     # Pick a valid vertex degree or zero for the external lines
-    for deg_ext in range(0, deg_max + 1, 2):
+    for deg_ext in range(0, deg_max_ext + 1, 2):
         # Split the valid vertex degree between external vertices
         for deg_0, deg_3 in two_partitions(deg_ext):
             # Split the vertex degree between the two internal vertices
@@ -52,7 +69,8 @@ def diagrams_generation(orders):
                     # between them will affect their degrees similarly
                     if ((abs(temp_deg_1 - temp_deg_2) % 2) == 0):
                         # Determine how many lines can connect the vertices
-                        max_addition = deg_max - max(temp_deg_1, temp_deg_2)
+                        max_addition = min(deg_max_bot - temp_deg_1,
+                                           deg_max_top - temp_deg_2)
                         # Check the odd/even character of vertices, since they
                         # must eventually be even
                         min_addition = 2 if (temp_deg_1 % 2 == 0) else 1
@@ -106,7 +124,7 @@ def order_diagrams(diagrams, order):
 
     for n in range(2, order + 1):
         index = sum(len(diags_per_order[i]) for i in range(1, n))
-        section_flags[n] = diagrams[index].tags[0]
+        section_flags[n] = diagrams[index].tags[0] if diags_per_order[n] else -1
 
     return diagrams, diags_nb_per_type, section_flags
 
@@ -166,13 +184,15 @@ class BimsrgDiagram(adg.diag.Diagram):
             (str): The LaTeX expression for the diagram.
 
         """
+        A_degrees = self.unsort_io_degrees[1] \
+            if self.graph.nodes[1]['operator'] == 'A' else self.unsort_io_degrees[2]
+        B_degrees = self.unsort_io_degrees[1] \
+            if self.graph.nodes[1]['operator'] == 'B' else self.unsort_io_degrees[2]
         name = " C^{%i%i}(%i%i,%i%i) = " \
             % (self.unsort_degrees[3], self.unsort_degrees[0],
-               self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
-               self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0])
+               A_degrees[1], A_degrees[0], B_degrees[1], B_degrees[0])
         return name + self.permutator() + self.symmetry_factor() \
-            + self.vertices_expression() \
-            + r"- \left[A \leftrightarrow B\right]"
+            + self.vertices_expression()
 
     def permutator(self):
         """Return the permutator associated to the diagram.
@@ -182,29 +202,29 @@ class BimsrgDiagram(adg.diag.Diagram):
 
         """
         # Number of external lines tied to each vertex
-        nb_out_A = self.adjacency_mat[2, 3]
-        nb_in_A = self.adjacency_mat[0, 2]
-        nb_out_B = self.adjacency_mat[1, 3]
-        nb_in_B = self.adjacency_mat[0, 1]
+        nb_out_2 = self.adjacency_mat[2, 3]
+        nb_in_2 = self.adjacency_mat[0, 2]
+        nb_out_1 = self.adjacency_mat[1, 3]
+        nb_in_1 = self.adjacency_mat[0, 1]
 
         perm = ""
 
         # Permutator for out-going lines
-        if (nb_out_A != 0) and (nb_out_B != 0):
+        if (nb_out_2 != 0) and (nb_out_1 != 0):
             perm += "\\textbf{P}(%s/%s) " \
-                % ("".join(greek_letter(idx) for idx in range(nb_out_A)),
+                % ("".join(greek_letter(idx) for idx in range(nb_out_2)),
                    "".join(greek_letter(idx) for idx
-                           in range(nb_out_A, nb_out_A + nb_out_B)))
+                           in range(nb_out_2, nb_out_2 + nb_out_1)))
 
         # Permutator for incoming lines
-        if (nb_in_A != 0) and (nb_in_B != 0):
+        if (nb_in_2 != 0) and (nb_in_1 != 0):
             perm += "\\textbf{P}(%s/%s) " \
                 % ("".join(greek_letter(idx) for idx
-                           in range(nb_out_A + nb_out_B,
-                                    nb_out_A + nb_out_B + nb_in_A)),
+                           in range(nb_out_2 + nb_out_1,
+                                    nb_out_2 + nb_out_1 + nb_in_2)),
                    "".join(greek_letter(idx) for idx
-                           in range(nb_out_A + nb_out_B + nb_in_A,
-                                    nb_out_A + nb_out_B + nb_in_A + nb_in_B)))
+                           in range(nb_out_2 + nb_out_1 + nb_in_2,
+                                    nb_out_2 + nb_out_1 + nb_in_2 + nb_in_1)))
         return perm
 
     def symmetry_factor(self):
@@ -227,29 +247,31 @@ class BimsrgDiagram(adg.diag.Diagram):
         internal_lines = "".join("k_{%i}" % label for label
                                  in range(1, self.adjacency_mat[1, 2] + 1))
         # Number of external lines tied to each vertex
-        nb_out_A = self.adjacency_mat[2, 3]
-        nb_in_A = self.adjacency_mat[0, 2]
-        nb_out_B = self.adjacency_mat[1, 3]
-        nb_in_B = self.adjacency_mat[0, 1]
+        nb_out_2 = self.adjacency_mat[2, 3]
+        nb_in_2 = self.adjacency_mat[0, 2]
+        nb_out_1 = self.adjacency_mat[1, 3]
+        nb_in_1 = self.adjacency_mat[0, 1]
         # Expression associated to the upper vertex
-        expr_A = "A^{%i%i}_{%s %s}" \
-            % (self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
-               "".join(greek_letter(idx) for idx in range(nb_out_A))
+        expr_2 = "%s^{%i%i}_{%s %s}" \
+            % (self.graph.nodes[2]['operator'],
+               self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
+               "".join(greek_letter(idx) for idx in range(nb_out_2))
                + "".join(greek_letter(idx) for idx
-                         in range(nb_out_A + nb_out_B,
-                                  nb_out_A + nb_out_B + nb_in_A)),
+                         in range(nb_out_2 + nb_out_1,
+                                  nb_out_2 + nb_out_1 + nb_in_2)),
                internal_lines)
         # Expression associated to the lower vertex
-        expr_B = "B^{%i%i}_{%s %s}" \
-            % (self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0],
+        expr_1 = "%s^{%i%i}_{%s %s}" \
+            % (self.graph.nodes[1]['operator'],
+               self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0],
                internal_lines,
                "".join(greek_letter(idx) for idx
-                       in range(nb_out_A, nb_out_A + nb_out_B))
+                       in range(nb_out_2, nb_out_2 + nb_out_1))
                + "".join(greek_letter(idx) for idx
-                         in range(nb_out_A + nb_out_B + nb_in_A,
-                                  nb_out_A + nb_out_B + nb_in_A + nb_in_B)))
+                         in range(nb_out_2 + nb_out_2 + nb_in_2,
+                                  nb_out_2 + nb_out_2 + nb_in_2 + nb_in_1)))
 
-        return "\\sum_{%s} %s %s" % (internal_lines, expr_A, expr_B)
+        return "\\sum_{%s} %s %s" % (internal_lines, expr_2, expr_1)
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the BMBPT graph and its associated TSD to the LaTeX file.
