@@ -48,8 +48,8 @@ def parse_command_line():
         description="Arguments available only for (P)BMBPT calculations.\n")
 
     basic_args.add_argument(
-        "-o", "--order", type=int, choices=list(range(1, 10)),
-        help="order of the diagrams (>=1)")
+        "-o", "--order", type=int, nargs='+', choices=list(range(1, 10)),
+        help="order of the diagrams (>=1) or N_A, N_B, N_C truncation for IMSRG")
     basic_args.add_argument(
         "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT', 'BIMSRG'],
         help="theory of interest: MBPT, BMBPT, PBMBPT, BIMSRG")
@@ -98,6 +98,29 @@ def parse_command_line():
         args.draw_tsds = None
     if args.theory != 'MBPT' and not args.interactive:
         args.cd_output = None
+    if args.theory != 'BIMSRG' and len(args.order) > 1:
+        print("Order of the diagrams has to be a single int. Exiting.")
+        exit()
+
+    if args.theory == 'BIMSRG':
+        if len(args.order) == 1:
+            print("Using the traditional IMSRG truncation: N_A = N_B = N_C.")
+            dummy_order = args.order[0]
+            args.order = (dummy_order, dummy_order, dummy_order)
+        elif len(args.order) == 2:
+            print("Truncate commutator and operators differently: N_A = N_B.")
+            ope_order, comm_order = args.order[0], args.order[-1]
+            args.order = (ope_order, ope_order, comm_order)
+        elif len(args.order) == 3:
+            print("Using the N_A, N_B, N_C truncation scheme.")
+            a_order, b_order, comm_order = args.order[0], args.order[1], args.order[-1]
+            args.order = (a_order, b_order, comm_order)
+        else:
+            print("Truncation order has to be three int at most. Exiting.")
+            exit()
+    else:
+        dummy_order = args.order[0]
+        args.order = dummy_order
 
     return args
 
@@ -112,21 +135,48 @@ def interactive_interface(commands):
         (Namespace): Flags initialized through keyboard input.
 
     """
-    try:
-        commands.order = int(input('Order of the diagrams? [1-9]\n'))
-    except ValueError:
-        print("Please enter an integer value! Program exiting.")
-        exit()
-    while commands.order < 1 or commands.order > 9:
-        print("Perturbative order too small or too high!")
-        commands.order = int(input('Order of the diagrams? [1-9]\n'))
-
     theories = ["BMBPT", "MBPT", "PBMBPT", "BIMSRG"]
 
     commands.theory = input('MBPT, BMBPT, PBMBPT or BIMSRG?\n').upper()
     while commands.theory not in theories:
         print("Invalid theory!")
         commands.theory = input('MBPT, BMBPT, PBMBPT or BIMSRG?\n').upper()
+
+    if commands.theory != 'BIMSRG':
+        try:
+            commands.order = int(input('Order of the diagrams? [1-9]\n'))
+        except ValueError:
+            print("Please enter an integer value! Program exiting.")
+            exit()
+        while commands.order < 1 or commands.order > 9:
+            print("Perturbative order too small or too high!")
+            commands.order = int(input('Order of the diagrams? [1-9]\n'))
+    else:
+        try:
+            order_a = int(input('Order of the A operator? [1-9]\n'))
+        except ValueError:
+            print("Please enter an integer value! Program exiting.")
+            exit()
+        while order_a < 1 or order_a > 9:
+            print("Order too small or too high!")
+            order_a = int(input('Order of the A operator? [1-9]\n'))
+        try:
+            order_b = int(input('Order of the B operator? [1-9]\n'))
+        except ValueError:
+            print("Please enter an integer value! Program exiting.")
+            exit()
+        while order_b < 1 or order_b > 9:
+            print("Order too small or too high!")
+            order_b = int(input('Order of the B operator? [1-9]\n'))
+        try:
+            order_c = int(input('Order of the C commutator? [1-9]\n'))
+        except ValueError:
+            print("Please enter an integer value! Program exiting.")
+            exit()
+        while order_c < 1 or order_c > 9:
+            print("Order too small or too high!")
+            order_c = int(input('Order of the C commutator? [1-9]\n'))
+        commands.order = (order_a, order_b, order_c)
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         commands.canonical = input(
@@ -188,13 +238,17 @@ def attribute_directory(commands):
     'MBPT/Order-3'
 
     """
-    directory = '%s/Order-%i' % (commands.theory, commands.order)
-    if commands.canonical:
-        directory += '_canonical'
-    if commands.theory in ('BMBPT', 'PBMBPT'):
-        directory += '_%ibody_observable' % commands.nbody_observable
-    if commands.with_3NF:
-        directory += '_with3N'
+    directory = '%s/' % commands.theory
+    if commands.theory != "BIMSRG":
+        directory += 'Order-%i' % commands.order
+        if commands.canonical:
+            directory += '_canonical'
+        if commands.theory in ('BMBPT', 'PBMBPT'):
+            directory += '_%ibody_observable' % commands.nbody_observable
+        if commands.with_3NF:
+            directory += '_with3N'
+    else:
+        directory += 'Order_%i_%i_%i' % commands.order
     if not os.path.exists(directory):
         os.makedirs(directory)
     if not os.path.exists(directory+"/Diagrams"):
@@ -284,7 +338,8 @@ def order_diagrams(diagrams, commands):
     elif commands.theory == "MBPT":
         diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
     elif commands.theory == "BIMSRG":
-        diagrams, diag_nbs, section_flags = adg.bimsrg.order_diagrams(diagrams, commands.order)
+        diagrams, diag_nbs, section_flags = adg.bimsrg.order_diagrams(diagrams,
+                                                                      commands.order[-1])
 
     # Reattribute a number to the BMBPT diagrams
     if commands.theory == "BMBPT":
@@ -337,7 +392,7 @@ def print_diags_numbers(commands, diags_nbs):
         )
     elif commands.theory == "BIMSRG":
         print("\nValid diagrams: %i" % diags_nbs['nb_diags'])
-        for n in range(1, commands.order + 1):
+        for n in range(1, commands.order[-1] + 1):
             print("B-IMSRG(%i) diagrams: %i" % (n, diags_nbs[n]))
     print()
 
@@ -403,10 +458,16 @@ def write_file_header(latex_file, commands, diags_nbs):
     if commands.theory in ('BMBPT', 'PBMBPT') and commands.order >= 3:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
-    header = header \
-        + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
-        % (commands.order, commands.theory) \
-        + "\\author{The ADG Dev Team}\n"
+    if commands.theory != 'BIMSRG':
+        header = header \
+            + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
+            % (commands.order, commands.theory) \
+            + "\\author{The ADG Dev Team}\n"
+    else:
+        header = header \
+            + "\\title{Diagrams and algebraic expressions at order (%i,%i,%i) in BIMSRG}\n" \
+            % commands.order \
+            + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory in ("BMBPT", "PBMBPT"):

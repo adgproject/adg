@@ -23,18 +23,18 @@ def two_partitions(number):
     return [(elem, number - elem) for elem in range(number+1)]
 
 
-def diagrams_generation(order):
+def diagrams_generation(orders):
     """Generate diagrams for B-IMSRG.
 
     Args:
-        order (int): The B-IMSRG order of the studied diagrams.
+        orders (tuple): The B-IMSRG (N_A, N_B, N_C) order of the diagrams.
 
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
 
     """
     matrices = []
-    deg_max = 2*order
+    deg_max = 2*orders[-1]
     mat = np.zeros((4, 4), dtype=int)
 
     # Pick a valid vertex degree or zero for the external lines
@@ -122,7 +122,7 @@ def write_header(tex_file, commands, diags_nbs):
     """
     tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags'])
 
-    for n in range(1, commands.order + 1):
+    for n in range(1, commands.order[-1] + 1):
         tex_file.write("B-IMSRG(%i) diagrams: %i\n\n" % (n, diags_nbs[n]))
 
 
@@ -274,7 +274,7 @@ class BimsrgDiagram(adg.diag.Diagram):
             section_flags (dict): UniqueIDs of diags starting each section.
 
         """
-        for n in range(1, commands.order + 1):
+        for n in range(1, commands.order[-1] + 1):
             if self.tags[0] == section_flags[n]:
                 result.write("\\section{B-IMSRG(%i)}\n\n" % n)
         if self.tags[0] in section_flags['new_op_struct']:
