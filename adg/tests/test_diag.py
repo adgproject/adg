@@ -12,7 +12,7 @@ def test_feynmf_generator():
     graph = nx.from_numpy_matrix(np.array([[0, 6], [0, 0]]),
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     adg.diag.feynmf_generator(graph, "BMBPT", "diag0")
     feynmf_ref = "\\parbox{40pt}{\\begin{fmffile}{diag0}\n" \
         + "\\begin{fmfgraph*}(40,40)\n" \
@@ -44,7 +44,7 @@ def test_feynmf_generator():
     graph = nx.from_numpy_matrix(np.array([[0, 1], [1, 0]]),
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "MBPT")
+    adg.diag.label_vertices([graph], "MBPT", -1)
     adg.diag.feynmf_generator(graph, "MBPT", "diag1")
     feynmf_ref = "\\parbox{40pt}{\\begin{fmffile}{diag1}\n" \
         + "\\begin{fmfgraph*}(40,40)\n" \

@@ -14,7 +14,7 @@ def test_time_structure_graph():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert list(adg.tsd.time_structure_graph(diag).edges()) == [(0, 1),
@@ -25,7 +25,7 @@ def test_time_structure_graph():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert list(adg.tsd.time_structure_graph(diag).edges()) == [(0, 1),
@@ -39,7 +39,7 @@ def test_time_structure_graph():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert list(adg.tsd.time_structure_graph(diag).edges()) == [(0, 1),
@@ -104,7 +104,7 @@ def test_treat_tsds():
                                    create_using=nx.MultiDiGraph(),
                                    parallel_edges=True)
               for diagram in diagrams]
-    adg.diag.label_vertices(graphs, "BMBPT")
+    adg.diag.label_vertices(graphs, "BMBPT", -1)
     diags = [adg.bmbpt.BmbptFeynmanDiagram(graph, ind)
              for ind, graph in enumerate(graphs)]
     for diag in diags:
@@ -127,7 +127,7 @@ def test___init__():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -143,7 +143,7 @@ def test___init__():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -162,7 +162,7 @@ def test_treat_cycles():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -182,7 +182,7 @@ def test_treat_cycles():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -199,7 +199,7 @@ def test_resummation_power():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -211,7 +211,7 @@ def test_resummation_power():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
