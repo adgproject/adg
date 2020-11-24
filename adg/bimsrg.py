@@ -170,7 +170,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         adg.diag.Diagram.__init__(self, nx_graph)
         self.tags = [tag_num]
         self.unique_id = tag_num
-        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
+        self.adjacency_mat = nx.to_numpy_array(self.graph, dtype=int)
         self.expr = self.attribute_expression()
         self.max_degree = max(self.unsort_degrees[0] + self.unsort_degrees[3],
                               self.unsort_degrees[1],
