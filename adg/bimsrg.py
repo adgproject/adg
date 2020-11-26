@@ -8,7 +8,7 @@ import math
 import networkx as nx
 import numpy as np
 import adg.diag
-from adg.tools import greek_letter, reversed_enumerate
+from adg.tools import reversed_enumerate
 
 
 def two_partitions(number):
@@ -212,17 +212,17 @@ class BimsrgDiagram(adg.diag.Diagram):
         # Permutator for out-going lines
         if (nb_out_2 != 0) and (nb_out_1 != 0):
             perm += "\\textbf{P}(%s/%s) " \
-                % ("".join(greek_letter(idx) for idx in range(nb_out_2)),
-                   "".join(greek_letter(idx) for idx
+                % ("".join('k_{%i}' % (idx + 1) for idx in range(nb_out_2)),
+                   "".join('k_{%i}' % (idx + 1) for idx
                            in range(nb_out_2, nb_out_2 + nb_out_1)))
 
         # Permutator for incoming lines
         if (nb_in_2 != 0) and (nb_in_1 != 0):
             perm += "\\textbf{P}(%s/%s) " \
-                % ("".join(greek_letter(idx) for idx
+                % ("".join('k_{%i}' % (idx + 1) for idx
                            in range(nb_out_2 + nb_out_1,
                                     nb_out_2 + nb_out_1 + nb_in_2)),
-                   "".join(greek_letter(idx) for idx
+                   "".join('k_{%i}' % (idx + 1) for idx
                            in range(nb_out_2 + nb_out_1 + nb_in_2,
                                     nb_out_2 + nb_out_1 + nb_in_2 + nb_in_1)))
         return perm
@@ -244,7 +244,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         Returns:
             (str): The LaTeX-formatted expression for the vertices.
         """
-        internal_lines = "".join("k_{%i}" % label for label
+        internal_lines = "".join("p_{%i}" % label for label
                                  in range(1, self.adjacency_mat[1, 2] + 1))
         # Number of external lines tied to each vertex
         nb_out_2 = self.adjacency_mat[2, 3]
@@ -255,8 +255,8 @@ class BimsrgDiagram(adg.diag.Diagram):
         expr_2 = "%s^{%i%i}_{%s %s}" \
             % (self.graph.nodes[2]['operator'],
                self.unsort_io_degrees[2][1], self.unsort_io_degrees[2][0],
-               "".join(greek_letter(idx) for idx in range(nb_out_2))
-               + "".join(greek_letter(idx) for idx
+               "".join('k_{%i}' % (idx + 1) for idx in range(nb_out_2))
+               + "".join('k_{%i}' % (idx + 1) for idx
                          in range(nb_out_2 + nb_out_1,
                                   nb_out_2 + nb_out_1 + nb_in_2)),
                internal_lines)
@@ -265,11 +265,11 @@ class BimsrgDiagram(adg.diag.Diagram):
             % (self.graph.nodes[1]['operator'],
                self.unsort_io_degrees[1][1], self.unsort_io_degrees[1][0],
                internal_lines,
-               "".join(greek_letter(idx) for idx
+               "".join('k_{%i}' % (idx + 1) for idx
                        in range(nb_out_2, nb_out_2 + nb_out_1))
-               + "".join(greek_letter(idx) for idx
-                         in range(nb_out_2 + nb_out_2 + nb_in_2,
-                                  nb_out_2 + nb_out_2 + nb_in_2 + nb_in_1)))
+               + "".join('k_{%i}' % (idx + 1) for idx
+                         in range(nb_out_2 + nb_out_1 + nb_in_2,
+                                  nb_out_2 + nb_out_1 + nb_in_2 + nb_in_1)))
 
         return "\\sum_{%s} %s %s" % (internal_lines, expr_2, expr_1)
 
