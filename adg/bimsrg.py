@@ -180,6 +180,13 @@ class BimsrgDiagram(adg.diag.Diagram):
     def attribute_expression(self):
         """Returns the LaTeX expression of the diagram.
 
+        The expression is extracted in a way that assumes the canonical
+        representation of the vertices as well as a labeling of the external
+        lines that would correspond to a canonical representation of the C
+        operator vertex. As such, there is no sign factor associated to
+        departing from the canonical representation of the diagram. This
+        additionally prevents any line crossing from appearing.
+
         Returns:
             (str): The LaTeX expression for the diagram.
 
@@ -196,6 +203,9 @@ class BimsrgDiagram(adg.diag.Diagram):
 
     def permutator(self):
         """Return the permutator associated to the diagram.
+
+        The labelling of the external lines correspond to the canonical
+        representation of the C operator vertex.
 
         Returns:
             (str): The permutator associated to the diagram in LaTeX format.
@@ -240,6 +250,12 @@ class BimsrgDiagram(adg.diag.Diagram):
 
     def vertices_expression(self):
         """Return the expression associated to the vertices in LaTeX format.
+
+        The expressions are extracted in a way that assumes the canonical
+        representation of the vertices as well as a labeling of the external
+        lines that would correspond to a canonical representation of the C
+        operator vertex. This prevents any crossing as well as additional sign
+        tied to departing from the canonical representation.
 
         Returns:
             (str): The LaTeX-formatted expression for the vertices.
