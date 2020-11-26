@@ -211,14 +211,14 @@ class BimsrgDiagram(adg.diag.Diagram):
 
         # Permutator for out-going lines
         if (nb_out_2 != 0) and (nb_out_1 != 0):
-            perm += "\\textbf{P}(%s/%s) " \
+            perm += "P(%s/%s) " \
                 % ("".join('k_{%i}' % (idx + 1) for idx in range(nb_out_2)),
                    "".join('k_{%i}' % (idx + 1) for idx
                            in range(nb_out_2, nb_out_2 + nb_out_1)))
 
         # Permutator for incoming lines
         if (nb_in_2 != 0) and (nb_in_1 != 0):
-            perm += "\\textbf{P}(%s/%s) " \
+            perm += "P(%s/%s) " \
                 % ("".join('k_{%i}' % (idx + 1) for idx
                            in range(nb_out_2 + nb_out_1,
                                     nb_out_2 + nb_out_1 + nb_in_2)),
