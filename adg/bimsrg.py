@@ -198,8 +198,21 @@ class BimsrgDiagram(adg.diag.Diagram):
         name = " C^{%i%i}(%i%i,%i%i) = " \
             % (self.unsort_degrees[3], self.unsort_degrees[0],
                A_degrees[1], A_degrees[0], B_degrees[1], B_degrees[0])
-        return name + self.permutator() + self.symmetry_factor() \
-            + self.vertices_expression()
+        return name + self.sign() + self.permutator() \
+            + self.symmetry_factor() + self.vertices_expression()
+
+    def sign(self):
+        """Return the sign of the diagram.
+
+        As the diagrams are made with vertices in canonical representation and
+        avoiding crossings, the only sign left is associated with the
+        commutator.
+
+        Returns:
+            (str): The sign of the diagram.
+
+        """
+        return '- ' if self.graph.nodes[2]['operator'] == 'B' else ''
 
     def permutator(self):
         """Return the permutator associated to the diagram.
