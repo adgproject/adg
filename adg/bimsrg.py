@@ -141,7 +141,7 @@ def write_header(tex_file, commands, diags_nbs):
     tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags'])
 
     for n in range(1, commands.order[-1] + 1):
-        tex_file.write("B-IMSRG(%i) diagrams: %i\n\n" % (n, diags_nbs[n]))
+        tex_file.write("$C^{[%i]}$ diagrams: %i\n\n" % (n, diags_nbs[n]))
 
 
 class BimsrgDiagram(adg.diag.Diagram):
@@ -327,7 +327,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         """
         for n in range(1, commands.order[-1] + 1):
             if self.tags[0] == section_flags[n]:
-                result.write("\\section{B-IMSRG(%i)}\n\n" % n)
+                result.write("\\section{$C^{[%i]}$}\n\n" % n)
         if self.tags[0] in section_flags['new_op_struct']:
             result.write("\\subsection{$C^{%i%i}$}\n\n"
                          % (self.ext_io_degree[1], self.ext_io_degree[0]))
