@@ -216,18 +216,26 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
     # Set the position of the vertices
     if theory_type == "BIMSRG":
+        nbs_out_edges = (sum(1 for prop in graph.in_edges(3, keys=True)
+                             if prop[0] == 1),
+                         sum(1 for prop in graph.in_edges(3, keys=True)
+                             if prop[0] == 2))
+        nbs_in_edges = (sum(1 for prop in graph.out_edges(0, keys=True)
+                            if prop[1] == 1),
+                        sum(1 for prop in graph.out_edges(0, keys=True)
+                            if prop[1] == 2))
         nb_out_edges = len(graph.in_edges(3, keys=True))
         nb_in_edges = len(graph.out_edges(0, keys=True))
-        nb_top_vertices = nb_out_edges if nb_out_edges % 2 != 0 \
-            else nb_out_edges + 1
-        nb_bot_vertices = nb_in_edges if nb_in_edges % 2 != 0 \
-            else nb_in_edges + 1
+        nb_top_vertices = nb_out_edges if nb_out_edges == 1 \
+            else (max(2*nbs_out_edges[0], 2*nbs_out_edges[1]) + 1)
+        nb_bot_vertices = nb_in_edges if nb_in_edges == 1 \
+            else (max(2*nbs_in_edges[0], 2*nbs_in_edges[1]) + 1)
         positions = "\\fmfstraight\n" \
             + "\\fmftopn{t}{%i}" % nb_top_vertices \
             + "\\fmfbottomn{b}{%i}\n" % nb_bot_vertices \
-            + "\\fmf{phantom}{b%i,v1}\n" % (nb_in_edges//2 + 1) \
+            + "\\fmf{phantom}{b%i,v1}\n" % (nb_bot_vertices//2 + 1) \
             + "\\fmf{phantom}{v1,v2}\n" \
-            + "\\fmf{phantom}{v2,t%i}\n" % (nb_out_edges//2 + 1) \
+            + "\\fmf{phantom}{v2,t%i}\n" % (nb_top_vertices//2 + 1) \
             + "\\fmfv{d.shape=circle,d.filled=%s,d.size=3thick}{v1}\n" \
             % ('full' if graph.nodes[1]['operator'] == 'A' else 'empty') \
             + "\\fmfv{d.shape=circle,d.filled=%s,d.size=3thick}{v2}\n" \
@@ -251,35 +259,41 @@ def feynmf_generator(graph, theory_type, diagram_name):
         for idx in range(nb_props):
             fmf_file.write("\\fmf{%s%s}{v1,v2}\n" % (propa, props_dir[idx]))
         # Incoming external line
-        offset = 0
         for vert in (1, 2):
             nb_props = sum(1 for edge in graph.edges(0, keys=True)
                            if edge[1] == vert)
+            if (nb_bot_vertices == 1) and (vert == 1):
+                orientation = ""
+            elif vert == 2:
+                orientation = ",right=0.4"
+            else:
+                orientation = ",left=0.3"
             # Draw the diagrams
             for key in range(nb_props):
                 fmf_file.write("\\fmf{%s%s}{b%i,v%i}\n"
                                % (propa,
-                                  ",right=0.3" \
-                                    if key+offset+1 > nb_bot_vertices / 2 \
-                                    else ",left=0.3",
-                                  key+offset+1,
+                                  orientation,
+                                  key+1 if vert == 1
+                                  else nb_bot_vertices - key,
                                   vert))
-            offset = nb_props
         # Outgoing external lines
-        offset = 0
         for vert in (1, 2):
             nb_props = sum(1 for edge in graph.in_edges(3, keys=True)
                            if edge[0] == vert)
+            if (nb_top_vertices == 1) and (vert == 2):
+                orientation = ""
+            elif vert == 2:
+                orientation = ",right=0.3"
+            else:
+                orientation = ",left=0.4"
             # Draw the diagrams
             for key in range(nb_props):
                 fmf_file.write("\\fmf{%s%s}{v%i,t%i}\n"
                                % (propa,
-                                  ",right=0.3" \
-                                    if key+offset+1 > nb_top_vertices / 2 \
-                                    else ",left=0.3",
+                                  orientation,
                                   vert,
-                                  key+offset+1))
-            offset = nb_props
+                                  key+1 if vert == 1
+                                  else nb_top_vertices - key))
     else:
         # Loop over all elements of the graph to draw associated propagators
         for vert_i in graph:
