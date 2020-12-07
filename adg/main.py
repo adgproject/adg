@@ -12,8 +12,6 @@ import adg.tsd
 
 def main():
     """Launch the ADG program."""
-    run_commands = adg.run.parse_command_line()
-
     print(
         "#####################\n"
         + "# Automatic Diagram #\n"
@@ -23,6 +21,7 @@ def main():
         + "#  by ADG Dev Team  #\n"
         + "#####################\n"
     )
+    run_commands = adg.run.parse_command_line()
 
     if run_commands.interactive:
         run_commands = adg.run.interactive_interface(run_commands)
