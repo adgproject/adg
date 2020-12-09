@@ -110,7 +110,8 @@ def order_diagrams(diagrams, order):
     diagrams = []
     for n in range(1, order + 1):
         diagrams += sorted(diags_per_order[n],
-                           key=lambda diag: diag.ext_io_degree)
+                           key=lambda diag: (diag.ext_io_degree,
+                                             not diag.is_AB))
     diags_nb_per_type['nb_diags'] = len(diagrams)
 
     section_flags = {1: 0}
