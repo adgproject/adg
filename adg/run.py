@@ -467,7 +467,7 @@ def write_file_header(latex_file, commands, diags_nbs):
             + "\\author{The ADG Dev Team}\n"
     else:
         header = header \
-            + "\\title{Diagrams and algebraic expressions at order (%i,%i,%i) in BIMSRG}\n" \
+            + "\\title{Diagrams and algebraic expressions at order (%i,%i;%i) in BIMSRG}\n" \
             % commands.order \
             + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)

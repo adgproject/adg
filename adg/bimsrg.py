@@ -138,6 +138,8 @@ def write_header(tex_file, commands, diags_nbs):
         diags_nbs (dict): The number of diagrams per type.
 
     """
+    tex_file.write("$C=\\left[A,B\\right]$ with $N_A = %i$, $N_B = %i$ and $N_C = %i$\n\n"
+                   % commands.order)
     tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags'])
 
     for n in range(1, commands.order[-1] + 1):
@@ -153,11 +155,12 @@ class BimsrgDiagram(adg.diag.Diagram):
         expr (str): The B-IMSRG expression associated to the diagram.
         ext_io_degree (tuple): The degree of the operator component the diagram
             corresponds to.
+        is_AB (bool): True if the diagram contributes to +AB, false if to -BA.
 
     """
 
     __slots__ = ('adjacency_mat', 'unique_id', 'ext_io_degree',
-                 '_vert_exchange_sym_fact', 'expr')
+                 '_vert_exchange_sym_fact', 'expr', 'is_AB')
 
     def __init__(self, nx_graph, tag_num):
         """Generate a BMBPT diagrams using a NetworkX graph.
@@ -176,6 +179,7 @@ class BimsrgDiagram(adg.diag.Diagram):
                               self.unsort_degrees[1],
                               self.unsort_degrees[2])
         self.ext_io_degree = (self.unsort_degrees[0], self.unsort_degrees[3])
+        self.is_AB = True if self.graph.nodes[2]['operator'] == 'A' else False
 
     def attribute_expression(self):
         """Returns the LaTeX expression of the diagram.
@@ -331,5 +335,6 @@ class BimsrgDiagram(adg.diag.Diagram):
         if self.tags[0] in section_flags['new_op_struct']:
             result.write("\\subsection{$C^{%i%i}$}\n\n"
                          % (self.ext_io_degree[1], self.ext_io_degree[0]))
-        result.write("\\paragraph{Diagram %i:}\n" % (self.tags[0] + 1))
+        result.write("\\paragraph{Diagram %i (%s):}\n"
+                     % (self.tags[0] + 1, '$+AB$' if self.is_AB else '$-BA$'))
         result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)
