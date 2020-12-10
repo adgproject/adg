@@ -481,6 +481,9 @@ def write_file_header(latex_file, commands, diags_nbs):
 
     latex_file.write("\n\\tableofcontents\n\n")
 
+    if commands.theory == "BIMSRG":
+        adg.bimsrg.write_permutator_section(latex_file, commands)
+
 
 def compile_manager(directory):
     """Compile the program's LaTeX ouput file.

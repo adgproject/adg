@@ -7,6 +7,8 @@ from builtins import range
 import math
 import networkx as nx
 import numpy as np
+from itertools import permutations, product
+from more_itertools import powerset
 import adg.diag
 from adg.tools import reversed_enumerate
 
@@ -145,6 +147,53 @@ def write_header(tex_file, commands, diags_nbs):
 
     for n in range(1, commands.order[-1] + 1):
         tex_file.write("$C^{[%i]}$ diagrams: %i\n\n" % (n, diags_nbs[n]))
+
+
+def write_permutator_section(tex_file, commands):
+    """Write the section defining permutation operators.
+
+    Args:
+        tex_file (file): The ouput LaTeX file of the program.
+        commands (Namespace): Flags for the program run.
+
+    """
+    tex_file.write("\\section{Permutators definitions}\n\n"
+                   + "\\begin{align*}\n")
+    # Number of external legs is at most two times N_C
+    for max_index in range(2, 2*commands.order[-1] + 1):
+        indices = list(range(1, max_index + 1))
+        # Split our qp states in two subgroups of varying length
+        for partition in ((indices[:n], indices[n:])
+                          for n in range(1, len(indices)//2 + 1)):
+            tex_file.write(permutator(partition[0], partition[1]))
+    tex_file.write("\\end{align*}\n")
+
+
+def permutator(set_1, set_2):
+    """Write the definition of the permutation operator given by the two sets.
+
+    Args:
+        set_1 (list): The list of the left-hand-side qp labels.
+        set_2 (list): The list of the right-hand-side qp labels.
+
+    Returns:
+        (str): The LaTeX expression for the permutation operator.
+
+    """
+    perm_op = 'P(%s/%s) &= 1 ' % ("".join('k_{%i}' % label for label in set_1),
+                                  "".join('k_{%i}' % label for label in set_2))
+    # Combine all possible subsets of both sets
+    for subset_1, subset_2 in product(powerset(set_1), powerset(set_2)):
+        # Ensure each qp state has a permutation partner, exclude the empty set
+        if (len(subset_1) == len(subset_2)) and (len(subset_1) > 0):
+            # Run through all permutations of the first subset
+            for permutation in permutations(subset_1):
+                perm_op += '+ ' if len(subset_1) % 2 == 0 else '- '
+                for elem in zip(permutation, subset_2):
+                    perm_op += 'P_{k_{%i} k_{%i}} ' % elem
+    perm_op += "\\\\\n"
+    return perm_op
+
 
 
 class BimsrgDiagram(adg.diag.Diagram):
