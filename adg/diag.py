@@ -1,7 +1,7 @@
 """Routines and class for all types of diagrams, inherited by others."""
 
 from builtins import range
-from builtins import object
+from builtins import object, str
 from adg.tools import reversed_enumerate
 
 import copy
@@ -95,8 +95,7 @@ def topologically_distinct_diagrams(diagrams):
         for i_comp_diag, comp_diag in reversed_enumerate(diagrams[:i_diag]):
             if diag_io_degrees == comp_diag.io_degrees:
                 # Check anomalous character of props for PBMBPT
-                if isinstance(diag,
-                              adg.pbmbpt.ProjectedBmbptDiagram):
+                if isinstance(diag, adg.pbmbpt.ProjectedBmbptDiagram):
                     doubled_graph = create_checkable_diagram(graph)
                     doubled_comp_diag = create_checkable_diagram(comp_diag.graph)
                     matcher = iso.DiGraphMatcher(doubled_graph,
@@ -111,8 +110,7 @@ def topologically_distinct_diagrams(diagrams):
                                                  node_match=op_nm)
                 if matcher.is_isomorphic():
                     # Store the set of permutations to recover the original TSD
-                    if isinstance(diag,
-                                  adg.tsd.TimeStructureDiagram):
+                    if isinstance(diag, adg.tsd.TimeStructureDiagram):
                         diag.perms.update(
                             update_permutations(comp_diag.perms,
                                                 comp_diag.tags[0],
@@ -605,5 +603,5 @@ class Diagram(object):
 
         """
         latex_file.write('\n\\begin{center}\n')
-        draw_diagram(directory, latex_file, self.tags[0], 'diag')
+        draw_diagram(directory, latex_file, str(self.tags[0]), 'diag')
         latex_file.write('\n\\end{center}\n\n')

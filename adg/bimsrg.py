@@ -2,7 +2,6 @@
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
 from builtins import range
 import math
 import networkx as nx
@@ -61,25 +60,25 @@ def diagrams_subset(deg_max_top, deg_max_bot, deg_max_ext):
         # Split the valid vertex degree between external vertices
         for deg_0, deg_3 in two_partitions(deg_ext):
             # Split the vertex degree between the two internal vertices
-            for part_0 in two_partitions(deg_0):
+            for part_0, part_3 in product(two_partitions(deg_0),
+                                          two_partitions(deg_3)):
                 mat[0,1], mat[0,2] = part_0
-                for part_3 in two_partitions(deg_3):
-                    mat[1,3], mat[2,3] = part_3
-                    temp_deg_1 = mat[0,1] + mat[1,3]
-                    temp_deg_2 = mat[0,2] + mat[2,3]
-                    # Check that internal vertices are both odd/even, as lines
-                    # between them will affect their degrees similarly
-                    if ((abs(temp_deg_1 - temp_deg_2) % 2) == 0):
-                        # Determine how many lines can connect the vertices
-                        max_addition = min(deg_max_bot - temp_deg_1,
-                                           deg_max_top - temp_deg_2)
-                        # Check the odd/even character of vertices, since they
-                        # must eventually be even
-                        min_addition = 2 if (temp_deg_1 % 2 == 0) else 1
-                        for addition in range(min_addition, max_addition+1, 2):
-                            temp_mat = mat.copy()
-                            temp_mat[1,2] = addition
-                            matrices.append(temp_mat)
+                mat[1,3], mat[2,3] = part_3
+                temp_deg_1 = mat[0,1] + mat[1,3]
+                temp_deg_2 = mat[0,2] + mat[2,3]
+                # Check that internal vertices are both odd/even, as lines
+                # between them will affect their degrees similarly
+                if ((abs(temp_deg_1 - temp_deg_2) % 2) == 0):
+                    # Determine how many lines can connect the vertices
+                    max_addition = min(deg_max_bot - temp_deg_1,
+                                       deg_max_top - temp_deg_2)
+                    # Check the odd/even character of vertices, since they
+                    # must eventually be even
+                    min_addition = 2 if (temp_deg_1 % 2 == 0) else 1
+                    for addition in range(min_addition, max_addition+1, 2):
+                        temp_mat = mat.copy()
+                        temp_mat[1,2] = addition
+                        matrices.append(temp_mat)
     return matrices
 
 
@@ -96,18 +95,14 @@ def order_diagrams(diagrams, order):
         output processing.
 
     """
-    diags_per_order = {}
-    for n in range(1, order + 1):
-        diags_per_order[n] = []
+    diags_per_order = {n: [] for n in range(1, order + 1)}
 
     for i_diag, diag in reversed_enumerate(diagrams):
         diags_per_order[diag.max_degree/2].append(diag)
         del diagrams[i_diag]
 
-    diags_nb_per_type = {}
-
-    for n in range(1, order + 1):
-        diags_nb_per_type[n] = len(diags_per_order[n])
+    diags_nb_per_type = {n: len(diags_per_order[n])
+                         for n in range(1, order + 1)}
 
     diagrams = []
     for n in range(1, order + 1):
@@ -141,7 +136,8 @@ def write_header(tex_file, commands, diags_nbs):
         diags_nbs (dict): The number of diagrams per type.
 
     """
-    tex_file.write("$C=\\left[A,B\\right]$ with $N_A = %i$, $N_B = %i$ and $N_C = %i$\n\n"
+    tex_file.write("$C=\\left[A,B\\right]$ "
+                   + "with $N_A = %i$, $N_B = %i$ and $N_C = %i$\n\n"
                    % commands.order)
     tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags'])
 
@@ -195,7 +191,6 @@ def permutator(set_1, set_2):
     return perm_op
 
 
-
 class BimsrgDiagram(adg.diag.Diagram):
     """Describes a B-IMSRG Feynman diagram with its related properties.
 
@@ -246,9 +241,11 @@ class BimsrgDiagram(adg.diag.Diagram):
 
         """
         A_degrees = self.unsort_io_degrees[1] \
-            if self.graph.nodes[1]['operator'] == 'A' else self.unsort_io_degrees[2]
+            if self.graph.nodes[1]['operator'] == 'A' \
+            else self.unsort_io_degrees[2]
         B_degrees = self.unsort_io_degrees[1] \
-            if self.graph.nodes[1]['operator'] == 'B' else self.unsort_io_degrees[2]
+            if self.graph.nodes[1]['operator'] == 'B' \
+            else self.unsort_io_degrees[2]
         name = " C^{%i%i}(%i%i,%i%i) = " \
             % (self.unsort_degrees[3], self.unsort_degrees[0],
                A_degrees[1], A_degrees[0], B_degrees[1], B_degrees[0])
@@ -355,20 +352,6 @@ class BimsrgDiagram(adg.diag.Diagram):
                                   nb_out_2 + nb_out_1 + nb_in_2 + nb_in_1)))
 
         return "\\sum_{%s} %s %s" % (internal_lines, expr_2, expr_1)
-
-    def write_graph(self, latex_file, directory, write_time):
-        """Write the BMBPT graph and its associated TSD to the LaTeX file.
-
-        Args:
-            latex_file (file): The LaTeX output file of the program.
-            directory (str): The path to the result folder.
-            write_time (bool): ``True`` if we want informations on the
-                associated TSDs.
-
-        """
-        latex_file.write('\n\\begin{center}\n')
-        adg.diag.draw_diagram(directory, latex_file, str(self.tags[0]), 'diag')
-        latex_file.write('\n\\end{center}\n\n')
 
     def write_section(self, result, commands, section_flags):
         """Write section and subsections for BMBPT result file.
