@@ -11,4 +11,5 @@ ADG Reference for Developers
     adg/bmbpt
     adg/pbmbpt
     adg/tsd
+    adg/bimsrg
     adg/tools

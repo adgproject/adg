@@ -49,7 +49,7 @@ def parse_command_line():
 
     basic_args.add_argument(
         "-o", "--order", type=int, nargs='+', choices=list(range(1, 10)),
-        help="order of the diagrams (>=1) or N_A, N_B, N_C truncation for IMSRG")
+        help="order of the diagrams (>=1) or N_A, N_B, N_C truncation for BIMSRG")
     basic_args.add_argument(
         "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT', 'BIMSRG'],
         help="theory of interest: MBPT, BMBPT, PBMBPT, BIMSRG")

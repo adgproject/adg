@@ -33,7 +33,7 @@ CLI options
 Generic options:
 *****************
 
--o, --order         order of the diagrams [1-9]
+-o, --order         order of the diagrams [1-9] or N_A, N_B, N_C truncation for BIMSRG
 -t, --theory        theory of interest: MBPT, BMBPT or PBMBPT
 -i, --interactive   execute ADG in interactive mode
 
@@ -65,7 +65,8 @@ subfolder named after the order, e.g. ``/MBPT/Order-4``. In the case of (P)BMBPT
 suffixes are added depending on the n-body forces of the observable, and if
 three-body forces were used or only canonical diagrams computed, i.e. for our
 previous example, results would be stored under
-``BMBPT/Order-4_2body_observable``.
+``BMBPT/Order-4_2body_observable``. For BIMSRG, the folder corresponds e.g. to
+``BIMSRG/Order_1_2_3`` if N_A is 1, N_B is 2 and N_B is 3.
 
 The main output file of the program, called ``result.tex``, is a LaTeX file
 containing the expressions of the diagrams along other basic infos on their
