@@ -20,6 +20,16 @@ def two_partitions(number):
 
     Returns:
         (list): All the 2-partitions as tuples.
+
+    >>> two_partitions(3)
+    [(0, 3), (1, 2), (2, 1), (3, 0)]
+
+    >>> two_partitions(0)
+    [(0, 0)]
+
+    >>> two_partitions(-1)
+    []
+
     """
     return [(elem, number - elem) for elem in range(number+1)]
 
@@ -46,10 +56,22 @@ def diagrams_subset(deg_max_top, deg_max_bot, deg_max_ext):
     """Generate diagrams for B-IMSRG.
 
     Args:
-        orders (tuple): The B-IMSRG (N_A, N_B, N_C) order of the diagrams.
+        orders (tuple): The max ranks (2*N_A, 2*N_B, 2*N_C) of the vertices.
 
     Returns:
         (list): NumPy arrays encoding the adjacency matrices of the graphs.
+
+    >>> diagrams_subset(2, 2, 0) # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 0, 0, 0],
+           [0, 0, 2, 0],
+           [0, 0, 0, 0],
+           [0, 0, 0, 0]])]
+    >>> len(diagrams_subset(2, 2, 2))
+    5
+    >>> len(diagrams_subset(4, 4, 4))
+    41
+    >>> len(diagrams_subset(0, 0, 0))
+    0
 
     """
     matrices = []
@@ -177,6 +199,9 @@ def permutator(set_1, set_2):
 
     Returns:
         (str): The LaTeX expression for the permutation operator.
+
+    >>> print(permutator([1, 2], [3])) # doctest: +NORMALIZE_WHITESPACE
+    P(k_{1}k_{2}/k_{3}) &= 1 - P_{k_{1} k_{3}} - P_{k_{2} k_{3}} \\\\\n
 
     """
     perm_op = 'P(%s/%s) &= 1 ' % ("".join('k_{%i}' % label for label in set_1),
