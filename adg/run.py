@@ -281,8 +281,8 @@ def generate_diagrams(commands, id_generator):
         exit()
     print("Number of matrices produced: ", len(diagrams))
 
-    diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
-                                  parallel_edges=True) for diagram in diagrams]
+    diags = [nx.from_numpy_array(diagram, create_using=nx.MultiDiGraph(),
+                                 parallel_edges=True) for diagram in diagrams]
 
     if commands.theory == "MBPT":
         for i_diag, diag in reversed_enumerate(diags):
