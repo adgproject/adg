@@ -139,10 +139,13 @@ def write_header(tex_file, commands, diags_nbs):
     tex_file.write("$C=\\left[A,B\\right]$ "
                    + "with $N_A = %i$, $N_B = %i$ and $N_C = %i$\n\n"
                    % commands.order)
+    tex_file.write("$d_\\mathrm{max} \\equiv \\mathrm{max}(d_A, d_B, d_C)\n\n")
+    tex_file.write("\\par \\vspace{\\baselineskip}\n")
     tex_file.write("Valid diagrams: %i\n\n" % diags_nbs['nb_diags'])
 
     for n in range(1, commands.order[-1] + 1):
-        tex_file.write("$C^{[%i]}$ diagrams: %i\n\n" % (n, diags_nbs[n]))
+        tex_file.write("$d_\\mathrm{max} = %i$ diagrams: %i\n\n"
+                       % (n, diags_nbs[n]))
 
 
 def write_permutator_section(tex_file, commands):
@@ -364,7 +367,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         """
         for n in range(1, commands.order[-1] + 1):
             if self.tags[0] == section_flags[n]:
-                result.write("\\section{$C^{[%i]}$}\n\n" % n)
+                result.write("\\section{$d_\\mathrm{max} = %i$}\n\n" % n)
         if self.tags[0] in section_flags['new_op_struct']:
             result.write("\\subsection{$C^{%i%i}$}\n\n"
                          % (self.ext_io_degree[1], self.ext_io_degree[0]))

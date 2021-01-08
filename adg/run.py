@@ -395,7 +395,7 @@ def print_diags_numbers(commands, diags_nbs):
     elif commands.theory == "BIMSRG":
         print("\nValid diagrams: %i" % diags_nbs['nb_diags'])
         for n in range(1, commands.order[-1] + 1):
-            print("C[%i] diagrams: %i" % (n, diags_nbs[n]))
+            print("d_max = %i diagrams: %i" % (n, diags_nbs[n]))
     print()
 
 
