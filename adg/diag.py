@@ -214,90 +214,21 @@ def feynmf_generator(graph, theory_type, diagram_name):
 
     # Set the position of the vertices
     if theory_type == "BIMSRG":
-        nbs_out_edges = (sum(1 for prop in graph.in_edges(3, keys=True)
-                             if prop[0] == 1),
-                         sum(1 for prop in graph.in_edges(3, keys=True)
-                             if prop[0] == 2))
-        nbs_in_edges = (sum(1 for prop in graph.out_edges(0, keys=True)
-                            if prop[1] == 1),
-                        sum(1 for prop in graph.out_edges(0, keys=True)
-                            if prop[1] == 2))
-        nb_out_edges = len(graph.in_edges(3, keys=True))
-        nb_in_edges = len(graph.out_edges(0, keys=True))
-        nb_top_vertices = nb_out_edges if nb_out_edges == 1 \
-            else (max(2*nbs_out_edges[0], 2*nbs_out_edges[1]) + 1)
-        nb_bot_vertices = nb_in_edges if nb_in_edges == 1 \
-            else (max(2*nbs_in_edges[0], 2*nbs_in_edges[1]) + 1)
-        positions = "\\fmfstraight\n" \
-            + "\\fmftopn{t}{%i}" % nb_top_vertices \
-            + "\\fmfbottomn{b}{%i}\n" % nb_bot_vertices \
-            + "\\fmf{phantom}{b%i,v1}\n" % (nb_bot_vertices//2 + 1) \
-            + "\\fmf{phantom}{v1,v2}\n" \
-            + "\\fmf{phantom}{v2,t%i}\n" % (nb_top_vertices//2 + 1) \
-            + "\\fmfv{d.shape=circle,d.filled=%s,d.size=3thick}{v1}\n" \
-            % ('full' if graph.nodes[1]['operator'] == 'A' else 'empty') \
-            + "\\fmfv{d.shape=circle,d.filled=%s,d.size=3thick}{v2}\n" \
-            % ('full' if graph.nodes[2]['operator'] == 'A' else 'empty') \
-            + "\\fmffreeze\n"
-        fmf_file.write(positions)
+        bimsrg_diagram_internals(graph, fmf_file, propa)
 
     else:
         fmf_file.write(vertex_positions(graph, p_order))
 
-    # Special config for self-contraction
-    if theory_type == "PBMBPT":
-        fmf_file.write(self_contractions(graph))
+        # Special config for self-contraction
+        if theory_type == "PBMBPT":
+            fmf_file.write(self_contractions(graph))
 
-    if theory_type == "BIMSRG":
-        # Internal lines
-        nb_props = sum(1 for edge in graph.edges(1, keys=True) if edge[1] == 2)
-        # Set the list of propagators directions to use
-        props_dir = prop_directions(1, nb_props)
-        # Draw the diagrams
-        for idx in range(nb_props):
-            fmf_file.write("\\fmf{%s%s}{v1,v2}\n" % (propa, props_dir[idx]))
-        # Incoming external line
-        for vert in (1, 2):
-            nb_props = sum(1 for edge in graph.edges(0, keys=True)
-                           if edge[1] == vert)
-            if (nb_bot_vertices == 1) and (vert == 1):
-                orientation = ""
-            elif vert == 2:
-                orientation = ",right=0.4"
-            else:
-                orientation = ",left=0.3"
-            # Draw the diagrams
-            for key in range(nb_props):
-                fmf_file.write("\\fmf{%s%s}{b%i,v%i}\n"
-                               % (propa,
-                                  orientation,
-                                  key+1 if vert == 1
-                                  else nb_bot_vertices - key,
-                                  vert))
-        # Outgoing external lines
-        for vert in (1, 2):
-            nb_props = sum(1 for edge in graph.in_edges(3, keys=True)
-                           if edge[0] == vert)
-            if (nb_top_vertices == 1) and (vert == 2):
-                orientation = ""
-            elif vert == 2:
-                orientation = ",right=0.3"
-            else:
-                orientation = ",left=0.4"
-            # Draw the diagrams
-            for key in range(nb_props):
-                fmf_file.write("\\fmf{%s%s}{v%i,t%i}\n"
-                               % (propa,
-                                  orientation,
-                                  vert,
-                                  key+1 if vert == 1
-                                  else nb_top_vertices - key))
-    else:
         # Loop over all elements of the graph to draw associated propagators
         for vert_i in graph:
             for vert_j in list(graph.nodes())[vert_i+1:]:
                 props_to_draw = [edge for edge in graph.edges([vert_i, vert_j],
-                                                              data=True, keys=True)
+                                                              data=True,
+                                                              keys=True)
                                  if edge[1] in (vert_i, vert_j)
                                  and edge[0] != edge[1]]
                 # Set the list of propagators directions to use
@@ -305,27 +236,25 @@ def feynmf_generator(graph, theory_type, diagram_name):
                 # Draw the diagrams
                 key = 0
                 # Start with props going down, used in MBPT only
-                for prop in props_to_draw:
-                    if prop[1] < prop[0] \
-                            and not ('anomalous' in prop[3]
-                                     and prop[3]['anomalous']):
-                        fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
-                                       % (propa, props_dir[key], vert_j, vert_i))
-                        key += 1
+                for _ in (p for p in props_to_draw
+                          if p[1] < p[0]
+                          and not ('anomalous' in p[3] and p[3]['anomalous'])):
+                    fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
+                                   % (propa, props_dir[key], vert_j, vert_i))
+                    key += 1
                 # Reinitialise the drawing configuration as we change direction
                 key = 0
-                for prop in props_to_draw:
-                    if 'anomalous' in prop[3] and prop[3]['anomalous']:
-                        fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
-                                       % (props_dir[key], vert_i, vert_j))
-                        key += 1
-                for prop in props_to_draw:
-                    if prop[0] < prop[1] \
-                            and not ('anomalous' in prop[3]
-                                     and prop[3]['anomalous']):
-                        fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
-                                       % (propa, props_dir[key], vert_i, vert_j))
-                        key += 1
+                for _ in (p for p in props_to_draw
+                          if ('anomalous' in p[3] and p[3]['anomalous'])):
+                    fmf_file.write("\\fmf{prop_mm%s}{v%i,v%i}\n"
+                                   % (props_dir[key], vert_i, vert_j))
+                    key += 1
+                for _ in (p for p in props_to_draw
+                          if p[0] < p[1]
+                          and not ('anomalous' in p[3] and p[3]['anomalous'])):
+                    fmf_file.write("\\fmf{%s%s}{v%i,v%i}\n"
+                                   % (propa, props_dir[key], vert_i, vert_j))
+                    key += 1
 
     fmf_file.write("\\end{fmfgraph*}\n\\end{fmffile}}\n")
     fmf_file.close()
@@ -456,6 +385,82 @@ def self_contractions(graph):
                     key += 1
         instructions += "\\fmffreeze\n"
     return instructions
+
+
+def bimsrg_diagram_internals(graph, fmf_file, prop_type):
+    """Write to file the vertices and propagators of BIMSRG diagrams.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph to be drawn.
+        fmf_file (file): The FeymanMF file to be written to.
+        prop_type (str): The FeymanMF type for drawing the propagators.
+
+    """
+    nbs_out_edges = (sum(1 for p in graph.in_edges(3, keys=True) if p[0] == 1),
+                     sum(1 for p in graph.in_edges(3, keys=True) if p[0] == 2))
+    nbs_in_edges = (sum(1 for p in graph.out_edges(0, keys=True) if p[1] == 1),
+                    sum(1 for p in graph.out_edges(0, keys=True) if p[1] == 2))
+
+    nb_out_edges = len(graph.in_edges(3, keys=True))
+    nb_in_edges = len(graph.out_edges(0, keys=True))
+
+    nb_top_vertices = nb_out_edges if nb_out_edges == 1 \
+        else (max(2*nbs_out_edges[0], 2*nbs_out_edges[1]) + 1)
+    nb_bot_vertices = nb_in_edges if nb_in_edges == 1 \
+        else (max(2*nbs_in_edges[0], 2*nbs_in_edges[1]) + 1)
+
+    positions = "\\fmfstraight\n" \
+        + "\\fmftopn{t}{%i}" % nb_top_vertices \
+        + "\\fmfbottomn{b}{%i}\n" % nb_bot_vertices \
+        + "\\fmf{phantom}{b%i,v1}\n" % (nb_bot_vertices//2 + 1) \
+        + "\\fmf{phantom}{v1,v2}\n" \
+        + "\\fmf{phantom}{v2,t%i}\n" % (nb_top_vertices//2 + 1) \
+        + "\\fmfv{d.shape=circle,d.filled=%s,d.size=3thick}{v1}\n" \
+        % ('full' if graph.nodes[1]['operator'] == 'A' else 'empty') \
+        + "\\fmfv{d.shape=circle,d.filled=%s,d.size=3thick}{v2}\n" \
+        % ('full' if graph.nodes[2]['operator'] == 'A' else 'empty') \
+        + "\\fmffreeze\n"
+    fmf_file.write(positions)
+
+    # Internal lines
+    nb_props = sum(1 for edge in graph.edges(1, keys=True) if edge[1] == 2)
+    # Set the list of propagators directions to use
+    props_dir = prop_directions(1, nb_props)
+    # Draw the propagators
+    for idx in range(nb_props):
+        fmf_file.write("\\fmf{%s%s}{v1,v2}\n" % (prop_type, props_dir[idx]))
+
+    # Incoming external line
+    for vertex in (1, 2):
+        nb_props = sum(1 for edge in graph.edges(0, keys=True)
+                       if edge[1] == vertex)
+        if (nb_bot_vertices == 1) and (vertex == 1):
+            orientation = ""
+        else:
+            orientation = ",left=0.3" if vertex == 1 else ",right=0.4"
+        # Draw the propagators
+        for key in range(nb_props):
+            fmf_file.write("\\fmf{%s%s}{b%i,v%i}\n"
+                           % (prop_type,
+                              orientation,
+                              key+1 if vertex == 1 else nb_bot_vertices - key,
+                              vertex))
+
+    # Outgoing external lines
+    for vertex in (1, 2):
+        nb_props = sum(1 for edge in graph.in_edges(3, keys=True)
+                       if edge[0] == vertex)
+        if (nb_top_vertices == 1) and (vertex == 2):
+            orientation = ""
+        else:
+            orientation = ",left=0.4" if vertex == 1 else ",right=0.3"
+        # Draw the propagators
+        for key in range(nb_props):
+            fmf_file.write("\\fmf{%s%s}{v%i,t%i}\n"
+                           % (prop_type,
+                              orientation,
+                              vertex,
+                              key+1 if vertex == 1 else nb_top_vertices - key))
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
