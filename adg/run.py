@@ -152,31 +152,10 @@ def interactive_interface(commands):
             print("Perturbative order too small or too high!")
             commands.order = int(input('Order of the diagrams? [1-9]\n'))
     else:
-        try:
-            order_a = int(input('Order of the A operator? [1-9]\n'))
-        except ValueError:
-            print("Please enter an integer value! Program exiting.")
-            exit()
-        while order_a < 1 or order_a > 9:
-            print("Order too small or too high!")
-            order_a = int(input('Order of the A operator? [1-9]\n'))
-        try:
-            order_b = int(input('Order of the B operator? [1-9]\n'))
-        except ValueError:
-            print("Please enter an integer value! Program exiting.")
-            exit()
-        while order_b < 1 or order_b > 9:
-            print("Order too small or too high!")
-            order_b = int(input('Order of the B operator? [1-9]\n'))
-        try:
-            order_c = int(input('Order of the C commutator? [1-9]\n'))
-        except ValueError:
-            print("Please enter an integer value! Program exiting.")
-            exit()
-        while order_c < 1 or order_c > 9:
-            print("Order too small or too high!")
-            order_c = int(input('Order of the C commutator? [1-9]\n'))
-        commands.order = (order_a, order_b, order_c)
+        commands.order = [0, 0, 0]
+        for position, operator in enumerate('A', 'B', 'C'):
+            commands.order[position] = get_bimsrg_truncation_order(operator)
+        commands.order = tuple(commands.order)
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         commands.canonical = input(
@@ -206,6 +185,26 @@ def interactive_interface(commands):
     commands.compile = input("Compile pdf? (y/N) ").lower() == 'y'
 
     return commands
+
+
+def get_bimsrg_truncation_order(operator):
+    """Return the truncation order of a given operator from the user input.
+
+    Args:
+        operator (str): The letter corresponding to the operator name.py
+
+    Returns:
+        order (int): The truncation rank of the operator.
+    """
+    try:
+        order = int(input('Order of the %s operator? [1-9]\n' % operator))
+    except ValueError:
+        print("Please enter an integer value! Program exiting.")
+        exit()
+    while order < 1 or order > 9:
+        print("Order too small or too high!")
+        order = int(input('Order of the %s operator? [1-9]\n' % operator))
+    return order
 
 
 def attribute_directory(commands):
