@@ -437,13 +437,13 @@ def bimsrg_diagram_internals(graph, fmf_file, prop_type):
         if (nb_bot_vertices == 1) and (vertex == 1):
             orientation = ""
         else:
-            orientation = ",left=0.3" if vertex == 1 else ",right=0.4"
+            orientation = ",left=0.4" if vertex == 2 else ",right=0.3"
         # Draw the propagators
         for key in range(nb_props):
             fmf_file.write("\\fmf{%s%s}{b%i,v%i}\n"
                            % (prop_type,
                               orientation,
-                              key+1 if vertex == 1 else nb_bot_vertices - key,
+                              key+1 if vertex == 2 else nb_bot_vertices - key,
                               vertex))
 
     # Outgoing external lines
@@ -453,14 +453,14 @@ def bimsrg_diagram_internals(graph, fmf_file, prop_type):
         if (nb_top_vertices == 1) and (vertex == 2):
             orientation = ""
         else:
-            orientation = ",left=0.4" if vertex == 1 else ",right=0.3"
+            orientation = ",right=0.4" if vertex == 1 else ",left=0.3"
         # Draw the propagators
         for key in range(nb_props):
             fmf_file.write("\\fmf{%s%s}{v%i,t%i}\n"
                            % (prop_type,
                               orientation,
                               vertex,
-                              key+1 if vertex == 1 else nb_top_vertices - key))
+                              key+1 if vertex == 2 else nb_top_vertices - key))
 
 
 def draw_diagram(directory, result_file, diagram_index, diag_type):
