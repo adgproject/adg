@@ -29,6 +29,9 @@ def test_generate_diagrams():
     com.nbody_observable, com.canonical = 2, False
     assert len(adg.run.generate_diagrams(com, id_gen)) == 3
 
+    com.theory, com.order, com.with_3NF = 'BIMSRG', (2, 2, 2), False
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 82
+
     # Test for anomalous cases
 
     with pytest.raises(TypeError):
@@ -116,6 +119,21 @@ def test_order_diagrams():
     # Test that diagrams are processed
     assert len(adg.run.order_diagrams(diagrams, com)[0]) == 3
 
+    # Tests for the number of diagrams produced for simple BIMSRG cases
+    com = argparse.Namespace()
+    com.theory, com.order, com.with_3NF = 'BIMSRG', (2, 2, 2), False
+
+    # Use generate_diagrams as a seed
+    diagrams = adg.run.generate_diagrams(com, id_gen)
+    assert len(diagrams) == 82
+
+    # Test that diagrams are processed and ordered
+    diagrams, diag_nbs, _ = adg.run.order_diagrams(diagrams, com)
+    assert len(diagrams) == 82
+    assert diag_nbs['nb_diags'] == 82
+    assert diag_nbs[1] == 10
+    assert diag_nbs[2] == 72
+
 
 def test_print_diags_numbers(capsys):
     """Test the correct output od diagram numbers per type."""
@@ -186,4 +204,19 @@ def test_print_diags_numbers(capsys):
         "3N energy canonical diagrams: 3\n"
         "3N canonical diagrams for a generic operator only: 4\n"
         "3N non-canonical diagrams: 4\n\n"
+    )
+
+    com = argparse.Namespace()
+    com.theory, com.with_3NF, com.canonical = 'BIMSRG', False, False
+    com.order = (2, 2, 2)
+
+    diags_nb_per_type = {'nb_diags': 82, 1: 10, 2: 72}
+
+    adg.run.print_diags_numbers(com, diags_nb_per_type)
+    output = capsys.readouterr()
+    assert output.out == (
+        "Number of connected diagrams:  82\n\n"
+        "Valid diagrams: 82\n"
+        "d_max = 1 diagrams: 10\n"
+        "d_max = 2 diagrams: 72\n\n"
     )

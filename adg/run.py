@@ -235,6 +235,11 @@ def attribute_directory(commands):
     >>>
     >>> attribute_directory(com)
     'MBPT/Order-3'
+    >>>
+    >>> com.theory, com.order = 'BIMSRG', (1,2,3)
+    >>>
+    >>> attribute_directory(com)
+    'BIMSRG/Order_1_2_3'
 
     """
     directory = '%s/' % commands.theory

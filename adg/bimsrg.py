@@ -398,4 +398,4 @@ class BimsrgDiagram(adg.diag.Diagram):
                          % (self.ext_io_degree[1], self.ext_io_degree[0]))
         result.write("\\paragraph{Diagram %i (%s):}\n"
                      % (self.tags[0] + 1, '$+AB$' if self.is_AB else '$-BA$'))
-        result.write("\\begin{equation}\\n%s\\n\\end{equation}\\n" % self.expr)
+        result.write("\\begin{equation}\n%s\n\\end{equation}\n" % self.expr)
