@@ -66,7 +66,7 @@ docs2.7:
 
 
 standard3.5:
-  image: python:3.7
+  image: python:3.5
   script: "adg --help"
 
 test3.5:
@@ -192,6 +192,40 @@ test_beta3.8:
 
 docs3.8:
   image: python:3.8
+  variables:
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../..
+
+
+standard3.9:
+  image: python:3.9
+  script: "adg --help"
+
+test3.9:
+  image: python:3.9
+  variables:
+      OPTIONAL_DEPS: 1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_beta3.9:
+  image: python:3.9
+  variables:
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+docs3.9:
+  image: python:3.9
   variables:
       OPTIONAL_DEPS: 1
       BUILD_DOCS: 1
