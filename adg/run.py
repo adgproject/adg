@@ -16,8 +16,11 @@ import adg.pbmbpt
 import adg.diag
 
 
-def parse_command_line():
+def parse_command_line(cli_args):
     """Return run commands from the Command Line Interface.
+
+    Args:
+        cli_args: Command-line arguments submitted with the program.
 
     Returns:
         (Namespace): Appropriate commands to manage the program's run.
@@ -81,7 +84,7 @@ def parse_command_line():
         "-cd", "--cd_output", action="store_true",
         help="produce computer-readable output for automated framework (MBPT)")
 
-    args = parser.parse_args()
+    args = parser.parse_args(cli_args)
 
     if (not args.interactive) and ((args.order is None)
                                    or (args.theory is None)):
@@ -94,7 +97,7 @@ def parse_command_line():
     if args.theory not in ('BMBPT', 'PBMBPT') and not args.interactive:
         args.canonical = None
         args.with_3NF = None
-        args.nobs = 2
+        args.nbody_observable = 2
         args.draw_tsds = None
     if args.theory != 'MBPT' and not args.interactive:
         args.cd_output = None

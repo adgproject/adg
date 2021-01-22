@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 from datetime import datetime
+import sys
 import adg.run
 import adg.bmbpt
 import adg.bimsrg
@@ -21,7 +22,7 @@ def main():
         + "#  by ADG Dev Team  #\n"
         + "#####################\n"
     )
-    run_commands = adg.run.parse_command_line()
+    run_commands = adg.run.parse_command_line(sys.argv[1:])
 
     if run_commands.interactive:
         run_commands = adg.run.interactive_interface(run_commands)
