@@ -24,6 +24,50 @@ def test_attribute_expressions():
     assert diag.expr == diag_ref
 
 
+def test_write_header():
+    """Test the write_header function."""
+    com = argparse.Namespace()
+    com.theory, com.with_3NF, com.canonical = 'BIMSRG', False, False
+    com.order = (2, 2, 2)
+
+    diags_nbs = {'nb_diags': 82, 1: 10, 2: 72}
+
+    header_ref = '$C=\\left[A,B\\right]$ with $N_A = 2$, $N_B = 2$ and $N_C = 2$\n\n' \
+        + '$d_\\mathrm{max} \\equiv \\mathrm{max}(d_A, d_B, d_C)\n\n' \
+        + '\\par \\vspace{\\baselineskip}\nValid diagrams: 82\n\n' \
+        + '$d_\\mathrm{max} = 1$ diagrams: 10\n\n' \
+        + '$d_\\mathrm{max} = 2$ diagrams: 72\n\n'
+
+    with open('header.tex', 'w') as header_file:
+        adg.bimsrg.write_header(header_file, com, diags_nbs)
+
+    with open('header.tex', 'r') as header_file:
+        assert header_file.read() == header_ref
+    os.unlink('header.tex')
+
+
+def test_write_permutator_section():
+    """Test the write_permutator_section function."""
+    com = argparse.Namespace()
+    com.theory, com.with_3NF, com.canonical = 'BIMSRG', False, False
+    com.order = (2, 2, 2)
+
+    perm_ref = '\\section{Permutators definitions}\n\n\\begin{align*}\n' \
+        + 'P(k_{1}/k_{2}) &= 1 - P_{k_{1} k_{2}} \\\\\n' \
+        + 'P(k_{1}/k_{2}k_{3}) &= 1 - P_{k_{1} k_{2}} - P_{k_{1} k_{3}} \\\\\n' \
+        + 'P(k_{1}/k_{2}k_{3}k_{4}) &= 1 - P_{k_{1} k_{2}} - P_{k_{1} k_{3}} - P_{k_{1} k_{4}} \\\\\n' \
+        + 'P(k_{1}k_{2}/k_{3}k_{4}) &= 1 - P_{k_{1} k_{3}} - P_{k_{1} k_{4}} ' \
+        + '- P_{k_{2} k_{3}} - P_{k_{2} k_{4}} + P_{k_{1} k_{3}} P_{k_{2} k_{4}} ' \
+        + '+ P_{k_{2} k_{3}} P_{k_{1} k_{4}} \\\\\n\\end{align*}\n'
+
+    with open('perm.tex', 'w') as perm_file:
+        adg.bimsrg.write_permutator_section(perm_file, com)
+
+    with open('perm.tex', 'r') as perm_file:
+        assert perm_file.read() == perm_ref
+    os.unlink('perm.tex')
+
+
 def test_write_section():
     """Test the write_section method."""
 
