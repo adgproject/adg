@@ -10,6 +10,7 @@ ADG is licensed under under GNU General Public License version 3
   Pierre Arthuis
   Thomas Duguet
   Jean-Paul Ebran
+  Heiko Hergert
   Raphaël-David Lasseri
   Julien Ripoche
   Alexander Tichai
