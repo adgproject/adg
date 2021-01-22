@@ -138,6 +138,26 @@ def test_propagator_style():
         adg.diag.propagator_style('prop_pp')
 
 
+def test_prop_directions():
+    """Test the prop_directions function."""
+    # Simplest case
+    assert adg.diag.prop_directions(2, 5) == [',right=0.9', ',right=0.75',
+                                              ',right=0.6', ',left=0.6',
+                                              ',left=0.75', ',left=0.9']
+    # Close vertices
+    assert adg.diag.prop_directions(1, 5) == [',right=0.75', ',right=0.5', '',
+                                              ',left=0.5', ',left=0.75',
+                                              ',left=0.9']
+    # Numerous props with close vertices
+    assert adg.diag.prop_directions(1, 8) == [',right=0.70', ',right=0.60',
+                                              ',right=0.50', ',right=0.40',
+                                              ',right=0.30', ',right=0.20',
+                                              ',right=0.10', ',left=0.10',
+                                              ',left=0.20', ',left=0.30',
+                                              ',left=0.40', ',left=0.50',
+                                              ',left=0.60', ',left=0.70']
+
+
 def test_to_skeleton():
     """Test the function returning the skeleton of a graph."""
     # Test for a graph with one redundant link
