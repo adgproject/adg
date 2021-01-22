@@ -32,6 +32,7 @@ following Python libraries:
   - numpy
   - scipy
   - future
+  - more-itertools
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,

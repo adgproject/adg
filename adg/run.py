@@ -16,8 +16,11 @@ import adg.pbmbpt
 import adg.diag
 
 
-def parse_command_line():
+def parse_command_line(cli_args):
     """Return run commands from the Command Line Interface.
+
+    Args:
+        cli_args: Command-line arguments submitted with the program.
 
     Returns:
         (Namespace): Appropriate commands to manage the program's run.
@@ -48,11 +51,11 @@ def parse_command_line():
         description="Arguments available only for (P)BMBPT calculations.\n")
 
     basic_args.add_argument(
-        "-o", "--order", type=int, choices=list(range(1, 10)),
-        help="order of the diagrams (>=1)")
+        "-o", "--order", type=int, nargs='+', choices=list(range(1, 10)),
+        help="order of the diagrams (>=1) or N_A, N_B, N_C truncation for BIMSRG")
     basic_args.add_argument(
-        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT'],
-        help="theory of interest: MBPT, BMBPT or PBMBPT")
+        "-t", "--theory", type=str, choices=['MBPT', 'BMBPT', 'PBMBPT', 'BIMSRG'],
+        help="theory of interest: MBPT, BMBPT, PBMBPT, BIMSRG")
     basic_args.add_argument(
         "-i", "--interactive", action="store_true",
         help="execute ADG in interactive mode")
@@ -81,7 +84,7 @@ def parse_command_line():
         "-cd", "--cd_output", action="store_true",
         help="produce computer-readable output for automated framework (MBPT)")
 
-    args = parser.parse_args()
+    args = parser.parse_args(cli_args)
 
     if (not args.interactive) and ((args.order is None)
                                    or (args.theory is None)):
@@ -94,10 +97,33 @@ def parse_command_line():
     if args.theory not in ('BMBPT', 'PBMBPT') and not args.interactive:
         args.canonical = None
         args.with_3NF = None
-        args.nobs = 2
+        args.nbody_observable = 2
         args.draw_tsds = None
     if args.theory != 'MBPT' and not args.interactive:
         args.cd_output = None
+    if args.theory != 'BIMSRG' and len(args.order) > 1:
+        print("Order of the diagrams has to be a single int. Exiting.")
+        exit()
+
+    if args.theory == 'BIMSRG':
+        if len(args.order) == 1:
+            print("Using the traditional IMSRG truncation: N_A = N_B = N_C.")
+            dummy_order = args.order[0]
+            args.order = (dummy_order, dummy_order, dummy_order)
+        elif len(args.order) == 2:
+            print("Truncate commutator and operators differently: N_A = N_B.")
+            ope_order, comm_order = args.order[0], args.order[-1]
+            args.order = (ope_order, ope_order, comm_order)
+        elif len(args.order) == 3:
+            print("Using the N_A, N_B, N_C truncation scheme.")
+            a_order, b_order, comm_order = args.order[0], args.order[1], args.order[-1]
+            args.order = (a_order, b_order, comm_order)
+        else:
+            print("Truncation order has to be three int at most. Exiting.")
+            exit()
+    else:
+        dummy_order = args.order[0]
+        args.order = dummy_order
 
     return args
 
@@ -112,21 +138,27 @@ def interactive_interface(commands):
         (Namespace): Flags initialized through keyboard input.
 
     """
-    try:
-        commands.order = int(input('Order of the diagrams? [1-9]\n'))
-    except ValueError:
-        print("Please enter an integer value! Program exiting.")
-        exit()
-    while commands.order < 1 or commands.order > 9:
-        print("Perturbative order too small or too high!")
-        commands.order = int(input('Order of the diagrams? [1-9]\n'))
+    theories = ["BMBPT", "MBPT", "PBMBPT", "BIMSRG"]
 
-    theories = ["BMBPT", "MBPT", "PBMBPT"]
-
-    commands.theory = input('MBPT, BMBPT or PBMBPT?\n').upper()
+    commands.theory = input('MBPT, BMBPT, PBMBPT or BIMSRG?\n').upper()
     while commands.theory not in theories:
         print("Invalid theory!")
-        commands.theory = input('MBPT, BMBPT or PBMBPT?\n').upper()
+        commands.theory = input('MBPT, BMBPT, PBMBPT or BIMSRG?\n').upper()
+
+    if commands.theory != 'BIMSRG':
+        try:
+            commands.order = int(input('Order of the diagrams? [1-9]\n'))
+        except ValueError:
+            print("Please enter an integer value! Program exiting.")
+            exit()
+        while commands.order < 1 or commands.order > 9:
+            print("Perturbative order too small or too high!")
+            commands.order = int(input('Order of the diagrams? [1-9]\n'))
+    else:
+        commands.order = [0, 0, 0]
+        for position, operator in enumerate('A', 'B', 'C'):
+            commands.order[position] = get_bimsrg_truncation_order(operator)
+        commands.order = tuple(commands.order)
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         commands.canonical = input(
@@ -158,6 +190,26 @@ def interactive_interface(commands):
     return commands
 
 
+def get_bimsrg_truncation_order(operator):
+    """Return the truncation order of a given operator from the user input.
+
+    Args:
+        operator (str): The letter corresponding to the operator name.py
+
+    Returns:
+        order (int): The truncation rank of the operator.
+    """
+    try:
+        order = int(input('Order of the %s operator? [1-9]\n' % operator))
+    except ValueError:
+        print("Please enter an integer value! Program exiting.")
+        exit()
+    while order < 1 or order > 9:
+        print("Order too small or too high!")
+        order = int(input('Order of the %s operator? [1-9]\n' % operator))
+    return order
+
+
 def attribute_directory(commands):
     """Create missing directories and return the working directory.
 
@@ -186,15 +238,24 @@ def attribute_directory(commands):
     >>>
     >>> attribute_directory(com)
     'MBPT/Order-3'
+    >>>
+    >>> com.theory, com.order = 'BIMSRG', (1,2,3)
+    >>>
+    >>> attribute_directory(com)
+    'BIMSRG/Order_1_2_3'
 
     """
-    directory = '%s/Order-%i' % (commands.theory, commands.order)
-    if commands.canonical:
-        directory += '_canonical'
-    if commands.theory in ('BMBPT', 'PBMBPT'):
-        directory += '_%ibody_observable' % commands.nbody_observable
-    if commands.with_3NF:
-        directory += '_with3N'
+    directory = '%s/' % commands.theory
+    if commands.theory != "BIMSRG":
+        directory += 'Order-%i' % commands.order
+        if commands.canonical:
+            directory += '_canonical'
+        if commands.theory in ('BMBPT', 'PBMBPT'):
+            directory += '_%ibody_observable' % commands.nbody_observable
+        if commands.with_3NF:
+            directory += '_with3N'
+    else:
+        directory += 'Order_%i_%i_%i' % commands.order
     if not os.path.exists(directory):
         os.makedirs(directory)
     if not os.path.exists(directory+"/Diagrams"):
@@ -220,26 +281,33 @@ def generate_diagrams(commands, id_generator):
                                                  commands.with_3NF,
                                                  commands.nbody_observable,
                                                  commands.canonical)
+    elif commands.theory == "BIMSRG":
+        diagrams, switch_flag = adg.bimsrg.diagrams_generation(commands.order)
     else:
         print("Invalid theory! Exiting program.")
         exit()
     print("Number of matrices produced: ", len(diagrams))
 
-    diags = [nx.from_numpy_matrix(diagram, create_using=nx.MultiDiGraph(),
-                                  parallel_edges=True) for diagram in diagrams]
+    diags = [nx.from_numpy_array(diagram, create_using=nx.MultiDiGraph(),
+                                 parallel_edges=True) for diagram in diagrams]
 
     if commands.theory == "MBPT":
         for i_diag, diag in reversed_enumerate(diags):
             if (nx.number_weakly_connected_components(diag)) != 1:
                 del diags[i_diag]
 
-    adg.diag.label_vertices(diags, commands.theory)
+    adg.diag.label_vertices(diags,
+                            commands.theory,
+                            switch_flag if commands.theory == 'BIMSRG' else -1)
 
     if commands.theory in ('BMBPT', "PBMBPT"):
         diagrams = [adg.bmbpt.BmbptFeynmanDiagram(graph, id_generator.get())
                     for graph in diags]
     elif commands.theory == 'MBPT':
         diagrams = [adg.mbpt.MbptDiagram(graph, id_generator.get())
+                    for graph in diags]
+    elif commands.theory == "BIMSRG":
+        diagrams = [adg.bimsrg.BimsrgDiagram(graph, id_generator.get())
                     for graph in diags]
 
     if commands.theory == "PBMBPT":
@@ -277,6 +345,10 @@ def order_diagrams(diagrams, commands):
         diagrams, diag_nbs, section_flags = adg.bmbpt.order_diagrams(diagrams)
     elif commands.theory == "MBPT":
         diagrams, diag_nbs, section_flags = adg.mbpt.order_diagrams(diagrams)
+    elif commands.theory == "BIMSRG":
+        order = max(commands.order)
+        diagrams, diag_nbs, section_flags = adg.bimsrg.order_diagrams(diagrams,
+                                                                      order)
 
     # Reattribute a number to the BMBPT diagrams
     if commands.theory == "BMBPT":
@@ -327,6 +399,10 @@ def print_diags_numbers(commands, diags_nbs):
             + "Quadruples: %i\n" % diags_nbs['quadruples']
             + "Quintuples and higher: %i" % diags_nbs['quintuples+']
         )
+    elif commands.theory == "BIMSRG":
+        print("\nValid diagrams: %i" % diags_nbs['nb_diags'])
+        for n in range(1, commands.order[-1] + 1):
+            print("d_max = %i diagrams: %i" % (n, diags_nbs[n]))
     print()
 
 
@@ -391,35 +467,43 @@ def write_file_header(latex_file, commands, diags_nbs):
     if commands.theory in ('BMBPT', 'PBMBPT') and commands.order >= 3:
         header = "%s\\usepackage[landscape]{geometry}\n" % header
 
-    header = header \
-        + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
-        % (commands.order, commands.theory) \
-        + "\\author{The ADG Dev Team}\n"
+    if commands.theory != 'BIMSRG':
+        header = header \
+            + "\\title{Diagrams and algebraic expressions at order %i in %s}\n" \
+            % (commands.order, commands.theory) \
+            + "\\author{The ADG Dev Team}\n"
+    else:
+        header = header \
+            + "\\title{Diagrams and algebraic expressions at order (%i,%i;%i) in BIMSRG}\n" \
+            % commands.order \
+            + "\\author{The ADG Dev Team}\n"
     latex_file.write("%s\n\\begin{document}\n\n\\maketitle\n\n" % header)
 
     if commands.theory in ("BMBPT", "PBMBPT"):
         adg.bmbpt.write_header(latex_file, commands, diags_nbs)
     elif commands.theory == "MBPT":
         adg.mbpt.write_header(latex_file, diags_nbs)
+    elif commands.theory == "BIMSRG":
+        adg.bimsrg.write_header(latex_file, commands, diags_nbs)
 
     latex_file.write("\n\\tableofcontents\n\n")
 
+    if commands.theory == "BIMSRG":
+        adg.bimsrg.write_permutator_section(latex_file, commands)
 
-def compile_manager(directory, pdiag):
+
+def compile_manager(directory):
     """Compile the program's LaTeX ouput file.
 
     Args:
         directory (str): Path to the ouput folder.
-        pdiag (bool): ``True`` if one wants to draw the diagrams.
 
     """
     os.chdir(directory)
     os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
-    if pdiag:
-        # Second compilation needed
-        os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
+    # Second compilation for table of contents and diagrams
+    os.system("pdflatex -shell-escape -interaction=batchmode result.tex")
     os.chdir("../..")
-    print("Result saved in %s/result.pdf" % directory)
 
 
 def clean_folders(directory, commands):

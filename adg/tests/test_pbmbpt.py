@@ -13,7 +13,7 @@ def test_generate_anomalous_diags():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
 
@@ -27,7 +27,7 @@ def test_generate_anomalous_diags():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
 

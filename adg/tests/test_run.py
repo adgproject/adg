@@ -6,6 +6,108 @@ import adg.run
 import adg.tools
 
 
+def test_parse_command_line():
+    """Test the parse_command_line function."""
+    # Test with simple BMBPT case
+    arguments = ['-t', 'BMBPT', '-o', '2']
+    commands = adg.run.parse_command_line(arguments)
+    assert commands.order == 2
+    assert commands.theory == 'BMBPT'
+    assert commands.nbody_observable == 2
+    assert not commands.with_3NF
+    assert not commands.interactive
+    assert not commands.draw_diags
+    assert not commands.canonical
+    assert not commands.cd_output
+    assert not commands.draw_tsds
+    assert not commands.compile
+
+    # Test with complex BMBPT case
+    arguments = ['-t', 'BMBPT', '-o', '2', '-d', '--with_3NF', '-nobs', '3']
+    commands = adg.run.parse_command_line(arguments)
+    assert commands.order == 2
+    assert commands.theory == 'BMBPT'
+    assert commands.nbody_observable == 3
+    assert commands.with_3NF
+    assert not commands.interactive
+    assert commands.draw_diags
+    assert not commands.canonical
+    assert not commands.cd_output
+    assert not commands.draw_tsds
+    assert not commands.compile
+
+    # Test MBPT case
+    arguments = ['-t', 'MBPT', '-o', '2', '-d', '-cd']
+    commands = adg.run.parse_command_line(arguments)
+    assert commands.order == 2
+    assert commands.theory == 'MBPT'
+    assert commands.nbody_observable == 2
+    assert not commands.with_3NF
+    assert not commands.interactive
+    assert commands.draw_diags
+    assert not commands.canonical
+    assert commands.cd_output
+    assert not commands.draw_tsds
+    assert not commands.compile
+
+    # Standard BIMSRG case
+    arguments = ['-t', 'BIMSRG', '-o', '2', '-d']
+    commands = adg.run.parse_command_line(arguments)
+    assert commands.order == (2, 2, 2)
+    assert commands.theory == 'BIMSRG'
+    assert commands.nbody_observable == 2
+    assert not commands.with_3NF
+    assert not commands.interactive
+    assert commands.draw_diags
+    assert not commands.canonical
+    assert not commands.cd_output
+    assert not commands.draw_tsds
+    assert not commands.compile
+
+    # BIMSRG case with commutator truncation
+    arguments = ['-t', 'BIMSRG', '-o', '3', '2', '-d']
+    commands = adg.run.parse_command_line(arguments)
+    assert commands.order == (3, 3, 2)
+    assert commands.theory == 'BIMSRG'
+    assert commands.nbody_observable == 2
+    assert not commands.with_3NF
+    assert not commands.interactive
+    assert commands.draw_diags
+    assert not commands.canonical
+    assert not commands.cd_output
+    assert not commands.draw_tsds
+    assert not commands.compile
+
+    # BIMSRG case with different truncation for each operator
+    arguments = ['-t', 'BIMSRG', '-o', '3', '2', '1', '-d']
+    commands = adg.run.parse_command_line(arguments)
+    assert commands.order == (3, 2, 1)
+    assert commands.theory == 'BIMSRG'
+    assert commands.nbody_observable == 2
+    assert not commands.with_3NF
+    assert not commands.interactive
+    assert commands.draw_diags
+    assert not commands.canonical
+    assert not commands.cd_output
+    assert not commands.draw_tsds
+    assert not commands.compile
+
+    # Anomalous BIMSRG case with too many orders
+    arguments = ['-t', 'BIMSRG', '-o', '3', '2', '1', '4']
+    with pytest.raises(SystemExit):
+        commands = adg.run.parse_command_line(arguments)
+
+    # Anomalous non-BIMSRG case with too many orders
+    arguments = ['-t', 'MBPT', '-o', '3', '2']
+    with pytest.raises(SystemExit):
+        commands = adg.run.parse_command_line(arguments)
+
+    # Anomalous case with missing flag
+    arguments = ['-t', 'BIMSRG']
+    with pytest.raises(SystemExit):
+        commands = adg.run.parse_command_line(arguments)
+
+
 def test_generate_diagrams():
     """Unit and regression test for generate_diagrams."""
     com = argparse.Namespace()
@@ -28,6 +130,9 @@ def test_generate_diagrams():
     com.theory, com.order, com.with_3NF = 'PBMBPT', 1, False
     com.nbody_observable, com.canonical = 2, False
     assert len(adg.run.generate_diagrams(com, id_gen)) == 3
+
+    com.theory, com.order, com.with_3NF = 'BIMSRG', (2, 2, 2), False
+    assert len(adg.run.generate_diagrams(com, id_gen)) == 82
 
     # Test for anomalous cases
 
@@ -116,6 +221,21 @@ def test_order_diagrams():
     # Test that diagrams are processed
     assert len(adg.run.order_diagrams(diagrams, com)[0]) == 3
 
+    # Tests for the number of diagrams produced for simple BIMSRG cases
+    com = argparse.Namespace()
+    com.theory, com.order, com.with_3NF = 'BIMSRG', (2, 2, 2), False
+
+    # Use generate_diagrams as a seed
+    diagrams = adg.run.generate_diagrams(com, id_gen)
+    assert len(diagrams) == 82
+
+    # Test that diagrams are processed and ordered
+    diagrams, diag_nbs, _ = adg.run.order_diagrams(diagrams, com)
+    assert len(diagrams) == 82
+    assert diag_nbs['nb_diags'] == 82
+    assert diag_nbs[1] == 10
+    assert diag_nbs[2] == 72
+
 
 def test_print_diags_numbers(capsys):
     """Test the correct output od diagram numbers per type."""
@@ -186,4 +306,19 @@ def test_print_diags_numbers(capsys):
         "3N energy canonical diagrams: 3\n"
         "3N canonical diagrams for a generic operator only: 4\n"
         "3N non-canonical diagrams: 4\n\n"
+    )
+
+    com = argparse.Namespace()
+    com.theory, com.with_3NF, com.canonical = 'BIMSRG', False, False
+    com.order = (2, 2, 2)
+
+    diags_nb_per_type = {'nb_diags': 82, 1: 10, 2: 72}
+
+    adg.run.print_diags_numbers(com, diags_nb_per_type)
+    output = capsys.readouterr()
+    assert output.out == (
+        "Number of connected diagrams:  82\n\n"
+        "Valid diagrams: 82\n"
+        "d_max = 1 diagrams: 10\n"
+        "d_max = 2 diagrams: 72\n\n"
     )

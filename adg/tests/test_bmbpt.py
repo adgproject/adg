@@ -13,7 +13,7 @@ def test_attribute_expressions():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -45,7 +45,7 @@ def test_attribute_expressions():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)
@@ -103,7 +103,7 @@ def test_vertex_exchange_sym_factor():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert diag.vertex_exchange_sym_factor == 2
@@ -116,7 +116,7 @@ def test_vertex_exchange_sym_factor():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert diag.vertex_exchange_sym_factor == 6
@@ -126,7 +126,7 @@ def test_vertex_exchange_sym_factor():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], 'BMBPT')
+    adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert diag.vertex_exchange_sym_factor == 1
@@ -138,7 +138,7 @@ def test_extract_integral():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
 
@@ -157,7 +157,7 @@ def test_extract_numerator():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
 
@@ -217,7 +217,7 @@ def test_time_tree_denominator():
     graph = nx.from_numpy_matrix(diagram,
                                  create_using=nx.MultiDiGraph(),
                                  parallel_edges=True)
-    adg.diag.label_vertices([graph], "BMBPT")
+    adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
     tsd = adg.tsd.TimeStructureDiagram(diag)

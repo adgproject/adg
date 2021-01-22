@@ -41,6 +41,7 @@ setup(
     url='https://github.com/adgproject/adg',
     install_requires=[
         "future",
+        "more-itertools",
         "networkx>=2.0",
         "numpy",
         "scipy",
@@ -72,6 +73,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Topic :: Scientific/Engineering :: Physics',

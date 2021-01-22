@@ -62,6 +62,7 @@ In order to run the code, you will need a Python install >= 2.7.1
     * numpy
     * scipy
     * future
+    * more-itertools
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,
@@ -125,18 +126,22 @@ actual calculation output would be stored.
 
 ## Citing
 If you use ADG in your research work, we kindly ask you to cite the following
-paper: P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
-Comput. Phys. Commun. **240**, 202-227 (2019). It is available under the
-following [DOI](https://doi.org/10.1016/j.cpc.2018.11.023).
+papers:
+  - P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
+    Comput. Phys. Commun. **240**, 202-227 (2019). It is available under the
+    following [DOI](https://doi.org/10.1016/j.cpc.2018.11.023).
+  - P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
+    Comput. Phys. Commun. in press (2021). It is available [here](https://doi.org/10.1016/j.cpc.2020.107677).
 
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
-Copyright (C) 2018-2020 ADG Dev Team
-Pierre Arthuis - University of Surrey (previously Irfu, CEA, UPSaclay & CEA, DAM, DIF)
+Copyright (C) 2018-2021 ADG Dev Team
+Pierre Arthuis - IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF
+Heiko Hergert - NSCL/FRIB Laboratory & Department of Physics and Astronomy, Michigan State University
 Raphaël-David Lasseri - ESNT, Irfu, CEA, UPSaclay (previously IPN, CNRS/IN2P3, UPSud, UPSaclay)
 Julien Ripoche - CEA, DAM, DIF
-Alexander Tichai - ESNT, Irfu, CEA, UPSaclay & MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & EMMI, GSI, Darmstadt
+Alexander Tichai - MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previsously ESNT, Irfu, CEA, Université Paris-Saclay)
 ```
