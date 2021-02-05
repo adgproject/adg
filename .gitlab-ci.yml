@@ -25,7 +25,7 @@ before_script:
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - pip install --retries 3 ${PIP_FLAGS} networkx>=2.0 numpy scipy
+  - pip install --retries 3 ${PIP_FLAGS} networkx>=2.0 numpy scipy more-itertools
   - if [[ "${OPTIONAL_DEPS}" == 1 ]]; then
       pip install --retries 3 ${PIP_FLAGS} pytest pytest-cov roman sphinx sphinx_rtd_theme;
     fi
