@@ -52,10 +52,10 @@ setup(
         # dependencies). You can install these using the following syntax:
         # $ pip install -e .[develop]
         develop=[
-            'pytest>=3.6,<5.0',
+            'pytest>=3.6',
             'pytest-cov',
             'roman',
-            'sphinx<2.0',
+            'sphinx',
             'sphinx_rtd_theme',
         ]
     ),
