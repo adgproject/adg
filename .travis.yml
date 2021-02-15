@@ -83,6 +83,21 @@ matrix:
       - OPTIONAL_DEPS=1
       - PIP_FLAGS="--pre"
     - python: 3.8
+    - os: linux
+      python: 3.9
+      env:
+      - OPTIONAL_DEPS=1
+      - BUILD_DOCS=1
+    - os: linux
+      python: 3.9
+      env:
+      - OPTIONAL_DEPS=1
+    - os: linux
+      python: 3.9
+      env:
+      - OPTIONAL_DEPS=1
+      - PIP_FLAGS="--pre"
+    - python: 3.9
 
 install:
   # install required packages

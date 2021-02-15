@@ -1,0 +1,2676 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,bottom=2.5cm,top=2.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hyperindex=true]{hyperref}\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{feynmp-auto}
+\title{Diagrams and algebraic expressions at order (2,2;2) in BIMSRG}
+\author{The ADG Dev Team}
+
+\begin{document}
+
+\maketitle
+
+$C=\left[A,B\right]$ with $N_A = 2$, $N_B = 2$ and $N_C = 2$
+
+$d_\mathrm{max} \equiv \mathrm{max}(d_A, d_B, d_C)
+
+\par \vspace{\baselineskip}
+Valid diagrams: 82
+
+$d_\mathrm{max} = 1$ diagrams: 10
+
+$d_\mathrm{max} = 2$ diagrams: 72
+
+
+\tableofcontents
+
+\section{Permutators definitions}
+
+\begin{align*}
+P(k_{1}/k_{2}) &= 1 - P_{k_{1} k_{2}} \\
+P(k_{1}/k_{2}k_{3}) &= 1 - P_{k_{1} k_{2}} - P_{k_{1} k_{3}} \\
+P(k_{1}/k_{2}k_{3}k_{4}) &= 1 - P_{k_{1} k_{2}} - P_{k_{1} k_{3}} - P_{k_{1} k_{4}} \\
+P(k_{1}k_{2}/k_{3}k_{4}) &= 1 - P_{k_{1} k_{3}} - P_{k_{1} k_{4}} - P_{k_{2} k_{3}} - P_{k_{2} k_{4}} + P_{k_{1} k_{3}} P_{k_{2} k_{4}} + P_{k_{2} k_{3}} P_{k_{1} k_{4}} \\
+\end{align*}
+\section{$d_\mathrm{max} = 1$}
+
+\subsection{$C^{00}$}
+
+\paragraph{Diagram 1 ($+AB$):}
+\begin{equation}
+ C^{00}(02,20) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{02}_{ p_{1}p_{2}} B^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_0}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 2 ($-BA$):}
+\begin{equation}
+ C^{00}(20,02) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{02}_{ p_{1}p_{2}} A^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_1}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{20}$}
+
+\paragraph{Diagram 3 ($+AB$):}
+\begin{equation}
+ C^{20}(11,20) = P(k_{1}/k_{2}) \sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{20}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_2}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 4 ($-BA$):}
+\begin{equation}
+ C^{20}(20,11) = - P(k_{1}/k_{2}) \sum_{p_{1}} B^{11}_{k_{1} p_{1}} A^{20}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_3}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{11}$}
+
+\paragraph{Diagram 5 ($+AB$):}
+\begin{equation}
+ C^{11}(11,11) = \sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{11}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_4}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 6 ($+AB$):}
+\begin{equation}
+ C^{11}(02,20) = \sum_{p_{1}} A^{02}_{k_{2} p_{1}} B^{20}_{p_{1} k_{1}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_5}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 7 ($-BA$):}
+\begin{equation}
+ C^{11}(11,11) = - \sum_{p_{1}} B^{11}_{k_{1} p_{1}} A^{11}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_6}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 8 ($-BA$):}
+\begin{equation}
+ C^{11}(20,02) = - \sum_{p_{1}} B^{02}_{k_{2} p_{1}} A^{20}_{p_{1} k_{1}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_7}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{02}$}
+
+\paragraph{Diagram 9 ($+AB$):}
+\begin{equation}
+ C^{02}(02,11) = P(k_{1}/k_{2}) \sum_{p_{1}} A^{02}_{k_{1} p_{1}} B^{11}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_8}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 10 ($-BA$):}
+\begin{equation}
+ C^{02}(11,02) = - P(k_{1}/k_{2}) \sum_{p_{1}} B^{02}_{k_{1} p_{1}} A^{11}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_9}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\section{$d_\mathrm{max} = 2$}
+
+\subsection{$C^{00}$}
+
+\paragraph{Diagram 11 ($+AB$):}
+\begin{equation}
+ C^{00}(04,40) = \frac{1}{24}\sum_{p_{1}p_{2}p_{3}p_{4}} A^{04}_{ p_{1}p_{2}p_{3}p_{4}} B^{40}_{p_{1}p_{2}p_{3}p_{4} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_10}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.75}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.75}{v1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 12 ($-BA$):}
+\begin{equation}
+ C^{00}(40,04) = - \frac{1}{24}\sum_{p_{1}p_{2}p_{3}p_{4}} B^{04}_{ p_{1}p_{2}p_{3}p_{4}} A^{40}_{p_{1}p_{2}p_{3}p_{4} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_11}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.75}{v1,v2}
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.75}{v1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{20}$}
+
+\paragraph{Diagram 13 ($+AB$):}
+\begin{equation}
+ C^{20}(02,40) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{02}_{ p_{1}p_{2}} B^{40}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_12}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 14 ($+AB$):}
+\begin{equation}
+ C^{20}(13,40) = P(k_{1}/k_{2}) \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} A^{13}_{k_{1} p_{1}p_{2}p_{3}} B^{40}_{p_{1}p_{2}p_{3} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_13}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 15 ($+AB$):}
+\begin{equation}
+ C^{20}(22,20) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{22}_{k_{1}k_{2} p_{1}p_{2}} B^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_14}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 16 ($-BA$):}
+\begin{equation}
+ C^{20}(40,02) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{02}_{ p_{1}p_{2}} A^{40}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_15}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 17 ($-BA$):}
+\begin{equation}
+ C^{20}(40,13) = - P(k_{1}/k_{2}) \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} B^{13}_{k_{1} p_{1}p_{2}p_{3}} A^{40}_{p_{1}p_{2}p_{3} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_16}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 18 ($-BA$):}
+\begin{equation}
+ C^{20}(20,22) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{22}_{k_{1}k_{2} p_{1}p_{2}} A^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_17}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{40}$}
+
+\paragraph{Diagram 19 ($+AB$):}
+\begin{equation}
+ C^{40}(11,40) = P(k_{1}/k_{2}k_{3}k_{4}) \sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{40}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_18}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t7}
+\fmf{half_prop,right=0.4}{v1,t6}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 20 ($+AB$):}
+\begin{equation}
+ C^{40}(22,40) = P(k_{1}k_{2}/k_{3}k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{22}_{k_{1}k_{2} p_{1}p_{2}} B^{40}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_19}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 21 ($+AB$):}
+\begin{equation}
+ C^{40}(31,20) = P(k_{1}k_{2}k_{3}/k_{4}) \sum_{p_{1}} A^{31}_{k_{1}k_{2}k_{3} p_{1}} B^{20}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_20}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t7}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\fmf{half_prop,left=0.3}{v2,t3}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 22 ($-BA$):}
+\begin{equation}
+ C^{40}(40,11) = - P(k_{1}/k_{2}k_{3}k_{4}) \sum_{p_{1}} B^{11}_{k_{1} p_{1}} A^{40}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_21}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t7}
+\fmf{half_prop,right=0.4}{v1,t6}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 23 ($-BA$):}
+\begin{equation}
+ C^{40}(40,22) = - P(k_{1}k_{2}/k_{3}k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{22}_{k_{1}k_{2} p_{1}p_{2}} A^{40}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_22}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 24 ($-BA$):}
+\begin{equation}
+ C^{40}(20,31) = - P(k_{1}k_{2}k_{3}/k_{4}) \sum_{p_{1}} B^{31}_{k_{1}k_{2}k_{3} p_{1}} A^{20}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_23}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.4}{v1,t7}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\fmf{half_prop,left=0.3}{v2,t3}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{11}$}
+
+\paragraph{Diagram 25 ($+AB$):}
+\begin{equation}
+ C^{11}(02,31) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{02}_{ p_{1}p_{2}} B^{31}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_24}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 26 ($+AB$):}
+\begin{equation}
+ C^{11}(13,31) = \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} A^{13}_{k_{1} p_{1}p_{2}p_{3}} B^{31}_{p_{1}p_{2}p_{3} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_25}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 27 ($+AB$):}
+\begin{equation}
+ C^{11}(04,40) = \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} A^{04}_{k_{2} p_{1}p_{2}p_{3}} B^{40}_{p_{1}p_{2}p_{3} k_{1}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_26}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 28 ($+AB$):}
+\begin{equation}
+ C^{11}(13,20) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{13}_{k_{1}k_{2} p_{1}p_{2}} B^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_27}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 29 ($-BA$):}
+\begin{equation}
+ C^{11}(31,02) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{02}_{ p_{1}p_{2}} A^{31}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_28}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 30 ($-BA$):}
+\begin{equation}
+ C^{11}(31,13) = - \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} B^{13}_{k_{1} p_{1}p_{2}p_{3}} A^{31}_{p_{1}p_{2}p_{3} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_29}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 31 ($-BA$):}
+\begin{equation}
+ C^{11}(40,04) = - \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} B^{04}_{k_{2} p_{1}p_{2}p_{3}} A^{40}_{p_{1}p_{2}p_{3} k_{1}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_30}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 32 ($-BA$):}
+\begin{equation}
+ C^{11}(20,13) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{13}_{k_{1}k_{2} p_{1}p_{2}} A^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_31}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{31}$}
+
+\paragraph{Diagram 33 ($+AB$):}
+\begin{equation}
+ C^{31}(11,31) = P(k_{1}/k_{2}k_{3}) \sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{31}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_32}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 34 ($+AB$):}
+\begin{equation}
+ C^{31}(22,31) = P(k_{1}k_{2}/k_{3}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{22}_{k_{1}k_{2} p_{1}p_{2}} B^{31}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_33}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 35 ($+AB$):}
+\begin{equation}
+ C^{31}(31,11) = \sum_{p_{1}} A^{31}_{k_{1}k_{2}k_{3} p_{1}} B^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_34}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\fmf{half_prop,left=0.3}{v2,t3}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 36 ($+AB$):}
+\begin{equation}
+ C^{31}(02,40) = \sum_{p_{1}} A^{02}_{k_{4} p_{1}} B^{40}_{p_{1} k_{1}k_{2}k_{3}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_35}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t7}
+\fmf{half_prop,right=0.4}{v1,t6}
+\fmf{half_prop,right=0.4}{v1,t5}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 37 ($+AB$):}
+\begin{equation}
+ C^{31}(13,40) = P(k_{1}/k_{2}k_{3}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{13}_{k_{1}k_{4} p_{1}p_{2}} B^{40}_{p_{1}p_{2} k_{2}k_{3}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_36}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 38 ($+AB$):}
+\begin{equation}
+ C^{31}(22,20) = P(k_{1}k_{2}/k_{3}) \sum_{p_{1}} A^{22}_{k_{1}k_{2}k_{4} p_{1}} B^{20}_{p_{1} k_{3}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_37}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 39 ($-BA$):}
+\begin{equation}
+ C^{31}(31,11) = - P(k_{1}/k_{2}k_{3}) \sum_{p_{1}} B^{11}_{k_{1} p_{1}} A^{31}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_38}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 40 ($-BA$):}
+\begin{equation}
+ C^{31}(31,22) = - P(k_{1}k_{2}/k_{3}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{22}_{k_{1}k_{2} p_{1}p_{2}} A^{31}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_39}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 41 ($-BA$):}
+\begin{equation}
+ C^{31}(11,31) = - \sum_{p_{1}} B^{31}_{k_{1}k_{2}k_{3} p_{1}} A^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_40}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop}{b1,v1}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\fmf{half_prop,left=0.3}{v2,t3}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 42 ($-BA$):}
+\begin{equation}
+ C^{31}(40,02) = - \sum_{p_{1}} B^{02}_{k_{4} p_{1}} A^{40}_{p_{1} k_{1}k_{2}k_{3}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_41}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{7}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t4}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t7}
+\fmf{half_prop,right=0.4}{v1,t6}
+\fmf{half_prop,right=0.4}{v1,t5}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 43 ($-BA$):}
+\begin{equation}
+ C^{31}(40,13) = - P(k_{1}/k_{2}k_{3}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{13}_{k_{1}k_{4} p_{1}p_{2}} A^{40}_{p_{1}p_{2} k_{2}k_{3}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_42}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 44 ($-BA$):}
+\begin{equation}
+ C^{31}(20,22) = - P(k_{1}k_{2}/k_{3}) \sum_{p_{1}} B^{22}_{k_{1}k_{2}k_{4} p_{1}} A^{20}_{p_{1} k_{3}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_43}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{1}
+\fmf{phantom}{b1,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{02}$}
+
+\paragraph{Diagram 45 ($+AB$):}
+\begin{equation}
+ C^{02}(02,22) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{02}_{ p_{1}p_{2}} B^{22}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_44}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 46 ($+AB$):}
+\begin{equation}
+ C^{02}(04,31) = P(k_{1}/k_{2}) \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} A^{04}_{k_{1} p_{1}p_{2}p_{3}} B^{31}_{p_{1}p_{2}p_{3} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_45}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 47 ($+AB$):}
+\begin{equation}
+ C^{02}(04,20) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{04}_{k_{1}k_{2} p_{1}p_{2}} B^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_46}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 48 ($-BA$):}
+\begin{equation}
+ C^{02}(22,02) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{02}_{ p_{1}p_{2}} A^{22}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_47}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 49 ($-BA$):}
+\begin{equation}
+ C^{02}(31,04) = - P(k_{1}/k_{2}) \frac{1}{6}\sum_{p_{1}p_{2}p_{3}} B^{04}_{k_{1} p_{1}p_{2}p_{3}} A^{31}_{p_{1}p_{2}p_{3} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_48}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 50 ($-BA$):}
+\begin{equation}
+ C^{02}(20,04) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{04}_{k_{1}k_{2} p_{1}p_{2}} A^{20}_{p_{1}p_{2} }
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_49}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{22}$}
+
+\paragraph{Diagram 51 ($+AB$):}
+\begin{equation}
+ C^{22}(11,22) = P(k_{1}/k_{2}) \sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{22}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_50}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 52 ($+AB$):}
+\begin{equation}
+ C^{22}(22,22) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{22}_{k_{1}k_{2} p_{1}p_{2}} B^{22}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_51}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 53 ($+AB$):}
+\begin{equation}
+ C^{22}(02,31) = P(k_{3}/k_{4}) \sum_{p_{1}} A^{02}_{k_{3} p_{1}} B^{31}_{p_{1} k_{1}k_{2}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_52}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 54 ($+AB$):}
+\begin{equation}
+ C^{22}(13,31) = P(k_{1}/k_{2}) P(k_{3}/k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{13}_{k_{1}k_{3} p_{1}p_{2}} B^{31}_{p_{1}p_{2} k_{2}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_53}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 55 ($+AB$):}
+\begin{equation}
+ C^{22}(22,11) = P(k_{3}/k_{4}) \sum_{p_{1}} A^{22}_{k_{1}k_{2}k_{3} p_{1}} B^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_54}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 56 ($+AB$):}
+\begin{equation}
+ C^{22}(04,40) = \frac{1}{2}\sum_{p_{1}p_{2}} A^{04}_{k_{3}k_{4} p_{1}p_{2}} B^{40}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_55}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 57 ($+AB$):}
+\begin{equation}
+ C^{22}(13,20) = P(k_{1}/k_{2}) \sum_{p_{1}} A^{13}_{k_{1}k_{3}k_{4} p_{1}} B^{20}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_56}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 58 ($-BA$):}
+\begin{equation}
+ C^{22}(22,11) = - P(k_{1}/k_{2}) \sum_{p_{1}} B^{11}_{k_{1} p_{1}} A^{22}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_57}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 59 ($-BA$):}
+\begin{equation}
+ C^{22}(22,22) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{22}_{k_{1}k_{2} p_{1}p_{2}} A^{22}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_58}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 60 ($-BA$):}
+\begin{equation}
+ C^{22}(31,02) = - P(k_{3}/k_{4}) \sum_{p_{1}} B^{02}_{k_{3} p_{1}} A^{31}_{p_{1} k_{1}k_{2}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_59}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 61 ($-BA$):}
+\begin{equation}
+ C^{22}(31,13) = - P(k_{1}/k_{2}) P(k_{3}/k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{13}_{k_{1}k_{3} p_{1}p_{2}} A^{31}_{p_{1}p_{2} k_{2}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_60}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 62 ($-BA$):}
+\begin{equation}
+ C^{22}(11,22) = - P(k_{3}/k_{4}) \sum_{p_{1}} B^{22}_{k_{1}k_{2}k_{3} p_{1}} A^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_61}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{3}
+\fmf{phantom}{b2,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b3,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.3}{v2,t1}
+\fmf{half_prop,left=0.3}{v2,t2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 63 ($-BA$):}
+\begin{equation}
+ C^{22}(40,04) = - \frac{1}{2}\sum_{p_{1}p_{2}} B^{04}_{k_{3}k_{4} p_{1}p_{2}} A^{40}_{p_{1}p_{2} k_{1}k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_62}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{5}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t3}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,right=0.4}{v1,t5}
+\fmf{half_prop,right=0.4}{v1,t4}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 64 ($-BA$):}
+\begin{equation}
+ C^{22}(20,13) = - P(k_{1}/k_{2}) \sum_{p_{1}} B^{13}_{k_{1}k_{3}k_{4} p_{1}} A^{20}_{p_{1} k_{2}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_63}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{3}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t2}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,right=0.4}{v1,t3}
+\fmf{half_prop,left=0.3}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{13}$}
+
+\paragraph{Diagram 65 ($+AB$):}
+\begin{equation}
+ C^{13}(11,13) = \sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{13}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_64}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b7,v1}
+\fmf{half_prop,right=0.3}{b6,v1}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 66 ($+AB$):}
+\begin{equation}
+ C^{13}(02,22) = P(k_{2}/k_{3}k_{4}) \sum_{p_{1}} A^{02}_{k_{2} p_{1}} B^{22}_{p_{1} k_{1}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_65}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 67 ($+AB$):}
+\begin{equation}
+ C^{13}(13,22) = P(k_{2}/k_{3}k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{13}_{k_{1}k_{2} p_{1}p_{2}} B^{22}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_66}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 68 ($+AB$):}
+\begin{equation}
+ C^{13}(04,31) = P(k_{2}k_{3}/k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{04}_{k_{2}k_{3} p_{1}p_{2}} B^{31}_{p_{1}p_{2} k_{1}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_67}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 69 ($+AB$):}
+\begin{equation}
+ C^{13}(13,11) = P(k_{2}k_{3}/k_{4}) \sum_{p_{1}} A^{13}_{k_{1}k_{2}k_{3} p_{1}} B^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_68}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 70 ($+AB$):}
+\begin{equation}
+ C^{13}(04,20) = \sum_{p_{1}} A^{04}_{k_{2}k_{3}k_{4} p_{1}} B^{20}_{p_{1} k_{1}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_69}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,left=0.4}{b3,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 71 ($-BA$):}
+\begin{equation}
+ C^{13}(13,11) = - \sum_{p_{1}} B^{11}_{k_{1} p_{1}} A^{13}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_70}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b7,v1}
+\fmf{half_prop,right=0.3}{b6,v1}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 72 ($-BA$):}
+\begin{equation}
+ C^{13}(22,02) = - P(k_{2}/k_{3}k_{4}) \sum_{p_{1}} B^{02}_{k_{2} p_{1}} A^{22}_{p_{1} k_{1}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_71}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 73 ($-BA$):}
+\begin{equation}
+ C^{13}(22,13) = - P(k_{2}/k_{3}k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{13}_{k_{1}k_{2} p_{1}p_{2}} A^{22}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_72}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 74 ($-BA$):}
+\begin{equation}
+ C^{13}(31,04) = - P(k_{2}k_{3}/k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{04}_{k_{2}k_{3} p_{1}p_{2}} A^{31}_{p_{1}p_{2} k_{1}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_73}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 75 ($-BA$):}
+\begin{equation}
+ C^{13}(11,13) = - P(k_{2}k_{3}/k_{4}) \sum_{p_{1}} B^{13}_{k_{1}k_{2}k_{3} p_{1}} A^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_74}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop}{v2,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 76 ($-BA$):}
+\begin{equation}
+ C^{13}(20,04) = - \sum_{p_{1}} B^{04}_{k_{2}k_{3}k_{4} p_{1}} A^{20}_{p_{1} k_{1}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_75}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,left=0.4}{b3,v2}
+\fmf{half_prop,right=0.4}{v1,t1}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\subsection{$C^{04}$}
+
+\paragraph{Diagram 77 ($+AB$):}
+\begin{equation}
+ C^{04}(02,13) = P(k_{1}/k_{2}k_{3}k_{4}) \sum_{p_{1}} A^{02}_{k_{1} p_{1}} B^{13}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_76}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b7,v1}
+\fmf{half_prop,right=0.3}{b6,v1}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 78 ($+AB$):}
+\begin{equation}
+ C^{04}(04,22) = P(k_{1}k_{2}/k_{3}k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} A^{04}_{k_{1}k_{2} p_{1}p_{2}} B^{22}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_77}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 79 ($+AB$):}
+\begin{equation}
+ C^{04}(04,11) = P(k_{1}k_{2}k_{3}/k_{4}) \sum_{p_{1}} A^{04}_{k_{1}k_{2}k_{3} p_{1}} B^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_78}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b7,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,left=0.4}{b3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 80 ($-BA$):}
+\begin{equation}
+ C^{04}(13,02) = - P(k_{1}/k_{2}k_{3}k_{4}) \sum_{p_{1}} B^{02}_{k_{1} p_{1}} A^{13}_{p_{1} k_{2}k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_79}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b7,v1}
+\fmf{half_prop,right=0.3}{b6,v1}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 81 ($-BA$):}
+\begin{equation}
+ C^{04}(22,04) = - P(k_{1}k_{2}/k_{3}k_{4}) \frac{1}{2}\sum_{p_{1}p_{2}} B^{04}_{k_{1}k_{2} p_{1}p_{2}} A^{22}_{p_{1}p_{2} k_{3}k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_80}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{5}
+\fmf{phantom}{b3,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop,right=0.5}{v1,v2}
+\fmf{half_prop,left=0.5}{v1,v2}
+\fmf{half_prop,right=0.3}{b5,v1}
+\fmf{half_prop,right=0.3}{b4,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\paragraph{Diagram 82 ($-BA$):}
+\begin{equation}
+ C^{04}(11,04) = - P(k_{1}k_{2}k_{3}/k_{4}) \sum_{p_{1}} B^{04}_{k_{1}k_{2}k_{3} p_{1}} A^{11}_{p_{1} k_{4}}
+\end{equation}
+
+\begin{center}
+\parbox{40pt}{\begin{fmffile}{diag_81}
+\begin{fmfgraph*}(40,80)
+\fmfcmd{style_def half_prop expr p =
+draw_plain p;
+shrink(.7);
+	cfill (marrow (p, .5))
+endshrink;
+enddef;}
+\fmfstraight
+\fmftopn{t}{1}\fmfbottomn{b}{7}
+\fmf{phantom}{b4,v1}
+\fmf{phantom}{v1,v2}
+\fmf{phantom}{v2,t1}
+\fmfv{d.shape=circle,d.filled=full,d.size=3thick}{v1}
+\fmfv{d.shape=circle,d.filled=empty,d.size=3thick}{v2}
+\fmffreeze
+\fmf{half_prop}{v1,v2}
+\fmf{half_prop,right=0.3}{b7,v1}
+\fmf{half_prop,left=0.4}{b1,v2}
+\fmf{half_prop,left=0.4}{b2,v2}
+\fmf{half_prop,left=0.4}{b3,v2}
+\end{fmfgraph*}
+\end{fmffile}}
+
+\end{center}
+
+\end{document}

@@ -41,6 +41,7 @@ setup(
     url='https://github.com/adgproject/adg',
     install_requires=[
         "future",
+        "more-itertools",
         "networkx>=2.0",
         "numpy",
         "scipy",
@@ -51,10 +52,10 @@ setup(
         # dependencies). You can install these using the following syntax:
         # $ pip install -e .[develop]
         develop=[
-            'pytest>=3.6,<5.0',
+            'pytest>=3.6',
             'pytest-cov',
             'roman',
-            'sphinx<2.0',
+            'sphinx',
             'sphinx_rtd_theme',
         ]
     ),
@@ -72,6 +73,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Topic :: Scientific/Engineering :: Physics',

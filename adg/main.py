@@ -2,8 +2,10 @@
 from __future__ import print_function
 
 from datetime import datetime
+import sys
 import adg.run
 import adg.bmbpt
+import adg.bimsrg
 import adg.mbpt
 import adg.tools
 import adg.tsd
@@ -11,8 +13,6 @@ import adg.tsd
 
 def main():
     """Launch the ADG program."""
-    run_commands = adg.run.parse_command_line()
-
     print(
         "#####################\n"
         + "# Automatic Diagram #\n"
@@ -22,6 +22,7 @@ def main():
         + "#  by ADG Dev Team  #\n"
         + "#####################\n"
     )
+    run_commands = adg.run.parse_command_line(sys.argv[1:])
 
     if run_commands.interactive:
         run_commands = adg.run.interactive_interface(run_commands)
@@ -90,10 +91,11 @@ def main():
         adg.mbpt.print_cd_output(directory, diagrams)
 
     if run_commands.compile:
-        adg.run.compile_manager(directory, run_commands.draw_diags)
+        adg.run.compile_manager(directory)
 
     adg.run.clean_folders(directory, run_commands)
 
+    print("\nResult saved in ./%s/" % directory)
     print("\nADG ended successfully!\n")
 
 

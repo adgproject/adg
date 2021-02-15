@@ -127,7 +127,8 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
             matrices_dict[row0] = [matrix]
         del matrices[idx]
     for row_key in sorted(matrices_dict.keys()):
-        check_topologically_equivalent(matrices_dict[row_key], max_vertex)
+        matrices_dict[row_key] = \
+            check_topologically_equivalent(matrices_dict[row_key], max_vertex)
     matrices = []
     for matrices_list in list(matrices_dict.values()):
         matrices += matrices_list
@@ -144,6 +145,18 @@ def check_topologically_equivalent(matrices, max_vertex):
     Returns:
         (list): The topologically unique matrices.
 
+    >>> import numpy
+    >>> mats = [numpy.array([[0, 2, 0, 0], [2, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]), \
+                numpy.array([[0, 0, 2, 0], [0, 0, 0, 0], [2, 0, 0, 1], [0, 0, 0, 0]])]
+    >>>
+    >>> mats = check_topologically_equivalent(mats, 2)
+    >>> mats # doctest: +NORMALIZE_WHITESPACE
+    [array([[0, 2, 0, 0], [2, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]])]
+    >>>
+    >>> mats = check_topologically_equivalent([], 2)
+    >>> mats # doctest: +NORMALIZE_WHITESPACE
+    []
+
     """
     if not matrices:
         return []
@@ -151,12 +164,12 @@ def check_topologically_equivalent(matrices, max_vertex):
     permutations = [[0] + list(k) + vertices[max_vertex+1:]
                     for k in itertools.permutations(vertices[1:max_vertex+1])]
     for ind_mat1, mat1 in reversed_enumerate(matrices[:-1]):
-        mat1_1plus_sorted = np.sort(mat1[1:max_vertex, :].flat)
+        mat1_1plus_sorted = np.sort(mat1[1:max_vertex+1, :].flat)
         for ind_mat2 in range(len(matrices)-1, ind_mat1, -1):
             mat2 = matrices[ind_mat2]
             # Basic check to avoid needless permutations
             if not (mat1_1plus_sorted
-                    - np.sort(mat2[1:max_vertex, :].flat)).any():
+                    - np.sort(mat2[1:max_vertex+1, :].flat)).any():
                 # Test for all possible permutations
                 for reordering in permutations:
                     if not (mat1 - mat2[:, reordering][reordering, :]).any():

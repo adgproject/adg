@@ -18,15 +18,20 @@ informations that can be compiled by ADG if needed. Other computer-readable
 files may be produced as well.
 
 ## Status
-As for now, the code is capable of handling two different formalisms, i.e.
+As for now, the code is capable of handling four different formalisms, i.e.
 Many-Body Perturbation Theory (MBPT), Bogoliubov Many-Body Perturbation
-Theory (BMBPT) and Projected Bogoliubov Many-Body Perturbation Theory (PBMBPT).
+Theory (BMBPT), Projected Bogoliubov Many-Body Perturbation Theory (PBMBPT)
+and Bogoliubov In-Medium Similarity Renormalization Group (BIMSRG).
   - For MBPT, the code generates all Hartree-Fock energy diagrams at any given
     order along with their expression and additional information
     (conjugate diagram, excitation level...).
   - For (P)BMBPT, the code generates all diagrams for a generic observable
     commuting with the Hamiltonian, along with their time-dependent and
     time-integrated expressions.
+  - For BIMSRG, the code generates all diagrams and expressions at any given
+    truncation order for the two operators as well as the commutator itself.
+    The traditional BIMSRG(n) truncation order corresponds to truncating both
+    operators as well as the commutator at the same rank.
 
 ## Future developments
 ADG is currently being extended to diagrams and expressions generation for
@@ -62,6 +67,7 @@ In order to run the code, you will need a Python install >= 2.7.1
     * numpy
     * scipy
     * future
+    * more-itertools
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,
@@ -125,18 +131,22 @@ actual calculation output would be stored.
 
 ## Citing
 If you use ADG in your research work, we kindly ask you to cite the following
-paper: P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
-Comput. Phys. Commun. **240**, 202-227 (2019). It is available under the
-following [DOI](https://doi.org/10.1016/j.cpc.2018.11.023).
+papers:
+  - P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
+    Comput. Phys. Commun. **240**, 202-227 (2019). It is available under the
+    following [DOI](https://doi.org/10.1016/j.cpc.2018.11.023).
+  - P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
+    Comput. Phys. Commun. **261**, 107677 (2021). It is available [here](https://doi.org/10.1016/j.cpc.2020.107677).
 
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
-Copyright (C) 2018-2020 ADG Dev Team
-Pierre Arthuis - University of Surrey (previously Irfu, CEA, UPSaclay & CEA, DAM, DIF)
+Copyright (C) 2018-2021 ADG Dev Team
+Pierre Arthuis - IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF
+Heiko Hergert - NSCL/FRIB Laboratory & Department of Physics and Astronomy, Michigan State University
 Raphaël-David Lasseri - ESNT, Irfu, CEA, UPSaclay (previously IPN, CNRS/IN2P3, UPSud, UPSaclay)
 Julien Ripoche - CEA, DAM, DIF
-Alexander Tichai - ESNT, Irfu, CEA, UPSaclay & MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & EMMI, GSI, Darmstadt
+Alexander Tichai - MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previsously ESNT, Irfu, CEA, Université Paris-Saclay)
 ```

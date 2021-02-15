@@ -253,7 +253,7 @@ class MbptDiagram(adg.diag.Diagram):
         self.excitation_level = self.calc_excitation()
         self.complex_conjugate = -1
         self.loops_number()
-        self.adjacency_mat = nx.to_numpy_matrix(self.graph, dtype=int)
+        self.adjacency_mat = nx.to_numpy_array(self.graph, dtype=int)
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
