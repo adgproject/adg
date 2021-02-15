@@ -17,7 +17,7 @@ computer-readable files may be produced as well.
 
 Status
 ------
-As for now, the code is capable of handling three different formalisms, i.e.
+As for now, the code is capable of handling four different formalisms, i.e.
 Many-Body Perturbation Theory (MBPT), Bogoliubov Many-Body Perturbation
 Theory (BMBPT), Projected Bogoliubov Many-Body Perturbation Theory (PBMBPT),
 and Bogoliubov In-Medium Similarity Renormalization Group (BIMSRG).
