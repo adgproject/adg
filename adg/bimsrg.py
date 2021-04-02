@@ -274,8 +274,11 @@ class BimsrgDiagram(adg.diag.Diagram):
         B_degrees = self.unsort_io_degrees[1] \
             if self.graph.nodes[1]['operator'] == 'B' \
             else self.unsort_io_degrees[2]
-        name = " C^{%i%i}(%i%i,%i%i) = " \
+        name = " C^{%i%i}_{%s}(%i%i,%i%i) = " \
             % (self.unsort_degrees[3], self.unsort_degrees[0],
+               "".join('k_{%i}' % (idx + 1) for idx
+                       in range(self.unsort_degrees[3]
+                                + self.unsort_degrees[0])),
                A_degrees[1], A_degrees[0], B_degrees[1], B_degrees[0])
         return name + self.sign() + self.permutator() \
             + self.symmetry_factor() + self.vertices_expression()
