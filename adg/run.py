@@ -121,6 +121,10 @@ def parse_command_line(cli_args):
         else:
             print("Truncation order has to be three int at most. Exiting.")
             exit()
+        if args.draw_diags and max(args.order) >= 7:
+            args.draw_diags = False
+            print("Diagram drawing is not supported for BIMSRG above order 6.")
+            print("The '-d' flag has been deactivated.")
     else:
         dummy_order = args.order[0]
         args.order = dummy_order
@@ -181,6 +185,12 @@ def interactive_interface(commands):
     commands.draw_diags = input(
         "Generate diagrams FeynMF instructions in TeX file? (y/N) "
         ).lower() == 'y'
+
+    if commands.theory == "BIMSRG" and commands.draw_diags \
+            and max(commands.order) >= 7:
+        commands.draw_diags = False
+        print("Diagram drawing is not supported for BIMSRG above order 6.")
+        print("The '-d' flag has been deactivated.")
 
     if commands.theory == "MBPT":
         commands.cd_output = input(
