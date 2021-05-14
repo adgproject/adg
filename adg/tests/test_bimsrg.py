@@ -18,7 +18,7 @@ def test_attribute_expressions():
     adg.diag.label_vertices([graph], "BIMSRG", 2)
     diag = adg.bimsrg.BimsrgDiagram(graph, 0)
 
-    diag_ref = ' C^{20}(11,20) = P(k_{1}/k_{2}) ' \
+    diag_ref = ' C^{20}_{k_{1}k_{2}}(11,20) = P(k_{1}/k_{2}) ' \
         + '\\sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{20}_{p_{1} k_{2}}'
 
     assert diag.expr == diag_ref
@@ -88,7 +88,7 @@ def test_write_section():
         + '\\subsection{$C^{20}$}\n\n' \
         + '\\paragraph{Diagram 1 ($+AB$):}\n' \
         + '\\begin{equation}\n' \
-        + ' C^{20}(11,20) = P(k_{1}/k_{2}) ' \
+        + ' C^{20}_{k_{1}k_{2}}(11,20) = P(k_{1}/k_{2}) ' \
         + '\\sum_{p_{1}} A^{11}_{k_{1} p_{1}} B^{20}_{p_{1} k_{2}}\n' \
         + '\\end{equation}\n'
 
