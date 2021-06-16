@@ -133,20 +133,21 @@ actual calculation output would be stored.
 If you use ADG in your research work, we kindly ask you to cite the following
 papers:
   - P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
-    Comput. Phys. Commun. **240**, 202-227 (2019). It is available under the
-    following [DOI](https://doi.org/10.1016/j.cpc.2018.11.023).
+    [Comput. Phys. Commun. **240**, 202-227](https://doi.org/10.1016/j.cpc.2018.11.023) (2019).
   - P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
-    Comput. Phys. Commun. **261**, 107677 (2021). It is available [here](https://doi.org/10.1016/j.cpc.2020.107677).
+    [Comput. Phys. Commun. **261**, 107677](https://doi.org/10.1016/j.cpc.2020.107677) (2021).
+  - A. Tichai, P. Arthuis, H. Hergert and T. Duguet,
+    [arXiv:2102.10889](https://arxiv.org/abs/2102.10889) (2021).
 
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
 Copyright (C) 2018-2021 ADG Dev Team
-Pierre Arthuis - IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
+Pierre Arthuis - TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF
 Heiko Hergert - NSCL/FRIB Laboratory & Department of Physics and Astronomy, Michigan State University
 Raphaël-David Lasseri - ESNT, Irfu, CEA, UPSaclay (previously IPN, CNRS/IN2P3, UPSud, UPSaclay)
 Julien Ripoche - CEA, DAM, DIF
-Alexander Tichai - MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previsously ESNT, Irfu, CEA, Université Paris-Saclay)
+Alexander Tichai - MPI fuer Kernphysik, Heidelberg & TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previsously ESNT, Irfu, CEA, Université Paris-Saclay)
 ```

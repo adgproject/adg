@@ -206,6 +206,7 @@ def permutator(set_1, set_2):
     """
     perm_op = 'P(%s/%s) &= 1 ' % ("".join('k_{%i}' % label for label in set_1),
                                   "".join('k_{%i}' % label for label in set_2))
+    perm_counter = 0
     # Combine all possible subsets of both sets
     for subset_1, subset_2 in product(powerset(set_1), powerset(set_2)):
         # Ensure each qp state has a permutation partner, exclude the empty set
@@ -215,7 +216,15 @@ def permutator(set_1, set_2):
                 perm_op += '+ ' if len(subset_1) % 2 == 0 else '- '
                 for elem in zip(permutation, subset_2):
                     perm_op += 'P_{k_{%i} k_{%i}} ' % elem
-    perm_op += "\\\\\n"
+                    perm_counter += 1
+                # Avoid permutators lines being too long
+                if perm_counter >= 10:
+                    perm_op += '\\\\\n &\\phantom{=} '
+                    perm_counter = 0
+    if perm_op.endswith('\\\\\n &\\phantom{=} '):
+        perm_op = perm_op[:-len(' &\\phantom{=} ')]
+    else:
+        perm_op += "\\\\\n"
     return perm_op
 
 
@@ -274,8 +283,11 @@ class BimsrgDiagram(adg.diag.Diagram):
         B_degrees = self.unsort_io_degrees[1] \
             if self.graph.nodes[1]['operator'] == 'B' \
             else self.unsort_io_degrees[2]
-        name = " C^{%i%i}(%i%i,%i%i) = " \
+        name = " C^{%i%i}_{%s}(%i%i,%i%i) = " \
             % (self.unsort_degrees[3], self.unsort_degrees[0],
+               "".join('k_{%i}' % (idx + 1) for idx
+                       in range(self.unsort_degrees[3]
+                                + self.unsort_degrees[0])),
                A_degrees[1], A_degrees[0], B_degrees[1], B_degrees[0])
         return name + self.sign() + self.permutator() \
             + self.symmetry_factor() + self.vertices_expression()
