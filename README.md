@@ -143,11 +143,11 @@ papers:
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
 Copyright (C) 2018-2021 ADG Dev Team
-Pierre Arthuis - IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
+Pierre Arthuis - TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF
 Heiko Hergert - NSCL/FRIB Laboratory & Department of Physics and Astronomy, Michigan State University
 Raphaël-David Lasseri - ESNT, Irfu, CEA, UPSaclay (previously IPN, CNRS/IN2P3, UPSud, UPSaclay)
 Julien Ripoche - CEA, DAM, DIF
-Alexander Tichai - MPI fuer Kernphysik, Heidelberg & IKP, TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previsously ESNT, Irfu, CEA, Université Paris-Saclay)
+Alexander Tichai - MPI fuer Kernphysik, Heidelberg & TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previsously ESNT, Irfu, CEA, Université Paris-Saclay)
 ```
