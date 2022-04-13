@@ -11,6 +11,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import adg
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
@@ -18,10 +19,9 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-import adg
 
 project = u'ADG - Automated Diagram Generator'
-copyright = u'2018-2021, ADG Dev Team'
+copyright = u'2018-2022, ADG Dev Team'
 author = u'ADG Dev Team'
 
 # The short X.Y version
