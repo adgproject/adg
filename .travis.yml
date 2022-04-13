@@ -39,80 +39,105 @@ matrix:
       - PIP_FLAGS="--pre"
     - python: 3.5
     - os: linux
+      dist: bionic
       python: 3.6
       env:
       - OPTIONAL_DEPS=1
       - BUILD_DOCS=1
     - os: linux
+      dist: bionic
       python: 3.6
       env:
       - OPTIONAL_DEPS=1
     - os: linux
+      dist: bionic
       python: 3.6
       env:
       - OPTIONAL_DEPS=1
       - PIP_FLAGS="--pre"
-    - python: 3.6
     - os: linux
+      dist: bionic
+      python: 3.6
+    - os: linux
+      dist: bionic
       python: 3.7
       env:
       - OPTIONAL_DEPS=1
       - BUILD_DOCS=1
     - os: linux
+      dist: bionic
       python: 3.7
       env:
       - OPTIONAL_DEPS=1
     - os: linux
+      dist: bionic
       python: 3.7
       env:
       - OPTIONAL_DEPS=1
       - PIP_FLAGS="--pre"
-    - python: 3.7
     - os: linux
+      dist: bionic
+      python: 3.7
+    - os: linux
+      dist: bionic
       python: 3.8
       env:
       - OPTIONAL_DEPS=1
       - BUILD_DOCS=1
     - os: linux
+      dist: bionic
       python: 3.8
       env:
       - OPTIONAL_DEPS=1
     - os: linux
+      dist: bionic
       python: 3.8
       env:
       - OPTIONAL_DEPS=1
       - PIP_FLAGS="--pre"
-    - python: 3.8
     - os: linux
+      dist: bionic
+      python: 3.8
+    - os: linux
+      dist: bionic
       python: 3.9
       env:
       - OPTIONAL_DEPS=1
       - BUILD_DOCS=1
     - os: linux
+      dist: bionic
       python: 3.9
       env:
       - OPTIONAL_DEPS=1
     - os: linux
+      dist: bionic
       python: 3.9
       env:
       - OPTIONAL_DEPS=1
       - PIP_FLAGS="--pre"
-    - python: 3.9
     - os: linux
+      dist: bionic
+      python: 3.9
+    - os: linux
+      dist: bionic
       python: 3.10
       env:
       - OPTIONAL_DEPS=1
       - BUILD_DOCS=1
     - os: linux
+      dist: bionic
       python: 3.10
       env:
       - OPTIONAL_DEPS=1
     - os: linux
+      dist: bionic
       python: 3.10
       env:
       - OPTIONAL_DEPS=1
       - PIP_FLAGS="--pre"
-    - python: 3.10
+    - os: linux
+      dist: bionic
+      python: 3.10
 
 install:
   # install required packages
