@@ -137,12 +137,12 @@ papers:
   - P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
     [Comput. Phys. Commun. **261**, 107677](https://doi.org/10.1016/j.cpc.2020.107677) (2021).
   - A. Tichai, P. Arthuis, H. Hergert and T. Duguet,
-    [arXiv:2102.10889](https://arxiv.org/abs/2102.10889) (2021).
+    [Eur. Phys. J. A **58**, 2](https://doi.org/10.1140/epja/s10050-021-00621-6) (2022).
 
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
-Copyright (C) 2018-2021 ADG Dev Team
+Copyright (C) 2018-2022 ADG Dev Team
 Pierre Arthuis - TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF

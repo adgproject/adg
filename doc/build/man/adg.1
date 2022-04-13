@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ADG" "1" "Jun 16, 2021" "3.0.1" "ADG - Automated Diagram Generator"
+.TH "ADG" "1" "Apr 13, 2022" "3.0.2" "ADG - Automated Diagram Generator"
 .SH NAME
 adg \- ADG - Automated Diagram Generator Documentation
 .
@@ -354,7 +354,7 @@ Return a list with diagrams of the appropriate type.
 .IP \(bu 2
 \fBcommands\fP (\fINamespace\fP) \-\- Flags for the run management.
 .IP \(bu 2
-\fBid_generator\fP (\fIUniqueID\fP) \-\- A unique ID number generator.
+\fBid_generator\fP (\fI\%UniqueID\fP) \-\- A unique ID number generator.
 .UNINDENT
 .TP
 .B Returns
@@ -492,7 +492,7 @@ Write the header of the result tex file.
 Routines and class for all types of diagrams, inherited by others.
 .INDENT 0.0
 .TP
-.B class adg.diag.Diagram(nx_graph)
+.B class  adg.diag.Diagram(nx_graph)
 Bases: \fBobject\fP
 .sp
 Describes a diagram with its related properties.
@@ -922,8 +922,8 @@ The FeynMP instructions for positioning the vertices.
 Routines and class for Many\-Body Perturbation Theory diagrams.
 .INDENT 0.0
 .TP
-.B class adg.mbpt.MbptDiagram(mbpt_graph, tag_num)
-Bases: \fBadg.diag.Diagram\fP
+.B class  adg.mbpt.MbptDiagram(mbpt_graph, tag_num)
+Bases: \fI\%adg.diag.Diagram\fP
 .sp
 Describes a MBPT diagram with its related properties.
 .INDENT 7.0
@@ -1119,7 +1119,7 @@ Return True if self and test_diagram are complex conjugate.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtest_diagram\fP (\fIMbptDiagram\fP) \-\- A diagram to compare with.
+\fBtest_diagram\fP (\fI\%MbptDiagram\fP) \-\- A diagram to compare with.
 .TP
 .B Returns
 The complex conjugate status of the pair of diagrams.
@@ -1299,7 +1299,7 @@ Write the expression associated to a diagram in the LaTeX file.
 .IP \(bu 2
 \fBlatex_file\fP (\fIfile\fP) \-\- The LaTeX output file to be written in.
 .IP \(bu 2
-\fBmbpt_diag\fP (\fIMbptDiagram\fP) \-\- The diagram which expression is being written.
+\fBmbpt_diag\fP (\fI\%MbptDiagram\fP) \-\- The diagram which expression is being written.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1324,8 +1324,8 @@ excitation level type.
 Routines and class for Bogoliubov MBPT diagrams.
 .INDENT 0.0
 .TP
-.B class adg.bmbpt.BmbptFeynmanDiagram(nx_graph, tag_num)
-Bases: \fBadg.diag.Diagram\fP
+.B class  adg.bmbpt.BmbptFeynmanDiagram(nx_graph, tag_num)
+Bases: \fI\%adg.diag.Diagram\fP
 .sp
 Describes a BMBPT Feynman diagram with its related properties.
 .INDENT 7.0
@@ -1430,7 +1430,7 @@ Attribute the correct Feynman and Goldstone expressions.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtime_diag\fP (\fITimeStructureDiagram\fP) \-\- The associated TSD.
+\fBtime_diag\fP (\fI\%TimeStructureDiagram\fP) \-\- The associated TSD.
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -1618,7 +1618,7 @@ The denominator of the graph.
 .UNINDENT
 .INDENT 7.0
 .TP
-.B property vertex_exchange_sym_factor
+.B property  vertex_exchange_sym_factor
 Return the symmetry factor associated with vertex exchange.
 .INDENT 7.0
 .TP
@@ -1941,8 +1941,8 @@ Write overall header for BMBPT result file.
 Routines and class for Projected Bogoliubov MBPT diagrams.
 .INDENT 0.0
 .TP
-.B class adg.pbmbpt.ProjectedBmbptDiagram(graph, unique_id, tag, child_tag)
-Bases: \fBadg.bmbpt.BmbptFeynmanDiagram\fP
+.B class  adg.pbmbpt.ProjectedBmbptDiagram(graph, unique_id, tag, child_tag)
+Bases: \fI\%adg.bmbpt.BmbptFeynmanDiagram\fP
 .sp
 Describes a PBMBPT diagram with its related properties.
 .INDENT 7.0
@@ -2071,7 +2071,7 @@ Attribute the correct Feynman and Goldstone expressions.
 .INDENT 7.0
 .TP
 .B Parameters
-\fBtime_diag\fP (\fITimeStructureDiagram\fP) \-\- The associated TSD.
+\fBtime_diag\fP (\fI\%TimeStructureDiagram\fP) \-\- The associated TSD.
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -2081,7 +2081,7 @@ Attribute the appropriate qp labels to the graph\(aqs propagators.
 .UNINDENT
 .INDENT 7.0
 .TP
-.B property check_graph
+.B property  check_graph
 Return a graph that can be used for topological equivalence checks.
 .sp
 Lazy\-initialized to reduce memory and CPU costs as this operation
@@ -2311,7 +2311,7 @@ The denominator of the graph.
 .UNINDENT
 .INDENT 7.0
 .TP
-.B property vertex_exchange_sym_factor
+.B property  vertex_exchange_sym_factor
 Return the symmetry factor associated with vertex exchange.
 .INDENT 7.0
 .TP
@@ -2464,7 +2464,7 @@ Generate PBMBPT graphs with anomalous lines, with some redundancy.
 .B Parameters
 .INDENT 7.0
 .IP \(bu 2
-\fBdiag\fP (\fIBmbptFeynmanDiagram\fP) \-\- The diagram to generate children from.
+\fBdiag\fP (\fI\%BmbptFeynmanDiagram\fP) \-\- The diagram to generate children from.
 .IP \(bu 2
 \fBnbody_max\fP (\fIint\fP) \-\- The maximal n\-body character of a graph vertex.
 .UNINDENT
@@ -2598,8 +2598,8 @@ Vertex combinations that do not produce equivalent diags.
 Module with functions relative to time\-stucture diagrams, called by ADG.
 .INDENT 0.0
 .TP
-.B class adg.tsd.TimeStructureDiagram(bmbpt_diag)
-Bases: \fBadg.diag.Diagram\fP
+.B class  adg.tsd.TimeStructureDiagram(bmbpt_diag)
+Bases: \fI\%adg.diag.Diagram\fP
 .sp
 Describes a time\-structure diagram with its related properties.
 .INDENT 7.0
@@ -2907,8 +2907,8 @@ Write the appropriate section for tsd diagrams in the LaTeX file.
 Routines and class for Bogoliubov IMSRG diagrams.
 .INDENT 0.0
 .TP
-.B class adg.bimsrg.BimsrgDiagram(nx_graph, tag_num)
-Bases: \fBadg.diag.Diagram\fP
+.B class  adg.bimsrg.BimsrgDiagram(nx_graph, tag_num)
+Bases: \fI\%adg.diag.Diagram\fP
 .sp
 Describes a B\-IMSRG Feynman diagram with its related properties.
 .INDENT 7.0
@@ -3308,7 +3308,7 @@ Write the section defining permutation operators.
 Miscellaneous diagram\-unrelated tools for ADG.
 .INDENT 0.0
 .TP
-.B class adg.tools.UniqueID
+.B class  adg.tools.UniqueID
 Bases: \fBobject\fP
 .sp
 Counter making sure of generating a unique ID number for diagrams.
@@ -3402,7 +3402,7 @@ P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
 Comput. Phys. Commun. \fB261\fP, 107677 (2021). It is available \fI\%here\fP\&.
 .IP \(bu 2
 A. Tichai, P. Arthuis, H. Hergert and T. Duguet,
-\fI\%arXiv:2102.10889\fP (2021).
+Eur. Phys. J. A \fB58\fP, 2 (2022). It is available under this \fI\%URL\fP\&.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -3415,7 +3415,7 @@ ADG is licensed under under GNU General Public License version 3
 .sp
 .nf
 .ft C
-Copyright (C) 2018\-2021 ADG Dev Team
+Copyright (C) 2018\-2022 ADG Dev Team
 Pierre Arthuis
 Thomas Duguet
 Jean\-Paul Ebran
@@ -3429,15 +3429,15 @@ Alexander Tichai
 .UNINDENT
 .INDENT 0.0
 .IP \(bu 2
-genindex
+\fI\%Index\fP
 .IP \(bu 2
-modindex
+\fI\%Module Index\fP
 .IP \(bu 2
-search
+\fI\%Search Page\fP
 .UNINDENT
 .SH AUTHOR
 ADG Dev Team
 .SH COPYRIGHT
-2018-2021, ADG Dev Team
+2018-2022, ADG Dev Team
 .\" Generated by docutils manpage writer.
 .
