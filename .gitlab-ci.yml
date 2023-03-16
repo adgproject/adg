@@ -267,3 +267,37 @@ docs3.10:
       - cd doc;
       - make html;
       - cd ../..
+
+
+standard3.11:
+  image: python:3.11
+  script: "adg --help"
+
+test3.11:
+  image: python:3.11
+  variables:
+      OPTIONAL_DEPS: 1
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+test_beta3.11:
+  image: python:3.11
+  variables:
+      OPTIONAL_DEPS: 1
+      PIP_FLAGS: "--pre"
+  script:
+      - cd adg/tests
+      - source run_test_suite.sh
+      - cd ../..
+
+docs3.11:
+  image: python:3.11
+  variables:
+      OPTIONAL_DEPS: 1
+      BUILD_DOCS: 1
+  script:
+      - cd doc;
+      - make html;
+      - cd ../..
