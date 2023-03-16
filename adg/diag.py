@@ -558,7 +558,7 @@ def print_adj_matrices(directory, diagrams):
         for idx, diagram in enumerate(diagrams):
             mat_file.write("Diagram n: %i\n" % (idx + 1))
             numpy.savetxt(mat_file,
-                          nx.to_numpy_matrix(diagram.graph, dtype=int),
+                          nx.to_numpy_array(diagram.graph, dtype=int),
                           fmt='%d')
             mat_file.write("\n")
 
