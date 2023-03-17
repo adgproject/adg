@@ -6,7 +6,7 @@ ADG is licensed under under GNU General Public License version 3
 
 .. code::
 
-  Copyright (C) 2018-2022 ADG Dev Team
+  Copyright (C) 2018-2023 ADG Dev Team
   Pierre Arthuis
   Thomas Duguet
   Jean-Paul Ebran
