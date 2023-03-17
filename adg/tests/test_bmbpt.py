@@ -10,9 +10,9 @@ def test_attribute_expressions():
     """Test the attribute_expressions method."""
     # Test for a simple diagram associated to a tree TSD
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -42,9 +42,9 @@ def test_attribute_expressions():
                         [0, 0, 0, 2],
                         [0, 0, 0, 2],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -83,9 +83,9 @@ def test_vertex_expression():
     """Test the vertex_expression method."""
     # Set up the test case
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     # attribute_qp_labels is used and thus tested in the process
@@ -100,9 +100,9 @@ def test_vertex_exchange_sym_factor():
     """Test the vertex_exchange_sym_factor method."""
     # Test case with symmetry factor
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
@@ -113,9 +113,9 @@ def test_vertex_exchange_sym_factor():
                         [0, 0, 0, 0],
                         [0, 0, 0, 0],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
@@ -123,9 +123,9 @@ def test_vertex_exchange_sym_factor():
 
     # Test case without symmetry factor
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
@@ -135,9 +135,9 @@ def test_vertex_exchange_sym_factor():
 def test_extract_integral():
     """Test for the extract_integral method."""
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -154,9 +154,9 @@ def test_extract_integral():
 def test_extract_numerator():
     """Test for the extract_numerator method."""
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -170,9 +170,9 @@ def test_has_crossing_sign():
     """Test for the has_crossing_sign method."""
     # Test case without crossing sign
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert not diag.has_crossing_sign()
@@ -182,9 +182,9 @@ def test_has_crossing_sign():
                         [0, 0, 1, 1],
                         [0, 0, 0, 1],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert diag.has_crossing_sign()
@@ -194,18 +194,18 @@ def test_multiplicity_symmetry_factor():
     """Test the multiplicity_symmetry_factor method."""
     # Test a simple case with twice two lines
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert diag.multiplicity_symmetry_factor() == '(2!)^2'
 
     # Test a case with once three lines
     diagram = np.array([[0, 3, 1], [0, 0, 1], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
     assert diag.multiplicity_symmetry_factor() == '(3!)'
@@ -214,9 +214,9 @@ def test_multiplicity_symmetry_factor():
 def test_time_tree_denominator():
     """Test for the time_tree_denominator method."""
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BMBPT", -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()

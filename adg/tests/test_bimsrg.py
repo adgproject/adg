@@ -12,9 +12,9 @@ def test_attribute_expressions():
     """Test the attribute_expressions method."""
     # Test for a simple diagram
     diagram = np.array([[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BIMSRG", 2)
     diag = adg.bimsrg.BimsrgDiagram(graph, 0)
 
@@ -72,9 +72,9 @@ def test_write_section():
     """Test the write_section method."""
 
     diagram = np.array([[0, 0, 0, 0], [0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], "BIMSRG", 2)
     diag = adg.bimsrg.BimsrgDiagram(graph, 0)
 
