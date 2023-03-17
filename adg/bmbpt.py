@@ -620,12 +620,12 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                                               dict(list(zip(perm_vertices,
                                                             permutation))),
                                               copy=True)
+            inter = nx.intersection(self.graph, permuted_graph)
+            inter.nodes[0]['operator'] = True
             # Check for a permutation that leaves the graph unchanged
             # (only way to keep the edge list of the same length)
             # (is_isomorphic could maybe be replaced by something faster here)
-            if nx.is_isomorphic(self.graph,
-                                nx.intersection(self.graph, permuted_graph),
-                                node_match=op_nm):
+            if nx.is_isomorphic(self.graph, inter, node_match=op_nm):
                 permutations.append(dict(list(zip(perm_vertices,
                                                   permutation))))
         return permutations
