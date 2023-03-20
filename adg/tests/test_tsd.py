@@ -11,9 +11,9 @@ def test_time_structure_graph():
     """Test the time_structure_graph routine."""
     # Test a simple case
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
@@ -22,9 +22,9 @@ def test_time_structure_graph():
 
     # Test the case where not all vertices are link to the bottom vertex
     diagram = np.array([[0, 0, 2], [0, 0, 2], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
@@ -36,9 +36,9 @@ def test_time_structure_graph():
                         [0, 0, 0, 2],
                         [0, 0, 0, 2],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
 
@@ -55,9 +55,9 @@ def test_find_cycle():
                         [0, 0, 0, 1],
                         [0, 0, 0, 1],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
 
     assert adg.tsd.find_cycle(graph) == (0, 3)
 
@@ -68,9 +68,9 @@ def test_find_cycle():
                         [0, 0, 0, 0, 1, 0],
                         [0, 0, 0, 0, 0, 0],
                         [0, 0, 0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
 
     assert adg.tsd.find_cycle(graph) == (1, 4)
 
@@ -82,9 +82,9 @@ def test_disentangle_cycle():
                         [0, 0, 0, 1],
                         [0, 0, 0, 1],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     result = adg.tsd.disentangle_cycle(graph, (0, 3))
 
     assert len(result) == 2
@@ -100,9 +100,9 @@ def test_treat_tsds():
         np.array([[0, 2, 2, 0], [0, 0, 0, 0], [0, 0, 0, 2], [0, 0, 0, 0]]),
         np.array([[0, 2, 2, 0], [0, 0, 0, 2], [0, 0, 0, 0], [0, 0, 0, 0]])
     ]
-    graphs = [nx.from_numpy_matrix(diagram,
-                                   create_using=nx.MultiDiGraph(),
-                                   parallel_edges=True)
+    graphs = [nx.from_numpy_array(diagram,
+                                  create_using=nx.MultiDiGraph(),
+                                  parallel_edges=True)
               for diagram in diagrams]
     adg.diag.label_vertices(graphs, "BMBPT", -1)
     diags = [adg.bmbpt.BmbptFeynmanDiagram(graph, ind)
@@ -124,9 +124,9 @@ def test___init__():
     """Test the creation of TSD objects."""
     # Test for a tree TSD
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -140,9 +140,9 @@ def test___init__():
                         [0, 0, 0, 2],
                         [0, 0, 0, 2],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -159,9 +159,9 @@ def test_treat_cycles():
                         [0, 0, 0, 2],
                         [0, 0, 0, 2],
                         [0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -179,9 +179,9 @@ def test_treat_cycles():
                         [0, 0, 0, 0, 2],
                         [0, 0, 0, 0, 2],
                         [0, 0, 0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -196,9 +196,9 @@ def test_resummation_power():
     """Test for the resummation_power method."""
     # Test for a linear tree TSD
     diagram = np.array([[0, 2, 2], [0, 0, 2], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()
@@ -208,9 +208,9 @@ def test_resummation_power():
 
     # Test for a non-linear tree TSD
     diagram = np.array([[0, 2, 2], [0, 0, 0], [0, 0, 0]])
-    graph = nx.from_numpy_matrix(diagram,
-                                 create_using=nx.MultiDiGraph(),
-                                 parallel_edges=True)
+    graph = nx.from_numpy_array(diagram,
+                                create_using=nx.MultiDiGraph(),
+                                parallel_edges=True)
     adg.diag.label_vertices([graph], 'BMBPT', -1)
     diag = adg.bmbpt.BmbptFeynmanDiagram(graph, 0)
     diag.attribute_qp_labels()

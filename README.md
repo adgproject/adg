@@ -142,7 +142,7 @@ papers:
 ## License
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
 ```
-Copyright (C) 2018-2022 ADG Dev Team
+Copyright (C) 2018-2023 ADG Dev Team
 Pierre Arthuis - TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
 Jean-Paul Ebran - CEA, DAM, DIF

@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 
 project = u'ADG - Automated Diagram Generator'
-copyright = u'2018-2022, ADG Dev Team'
+copyright = u'2018-2023, ADG Dev Team'
 author = u'ADG Dev Team'
 
 # The short X.Y version

@@ -138,6 +138,26 @@ matrix:
     - os: linux
       dist: bionic
       python: 3.10
+    - os: linux
+      dist: bionic
+      python: 3.11
+      env:
+      - OPTIONAL_DEPS=1
+      - BUILD_DOCS=1
+    - os: linux
+      dist: bionic
+      python: 3.11
+      env:
+      - OPTIONAL_DEPS=1
+    - os: linux
+      dist: bionic
+      python: 3.11
+      env:
+      - OPTIONAL_DEPS=1
+      - PIP_FLAGS="--pre"
+    - os: linux
+      dist: bionic
+      python: 3.11
 
 install:
   # install required packages
