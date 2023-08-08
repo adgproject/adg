@@ -222,18 +222,18 @@ def treat_tsds(diagrams_time):
 
 
 class TimeStructureDiagram(adg.diag.Diagram):
-    """Describes a time-structure diagram with its related properties."""
+    """Describes a time-structure diagram with its related properties.
+
+    Args:
+        bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph to be turned
+            into a TSD.
+
+    """
 
     __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
 
     def __init__(self, bmbpt_diag):
-        """Generate a tsd diagram out of a BMBPT one.
-
-        Args:
-            bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph used to be
-                turned into a TSD.
-
-        """
+        """Generate a tsd diagram out of a BMBPT one."""
         adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
         self.tags = [bmbpt_diag.unique_id]
         self.perms = {bmbpt_diag.unique_id: {i: i

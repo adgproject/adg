@@ -260,17 +260,21 @@ def filter_new_diagrams(new_diags, old_diags):
 
 
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
-    """Describes a PBMBPT diagram with its related properties."""
+    """Describes a PBMBPT diagram with its related properties.
+
+    Args:
+        graph (NetworkX MultiDiGraph): The graph of interest.
+        unique_id (int): The unique number associated to the diagram.
+        tag (int): Tag of the parent BMBPT diagram.
+        child_tag (int): Identifier of the PBMBPT diagram within the children
+            of the BMBPT diagram.
+
+    """
 
     __slots__ = ('_check_graph',)
 
     def __init__(self, graph, unique_id, tag, child_tag):
-        """Generate a PBMBPT diagram by copying a BMBPT one.
-
-        Args:
-            graph (NetworkX MultiDiGraph)): The graph of interest.
-
-        """
+        """Generate a PBMBPT diagram by copying a BMBPT one."""
         adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, unique_id)
         self.tags = [tag, child_tag]
         self.set_io_degrees()

@@ -343,20 +343,20 @@ def order_diagrams(diagrams):
 
 
 class BmbptFeynmanDiagram(adg.diag.Diagram):
-    """Describes a BMBPT Feynman diagram with its related properties."""
+    """Describes a BMBPT Feynman diagram with its related properties.
+
+    Args:
+        nx_graph (NetworkX MultiDiGraph): The graph of interest.
+        tag_num (int): The tag number associated to the diagram.
+
+    """
 
     __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
                  'diag_exp', 'vert_exp', 'hf_type', 'unique_id',
                  '_vert_exchange_sym_fact')
 
     def __init__(self, nx_graph, tag_num):
-        """Generate a BMBPT diagrams using a NetworkX graph.
-
-        Args:
-            nx_graph (NetworkX MultiDiGraph): The graph of interest.
-            tag_num (int): The tag number associated to the diagram.
-
-        """
+        """Generate a BMBPT diagrams using a NetworkX graph."""
         adg.diag.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
         """int: The 2 or 3-body characted of the vertices."""

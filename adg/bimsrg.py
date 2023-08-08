@@ -229,19 +229,19 @@ def permutator(set_1, set_2):
 
 
 class BimsrgDiagram(adg.diag.Diagram):
-    """Describes a B-IMSRG Feynman diagram with its related properties."""
+    """Describes a B-IMSRG Feynman diagram with its related properties.
+
+    Args:
+        nx_graph (NetworkX MultiDiGraph): The graph of interest.
+        tag_num (int): The tag number associated to the diagram.
+
+    """
 
     __slots__ = ('adjacency_mat', 'unique_id', 'ext_io_degree',
                  '_vert_exchange_sym_fact', 'expr', 'is_AB')
 
     def __init__(self, nx_graph, tag_num):
-        """Generate a BMBPT diagrams using a NetworkX graph.
-
-        Args:
-            nx_graph (NetworkX MultiDiGraph): The graph of interest.
-            tag_num (int): The tag number associated to the diagram.
-
-        """
+        """Generate a BMBPT diagrams using a NetworkX graph."""
         adg.diag.Diagram.__init__(self, nx_graph)
         self.tags = [tag_num]
         self.unique_id = tag_num

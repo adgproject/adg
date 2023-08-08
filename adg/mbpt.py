@@ -218,19 +218,19 @@ def extract_cd_denom(start_graph, subgraph):
 
 
 class MbptDiagram(adg.diag.Diagram):
-    """Describes a MBPT diagram with its related properties."""
+    """Describes a MBPT diagram with its related properties.
+
+    Args:
+        mbpt_graph (NetworkX MultiDiGraph): The actual diagram.
+        tag_num (int): The tag number associated to the graph.
+
+    """
 
     __slots__ = ('incidence', 'excitation_level', 'complex_conjugate', 'expr',
                  'cd_expr', 'adjacency_mat')
 
     def __init__(self, mbpt_graph, tag_num):
-        """Generate a MBPT diagram using the appropriate NetworkX graph.
-
-        Args:
-            mbpt_graph (NetworkX MultiDiGraph): The actual diagram.
-            tag_num (int): The tag number associated to the graph.
-
-        """
+        """Generate a MBPT diagram using the appropriate NetworkX graph."""
         adg.diag.Diagram.__init__(self, mbpt_graph)
         self.tags = [tag_num]
         # Beware of the sign convention !!!

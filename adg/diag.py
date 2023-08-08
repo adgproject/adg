@@ -564,18 +564,18 @@ def print_adj_matrices(directory, diagrams):
 
 
 class Diagram(object):
-    """Describes a diagram with its related properties."""
+    """Describes a diagram with its related properties.
+
+    Args:
+        nx_graph (NetworkX MultiDiGraph): The graph of interest.
+
+    """
 
     __slots__ = ('graph', 'unsort_degrees', 'degrees', 'unsort_io_degrees',
                  'io_degrees', 'max_degree', 'tags')
 
     def __init__(self, nx_graph):
-        """Generate a Diagram object starting from the NetworkX graph.
-
-        Args:
-            nx_graph (NetworkX MultiDiGraph): The graph of interest.
-
-        """
+        """Generate a Diagram object starting from the NetworkX graph."""
         self.graph = nx_graph
         """NetworkX MultiDiGraph: The actual graph."""
         self.unsort_degrees = tuple(nx_graph.degree(node) for node in nx_graph)
