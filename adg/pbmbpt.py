@@ -21,7 +21,7 @@ def generate_anomalous_diags(diag, nbody_max):
         nbody_max (int): The maximal n-body character of a graph vertex.
 
     Returns:
-        (list): The anomalous graphs generated.
+        list: The anomalous graphs generated.
 
     """
     graph = diag.graph
@@ -71,7 +71,7 @@ def generate_combinations(iter_list):
         iter_list (list): A list of iterable objects.
 
     Returns:
-        (list): A list with all the possible combinations of all lengths.
+        list: A list with all the possible combinations of all lengths.
 
     >>> print(generate_combinations([1, 2, 3]))
     [(1,), (1, 2), (1, 2, 3), (1, 3), (2,), (2, 3), (3,)]
@@ -92,7 +92,7 @@ def unique_edge_combinations(edges, permutations):
         permutations (list): The permutation generating equivalent diagrams.
 
     Returns:
-        (list): The list of edges producing unique anomalous diagrams.
+        list: The list of edges producing unique anomalous diagrams.
 
     >>> edges = [(1, 3), (2, 3)]
     >>> permutations = [{1: 1, 2: 2}, {1: 2, 2: 1}]
@@ -138,7 +138,7 @@ def unique_vertex_combinations(vertices, permutations):
         permutations (list): The permutations that generate equivalent diags.
 
     Returns:
-        (list): Vertex combinations that do not produce equivalent diags.
+        list: Vertex combinations that do not produce equivalent diags.
 
     >>> vertices = [1, 3]
     >>> permutations = [{1: 1, 3: 3}, {1: 3, 3: 1}]
@@ -175,7 +175,7 @@ def equiv_generating_permutations(graph):
         graph (Networkx MultiDiGraph): The graph to be checked.
 
     Returns:
-        (list): The mappings giving equivalent graphs, inc. identity.
+        list: The mappings giving equivalent graphs, inc. identity.
 
     """
     op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
@@ -302,7 +302,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return the integral part of the Feynman expression of the diag.
 
         Returns:
-            (str): The integral part of its Feynman expression.
+            str: The integral part of its Feynman expression.
 
         """
         pert_vertex_indices = list(range(1, len(self.graph)))
@@ -343,7 +343,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
             vertex (int): The vertex of interest in the graph.
 
         Returns:
-            (str): The LaTeX expression associated to the vertex.
+            str: The LaTeX expression associated to the vertex.
 
         """
         expression = r"\epsilon^{" \
@@ -372,7 +372,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         Wrapper allowing for easy refactoring of expression code.
 
         Returns:
-            (boolean): The presence of a sign factor.
+            bool: The presence of a sign factor.
 
         """
         # Use exclusive or for the sign factor
@@ -382,7 +382,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return the numerator associated to a PBMBPT graph.
 
         Returns:
-            (str): The numerator of the graph.
+            str: The numerator of the graph.
 
         """
         graph = self.graph
@@ -444,7 +444,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return the overall symmetry factor of the diagram.
 
         Returns:
-            (str): The combination of all symmetry factors.
+            str: The combination of all symmetry factors.
 
         """
         sym_factor = ""
@@ -463,7 +463,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return the symmetry factor associated with propagators multiplicity.
 
         Returns:
-            (str): The symmetry factor associated with equivalent lines.
+            str: The symmetry factor associated with equivalent lines.
 
         """
         factor = ""
@@ -497,7 +497,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return the factor associated with anomalous self-contractions.
 
         Returns:
-            (int): The anomalous self-contractions factor.
+            int: The anomalous self-contractions factor.
 
         """
         nb_self_contractions = len(list(nx.selfloop_edges(self.graph)))
@@ -507,7 +507,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return the permutations generating equivalent diagrams.
 
         Returns:
-            (list): Vertices permutations as dictionnaries.
+            list: Vertices permutations as dictionnaries.
 
         """
         op_nm = nx.algorithms.isomorphism.categorical_node_match('operator',
@@ -547,7 +547,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         extraction.
 
         Returns:
-            (bool): The presence of the sign factor.
+            bool: The presence of the sign factor.
 
         """
         counter = 0
@@ -570,7 +570,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         """Return True if the diagram has anomalous propagators.
 
         Returns:
-            (bool): The presence of anomalous propagators.
+            bool: The presence of anomalous propagators.
 
         """
         for prop in self.graph.edges(keys=True, data='anomalous'):
@@ -602,7 +602,7 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         requires a deep copy.
 
         Returns:
-            (NetworkX MultiDiGraph): The graph with doubled anomalous props.
+            NetworkX MultiDiGraph: The graph with doubled anomalous props.
 
         """
         if self._check_graph is None:

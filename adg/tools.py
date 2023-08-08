@@ -12,7 +12,7 @@ def reversed_enumerate(data):
         data (iterable data structure): The data to be used..
 
     Returns:
-        (tuple): Index and item.
+        tuple: Index and item.
 
     >>> list(reversed_enumerate(['A', 'B', 'C']))
     [(2, 'C'), (1, 'B'), (0, 'A')]
@@ -36,7 +36,7 @@ class UniqueID(object):
         """Iterate on counter value and return current value.
 
         Returns:
-            (int): A unique identifier for the diagram.
+            int: A unique identifier for the diagram.
 
         """
         self.current += 1

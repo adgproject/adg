@@ -23,7 +23,7 @@ def parse_command_line(cli_args):
         cli_args: Command-line arguments submitted with the program.
 
     Returns:
-        (Namespace): Appropriate commands to manage the program's run.
+        Namespace: Appropriate commands to manage the program's run.
 
     """
     parser = argparse.ArgumentParser(
@@ -139,7 +139,7 @@ def interactive_interface(commands):
         commands (Namespace): Flags for the run management.
 
     Returns:
-        (Namespace): Flags initialized through keyboard input.
+        Namespace: Flags initialized through keyboard input.
 
     """
     theories = ["BMBPT", "MBPT", "PBMBPT", "BIMSRG"]
@@ -207,7 +207,7 @@ def get_bimsrg_truncation_order(operator):
         operator (str): The letter corresponding to the operator name.py
 
     Returns:
-        order (int): The truncation rank of the operator.
+        int: The truncation rank of the operator.
     """
     try:
         order = int(input('Order of the %s operator? [1-9]\n' % operator))
@@ -227,7 +227,7 @@ def attribute_directory(commands):
         commands (Namespace): Flags for the run management.
 
     Returns:
-        (str): Path to the result folder.
+        str: Path to the result folder.
 
     >>> com = argparse.Namespace()
     >>>
@@ -281,7 +281,7 @@ def generate_diagrams(commands, id_generator):
         id_generator (UniqueID): A unique ID number generator.
 
     Returns:
-        (list): All the diagrams of the appropriate Class and order.
+        list: All the diagrams of the appropriate Class and order.
 
     """
     if commands.theory == "MBPT":
@@ -345,7 +345,7 @@ def order_diagrams(diagrams, commands):
         commands (Namespace): Flags for the run management.
 
     Returns:
-        (tuple): First element is the list of ordered and unique diagrams.
+        tuple: First element is the list of ordered and unique diagrams.
         Second element is a dict with the number of diagrams per type. Third
         element is a dict with the identifiers of diagrams starting each output
         file section.

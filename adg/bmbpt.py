@@ -23,7 +23,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         canonical (bool): ``True`` if one draws only canonical diagrams.
 
     Returns:
-        (list): NumPy arrays encoding the adjacency matrices of the graphs.
+        list: NumPy arrays encoding the adjacency matrices of the graphs.
 
     >>> diags = diagrams_generation(1, False, 2, False)
     >>> len(diags)
@@ -114,7 +114,7 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
         max_vertex (int): The maximum vertex which has been filled.
 
     Returns:
-        (list): The ordered topologically unique matrices.
+        list: The ordered topologically unique matrices.
 
     """
     matrices_dict = {}
@@ -143,7 +143,7 @@ def check_topologically_equivalent(matrices, max_vertex):
         max_vertex (int): The maximum vertex which have been filled.
 
     Returns:
-        (list): The topologically unique matrices.
+        list: The topologically unique matrices.
 
     >>> import numpy
     >>> mats = [numpy.array([[0, 2, 0, 0], [2, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]), \
@@ -280,7 +280,7 @@ def order_diagrams(diagrams):
         diagrams (list): Possibly redundant BmbptFeynmanDiagrams.
 
     Returns:
-        (tuple): First element is the list of topologically unique, ordered
+        tuple: First element is the list of topologically unique, ordered
             diagrams. Second element is a dict with the number of diagrams
             for each major type. Third element is a dict with the identifiers
             of diagrams starting each output file section.
@@ -433,7 +433,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         Wrapper allowing for easy refactoring of expression code.
 
         Returns:
-            (boolean): The presence of a sign factor.
+            bool: The presence of a sign factor.
 
         """
         # Use exclusive or for the sign factor
@@ -443,7 +443,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the overall symmetry factor of the diagram.
 
         Returns:
-            (str): The combination of all symmetry factors.
+            str: The combination of all symmetry factors.
         """
         sym_factor = ""
         for vertex_degrees in self.unsort_io_degrees:
@@ -461,7 +461,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             vertex (int): The vertex of interest in the graph.
 
         Returns:
-            (str): The LaTeX expression associated to the vertex.
+            str: The LaTeX expression associated to the vertex.
 
         """
         expression = r"\epsilon^{" \
@@ -587,7 +587,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the symmetry factor associated with vertex exchange.
 
         Returns:
-            (int): The symmetry factor for vertex exchange.
+            int: The symmetry factor for vertex exchange.
 
         """
         if self._vert_exchange_sym_fact is None:
@@ -599,7 +599,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the permutations generating equivalent diagrams.
 
         Returns:
-            (list): Vertices permutations as dictionnaries.
+            list: Vertices permutations as dictionnaries.
 
         """
         perm_vertices = [vertex for vertex, degrees
@@ -628,7 +628,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the integral part of the Feynman expression of the diag.
 
         Returns:
-            (str): The integral part of its Feynman expression.
+            str: The integral part of its Feynman expression.
 
         """
         pert_vertex_indices = list(range(1, len(self.graph)))
@@ -654,7 +654,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the numerator associated to a BMBPT graph.
 
         Returns:
-            (str): The numerator of the graph.
+            str: The numerator of the graph.
 
         """
         graph = self.graph
@@ -686,7 +686,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         canonical representation of the diagrams and vertices.
 
         Returns:
-            (bool): Encode for the sign factor associated with crossing
+            bool: Encode for the sign factor associated with crossing
                 propagators.
 
         """
@@ -703,7 +703,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the symmetry factor associated with propagators multiplicity.
 
         Returns:
-            (str): The symmetry factor associated with equivalent lines.
+            str: The symmetry factor associated with equivalent lines.
 
         """
         factor = ""
@@ -730,7 +730,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 graph.
 
         Returns:
-            (str): The denominator of the graph.
+            str: The denominator of the graph.
 
         """
         denominator = ""
