@@ -27,4 +27,3 @@ python:
 # Allow downloads in PDF and epub formats
 formats:
   - pdf
-  - epub
