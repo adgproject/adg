@@ -35,5 +35,10 @@ and Bogoliubov In-Medium Similarity Renormalization Group (BIMSRG).
 
 Future developments
 -------------------
-ADG is currently being extended to diagrams and expressions generation for
-Gorkov Self-Consistent Green's Functions (GSCGF).
+ADG is currently being extended to other many-body methods.
+
+Deprecation warning
+-------------------
+In the upcoming major version of ADG, we will be discontinuing support for 
+Python versions prior to 3.7. Please consider moving to newer versions of 
+the language.
