@@ -30,14 +30,14 @@ Finally, to obtain more information on all the available flags, use
 CLI options
 -----------
 
-Generic options:
+Generic options
 *****************
 
 -o, --order         order of the diagrams [1-9] or N_A, N_B, N_C truncation for BIMSRG
 -t, --theory        theory of interest: MBPT, BMBPT or PBMBPT
 -i, --interactive   execute ADG in interactive mode
 
-(P)BMBPT options:
+(P)BMBPT options
 *****************
 
 -can, --canonical           consider only canonical diagrams
@@ -45,12 +45,12 @@ Generic options:
 -3NF, --with_3NF            use two and three-body forces for BMBPT diagrams
 -dt, --draw_tsds            draw Time-Structure Diagrams
 
-MBPT option:
+MBPT option
 ************
 
 -cd, --cd_output  produce computer-readable output for automated frameworks
 
-Run management options:
+Run management options
 ***********************
 
 -d, --draw_diags  draw the diagrams using FeynMF
