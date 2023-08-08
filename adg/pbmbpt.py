@@ -260,27 +260,7 @@ def filter_new_diagrams(new_diags, old_diags):
 
 
 class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
-    """Describes a PBMBPT diagram with its related properties.
-
-    Attributes:
-        two_or_three_body (int): The 2 or 3-body characted of the vertices.
-        time_tag (int): The tag number associated to the diagram's
-            associated TSD.
-        tsd_is_tree (bool): The tree or non-tree character of the
-            associated TSD.
-        feynman_exp (str): The Feynman expression associated to the diagram.
-        diag_exp (str): The Goldstone expression associated to the diagram.
-        vert_exp (list): The expression associated to the vertices.
-        hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
-            the energy operator only character of the graph.
-        unique_id (int): A unique number associated to the diagram.
-        vertex_exchange_sym_factor (int): Lazy-initialized symmetry factor
-            associated to the vertex exchange, stored to avoid being computed
-            several times.
-        check_graph (NetworkX MultiDiGraph): A copy of the graph that can be
-            used for topological equivalence checks (lazy-initialized).
-
-    """
+    """Describes a PBMBPT diagram with its related properties."""
 
     __slots__ = ('_check_graph',)
 
@@ -294,6 +274,9 @@ class ProjectedBmbptDiagram(adg.bmbpt.BmbptFeynmanDiagram):
         adg.bmbpt.BmbptFeynmanDiagram.__init__(self, graph, unique_id)
         self.tags = [tag, child_tag]
         self.set_io_degrees()
+        self._check_graph = None
+        """NetworkX MultiDiGraph: A copy of the graph that can be used for
+        topological equivalence checks (lazy-initialized)."""
 
     def set_io_degrees(self):
         """Attribute the correct in- and out-degrees to a PBMBPT diagram."""

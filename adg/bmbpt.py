@@ -343,25 +343,7 @@ def order_diagrams(diagrams):
 
 
 class BmbptFeynmanDiagram(adg.diag.Diagram):
-    """Describes a BMBPT Feynman diagram with its related properties.
-
-    Attributes:
-        two_or_three_body (int): The 2 or 3-body characted of the vertices.
-        time_tag (int): The tag number associated to the diagram's
-            associated TSD.
-        tsd_is_tree (bool): The tree or non-tree character of the
-            associated TSD.
-        feynman_exp (str): The Feynman expression associated to the diagram.
-        diag_exp (str): The Goldstone expression associated to the diagram.
-        vert_exp (list): The expression associated to the vertices.
-        hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
-            the energy operator only character of the graph.
-        unique_id (int): A unique number associated to the diagram.
-        vertex_exchange_sym_factor (int): Lazy-initialized symmetry factor
-            associated to the vertex exchange, stored to avoid being computed
-            several times.
-
-    """
+    """Describes a BMBPT Feynman diagram with its related properties."""
 
     __slots__ = ('two_or_three_body', 'time_tag', 'tsd_is_tree', 'feynman_exp',
                  'diag_exp', 'vert_exp', 'hf_type', 'unique_id',
@@ -377,12 +359,21 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """
         adg.diag.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
+        """int: The 2 or 3-body characted of the vertices."""
         self.tags = [tag_num]
         self.time_tag = -1
+        """int: The tag number associated to the diagram's associated TSD."""
         self.tsd_is_tree = False
+        """bool: The tree or non-tree character of the associated TSD."""
         self.feynman_exp = ""
+        """str: The Feynman expression associated to the diagram."""
         self.diag_exp = ""
+        """str: The Goldstone expression associated to the diagram."""
         self.vert_exp = []
+        """list: The expression associated to the vertices."""
+        self.hf_type = ''
+        """str: The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
+        the energy operator only character of the graph."""
         if 2 not in self.degrees:
             self.hf_type = "HF"
         elif 2 not in self.unsort_degrees[1:]:
@@ -390,7 +381,10 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         else:
             self.hf_type = "noHF"
         self.unique_id = tag_num
+        """int: A unique number associated to the diagram."""
         self._vert_exchange_sym_fact = None
+        """int: Lazy-initialized symmetry factor associated to the vertex
+        exchange, stored to avoid being computed several times."""
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.

@@ -564,19 +564,7 @@ def print_adj_matrices(directory, diagrams):
 
 
 class Diagram(object):
-    """Describes a diagram with its related properties.
-
-    Attributes:
-        graph (NetworkX MultiDiGraph): The actual graph.
-        unsorted_degrees (tuple): The degrees of the graph vertices
-        degrees (tuple): The ascendingly sorted degrees of the graph vertices.
-        unsort_io_degrees (tuple): The list of in- and out-degrees for each
-            vertex of the graph, stored in a (in, out) tuple.
-        io_degrees (tuple): The sorted version of unsort_io_degrees.
-        max_degree (int): The maximal degree of a vertex in the graph.
-        tags (list): The tag numbers associated to a diagram.
-
-    """
+    """Describes a diagram with its related properties."""
 
     __slots__ = ('graph', 'unsort_degrees', 'degrees', 'unsort_io_degrees',
                  'io_degrees', 'max_degree', 'tags')
@@ -589,14 +577,22 @@ class Diagram(object):
 
         """
         self.graph = nx_graph
+        """NetworkX MultiDiGraph: The actual graph."""
         self.unsort_degrees = tuple(nx_graph.degree(node) for node in nx_graph)
+        """tuple: The degrees of the graph vertices"""
         self.degrees = tuple(sorted(self.unsort_degrees))
+        """tuple: The ascendingly sorted degrees of the graph vertices."""
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
                                         nx_graph.out_degree(node))
                                        for node in nx_graph)
+        """tuple: The list of in- and out-degrees for each vertex of the graph,
+        stored in a (in, out) tuple."""
         self.io_degrees = tuple(sorted(self.unsort_io_degrees))
+        """tuple: The sorted version of unsort_io_degrees."""
         self.max_degree = self.degrees[-1]
+        """int: The maximal degree of a vertex in the graph."""
         self.tags = [0]
+        """list: The tag numbers associated to a diagram."""
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the graph of the diagram to the LaTeX file.

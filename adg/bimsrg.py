@@ -229,17 +229,7 @@ def permutator(set_1, set_2):
 
 
 class BimsrgDiagram(adg.diag.Diagram):
-    """Describes a B-IMSRG Feynman diagram with its related properties.
-
-    Attributes:
-        adjacency_mat (Numpy array): The adjacency matrix of the diagram.
-        unique_id (int): A unique number associated to the diagram.
-        expr (str): The B-IMSRG expression associated to the diagram.
-        ext_io_degree (tuple): The degree of the operator component the diagram
-            corresponds to.
-        is_AB (bool): True if the diagram contributes to +AB, false if to -BA.
-
-    """
+    """Describes a B-IMSRG Feynman diagram with its related properties."""
 
     __slots__ = ('adjacency_mat', 'unique_id', 'ext_io_degree',
                  '_vert_exchange_sym_fact', 'expr', 'is_AB')
@@ -255,13 +245,20 @@ class BimsrgDiagram(adg.diag.Diagram):
         adg.diag.Diagram.__init__(self, nx_graph)
         self.tags = [tag_num]
         self.unique_id = tag_num
+        """int: A unique number associated to the diagram."""
         self.adjacency_mat = nx.to_numpy_array(self.graph, dtype=int)
+        """Numpy array: The adjacency matrix of the diagram."""
         self.expr = self.attribute_expression()
+        """str: The B-IMSRG expression associated to the diagram."""
         self.max_degree = max(self.unsort_degrees[0] + self.unsort_degrees[3],
                               self.unsort_degrees[1],
                               self.unsort_degrees[2])
+        """int: Maximal degree over vertices or external lines (A, B, C)."""
         self.ext_io_degree = (self.unsort_degrees[0], self.unsort_degrees[3])
+        """tuple: The degree of the operator component the diagram
+        corresponds to."""
         self.is_AB = True if self.graph.nodes[2]['operator'] == 'A' else False
+        """bool: True if the diagram contributes to +AB, false if to -BA."""
 
     def attribute_expression(self):
         """Returns the LaTeX expression of the diagram.

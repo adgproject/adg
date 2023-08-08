@@ -222,18 +222,7 @@ def treat_tsds(diagrams_time):
 
 
 class TimeStructureDiagram(adg.diag.Diagram):
-    """Describes a time-structure diagram with its related properties.
-
-    Attributes:
-        perms (dict): The permutations on the vertices for all the BMBPT
-            diagrams associated to this TSD.
-        equivalent_trees (list): The tag numbers of the equivalent tree TSDs
-            associated to a non-tree TSD.
-        is_tree (bool): The tree or non-tree character of a TSD.
-        expr (str): The Goldstone denominator associated to the TSD.
-        resum (int): The resummation power of a tree TSD.
-
-    """
+    """Describes a time-structure diagram with its related properties."""
 
     __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
 
@@ -249,15 +238,21 @@ class TimeStructureDiagram(adg.diag.Diagram):
         self.tags = [bmbpt_diag.unique_id]
         self.perms = {bmbpt_diag.unique_id: {i: i
                                              for i in range(len(self.graph))}}
+        """dict: The permutations on the vertices for all the BMBPT diagrams
+        associated to this TSD."""
         self.equivalent_trees = []
+        """list: The tag numbers of the equivalent tree TSDs associated to a
+        non-tree TSD."""
+        self.is_tree = False
+        """bool: The tree or non-tree character of a TSD."""
+        self.expr = ""
+        """str: The Goldstone denominator associated to the TSD."""
+        self.resum = 0
+        """int: The resummation power of a tree TSD."""
         if nx.is_arborescence(self.graph):
             self.is_tree = True
             self.expr = "\\frac{1}{%s}" % tree_time_structure_den(self.graph)
             self.resum = self.resummation_power()
-        else:
-            self.is_tree = False
-            self.expr = ""
-            self.resum = 0
 
     def treat_cycles(self):
         """Find and treat cycles in a TSD diagram.

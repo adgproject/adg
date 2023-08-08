@@ -218,19 +218,7 @@ def extract_cd_denom(start_graph, subgraph):
 
 
 class MbptDiagram(adg.diag.Diagram):
-    """Describes a MBPT diagram with its related properties.
-
-    Attributes:
-        incidence (NumPy array): The incidence matrix of the graph.
-        excitation_level (int): The single, double, etc., excitation character.
-        complex_conjugate (int): The tag number of the diagram's complex
-            conjugate. -1 is the graph has none.
-        expr (str): The MBPT expression associated to the diagram.
-        cd_expr (str): The expression associated to the diagram in a
-            computer-readable format.
-        adjacency_mat (NumPy array): The adjacency matrix of the graph.
-
-    """
+    """Describes a MBPT diagram with its related properties."""
 
     __slots__ = ('incidence', 'excitation_level', 'complex_conjugate', 'expr',
                  'cd_expr', 'adjacency_mat')
@@ -248,12 +236,22 @@ class MbptDiagram(adg.diag.Diagram):
         # Beware of the sign convention !!!
         self.incidence = - nx.incidence_matrix(self.graph,
                                                oriented=True).todense()
+        """NumPy array: The incidence matrix of the graph."""
         self.attribute_ph_labels()
+        self.expr = ''
+        """str: The MBPT expression associated to the diagram."""
+        self.cd_expr = ''
+        """str: The expression associated to the diagram in a
+        computer-readable format."""
         self.attribute_expression()
         self.excitation_level = self.calc_excitation()
+        """int: The single, double, etc., excitation character."""
         self.complex_conjugate = -1
+        """int: The tag number of the diagram's complex conjugate.
+        -1 if the graph has none."""
         self.loops_number()
         self.adjacency_mat = nx.to_numpy_array(self.graph, dtype=int)
+        """NumPy array: The adjacency matrix of the graph."""
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
