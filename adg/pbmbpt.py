@@ -67,7 +67,7 @@ def generate_anomalous_diags(diag, nbody_max):
 def generate_combinations(iter_list):
     """Generate all possible combinations of length 1 to total.
 
-    Attributes:
+    Args:
         iter_list (list): A list of iterable objects.
 
     Returns:
@@ -87,7 +87,7 @@ def generate_combinations(iter_list):
 def unique_edge_combinations(edges, permutations):
     """Return all edge combinations not producing equivalent anomalous graphs.
 
-    Attributes:
+    Args:
         edges (list): The edges that can be modified.
         permutations (list): The permutation generating equivalent diagrams.
 
@@ -133,7 +133,7 @@ def unique_vertex_combinations(vertices, permutations):
     Return combinations of vertices on which self-contractions can be added
     without producing topologically equivalent PBMBPT diagrams.
 
-    Attributes:
+    Args:
         vertices (list): Vertices that can be self-contracted.
         permutations (list): The permutations that generate equivalent diags.
 
@@ -171,7 +171,7 @@ def unique_vertex_combinations(vertices, permutations):
 def equiv_generating_permutations(graph):
     """Return the list of permutations generating equivalent PBMBPT diags.
 
-    Attributes:
+    Args:
         graph (Networkx MultiDiGraph): The graph to be checked.
 
     Returns:
@@ -220,7 +220,7 @@ def equiv_generating_permutations(graph):
 def filter_new_diagrams(new_diags, old_diags):
     """Eliminate diagrams having a topologically equivalent diag.
 
-    Attibutes:
+    Args:
         new_diags (list): The list of newly created PBMBPT diagrams.
         old_diags (list): The list of already checked PBMBPT diagrams.
 
