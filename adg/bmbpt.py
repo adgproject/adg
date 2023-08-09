@@ -23,7 +23,7 @@ def diagrams_generation(p_order, three_body_use, nbody_obs, canonical):
         canonical (bool): ``True`` if one draws only canonical diagrams.
 
     Returns:
-        (list): NumPy arrays encoding the adjacency matrices of the graphs.
+        list: NumPy arrays encoding the adjacency matrices of the graphs.
 
     >>> diags = diagrams_generation(1, False, 2, False)
     >>> len(diags)
@@ -114,7 +114,7 @@ def order_and_remove_topologically_equiv(matrices, max_vertex):
         max_vertex (int): The maximum vertex which has been filled.
 
     Returns:
-        (list): The ordered topologically unique matrices.
+        list: The ordered topologically unique matrices.
 
     """
     matrices_dict = {}
@@ -143,7 +143,7 @@ def check_topologically_equivalent(matrices, max_vertex):
         max_vertex (int): The maximum vertex which have been filled.
 
     Returns:
-        (list): The topologically unique matrices.
+        list: The topologically unique matrices.
 
     >>> import numpy
     >>> mats = [numpy.array([[0, 2, 0, 0], [2, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]), \
@@ -280,7 +280,7 @@ def order_diagrams(diagrams):
         diagrams (list): Possibly redundant BmbptFeynmanDiagrams.
 
     Returns:
-        (tuple): First element is the list of topologically unique, ordered
+        tuple: First element is the list of topologically unique, ordered
             diagrams. Second element is a dict with the number of diagrams
             for each major type. Third element is a dict with the identifiers
             of diagrams starting each output file section.
@@ -345,21 +345,9 @@ def order_diagrams(diagrams):
 class BmbptFeynmanDiagram(adg.diag.Diagram):
     """Describes a BMBPT Feynman diagram with its related properties.
 
-    Attributes:
-        two_or_three_body (int): The 2 or 3-body characted of the vertices.
-        time_tag (int): The tag number associated to the diagram's
-            associated TSD.
-        tsd_is_tree (bool): The tree or non-tree character of the
-            associated TSD.
-        feynman_exp (str): The Feynman expression associated to the diagram.
-        diag_exp (str): The Goldstone expression associated to the diagram.
-        vert_exp (list): The expression associated to the vertices.
-        hf_type (str): The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
-            the energy operator only character of the graph.
-        unique_id (int): A unique number associated to the diagram.
-        vertex_exchange_sym_factor (int): Lazy-initialized symmetry factor
-            associated to the vertex exchange, stored to avoid being computed
-            several times.
+    Args:
+        nx_graph (NetworkX MultiDiGraph): The graph of interest.
+        tag_num (int): The tag number associated to the diagram.
 
     """
 
@@ -368,21 +356,24 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                  '_vert_exchange_sym_fact')
 
     def __init__(self, nx_graph, tag_num):
-        """Generate a BMBPT diagrams using a NetworkX graph.
-
-        Args:
-            nx_graph (NetworkX MultiDiGraph): The graph of interest.
-            tag_num (int): The tag number associated to the diagram.
-
-        """
+        """Generate a BMBPT diagrams using a NetworkX graph."""
         adg.diag.Diagram.__init__(self, nx_graph)
         self.two_or_three_body = 3 if self.max_degree == 6 else 2
+        """int: The 2 or 3-body characted of the vertices."""
         self.tags = [tag_num]
         self.time_tag = -1
+        """int: The tag number associated to the diagram's associated TSD."""
         self.tsd_is_tree = False
+        """bool: The tree or non-tree character of the associated TSD."""
         self.feynman_exp = ""
+        """str: The Feynman expression associated to the diagram."""
         self.diag_exp = ""
+        """str: The Goldstone expression associated to the diagram."""
         self.vert_exp = []
+        """list: The expression associated to the vertices."""
+        self.hf_type = ''
+        """str: The Hartree-Fock, non-Hartree-Fock or Hartree-Fock for
+        the energy operator only character of the graph."""
         if 2 not in self.degrees:
             self.hf_type = "HF"
         elif 2 not in self.unsort_degrees[1:]:
@@ -390,7 +381,10 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         else:
             self.hf_type = "noHF"
         self.unique_id = tag_num
+        """int: A unique number associated to the diagram."""
         self._vert_exchange_sym_fact = None
+        """int: Lazy-initialized symmetry factor associated to the vertex
+        exchange, stored to avoid being computed several times."""
 
     def attribute_expressions(self, time_diag):
         """Attribute the correct Feynman and Goldstone expressions.
@@ -439,7 +433,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         Wrapper allowing for easy refactoring of expression code.
 
         Returns:
-            (boolean): The presence of a sign factor.
+            bool: The presence of a sign factor.
 
         """
         # Use exclusive or for the sign factor
@@ -449,7 +443,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the overall symmetry factor of the diagram.
 
         Returns:
-            (str): The combination of all symmetry factors.
+            str: The combination of all symmetry factors.
         """
         sym_factor = ""
         for vertex_degrees in self.unsort_io_degrees:
@@ -467,7 +461,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
             vertex (int): The vertex of interest in the graph.
 
         Returns:
-            (str): The LaTeX expression associated to the vertex.
+            str: The LaTeX expression associated to the vertex.
 
         """
         expression = r"\epsilon^{" \
@@ -593,7 +587,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the symmetry factor associated with vertex exchange.
 
         Returns:
-            (int): The symmetry factor for vertex exchange.
+            int: The symmetry factor for vertex exchange.
 
         """
         if self._vert_exchange_sym_fact is None:
@@ -605,7 +599,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the permutations generating equivalent diagrams.
 
         Returns:
-            (list): Vertices permutations as dictionnaries.
+            list: Vertices permutations as dictionnaries.
 
         """
         perm_vertices = [vertex for vertex, degrees
@@ -634,7 +628,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the integral part of the Feynman expression of the diag.
 
         Returns:
-            (str): The integral part of its Feynman expression.
+            str: The integral part of its Feynman expression.
 
         """
         pert_vertex_indices = list(range(1, len(self.graph)))
@@ -660,7 +654,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the numerator associated to a BMBPT graph.
 
         Returns:
-            (str): The numerator of the graph.
+            str: The numerator of the graph.
 
         """
         graph = self.graph
@@ -692,7 +686,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         canonical representation of the diagrams and vertices.
 
         Returns:
-            (bool): Encode for the sign factor associated with crossing
+            bool: Encode for the sign factor associated with crossing
                 propagators.
 
         """
@@ -709,7 +703,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
         """Return the symmetry factor associated with propagators multiplicity.
 
         Returns:
-            (str): The symmetry factor associated with equivalent lines.
+            str: The symmetry factor associated with equivalent lines.
 
         """
         factor = ""
@@ -736,7 +730,7 @@ class BmbptFeynmanDiagram(adg.diag.Diagram):
                 graph.
 
         Returns:
-            (str): The denominator of the graph.
+            str: The denominator of the graph.
 
         """
         denominator = ""

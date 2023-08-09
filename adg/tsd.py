@@ -16,7 +16,7 @@ def time_structure_graph(diag):
         diag (BmbptFeymmanDiagram): The BMBPT graph of interest.
 
     Returns:
-        (NetworkX MultiDiGraph): The time-structure diagram.
+        NetworkX MultiDiGraph: The time-structure diagram.
 
     """
     import adg.pbmbpt
@@ -40,7 +40,7 @@ def tree_time_structure_den(time_graph):
         time_graph (NetworkX MultiDiGraph): The TSD of interest.
 
     Returns:
-        (str): The denominator associated to the TSD.
+        str: The denominator associated to the TSD.
 
     """
     denominator = ""
@@ -69,7 +69,7 @@ def equivalent_labelled_tsds(equivalent_trees, labelled_tsds):
         labelled_tsds (list): The labelled TSDs obtained from BMBPT diagrams.
 
     Returns:
-        (str): The list of tag numbers of the equivalent TSDs.
+        str: The list of tag numbers of the equivalent TSDs.
 
     """
     op_nm = nx.algorithms.isomorphism.categorical_node_match('operator', False)
@@ -139,7 +139,7 @@ def disentangle_cycle(time_graph, cycle_nodes):
             of the cycle.
 
     Returns:
-        (list): New graphs produced from treating the cycles in the TSD.
+        list: New graphs produced from treating the cycles in the TSD.
 
     """
     paths = list(nx.all_simple_paths(time_graph,
@@ -167,7 +167,7 @@ def find_cycle(graph):
         graph (NetworkX MultiDiGraph): A TSD with cycle(s) to be treated.
 
     Returns:
-        (tuple): Positions of the two end nodes of a cycle in the graph.
+        tuple: Positions of the two end nodes of a cycle in the graph.
 
     """
     cycle_found = False
@@ -196,7 +196,7 @@ def treat_tsds(diagrams_time):
         diagrams_time (list): All the associated TSDs.
 
     Returns:
-        (tuple): List of TSDs, number of tree TSDs
+        tuple: List of TSDs, number of tree TSDs
 
     """
     tree_tsds = []
@@ -224,46 +224,41 @@ def treat_tsds(diagrams_time):
 class TimeStructureDiagram(adg.diag.Diagram):
     """Describes a time-structure diagram with its related properties.
 
-    Attributes:
-        perms (dict): The permutations on the vertices for all the BMBPT
-            diagrams associated to this TSD.
-        equivalent_trees (list): The tag numbers of the equivalent tree TSDs
-            associated to a non-tree TSD.
-        is_tree (bool): The tree or non-tree character of a TSD.
-        expr (str): The Goldstone denominator associated to the TSD.
-        resum (int): The resummation power of a tree TSD.
+    Args:
+        bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph to be turned
+            into a TSD.
 
     """
 
     __slots__ = ('perms', 'equivalent_trees', 'is_tree', 'expr', 'resum')
 
     def __init__(self, bmbpt_diag):
-        """Generate a tsd diagram out of a BMBPT one.
-
-        Args:
-            bmbpt_diag (BmbptFeynmanDiagram): The BMBPT graph used to be
-                turned into a TSD.
-
-        """
+        """Generate a tsd diagram out of a BMBPT one."""
         adg.diag.Diagram.__init__(self, time_structure_graph(bmbpt_diag))
         self.tags = [bmbpt_diag.unique_id]
         self.perms = {bmbpt_diag.unique_id: {i: i
                                              for i in range(len(self.graph))}}
+        """dict: The permutations on the vertices for all the BMBPT diagrams
+        associated to this TSD."""
         self.equivalent_trees = []
+        """list: The tag numbers of the equivalent tree TSDs associated to a
+        non-tree TSD."""
+        self.is_tree = False
+        """bool: The tree or non-tree character of a TSD."""
+        self.expr = ""
+        """str: The Goldstone denominator associated to the TSD."""
+        self.resum = 0
+        """int: The resummation power of a tree TSD."""
         if nx.is_arborescence(self.graph):
             self.is_tree = True
             self.expr = "\\frac{1}{%s}" % tree_time_structure_den(self.graph)
             self.resum = self.resummation_power()
-        else:
-            self.is_tree = False
-            self.expr = ""
-            self.resum = 0
 
     def treat_cycles(self):
         """Find and treat cycles in a TSD diagram.
 
         Returns:
-            (list): The unique tree TSDs associated to a non-tree TSD.
+            list: The unique tree TSDs associated to a non-tree TSD.
 
         """
         graphs = [self.graph]
@@ -311,7 +306,7 @@ class TimeStructureDiagram(adg.diag.Diagram):
         """Calculate the resummation power of the tree TSD.
 
         Returns:
-            (int): The resummation power associated to the TSD.abs
+            int: The resummation power associated to the TSD.abs
 
         """
         power = math.factorial(len(self.graph) - 1)
@@ -328,7 +323,7 @@ class TimeStructureDiagram(adg.diag.Diagram):
             feyn_diagrams (list): All produced BmbptFeymmanDiagrams.
 
         Returns:
-            (str): All the identifiers of associated BmbptFeymmanDiagrams.
+            str: All the identifiers of associated BmbptFeymmanDiagrams.
 
         """
         if isinstance(feyn_diagrams[0], adg.pbmbpt.ProjectedBmbptDiagram):

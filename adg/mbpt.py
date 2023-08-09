@@ -20,7 +20,7 @@ def diagrams_generation(order):
         order (int): The perturbative order of interest.
 
     Returns:
-        (list): A list of NumPy arrays with the diagrams adjacency matrices.
+        list: A list of NumPy arrays with the diagrams adjacency matrices.
 
     >>> diagrams_generation(2) # doctest: +NORMALIZE_WHITESPACE
     [array([[0, 2], [2, 0]])]
@@ -115,7 +115,7 @@ def order_diagrams(diagrams):
         diagrams (list): The unordered MbptDiagrams.
 
     Returns:
-        (tuple): First element are the ordered MbptDiagrams. Second element is
+        tuple: First element are the ordered MbptDiagrams. Second element is
         the number of diagrams for each excitation level type.
 
     """
@@ -199,7 +199,7 @@ def extract_cd_denom(start_graph, subgraph):
             factor.
 
     Returns:
-        (str): The denominator factor associated to this subgraph.
+        str: The denominator factor associated to this subgraph.
 
     """
     denomin = "{" \
@@ -220,15 +220,9 @@ def extract_cd_denom(start_graph, subgraph):
 class MbptDiagram(adg.diag.Diagram):
     """Describes a MBPT diagram with its related properties.
 
-    Attributes:
-        incidence (NumPy array): The incidence matrix of the graph.
-        excitation_level (int): The single, double, etc., excitation character.
-        complex_conjugate (int): The tag number of the diagram's complex
-            conjugate. -1 is the graph has none.
-        expr (str): The MBPT expression associated to the diagram.
-        cd_expr (str): The expression associated to the diagram in a
-            computer-readable format.
-        adjacency_mat (NumPy array): The adjacency matrix of the graph.
+    Args:
+        mbpt_graph (NetworkX MultiDiGraph): The actual diagram.
+        tag_num (int): The tag number associated to the graph.
 
     """
 
@@ -236,24 +230,28 @@ class MbptDiagram(adg.diag.Diagram):
                  'cd_expr', 'adjacency_mat')
 
     def __init__(self, mbpt_graph, tag_num):
-        """Generate a MBPT diagram using the appropriate NetworkX graph.
-
-        Args:
-            mbpt_graph (NetworkX MultiDiGraph): The actual diagram.
-            tag_num (int): The tag number associated to the graph.
-
-        """
+        """Generate a MBPT diagram using the appropriate NetworkX graph."""
         adg.diag.Diagram.__init__(self, mbpt_graph)
         self.tags = [tag_num]
         # Beware of the sign convention !!!
         self.incidence = - nx.incidence_matrix(self.graph,
                                                oriented=True).todense()
+        """NumPy array: The incidence matrix of the graph."""
         self.attribute_ph_labels()
+        self.expr = ''
+        """str: The MBPT expression associated to the diagram."""
+        self.cd_expr = ''
+        """str: The expression associated to the diagram in a
+        computer-readable format."""
         self.attribute_expression()
         self.excitation_level = self.calc_excitation()
+        """int: The single, double, etc., excitation character."""
         self.complex_conjugate = -1
+        """int: The tag number of the diagram's complex conjugate.
+        -1 if the graph has none."""
         self.loops_number()
         self.adjacency_mat = nx.to_numpy_array(self.graph, dtype=int)
+        """NumPy array: The adjacency matrix of the graph."""
 
     def attribute_expression(self):
         """Initialize the expression associated to the diagram."""
@@ -275,7 +273,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return an integer coding for the excitation level of the diag.
 
         Returns:
-            (int): The singles / doubles / etc. character of the graph.
+            int: The singles / doubles / etc. character of the graph.
 
         """
         max_excited_states = 0
@@ -292,7 +290,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return an integer for the number of hole lines in the graph.
 
         Returns:
-            (int): The number of holes in the diagram.
+            int: The number of holes in the diagram.
 
         """
         return sum(1 for edge in self.graph.edges() if edge[0] > edge[1])
@@ -304,7 +302,7 @@ class MbptDiagram(adg.diag.Diagram):
             test_diagram (MbptDiagram): A diagram to compare with.
 
         Return:
-            (bool): The complex conjugate status of the pair of diagrams.
+            bool: The complex conjugate status of the pair of diagrams.
 
         """
         # Check the adjacency mat against the anti-transposed one of test_diag
@@ -327,7 +325,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return the denominator for a MBPT graph.
 
         Returns:
-            (str): The denominator of the diagram.
+            str: The denominator of the diagram.
 
         """
         denominator = ""
@@ -343,7 +341,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return the computer-readable denominator of the graph.
 
         Return:
-            (str): The graph denominator tailored for automated frameworks.
+            str: The graph denominator tailored for automated frameworks.
 
         """
         denominator = ""
@@ -359,7 +357,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return the numerator associated to a MBPT graph.
 
         Returns:
-            (str): The numerator of the diagram.
+            str: The numerator of the diagram.
 
         """
         graph = self.graph
@@ -380,7 +378,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return the computer-readable numerator.
 
         Returns:
-            (str): The graph numerator tailored for automated frameworks.
+            str: The graph numerator tailored for automated frameworks.
 
         """
         graph = self.graph
@@ -404,7 +402,7 @@ class MbptDiagram(adg.diag.Diagram):
         """Return the number of loops in the diagram as an integer.
 
         Returns:
-            (int): The number of loops in the graph.
+            int: The number of loops in the graph.
 
         """
         nb_loops = 0

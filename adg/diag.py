@@ -16,7 +16,7 @@ def no_trace(matrices):
         matrices (list): A list of adjacency matrices.
 
     Returns:
-        (list): The adjacency matrices without non-zero diagonal elements.
+        list: The adjacency matrices without non-zero diagonal elements.
 
     >>> test_matrices = [[[0, 1, 2], [2, 0, 1], [5, 2, 0]], \
     [[2, 2, 2], [1, 2, 3], [0, 0, 0]], \
@@ -82,7 +82,7 @@ def topologically_distinct_diagrams(diagrams):
         diagrams (list): The Diagrams of interest.
 
     Returns:
-        (list): Topologically unique diagrams.
+        list: Topologically unique diagrams.
 
     """
     import adg.tsd
@@ -151,7 +151,7 @@ def create_checkable_diagram(pbmbpt_graph):
         pbmbpt_graph (NetworkX MultiDiGraph): The graph to be copied.
 
     Returns:
-        (NetworkX MultiDiGraph): Graph with double the anomalous props.
+        NetworkX MultiDiGraph: Graph with double the anomalous props.
 
     """
     doubled_graph = copy.deepcopy(pbmbpt_graph)
@@ -268,7 +268,7 @@ def prop_directions(vert_distance, nb_props):
         nb_props (int): Number of propagators to be drawn.
 
     Returns:
-        (list): Propagators directions stored as strings.
+        list: Propagators directions stored as strings.
 
     """
     if nb_props < 7:
@@ -304,7 +304,7 @@ def propagator_style(prop_type):
         prop_type (str): The type of propagators used in the diagram.
 
     Returns:
-        (str): The FeynMF definition for the propagator style used.
+        str: The FeynMF definition for the propagator style used.
 
     """
     line_styles = {}
@@ -337,7 +337,7 @@ def vertex_positions(graph, order):
         order (int): The perturbative order of the graph.
 
     Returns:
-        (str): The FeynMP instructions for positioning the vertices.
+        str: The FeynMP instructions for positioning the vertices.
 
     """
     positions = "\\fmftop{v%i}\\fmfbottom{v0}\n" % (order-1)
@@ -359,7 +359,7 @@ def self_contractions(graph):
         graph (NetworkX MultiDiGraph): The graph being drawn.
 
     Returns:
-        (str): FeynMF instructions for drawing the self-contractions.
+        str: FeynMF instructions for drawing the self-contractions.
 
     """
     instructions = ""
@@ -485,7 +485,7 @@ def to_skeleton(graph):
         graph (NetworkX MultiDiGraph): The graph to be turned into a skeleton.
 
     Returns:
-        (NetworkX MultiDiGraph): The skeleton of the initial graph.
+        NetworkX MultiDiGraph: The skeleton of the initial graph.
 
     """
     for vertex_a in graph:
@@ -507,7 +507,7 @@ def extract_denom(start_graph, subgraph):
             denominator factor.
 
     Returns:
-        (str): The denominator factor for this subgraph.
+        str: The denominator factor for this subgraph.
 
     """
     denomin = r"\epsilon^{" \
@@ -566,15 +566,8 @@ def print_adj_matrices(directory, diagrams):
 class Diagram(object):
     """Describes a diagram with its related properties.
 
-    Attributes:
-        graph (NetworkX MultiDiGraph): The actual graph.
-        unsorted_degrees (tuple): The degrees of the graph vertices
-        degrees (tuple): The ascendingly sorted degrees of the graph vertices.
-        unsort_io_degrees (tuple): The list of in- and out-degrees for each
-            vertex of the graph, stored in a (in, out) tuple.
-        io_degrees (tuple): The sorted version of unsort_io_degrees.
-        max_degree (int): The maximal degree of a vertex in the graph.
-        tags (list): The tag numbers associated to a diagram.
+    Args:
+        nx_graph (NetworkX MultiDiGraph): The graph of interest.
 
     """
 
@@ -582,21 +575,24 @@ class Diagram(object):
                  'io_degrees', 'max_degree', 'tags')
 
     def __init__(self, nx_graph):
-        """Generate a Diagram object starting from the NetworkX graph.
-
-        Args:
-            nx_graph (NetworkX MultiDiGraph): The graph of interest.
-
-        """
+        """Generate a Diagram object starting from the NetworkX graph."""
         self.graph = nx_graph
+        """NetworkX MultiDiGraph: The actual graph."""
         self.unsort_degrees = tuple(nx_graph.degree(node) for node in nx_graph)
+        """tuple: The degrees of the graph vertices"""
         self.degrees = tuple(sorted(self.unsort_degrees))
+        """tuple: The ascendingly sorted degrees of the graph vertices."""
         self.unsort_io_degrees = tuple((nx_graph.in_degree(node),
                                         nx_graph.out_degree(node))
                                        for node in nx_graph)
+        """tuple: The list of in- and out-degrees for each vertex of the graph,
+        stored in a (in, out) tuple."""
         self.io_degrees = tuple(sorted(self.unsort_io_degrees))
+        """tuple: The sorted version of unsort_io_degrees."""
         self.max_degree = self.degrees[-1]
+        """int: The maximal degree of a vertex in the graph."""
         self.tags = [0]
+        """list: The tag numbers associated to a diagram."""
 
     def write_graph(self, latex_file, directory, write_time):
         """Write the graph of the diagram to the LaTeX file.

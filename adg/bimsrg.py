@@ -19,7 +19,7 @@ def two_partitions(number):
         numbr (int): The integer to partition.
 
     Returns:
-        (list): All the 2-partitions as tuples.
+        list: All the 2-partitions as tuples.
 
     >>> two_partitions(3)
     [(0, 3), (1, 2), (2, 1), (3, 0)]
@@ -41,7 +41,7 @@ def diagrams_generation(orders):
         orders (tuple): The B-IMSRG (N_A, N_B, N_C) order of the diagrams.
 
     Returns:
-        (tuple): NumPy arrays encoding the adjacency matrices of the graphs,
+        tuple: NumPy arrays encoding the adjacency matrices of the graphs,
             and number of diagrams with the A vertex on top.
 
     """
@@ -59,7 +59,7 @@ def diagrams_subset(deg_max_top, deg_max_bot, deg_max_ext):
         orders (tuple): The max ranks (2*N_A, 2*N_B, 2*N_C) of the vertices.
 
     Returns:
-        (list): NumPy arrays encoding the adjacency matrices of the graphs.
+        list: NumPy arrays encoding the adjacency matrices of the graphs.
 
     >>> diagrams_subset(2, 2, 0) # doctest: +NORMALIZE_WHITESPACE
     [array([[0, 0, 0, 0],
@@ -112,7 +112,7 @@ def order_diagrams(diagrams, order):
         order (int): The order of the B-IMSRG truncation.
 
     Returns:
-        (tuple): First element are the ordered BimsrgDiagrams. Second element
+        tuple: First element are the ordered BimsrgDiagrams. Second element
         is the number of diagrams for each type. Third element is flags for the
         output processing.
 
@@ -198,7 +198,7 @@ def permutator(set_1, set_2):
         set_2 (list): The list of the right-hand-side qp labels.
 
     Returns:
-        (str): The LaTeX expression for the permutation operator.
+        str: The LaTeX expression for the permutation operator.
 
     >>> print(permutator([1, 2], [3])) # doctest: +NORMALIZE_WHITESPACE
     P(k_{1}k_{2}/k_{3}) &= 1 - P_{k_{1} k_{3}} - P_{k_{2} k_{3}} \\\\\n
@@ -231,13 +231,9 @@ def permutator(set_1, set_2):
 class BimsrgDiagram(adg.diag.Diagram):
     """Describes a B-IMSRG Feynman diagram with its related properties.
 
-    Attributes:
-        adjacency_mat (Numpy array): The adjacency matrix of the diagram.
-        unique_id (int): A unique number associated to the diagram.
-        expr (str): The B-IMSRG expression associated to the diagram.
-        ext_io_degree (tuple): The degree of the operator component the diagram
-            corresponds to.
-        is_AB (bool): True if the diagram contributes to +AB, false if to -BA.
+    Args:
+        nx_graph (NetworkX MultiDiGraph): The graph of interest.
+        tag_num (int): The tag number associated to the diagram.
 
     """
 
@@ -245,23 +241,24 @@ class BimsrgDiagram(adg.diag.Diagram):
                  '_vert_exchange_sym_fact', 'expr', 'is_AB')
 
     def __init__(self, nx_graph, tag_num):
-        """Generate a BMBPT diagrams using a NetworkX graph.
-
-        Args:
-            nx_graph (NetworkX MultiDiGraph): The graph of interest.
-            tag_num (int): The tag number associated to the diagram.
-
-        """
+        """Generate a BMBPT diagrams using a NetworkX graph."""
         adg.diag.Diagram.__init__(self, nx_graph)
         self.tags = [tag_num]
         self.unique_id = tag_num
+        """int: A unique number associated to the diagram."""
         self.adjacency_mat = nx.to_numpy_array(self.graph, dtype=int)
+        """Numpy array: The adjacency matrix of the diagram."""
         self.expr = self.attribute_expression()
+        """str: The B-IMSRG expression associated to the diagram."""
         self.max_degree = max(self.unsort_degrees[0] + self.unsort_degrees[3],
                               self.unsort_degrees[1],
                               self.unsort_degrees[2])
+        """int: Maximal degree over vertices or external lines (A, B, C)."""
         self.ext_io_degree = (self.unsort_degrees[0], self.unsort_degrees[3])
+        """tuple: The degree of the operator component the diagram
+        corresponds to."""
         self.is_AB = True if self.graph.nodes[2]['operator'] == 'A' else False
+        """bool: True if the diagram contributes to +AB, false if to -BA."""
 
     def attribute_expression(self):
         """Returns the LaTeX expression of the diagram.
@@ -274,7 +271,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         additionally prevents any line crossing from appearing.
 
         Returns:
-            (str): The LaTeX expression for the diagram.
+            str: The LaTeX expression for the diagram.
 
         """
         A_degrees = self.unsort_io_degrees[1] \
@@ -300,7 +297,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         commutator.
 
         Returns:
-            (str): The sign of the diagram.
+            str: The sign of the diagram.
 
         """
         return '- ' if self.graph.nodes[2]['operator'] == 'B' else ''
@@ -312,7 +309,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         representation of the C operator vertex.
 
         Returns:
-            (str): The permutator associated to the diagram in LaTeX format.
+            str: The permutator associated to the diagram in LaTeX format.
 
         """
         # Number of external lines tied to each vertex
@@ -345,7 +342,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         """Returns the symmetry factor of the diagram in LaTeX format.
 
         Returns:
-            (str): The LaTeX-formatted symmetry factor.
+            str: The LaTeX-formatted symmetry factor.
 
         """
         # Count the number of internal lines
@@ -362,7 +359,7 @@ class BimsrgDiagram(adg.diag.Diagram):
         tied to departing from the canonical representation.
 
         Returns:
-            (str): The LaTeX-formatted expression for the vertices.
+            str: The LaTeX-formatted expression for the vertices.
         """
         internal_lines = "".join("p_{%i}" % label for label
                                  in range(1, self.adjacency_mat[1, 2] + 1))
