@@ -6,6 +6,7 @@
 [![Python version](https://img.shields.io/pypi/pyversions/adg)](https://pypi.org/project/adg/)
 
 ## Description
+
 ADG is a tool generating diagrams and producing their expressions for given
 many-body formalisms. Diagrammatic rules from the formalism are combined with
 graph theory objects to produce diagrams and expressions in a fast, simple and
@@ -18,87 +19,111 @@ informations that can be compiled by ADG if needed. Other computer-readable
 files may be produced as well.
 
 ## Status
+
 As for now, the code is capable of handling four different formalisms, i.e.
 Many-Body Perturbation Theory (MBPT), Bogoliubov Many-Body Perturbation
 Theory (BMBPT), Projected Bogoliubov Many-Body Perturbation Theory (PBMBPT)
 and Bogoliubov In-Medium Similarity Renormalization Group (BIMSRG).
-  - For MBPT, the code generates all Hartree-Fock energy diagrams at any given
-    order along with their expression and additional information
-    (conjugate diagram, excitation level...).
-  - For (P)BMBPT, the code generates all diagrams for a generic observable
-    commuting with the Hamiltonian, along with their time-dependent and
-    time-integrated expressions.
-  - For BIMSRG, the code generates all diagrams and expressions at any given
-    truncation order for the two operators as well as the commutator itself.
-    The traditional BIMSRG(n) truncation order corresponds to truncating both
-    operators as well as the commutator at the same rank.
+
+- For MBPT, the code generates all Hartree-Fock energy diagrams at any given
+  order along with their expression and additional information
+  (conjugate diagram, excitation level...).
+- For (P)BMBPT, the code generates all diagrams for a generic observable
+  commuting with the Hamiltonian, along with their time-dependent and
+  time-integrated expressions.
+- For BIMSRG, the code generates all diagrams and expressions at any given
+  truncation order for the two operators as well as the commutator itself.
+  The traditional BIMSRG(n) truncation order corresponds to truncating both
+  operators as well as the commutator at the same rank.
 
 ## Future developments
-ADG is currently being extended to diagrams and expressions generation for
-Gorkov Self-Consistent Green's Functions (GSCGF).
+
+ADG is currently being extended to other many-body methods.
+
+## Deprecation warning
+
+In the upcoming major version of ADG, we will be discontinuing support for
+Python versions prior to 3.7. Please consider moving to newer versions of
+the language.
 
 ## Install
+
 The easiest way to install the latest stable version of ADG is to use
-```
+
+```bash
 pip install adg
 ```
+
 Updating after the release of a new version can be done via
-```
+
+```bash
 pip install --upgrade adg
 ```
 
 To install ADG after downloading the source files, run
-```
+
+```bash
 pip install <project_folder>
 ```
+
 or alternatively
-```
+
+```bash
 python setup.py install
 ```
+
 If you want to install ADG in ```develop``` mode, then run
-```
+
+```bash
 pip install -e <project_folder>
 ```
 
 ## Dependencies
+
 In order to run the code, you will need a Python install >= 2.7.1
-  - Python libraries:
-  	* networkx >= 2.0
-    * numpy
-    * scipy
-    * future
-    * more-itertools
+
+- Python libraries:
+  - networkx >= 2.0
+  - numpy
+  - scipy
+  - future
+  - more-itertools
 
 If you want ADG to compile the LaTeX output file, you will need a Latex install
 with the PDFLaTeX compiler and the feynmp and feynmp-auto packages installed,
 which are standard packages in most recent distributions.
 
-
 ## Use
+
 To run the program and generate BMBPT diagrams at order 4 for example, use
-```
+
+```bash
 adg -o 4 -t BMBPT -d -c
 ```
+
 where the ```-o``` flag is for the order, ```-t``` for the type of theory,
 ```-d``` indicates you want the diagrams to be drawn and ```-c``` that you want
 ADG to compile the LaTeX output.
 
 You can alternatively run the program in interactive mode by typing
-```
+
+```bash
 adg -i
 ```
 
 Finally, to obtain more information on all the available flags, use
-```
+
+```bash
 adg -h
 ```
 
 ## Documentation
 
-An extensive on-line documentation is available at https://adg.rtfd.io/.
+An extensive on-line documentation is available at <https://adg.rtfd.io/>.
 Alternatively, the documentation can be generated from entering the ```doc```
 folder and using
-```
+
+```bash
 make html
 ```
 
@@ -130,18 +155,22 @@ available in the sample_output subfolder, then organized in the same way an
 actual calculation output would be stored.
 
 ## Citing
+
 If you use ADG in your research work, we kindly ask you to cite the following
 papers:
-  - P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
-    [Comput. Phys. Commun. **240**, 202-227](https://doi.org/10.1016/j.cpc.2018.11.023) (2019).
-  - P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
-    [Comput. Phys. Commun. **261**, 107677](https://doi.org/10.1016/j.cpc.2020.107677) (2021).
-  - A. Tichai, P. Arthuis, H. Hergert and T. Duguet,
-    [Eur. Phys. J. A **58**, 2](https://doi.org/10.1140/epja/s10050-021-00621-6) (2022).
+
+- P. Arthuis, T. Duguet, A. Tichai, R.-D. Lasseri and J.-P. Ebran,
+  [Comput. Phys. Commun. **240**, 202-227](https://doi.org/10.1016/j.cpc.2018.11.023) (2019).
+- P. Arthuis, A. Tichai, J. Ripoche and T. Duguet,
+  [Comput. Phys. Commun. **261**, 107677](https://doi.org/10.1016/j.cpc.2020.107677) (2021).
+- A. Tichai, P. Arthuis, H. Hergert and T. Duguet,
+  [Eur. Phys. J. A **58**, 2](https://doi.org/10.1140/epja/s10050-021-00621-6) (2022).
 
 ## License
+
 ADG is licensed under GNU General Public License version 3 (see LICENSE.txt).
-```
+
+```text
 Copyright (C) 2018-2023 ADG Dev Team
 Pierre Arthuis - TU Darmstadt & ExtreMe Matter Institute EMMI, GSI, Darmstadt (previously University of Surrey & Irfu, CEA, Université Paris-Saclay & CEA, DAM, DIF)
 Thomas Duguet - Irfu, CEA, UPSaclay & KU Leuven, IKS
